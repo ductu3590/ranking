@@ -5,15 +5,41 @@ import { supabase } from '@/lib/supabaseClient';
 export default function Home() {
     const [stats, setStats] = useState([]);
     const [totalFund, setTotalFund] = useState(0);
+    const [baseFund, setBaseFund] = useState(0);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         fetchData();
     }, []);
 
+    // Hàm tạo avatar dựa trên rank
+    const getAvatar = (index) => {
+        if (index === 0) return '/avatar_rank_1.png';
+        if (index === 1) return '/avatar_rank_2.png';
+        if (index === 2) return '/avatar_rank_3.png';
+        return '/avatar_default.png';
+    };
+
+    // Hàm tạo biệt danh hài hước
+    const getFunnyNickname = (index, name) => {
+        const nicknames = [
+            { title: '👑 VUA NỘP PHẠT', desc: `${name} - "Người dẫn đầu bảng xếp hạng danh dự! Cứ phạm lỗi rồi nộp tiền, chu kỳ hoàn hảo!" 😎` },
+            { title: '🥈 Á VƯƠNG PHẠT NGUỘI', desc: `${name} - "Gần lắm rồi nhưng chưa đủ! Cố lên nữa là lên top 1 nha bạn ơi!" 😏` },
+            { title: '🥉 ĐỒNG HẠNG BA', desc: `${name} - "Ít nhất cũng lọt top 3! Danh dự mà, đừng buồn!" 🤗` },
+            { title: '💀 TÂN BINH MỚI VỀ ĐỘI', desc: `${name} - "Mới toanh! Làm quen với việc nộp phạt đi nhé!" 🔰` },
+            { title: '😅 CAO THỦ PHẠM LỖI', desc: `${name} - "Đã có kinh nghiệm nộp phạt rồi đấy!" 💪` },
+            { title: '🤡 VUA HÀI HƯỚC', desc: `${name} - "Nộp ít nhưng vui là được!" 🎭` },
+            { title: '🐢 CHẬM MÀ CHẮC', desc: `${name} - "Từ từ nộp phạt, đừng vội!" 🚶` },
+            { title: '💸 THẦN TÀI NHỎ', desc: `${name} - "Đóng góp ít nhưng có tâm!" 🙏` },
+            { title: '🎯 XẠ THỦ BỦA', desc: `${name} - "Lỡ tay phạm lỗi thôi mà!" 😬` },
+            { title: '🌟 NGÔI SAO MỚI NỔI', desc: `${name} - "Tài năng trẻ của làng pickleball!" ✨` }
+        ];
+
+        return nicknames[Math.min(index, nicknames.length - 1)];
+    };
+
     async function fetchData() {
         setLoading(true);
-        // Lấy dữ liệu tháng hiện tại
         const now = new Date();
         const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
 
@@ -26,12 +52,22 @@ export default function Home() {
             console.log(error);
             setLoading(false);
         } else {
-            // Tính toán xếp hạng (Group by người nộp)
-            const ranking = {};
-            let total = 0;
+            // Tách riêng tài khoản gốc
+            const baseAccount = data.filter(item => item.nguoi_nop === 'TAI KHOAN GOC');
+            const transactions = data.filter(item => item.nguoi_nop !== 'TAI KHOAN GOC');
 
-            data.forEach(item => {
-                total += item.so_tien;
+            // Tính tài khoản gốc
+            let base = 0;
+            baseAccount.forEach(item => {
+                base += item.so_tien;
+            });
+
+            // Tính toán xếp hạng (Group by người nộp, loại trừ TAI KHOAN GOC)
+            const ranking = {};
+            let penaltyTotal = 0;
+
+            transactions.forEach(item => {
+                penaltyTotal += item.so_tien;
                 if (!ranking[item.nguoi_nop]) ranking[item.nguoi_nop] = 0;
                 ranking[item.nguoi_nop] += item.so_tien;
             });
@@ -42,73 +78,265 @@ export default function Home() {
                 .sort((a, b) => b.amount - a.amount);
 
             setStats(sortedRanking);
-            setTotalFund(total);
+            setBaseFund(base);
+            setTotalFund(base + penaltyTotal); // Tổng = Gốc + Tiền phạt
             setLoading(false);
         }
     }
 
     return (
-        <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', maxWidth: '600px', margin: '0 auto', backgroundColor: '#f9f9f9', minHeight: '100vh' }}>
-            <h1 style={{ textAlign: 'center', color: '#0070f3', marginBottom: '10px' }}>🏓 QUỸ PICKLEBALL</h1>
-            <p style={{ textAlign: 'center', color: '#666', marginBottom: '30px' }}>Tháng {new Date().getMonth() + 1}/{new Date().getFullYear()}</p>
+        <div style={{
+            minHeight: '100vh',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            padding: '20px',
+            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+        }}>
+            <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+                {/* Header */}
+                <div style={{ textAlign: 'center', marginBottom: '30px', color: '#fff' }}>
+                    <h1 style={{
+                        fontSize: '42px',
+                        fontWeight: '800',
+                        margin: '0 0 10px 0',
+                        textShadow: '2px 2px 4px rgba(0,0,0,0.2)'
+                    }}>
+                        🏓 QUỶ PICKLEBALL CLUB
+                    </h1>
+                    <p style={{ fontSize: '18px', opacity: 0.9, margin: 0 }}>
+                        📊 Bảng Xếp Hạng "Danh Dự" Tháng {new Date().getMonth() + 1}/{new Date().getFullYear()}
+                    </p>
+                </div>
 
-            <div style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', padding: '20px', borderRadius: '12px', marginBottom: '30px', textAlign: 'center', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
-                <h3 style={{ color: '#fff', margin: '0 0 10px 0', fontSize: '16px', fontWeight: 'normal' }}>Tổng quỹ hiện tại</h3>
-                <h2 style={{ color: '#fff', margin: 0, fontSize: '36px' }}>{new Intl.NumberFormat('vi-VN').format(totalFund)} đ</h2>
-            </div>
+                {/* Total Fund Card */}
+                <div style={{
+                    background: 'rgba(255, 255, 255, 0.95)',
+                    borderRadius: '20px',
+                    padding: '30px',
+                    marginBottom: '30px',
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+                    backdropFilter: 'blur(10px)'
+                }}>
+                    <div style={{ textAlign: 'center' }}>
+                        <h3 style={{ color: '#667eea', margin: '0 0 15px 0', fontSize: '18px', fontWeight: '600' }}>
+                            💰 TỔNG QUỸ HIỆN TẠI
+                        </h3>
+                        <div style={{ fontSize: '48px', fontWeight: '800', color: '#764ba2', marginBottom: '15px' }}>
+                            {new Intl.NumberFormat('vi-VN').format(totalFund)} đ
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'center', gap: '30px', fontSize: '14px' }}>
+                            <div>
+                                <span style={{ color: '#666' }}>🏦 Tài khoản gốc: </span>
+                                <strong style={{ color: '#0070f3' }}>{new Intl.NumberFormat('vi-VN').format(baseFund)} đ</strong>
+                            </div>
+                            <div>
+                                <span style={{ color: '#666' }}>💸 Tiền phạt: </span>
+                                <strong style={{ color: '#e74c3c' }}>{new Intl.NumberFormat('vi-VN').format(totalFund - baseFund)} đ</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-            {loading ? (
-                <p style={{ textAlign: 'center', color: '#999' }}>Đang tải dữ liệu...</p>
-            ) : (
-                <>
-                    <h3 style={{ marginBottom: '15px', color: '#333' }}>🏆 Bảng Xếp Hạng &quot;Đóng Góp&quot;</h3>
-
-                    {stats.length === 0 ? (
-                        <p style={{ textAlign: 'center', color: '#999', padding: '40px 0' }}>Chưa có dữ liệu đóng góp trong tháng này</p>
-                    ) : (
-                        <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: '#fff', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-                            <thead>
-                                <tr style={{ background: '#333', color: '#fff' }}>
-                                    <th style={{ padding: '12px', fontSize: '14px' }}>Hạng</th>
-                                    <th style={{ padding: '12px', textAlign: 'left', fontSize: '14px' }}>Thành viên</th>
-                                    <th style={{ padding: '12px', textAlign: 'right', fontSize: '14px' }}>Số tiền</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {stats.map((item, index) => (
-                                    <tr key={index} style={{ borderBottom: '1px solid #eee', transition: 'background 0.2s' }}>
-                                        <td style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', color: index === 0 ? '#ffd700' : index === 1 ? '#c0c0c0' : index === 2 ? '#cd7f32' : '#666' }}>
-                                            {index + 1}
-                                        </td>
-                                        <td style={{ padding: '12px', fontWeight: 'bold', color: '#333' }}>{item.name}</td>
-                                        <td style={{ padding: '12px', textAlign: 'right', color: '#0070f3', fontWeight: '600' }}>
-                                            {new Intl.NumberFormat('vi-VN').format(item.amount)} đ
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    )}
-
-                    <button
-                        onClick={fetchData}
-                        style={{
-                            marginTop: '20px',
-                            width: '100%',
-                            padding: '12px',
-                            backgroundColor: '#0070f3',
+                {loading ? (
+                    <div style={{ textAlign: 'center', padding: '60px', color: '#fff', fontSize: '18px' }}>
+                        ⏳ Đang tải bảng xếp hạng...
+                    </div>
+                ) : (
+                    <>
+                        <h2 style={{
                             color: '#fff',
-                            border: 'none',
-                            borderRadius: '8px',
-                            fontSize: '16px',
-                            cursor: 'pointer',
-                            fontWeight: '600'
-                        }}
-                    >
-                        🔄 Làm mới
-                    </button>
-                </>
-            )}
+                            textAlign: 'center',
+                            marginBottom: '25px',
+                            fontSize: '28px',
+                            fontWeight: '700',
+                            textShadow: '2px 2px 4px rgba(0,0,0,0.2)'
+                        }}>
+                            🏆 BẢNG XẾP HẠNG "ĐÓNG GÓP"
+                        </h2>
+
+                        {stats.length === 0 ? (
+                            <div style={{
+                                background: 'rgba(255, 255, 255, 0.9)',
+                                borderRadius: '15px',
+                                padding: '60px',
+                                textAlign: 'center',
+                                color: '#666'
+                            }}>
+                                <div style={{ fontSize: '64px', marginBottom: '20px' }}>🎾</div>
+                                <p style={{ fontSize: '18px', margin: 0 }}>Chưa có ai nộp phạt trong tháng này!</p>
+                                <p style={{ fontSize: '14px', color: '#999', margin: '10px 0 0 0' }}>
+                                    Hãy là người đầu tiên "đóng góp" nha! 😄
+                                </p>
+                            </div>
+                        ) : (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                                {stats.map((item, index) => {
+                                    const nickname = getFunnyNickname(index, item.name);
+                                    const isTopThree = index < 3;
+
+                                    return (
+                                        <div
+                                            key={index}
+                                            style={{
+                                                background: isTopThree
+                                                    ? 'linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.95) 100%)'
+                                                    : 'rgba(255, 255, 255, 0.92)',
+                                                borderRadius: '20px',
+                                                padding: '25px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '20px',
+                                                boxShadow: isTopThree
+                                                    ? '0 8px 24px rgba(0,0,0,0.15)'
+                                                    : '0 4px 12px rgba(0,0,0,0.1)',
+                                                border: isTopThree ? '3px solid ' + (index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : '#CD7F32') : 'none',
+                                                transition: 'transform 0.2s, box-shadow 0.2s',
+                                                cursor: 'pointer',
+                                                position: 'relative',
+                                                overflow: 'hidden'
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                e.currentTarget.style.transform = 'translateY(-5px)';
+                                                e.currentTarget.style.boxShadow = '0 12px 32px rgba(0,0,0,0.2)';
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                e.currentTarget.style.transform = 'translateY(0)';
+                                                e.currentTarget.style.boxShadow = isTopThree
+                                                    ? '0 8px 24px rgba(0,0,0,0.15)'
+                                                    : '0 4px 12px rgba(0,0,0,0.1)';
+                                            }}
+                                        >
+                                            {/* Rank Number */}
+                                            <div style={{
+                                                fontSize: '48px',
+                                                fontWeight: '900',
+                                                width: '80px',
+                                                textAlign: 'center',
+                                                color: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : '#999',
+                                                textShadow: '2px 2px 4px rgba(0,0,0,0.1)'
+                                            }}>
+                                                {index + 1}
+                                            </div>
+
+                                            {/* Avatar */}
+                                            <div style={{
+                                                width: '100px',
+                                                height: '100px',
+                                                borderRadius: '50%',
+                                                overflow: 'hidden',
+                                                border: '4px solid ' + (index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : '#ddd'),
+                                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                                                flexShrink: 0,
+                                                background: '#f0f0f0',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                fontSize: '48px'
+                                            }}>
+                                                {/* Fallback emoji avatar */}
+                                                {index === 0 ? '👑' : index === 1 ? '🥈' : index === 2 ? '🥉' : '😊'}
+                                            </div>
+
+                                            {/* Info */}
+                                            <div style={{ flex: 1 }}>
+                                                <div style={{
+                                                    fontSize: '14px',
+                                                    fontWeight: '700',
+                                                    color: '#667eea',
+                                                    marginBottom: '5px'
+                                                }}>
+                                                    {nickname.title}
+                                                </div>
+                                                <div style={{
+                                                    fontSize: '22px',
+                                                    fontWeight: '700',
+                                                    color: '#333',
+                                                    marginBottom: '8px'
+                                                }}>
+                                                    {item.name}
+                                                </div>
+                                                <div style={{
+                                                    fontSize: '13px',
+                                                    color: '#666',
+                                                    lineHeight: '1.5',
+                                                    fontStyle: 'italic'
+                                                }}>
+                                                    {nickname.desc}
+                                                </div>
+                                            </div>
+
+                                            {/* Amount */}
+                                            <div style={{
+                                                textAlign: 'right',
+                                                paddingRight: '10px'
+                                            }}>
+                                                <div style={{
+                                                    fontSize: '28px',
+                                                    fontWeight: '800',
+                                                    color: index === 0 ? '#e74c3c' : index === 1 ? '#3498db' : index === 2 ? '#f39c12' : '#27ae60',
+                                                    marginBottom: '5px'
+                                                }}>
+                                                    {new Intl.NumberFormat('vi-VN').format(item.amount)} đ
+                                                </div>
+                                                <div style={{
+                                                    fontSize: '12px',
+                                                    color: '#999'
+                                                }}>
+                                                    {((item.amount / (totalFund - baseFund)) * 100).toFixed(1)}% tổng phạt
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+
+                        {/* Refresh Button */}
+                        <button
+                            onClick={fetchData}
+                            style={{
+                                marginTop: '30px',
+                                width: '100%',
+                                padding: '18px',
+                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: '15px',
+                                fontSize: '18px',
+                                fontWeight: '700',
+                                cursor: 'pointer',
+                                boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
+                                transition: 'all 0.3s'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'scale(1.02)';
+                                e.currentTarget.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.6)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'scale(1)';
+                                e.currentTarget.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
+                            }}
+                        >
+                            🔄 Làm mới bảng xếp hạng
+                        </button>
+
+                        {/* Footer */}
+                        <div style={{
+                            textAlign: 'center',
+                            marginTop: '40px',
+                            padding: '20px',
+                            color: 'rgba(255,255,255,0.8)',
+                            fontSize: '14px'
+                        }}>
+                            <p style={{ margin: '0 0 5px 0' }}>
+                                💡 <strong>Mẹo:</strong> Chuyển khoản với nội dung &quot;PKB + TÊN&quot; để hệ thống tự động ghi nhận!
+                            </p>
+                            <p style={{ margin: 0, fontSize: '12px', opacity: 0.7 }}>
+                                Ví dụ: &quot;PKB TUAN&quot; hoặc &quot;PKB HUNG NOP PHAT&quot;
+                            </p>
+                        </div>
+                    </>
+                )}
+            </div>
         </div>
     );
 }

@@ -103,7 +103,7 @@ export default function Home() {
                         🏓 QUỶ PICKLEBALL CLUB
                     </h1>
                     <p style={{ fontSize: '18px', opacity: 0.9, margin: 0 }}>
-                        📊 Bảng Xếp Hạng "Danh Dự" Tháng {new Date().getMonth() + 1}/{new Date().getFullYear()}
+                        📊 Bảng Xếp Hạng &quot;Danh Dự&quot; Tháng {new Date().getMonth() + 1}/{new Date().getFullYear()}
                     </p>
                 </div>
 
@@ -150,7 +150,7 @@ export default function Home() {
                             fontWeight: '700',
                             textShadow: '2px 2px 4px rgba(0,0,0,0.2)'
                         }}>
-                            🏆 BẢNG XẾP HẠNG "ĐÓNG GÓP"
+                            🏆 BẢNG XẾP HẠNG &quot;ĐÓNG GÓP&quot;
                         </h2>
 
                         {stats.length === 0 ? (
@@ -164,7 +164,7 @@ export default function Home() {
                                 <div style={{ fontSize: '64px', marginBottom: '20px' }}>🎾</div>
                                 <p style={{ fontSize: '18px', margin: 0 }}>Chưa có ai nộp phạt trong tháng này!</p>
                                 <p style={{ fontSize: '14px', color: '#999', margin: '10px 0 0 0' }}>
-                                    Hãy là người đầu tiên "đóng góp" nha! 😄
+                                    Hãy là người đầu tiên &quot;đóng góp&quot; nha! 😄
                                 </p>
                             </div>
                         ) : (

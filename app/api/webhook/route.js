@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabaseClient';
+import { supabaseServer } from '@/lib/supabaseServer';
 
 export async function POST(req) {
     try {
         const data = await req.json();
+
+        // Log để debug
+        console.log('Webhook received:', JSON.stringify(data, null, 2));
 
         // 1. Lấy thông tin từ SePay
         const amount = data.transferAmount;
@@ -23,7 +26,9 @@ export async function POST(req) {
             }
 
             // 4. Lưu vào Supabase
-            const { error } = await supabase
+            console.log('Attempting to insert:', { memberName, amount, content, reference });
+
+            const { data: insertedData, error } = await supabaseServer
                 .from('quy_pickleball')
                 .insert({
                     nguoi_nop: memberName,
@@ -35,18 +40,21 @@ export async function POST(req) {
             if (error) {
                 // Nếu lỗi do trùng mã giao dịch (Unique key) thì bỏ qua
                 if (error.code === '23505') {
+                    console.log('Transaction already exists:', reference);
                     return NextResponse.json({ message: 'Transaction exists' }, { status: 200 });
                 }
-                console.error("Supabase Error:", error);
-                return NextResponse.json({ message: 'Error saving' }, { status: 500 });
+                console.error("Supabase Error:", JSON.stringify(error, null, 2));
+                return NextResponse.json({ message: 'Error saving', error: error.message }, { status: 500 });
             }
 
+            console.log('Successfully inserted:', insertedData);
             return NextResponse.json({ message: 'Success', user: memberName }, { status: 200 });
         }
 
         return NextResponse.json({ message: 'Ignored (Not PKB)' }, { status: 200 });
 
     } catch (error) {
-        return NextResponse.json({ message: 'Invalid Request' }, { status: 400 });
+        console.error('Webhook Error:', error);
+        return NextResponse.json({ message: 'Invalid Request', error: error.message }, { status: 400 });
     }
 }

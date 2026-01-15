@@ -61,7 +61,7 @@ export default function Home() {
                 <p style={{ textAlign: 'center', color: '#999' }}>Đang tải dữ liệu...</p>
             ) : (
                 <>
-                    <h3 style={{ marginBottom: '15px', color: '#333' }}>🏆 Bảng Xếp Hạng "Đóng Góp"</h3>
+                    <h3 style={{ marginBottom: '15px', color: '#333' }}>🏆 Bảng Xếp Hạng &quot;Đóng Góp&quot;</h3>
 
                     {stats.length === 0 ? (
                         <p style={{ textAlign: 'center', color: '#999', padding: '40px 0' }}>Chưa có dữ liệu đóng góp trong tháng này</p>

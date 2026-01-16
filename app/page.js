@@ -7,9 +7,20 @@ export default function Home() {
     const [totalFund, setTotalFund] = useState(0);
     const [baseFund, setBaseFund] = useState(0);
     const [loading, setLoading] = useState(true);
+    const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
         fetchData();
+
+        // Detect mobile viewport
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth <= 768);
+        };
+
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+
+        return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
     // Hàm tạo avatar dựa trên rank
@@ -88,42 +99,59 @@ export default function Home() {
         <div style={{
             minHeight: '100vh',
             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            padding: '20px',
+            padding: isMobile ? '12px' : '20px',
             fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
         }}>
             <div style={{ maxWidth: '900px', margin: '0 auto' }}>
                 {/* Header */}
-                <div style={{ textAlign: 'center', marginBottom: '30px', color: '#fff' }}>
+                <div style={{ textAlign: 'center', marginBottom: isMobile ? '20px' : '30px', color: '#fff' }}>
                     <h1 style={{
-                        fontSize: '42px',
+                        fontSize: isMobile ? '28px' : '42px',
                         fontWeight: '800',
                         margin: '0 0 10px 0',
-                        textShadow: '2px 2px 4px rgba(0,0,0,0.2)'
+                        textShadow: '2px 2px 4px rgba(0,0,0,0.2)',
+                        lineHeight: '1.2'
                     }}>
                         🏓 QUỶ PICKLEBALL CLUB
                     </h1>
-                    <p style={{ fontSize: '18px', opacity: 0.9, margin: 0 }}>
-                        📊 Bảng Xếp Hạng &quot;Danh Dự&quot; Tháng {new Date().getMonth() + 1}/{new Date().getFullYear()}
+                    <p style={{ fontSize: isMobile ? '14px' : '18px', opacity: 0.9, margin: 0 }}>
+                        📊 Bảng Xếp Hạng "Danh Dự" Tháng {new Date().getMonth() + 1}/{new Date().getFullYear()}
                     </p>
                 </div>
 
                 {/* Total Fund Card */}
                 <div style={{
                     background: 'rgba(255, 255, 255, 0.95)',
-                    borderRadius: '20px',
-                    padding: '30px',
-                    marginBottom: '30px',
+                    borderRadius: isMobile ? '15px' : '20px',
+                    padding: isMobile ? '20px' : '30px',
+                    marginBottom: isMobile ? '20px' : '30px',
                     boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
                     backdropFilter: 'blur(10px)'
                 }}>
                     <div style={{ textAlign: 'center' }}>
-                        <h3 style={{ color: '#667eea', margin: '0 0 15px 0', fontSize: '18px', fontWeight: '600' }}>
+                        <h3 style={{
+                            color: '#667eea',
+                            margin: '0 0 15px 0',
+                            fontSize: isMobile ? '15px' : '18px',
+                            fontWeight: '600'
+                        }}>
                             💰 TỔNG QUỸ HIỆN TẠI
                         </h3>
-                        <div style={{ fontSize: '48px', fontWeight: '800', color: '#764ba2', marginBottom: '15px' }}>
+                        <div style={{
+                            fontSize: isMobile ? '36px' : '48px',
+                            fontWeight: '800',
+                            color: '#764ba2',
+                            marginBottom: '15px'
+                        }}>
                             {new Intl.NumberFormat('vi-VN').format(totalFund)} đ
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'center', gap: '30px', fontSize: '14px' }}>
+                        <div style={{
+                            display: 'flex',
+                            flexDirection: isMobile ? 'column' : 'row',
+                            justifyContent: 'center',
+                            gap: isMobile ? '8px' : '30px',
+                            fontSize: isMobile ? '13px' : '14px'
+                        }}>
                             <div>
                                 <span style={{ color: '#666' }}>🏦 Tài khoản gốc: </span>
                                 <strong style={{ color: '#0070f3' }}>{new Intl.NumberFormat('vi-VN').format(baseFund)} đ</strong>
@@ -145,30 +173,30 @@ export default function Home() {
                         <h2 style={{
                             color: '#fff',
                             textAlign: 'center',
-                            marginBottom: '25px',
-                            fontSize: '28px',
+                            marginBottom: isMobile ? '15px' : '25px',
+                            fontSize: isMobile ? '22px' : '28px',
                             fontWeight: '700',
                             textShadow: '2px 2px 4px rgba(0,0,0,0.2)'
                         }}>
-                            🏆 BẢNG XẾP HẠNG &quot;ĐÓNG GÓP&quot;
+                            🏆 BẢNG XẾP HẠNG "ĐÓNG GÓP"
                         </h2>
 
                         {stats.length === 0 ? (
                             <div style={{
                                 background: 'rgba(255, 255, 255, 0.9)',
                                 borderRadius: '15px',
-                                padding: '60px',
+                                padding: isMobile ? '40px 20px' : '60px',
                                 textAlign: 'center',
                                 color: '#666'
                             }}>
-                                <div style={{ fontSize: '64px', marginBottom: '20px' }}>🎾</div>
-                                <p style={{ fontSize: '18px', margin: 0 }}>Chưa có ai nộp phạt trong tháng này!</p>
-                                <p style={{ fontSize: '14px', color: '#999', margin: '10px 0 0 0' }}>
-                                    Hãy là người đầu tiên &quot;đóng góp&quot; nha! 😄
+                                <div style={{ fontSize: isMobile ? '48px' : '64px', marginBottom: '20px' }}>🎾</div>
+                                <p style={{ fontSize: isMobile ? '16px' : '18px', margin: 0 }}>Chưa có ai nộp phạt trong tháng này!</p>
+                                <p style={{ fontSize: isMobile ? '13px' : '14px', color: '#999', margin: '10px 0 0 0' }}>
+                                    Hãy là người đầu tiên "đóng góp" nha! 😄
                                 </p>
                             </div>
                         ) : (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '12px' : '20px' }}>
                                 {stats.map((item, index) => {
                                     const nickname = getFunnyNickname(index, item.name);
                                     const isTopThree = index < 3;
@@ -180,11 +208,11 @@ export default function Home() {
                                                 background: isTopThree
                                                     ? 'linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.95) 100%)'
                                                     : 'rgba(255, 255, 255, 0.92)',
-                                                borderRadius: '20px',
-                                                padding: '25px',
+                                                borderRadius: isMobile ? '15px' : '20px',
+                                                padding: isMobile ? '15px' : '25px',
                                                 display: 'flex',
                                                 alignItems: 'center',
-                                                gap: '20px',
+                                                gap: isMobile ? '10px' : '20px',
                                                 boxShadow: isTopThree
                                                     ? '0 8px 24px rgba(0,0,0,0.15)'
                                                     : '0 4px 12px rgba(0,0,0,0.1)',
@@ -195,32 +223,37 @@ export default function Home() {
                                                 overflow: 'hidden'
                                             }}
                                             onMouseEnter={(e) => {
-                                                e.currentTarget.style.transform = 'translateY(-5px)';
-                                                e.currentTarget.style.boxShadow = '0 12px 32px rgba(0,0,0,0.2)';
+                                                if (!isMobile) {
+                                                    e.currentTarget.style.transform = 'translateY(-5px)';
+                                                    e.currentTarget.style.boxShadow = '0 12px 32px rgba(0,0,0,0.2)';
+                                                }
                                             }}
                                             onMouseLeave={(e) => {
-                                                e.currentTarget.style.transform = 'translateY(0)';
-                                                e.currentTarget.style.boxShadow = isTopThree
-                                                    ? '0 8px 24px rgba(0,0,0,0.15)'
-                                                    : '0 4px 12px rgba(0,0,0,0.1)';
+                                                if (!isMobile) {
+                                                    e.currentTarget.style.transform = 'translateY(0)';
+                                                    e.currentTarget.style.boxShadow = isTopThree
+                                                        ? '0 8px 24px rgba(0,0,0,0.15)'
+                                                        : '0 4px 12px rgba(0,0,0,0.1)';
+                                                }
                                             }}
                                         >
                                             {/* Rank Number */}
                                             <div style={{
-                                                fontSize: '48px',
+                                                fontSize: isMobile ? '32px' : '48px',
                                                 fontWeight: '900',
-                                                width: '80px',
+                                                width: isMobile ? '50px' : '80px',
                                                 textAlign: 'center',
                                                 color: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : '#999',
-                                                textShadow: '2px 2px 4px rgba(0,0,0,0.1)'
+                                                textShadow: '2px 2px 4px rgba(0,0,0,0.1)',
+                                                flexShrink: 0
                                             }}>
                                                 {index + 1}
                                             </div>
 
                                             {/* Avatar */}
                                             <div style={{
-                                                width: '100px',
-                                                height: '100px',
+                                                width: isMobile ? '60px' : '100px',
+                                                height: isMobile ? '60px' : '100px',
                                                 borderRadius: '50%',
                                                 overflow: 'hidden',
                                                 border: '4px solid ' + (index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : '#ddd'),
@@ -230,35 +263,39 @@ export default function Home() {
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 justifyContent: 'center',
-                                                fontSize: '48px'
+                                                fontSize: isMobile ? '32px' : '48px'
                                             }}>
                                                 {/* Fallback emoji avatar */}
                                                 {index === 0 ? '👑' : index === 1 ? '🥈' : index === 2 ? '🥉' : '😊'}
                                             </div>
 
                                             {/* Info */}
-                                            <div style={{ flex: 1 }}>
+                                            <div style={{ flex: 1, minWidth: 0 }}>
                                                 <div style={{
-                                                    fontSize: '14px',
+                                                    fontSize: isMobile ? '11px' : '14px',
                                                     fontWeight: '700',
                                                     color: '#667eea',
-                                                    marginBottom: '5px'
+                                                    marginBottom: '4px'
                                                 }}>
                                                     {nickname.title}
                                                 </div>
                                                 <div style={{
-                                                    fontSize: '22px',
+                                                    fontSize: isMobile ? '16px' : '22px',
                                                     fontWeight: '700',
                                                     color: '#333',
-                                                    marginBottom: '8px'
+                                                    marginBottom: isMobile ? '4px' : '8px'
                                                 }}>
                                                     {item.name}
                                                 </div>
                                                 <div style={{
-                                                    fontSize: '13px',
+                                                    fontSize: isMobile ? '11px' : '13px',
                                                     color: '#666',
-                                                    lineHeight: '1.5',
-                                                    fontStyle: 'italic'
+                                                    lineHeight: '1.4',
+                                                    fontStyle: 'italic',
+                                                    display: isMobile ? '-webkit-box' : 'block',
+                                                    WebkitLineClamp: isMobile ? '2' : 'unset',
+                                                    WebkitBoxOrient: 'vertical',
+                                                    overflow: isMobile ? 'hidden' : 'visible'
                                                 }}>
                                                     {nickname.desc}
                                                 </div>
@@ -267,19 +304,22 @@ export default function Home() {
                                             {/* Amount */}
                                             <div style={{
                                                 textAlign: 'right',
-                                                paddingRight: '10px'
+                                                paddingRight: isMobile ? '5px' : '10px',
+                                                flexShrink: 0
                                             }}>
                                                 <div style={{
-                                                    fontSize: '28px',
+                                                    fontSize: isMobile ? '18px' : '28px',
                                                     fontWeight: '800',
                                                     color: index === 0 ? '#e74c3c' : index === 1 ? '#3498db' : index === 2 ? '#f39c12' : '#27ae60',
-                                                    marginBottom: '5px'
+                                                    marginBottom: '3px',
+                                                    whiteSpace: 'nowrap'
                                                 }}>
                                                     {new Intl.NumberFormat('vi-VN').format(item.amount)} đ
                                                 </div>
                                                 <div style={{
-                                                    fontSize: '12px',
-                                                    color: '#999'
+                                                    fontSize: isMobile ? '10px' : '12px',
+                                                    color: '#999',
+                                                    whiteSpace: 'nowrap'
                                                 }}>
                                                     {((item.amount / (totalFund - baseFund)) * 100).toFixed(1)}% tổng phạt
                                                 </div>
@@ -294,26 +334,31 @@ export default function Home() {
                         <button
                             onClick={fetchData}
                             style={{
-                                marginTop: '30px',
+                                marginTop: isMobile ? '20px' : '30px',
                                 width: '100%',
-                                padding: '18px',
+                                padding: isMobile ? '14px' : '18px',
                                 background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                                 color: '#fff',
                                 border: 'none',
                                 borderRadius: '15px',
-                                fontSize: '18px',
+                                fontSize: isMobile ? '16px' : '18px',
                                 fontWeight: '700',
                                 cursor: 'pointer',
                                 boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
-                                transition: 'all 0.3s'
+                                transition: 'all 0.3s',
+                                WebkitTapHighlightColor: 'transparent'
                             }}
                             onMouseEnter={(e) => {
-                                e.currentTarget.style.transform = 'scale(1.02)';
-                                e.currentTarget.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.6)';
+                                if (!isMobile) {
+                                    e.currentTarget.style.transform = 'scale(1.02)';
+                                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.6)';
+                                }
                             }}
                             onMouseLeave={(e) => {
-                                e.currentTarget.style.transform = 'scale(1)';
-                                e.currentTarget.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
+                                if (!isMobile) {
+                                    e.currentTarget.style.transform = 'scale(1)';
+                                    e.currentTarget.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
+                                }
                             }}
                         >
                             🔄 Làm mới bảng xếp hạng
@@ -322,16 +367,16 @@ export default function Home() {
                         {/* Footer */}
                         <div style={{
                             textAlign: 'center',
-                            marginTop: '40px',
-                            padding: '20px',
+                            marginTop: isMobile ? '30px' : '40px',
+                            padding: isMobile ? '15px' : '20px',
                             color: 'rgba(255,255,255,0.8)',
-                            fontSize: '14px'
+                            fontSize: isMobile ? '13px' : '14px'
                         }}>
                             <p style={{ margin: '0 0 5px 0' }}>
-                                💡 <strong>Mẹo:</strong> Chuyển khoản với nội dung &quot;PKB + TÊN&quot; để hệ thống tự động ghi nhận!
+                                💡 <strong>Mẹo:</strong> Chuyển khoản với nội dung "PKB + TÊN" để hệ thống tự động ghi nhận!
                             </p>
-                            <p style={{ margin: 0, fontSize: '12px', opacity: 0.7 }}>
-                                Ví dụ: &quot;PKB TUAN&quot; hoặc &quot;PKB HUNG NOP PHAT&quot;
+                            <p style={{ margin: 0, fontSize: isMobile ? '11px' : '12px', opacity: 0.7 }}>
+                                Ví dụ: "PKB TUAN" hoặc "PKB HUNG NOP PHAT"
                             </p>
                         </div>
                     </>

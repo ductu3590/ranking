@@ -56,11 +56,11 @@ export default function Home() {
         const now = new Date();
         const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
 
+        // Lấy TẤT CẢ giao dịch (cả tiền vào và tiền ra) để tính tổng quỹ chính xác
         const { data, error } = await supabase
             .from('quy_pickleball')
-            .select('nguoi_nop, so_tien')
-            .gte('created_at', startOfMonth)
-            .eq('huong_giao_dich', 'in'); // Chỉ lấy giao dịch tiền vào, loại bỏ giao dịch chi (tiền ra)
+            .select('nguoi_nop, so_tien, huong_giao_dich')
+            .gte('created_at', startOfMonth);
 
         if (error) {
             console.log(error);
@@ -68,7 +68,14 @@ export default function Home() {
         } else {
             // Tách riêng tài khoản gốc
             const baseAccount = data.filter(item => item.nguoi_nop === 'TAI KHOAN GOC');
-            const transactions = data.filter(item => item.nguoi_nop !== 'TAI KHOAN GOC');
+
+            // Chỉ lấy giao dịch TIỀN VÀO để hiển thị trong bảng xếp hạng
+            const incomingTransactions = data.filter(
+                item => item.nguoi_nop !== 'TAI KHOAN GOC' && item.huong_giao_dich === 'in'
+            );
+
+            // Lấy tất cả giao dịch TIỀN RA để tính tổng quỹ
+            const outgoingTransactions = data.filter(item => item.huong_giao_dich === 'out');
 
             // Tính tài khoản gốc
             let base = 0;
@@ -76,14 +83,20 @@ export default function Home() {
                 base += item.so_tien;
             });
 
-            // Tính toán xếp hạng (Group by người nộp, loại trừ TAI KHOAN GOC)
+            // Tính toán xếp hạng (chỉ từ giao dịch tiền vào)
             const ranking = {};
             let penaltyTotal = 0;
 
-            transactions.forEach(item => {
+            incomingTransactions.forEach(item => {
                 penaltyTotal += item.so_tien;
                 if (!ranking[item.nguoi_nop]) ranking[item.nguoi_nop] = 0;
                 ranking[item.nguoi_nop] += item.so_tien;
+            });
+
+            // Tính tổng tiền ra
+            let totalOut = 0;
+            outgoingTransactions.forEach(item => {
+                totalOut += Math.abs(item.so_tien); // Dùng abs vì tiền ra có thể là số âm
             });
 
             // Chuyển object thành array và sort giảm dần
@@ -93,7 +106,8 @@ export default function Home() {
 
             setStats(sortedRanking);
             setBaseFund(base);
-            setTotalFund(base + penaltyTotal); // Tổng = Gốc + Tiền phạt
+            // Tổng quỹ = Gốc + Tiền vào - Tiền ra
+            setTotalFund(base + penaltyTotal - totalOut);
             setLoading(false);
         }
     }
@@ -115,7 +129,7 @@ export default function Home() {
                         textShadow: '2px 2px 4px rgba(0,0,0,0.2)',
                         lineHeight: '1.2'
                     }}>
-                        🏓 QUỶ PICKLEBALL CLUB
+                        🏓 PICKLEBALL 246 CLUB
                     </h1>
                     <p style={{ fontSize: isMobile ? '14px' : '18px', opacity: 0.9, margin: 0 }}>
                         📊 Bảng Xếp Hạng &quot;Danh Dự&quot; Tháng {new Date().getMonth() + 1}/{new Date().getFullYear()}

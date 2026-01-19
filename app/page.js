@@ -59,7 +59,7 @@ export default function Home() {
         // Lấy TẤT CẢ giao dịch (cả tiền vào và tiền ra) để tính tổng quỹ chính xác
         const { data, error } = await supabase
             .from('quy_pickleball')
-            .select('nguoi_nop, so_tien, huong_giao_dich')
+            .select('nguoi_nop, so_tien, huong_giao_dich, loai_giao_dich')
             .gte('created_at', startOfMonth);
 
         if (error) {
@@ -69,9 +69,11 @@ export default function Home() {
             // Tách riêng tài khoản gốc
             const baseAccount = data.filter(item => item.nguoi_nop === 'TAI KHOAN GOC');
 
-            // Chỉ lấy giao dịch TIỀN VÀO để hiển thị trong bảng xếp hạng
+            // Chỉ lấy giao dịch TIỀN VÀO và chỉ hiển thị các giao dịch NỘP PHẠT (≤100K hoặc đã được phân loại là nộp phạt)
             const incomingTransactions = data.filter(
-                item => item.nguoi_nop !== 'TAI KHOAN GOC' && item.huong_giao_dich === 'in'
+                item => item.nguoi_nop !== 'TAI KHOAN GOC'
+                    && item.huong_giao_dich === 'in'
+                    && (item.loai_giao_dich === 'nop_phat' || item.so_tien <= 100000)
             );
 
             // Lấy tất cả giao dịch TIỀN RA để tính tổng quỹ

@@ -26,6 +26,10 @@ export default function AdminPage() {
     const [addingMember, setAddingMember] = useState(false);
     const [newMember, setNewMember] = useState({ full_name: '', phone: '', email: '' });
 
+    // Bulk edit states
+    const [selectedTransactions, setSelectedTransactions] = useState([]);
+    const [bulkEditCategory, setBulkEditCategory] = useState('nop_phat');
+
     // Check authentication
     useEffect(() => {
         checkAuth();
@@ -129,6 +133,52 @@ export default function AdminPage() {
             alert('Lỗi xóa: ' + error.message);
         } else {
             loadMembers();
+        }
+    }
+
+    // Bulk edit functions
+    function handleSelectAll(e) {
+        if (e.target.checked) {
+            setSelectedTransactions(filteredTransactions.map(t => t.id));
+        } else {
+            setSelectedTransactions([]);
+        }
+    }
+
+    function handleSelectTransaction(id) {
+        setSelectedTransactions(prev => {
+            if (prev.includes(id)) {
+                return prev.filter(tid => tid !== id);
+            } else {
+                return [...prev, id];
+            }
+        });
+    }
+
+    async function handleBulkUpdate() {
+        if (selectedTransactions.length === 0) {
+            alert('Vui lòng chọn ít nhất một giao dịch');
+            return;
+        }
+
+        if (!confirm(`Bạn có chắc muốn cập nhật ${selectedTransactions.length} giao dịch thành "${bulkEditCategory === 'nop_phat' ? 'Nộp phạt' : bulkEditCategory === 'nop_quy' ? 'Nộp quỹ' : 'Khác'}"?`)) {
+            return;
+        }
+
+        const { error } = await supabase
+            .from('quy_pickleball')
+            .update({
+                loai_giao_dich: bulkEditCategory,
+                is_manually_categorized: true
+            })
+            .in('id', selectedTransactions);
+
+        if (error) {
+            alert('Lỗi cập nhật: ' + error.message);
+        } else {
+            alert(`Đã cập nhật ${selectedTransactions.length} giao dịch thành công!`);
+            setSelectedTransactions([]);
+            loadTransactions();
         }
     }
 
@@ -242,12 +292,40 @@ export default function AdminPage() {
                             </div>
                         </div>
 
+                        {/* Bulk Edit Toolbar */}
+                        {selectedTransactions.length > 0 && (
+                            <div className="bulk-edit-toolbar">
+                                <span className="toolbar-label">✓ {selectedTransactions.length} giao dịch được chọn</span>
+                                <select
+                                    value={bulkEditCategory}
+                                    onChange={(e) => setBulkEditCategory(e.target.value)}
+                                >
+                                    <option value="nop_phat">Nộp phạt</option>
+                                    <option value="nop_quy">Nộp quỹ</option>
+                                    <option value="khac">Khác</option>
+                                </select>
+                                <button className="btn-apply" onClick={handleBulkUpdate}>
+                                    ✅ Áp dụng
+                                </button>
+                                <button className="btn-clear" onClick={() => setSelectedTransactions([])}>
+                                    ✖ Bỏ chọn
+                                </button>
+                            </div>
+                        )}
+
                         {/* Transactions Table */}
                         <div className="table-card">
                             <div className="table-container">
                                 <table>
                                     <thead>
                                         <tr>
+                                            <th className="checkbox-cell">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedTransactions.length === filteredTransactions.length && filteredTransactions.length > 0}
+                                                    onChange={handleSelectAll}
+                                                />
+                                            </th>
                                             <th>Ngày</th>
                                             <th>Thành viên</th>
                                             <th>Số tiền</th>
@@ -260,7 +338,17 @@ export default function AdminPage() {
                                     </thead>
                                     <tbody>
                                         {filteredTransactions.map(t => (
-                                            <tr key={t.id} className={t.is_manually_categorized ? 'manually-edited' : ''}>
+                                            <tr
+                                                key={t.id}
+                                                className={`${t.is_manually_categorized ? 'manually-edited' : ''} ${selectedTransactions.includes(t.id) ? 'selected' : ''}`}
+                                            >
+                                                <td className="checkbox-cell">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectedTransactions.includes(t.id)}
+                                                        onChange={() => handleSelectTransaction(t.id)}
+                                                    />
+                                                </td>
                                                 <td>{new Date(t.created_at).toLocaleDateString('vi-VN')}</td>
                                                 <td className="font-medium">{t.nguoi_nop}</td>
                                                 <td>

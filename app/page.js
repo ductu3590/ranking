@@ -209,9 +209,6 @@ export default function Home() {
                     }}>
                         🏓 PICKLEBALL 246 CLUB
                     </h1>
-                    <p style={{ fontSize: isMobile ? '14px' : '18px', opacity: 0.9, margin: 0 }}>
-                        📊 Bảng Xếp Hạng &quot;Danh Dự&quot; Tháng {new Date().getMonth() + 1}/{new Date().getFullYear()}
-                    </p>
                 </div>
 
                 {/* Navigation Menu */}

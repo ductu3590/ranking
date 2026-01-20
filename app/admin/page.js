@@ -30,6 +30,16 @@ export default function AdminPage() {
     const [selectedTransactions, setSelectedTransactions] = useState([]);
     const [bulkEditCategory, setBulkEditCategory] = useState('nop_phat');
 
+    // Manual expense states
+    const [addingExpense, setAddingExpense] = useState(false);
+    const [expenseForm, setExpenseForm] = useState({
+        so_tien: '',
+        loai_giao_dich: 'khac',
+        noi_dung: '',
+        ngay_giao_dich: new Date().toISOString().split('T')[0],
+        ghi_chu: ''
+    });
+
     // Check authentication
     useEffect(() => {
         checkAuth();
@@ -182,6 +192,52 @@ export default function AdminPage() {
         }
     }
 
+    async function addExpenseTransaction() {
+        // Validate
+        if (!expenseForm.so_tien || parseFloat(expenseForm.so_tien) <= 0) {
+            alert('Vui lòng nhập số tiền hợp lệ (> 0)');
+            return;
+        }
+        if (!expenseForm.noi_dung.trim()) {
+            alert('Vui lòng nhập nội dung giao dịch');
+            return;
+        }
+
+        const timestamp = Date.now();
+        const transactionData = {
+            ma_giao_dich: `MANUAL_CHI_${timestamp}`,
+            so_tien: -Math.abs(parseFloat(expenseForm.so_tien)),
+            noi_dung_goc: expenseForm.noi_dung.trim(),
+            nguoi_nop: 'THỦ QUỸ',
+            loai_giao_dich: expenseForm.loai_giao_dich,
+            huong_giao_dich: 'out',
+            is_manually_categorized: true,
+            admin_note: expenseForm.ghi_chu.trim() || null,
+            confidence_score: 100,
+            parsing_method: 'manual',
+            created_at: new Date(expenseForm.ngay_giao_dich).toISOString()
+        };
+
+        const { error } = await supabase
+            .from('quy_pickleball')
+            .insert([transactionData]);
+
+        if (error) {
+            alert('Lỗi thêm giao dịch: ' + error.message);
+        } else {
+            alert('Đã thêm giao dịch chi thành công!');
+            setAddingExpense(false);
+            setExpenseForm({
+                so_tien: '',
+                loai_giao_dich: 'khac',
+                noi_dung: '',
+                ngay_giao_dich: new Date().toISOString().split('T')[0],
+                ghi_chu: ''
+            });
+            loadTransactions();
+        }
+    }
+
     // Calculate stats
     const stats = {
         totalIn: transactions.filter(t => t.huong_giao_dich === 'in').reduce((sum, t) => sum + (t.so_tien || 0), 0),
@@ -289,6 +345,11 @@ export default function AdminPage() {
                                         placeholder="Nội dung giao dịch..."
                                     />
                                 </div>
+                            </div>
+                            <div className="action-bar" style={{ marginTop: '15px', paddingTop: '15px', borderTop: '1px solid #e5e7eb' }}>
+                                <button className="btn-expense" onClick={() => setAddingExpense(true)}>
+                                    💸 Chi
+                                </button>
                             </div>
                         </div>
 
@@ -591,6 +652,92 @@ export default function AdminPage() {
                                 onClick={() => {
                                     setAddingMember(false);
                                     setNewMember({ full_name: '', phone: '', email: '' });
+                                }}
+                            >
+                                ❌ Hủy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Add Expense Modal */}
+            {addingExpense && (
+                <div className="modal-overlay" onClick={() => setAddingExpense(false)}>
+                    <div className="modal" onClick={(e) => e.stopPropagation()}>
+                        <h2>💸 Thêm Giao Dịch Chi</h2>
+
+                        <div className="form-group">
+                            <label>Số tiền *</label>
+                            <input
+                                type="number"
+                                value={expenseForm.so_tien}
+                                onChange={(e) => setExpenseForm({ ...expenseForm, so_tien: e.target.value })}
+                                placeholder="Nhập số tiền (VD: 48000)"
+                                min="0"
+                                step="1000"
+                            />
+                            <small style={{ color: '#6b7280', fontSize: '0.875rem', marginTop: '5px', display: 'block' }}>
+                                Nhập số tiền dương, hệ thống sẽ tự động chuyển thành tiền ra
+                            </small>
+                        </div>
+
+                        <div className="form-group">
+                            <label>Loại giao dịch</label>
+                            <select
+                                value={expenseForm.loai_giao_dich}
+                                onChange={(e) => setExpenseForm({ ...expenseForm, loai_giao_dich: e.target.value })}
+                            >
+                                <option value="khac">Khác</option>
+                                <option value="nop_phat">Nộp phạt</option>
+                                <option value="nop_quy">Nộp quỹ</option>
+                            </select>
+                        </div>
+
+                        <div className="form-group">
+                            <label>Nội dung giao dịch *</label>
+                            <input
+                                type="text"
+                                value={expenseForm.noi_dung}
+                                onChange={(e) => setExpenseForm({ ...expenseForm, noi_dung: e.target.value })}
+                                placeholder="VD: Trả tiền nước, Mua bóng..."
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Ngày giao dịch</label>
+                            <input
+                                type="date"
+                                value={expenseForm.ngay_giao_dich}
+                                onChange={(e) => setExpenseForm({ ...expenseForm, ngay_giao_dich: e.target.value })}
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Ghi chú</label>
+                            <textarea
+                                value={expenseForm.ghi_chu}
+                                onChange={(e) => setExpenseForm({ ...expenseForm, ghi_chu: e.target.value })}
+                                rows="3"
+                                placeholder="Ghi chú thêm (tùy chọn)..."
+                            />
+                        </div>
+
+                        <div className="modal-actions">
+                            <button className="btn-primary" onClick={addExpenseTransaction}>
+                                ✅ Thêm
+                            </button>
+                            <button
+                                className="btn-secondary"
+                                onClick={() => {
+                                    setAddingExpense(false);
+                                    setExpenseForm({
+                                        so_tien: '',
+                                        loai_giao_dich: 'khac',
+                                        noi_dung: '',
+                                        ngay_giao_dich: new Date().toISOString().split('T')[0],
+                                        ghi_chu: ''
+                                    });
                                 }}
                             >
                                 ❌ Hủy

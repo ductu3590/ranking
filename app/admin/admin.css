@@ -382,6 +382,24 @@ td.font-medium {
     background: #cbd5e0;
 }
 
+.btn-expense {
+    background: linear-gradient(135deg, #f56565 0%, #ed8936 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(245, 101, 101, 0.3);
+}
+
+.btn-expense:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(245, 101, 101, 0.4);
+}
+
 /* Bulk Edit Styles */
 .checkbox-cell {
     width: 40px;

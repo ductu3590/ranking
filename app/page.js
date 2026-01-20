@@ -9,6 +9,8 @@ export default function Home() {
     const [loading, setLoading] = useState(true);
     const [isMobile, setIsMobile] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
+    const [previousRanking, setPreviousRanking] = useState({}); // Map: nguoi_nop -> previous rank
+    const [activeTab, setActiveTab] = useState('this-month'); // 'this-month' | 'last-month' | 'all-time'
     const itemsPerPage = 10;
 
     useEffect(() => {
@@ -23,7 +25,7 @@ export default function Home() {
         window.addEventListener('resize', checkMobile);
 
         return () => window.removeEventListener('resize', checkMobile);
-    }, []);
+    }, [activeTab]); // Re-fetch when tab changes
 
     // Hàm tạo avatar dựa trên rank
     const getAvatar = (index) => {
@@ -51,16 +53,90 @@ export default function Home() {
         return nicknames[Math.min(index, nicknames.length - 1)];
     };
 
+    // Hàm render icon thay đổi rank
+    const getRankChangeIcon = (currentRank, previousRank) => {
+        if (!previousRank) {
+            return <span style={{ fontSize: isMobile ? '10px' : '12px', color: '#999', fontWeight: '600' }}>NEW</span>;
+        }
+
+        const change = previousRank - currentRank; // Positive = tăng hạng, Negative = giảm hạng
+
+        if (change > 0) {
+            // Tăng hạng (số rank nhỏ hơn = tốt hơn)
+            return (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#00C853' }}>
+                    <span style={{ fontSize: isMobile ? '18px' : '22px', lineHeight: '1' }}>↑</span>
+                    <span style={{ fontSize: isMobile ? '11px' : '13px', fontWeight: '700' }}>+{change}</span>
+                </div>
+            );
+        } else if (change < 0) {
+            // Giảm hạng
+            return (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#FF3D00' }}>
+                    <span style={{ fontSize: isMobile ? '18px' : '22px', lineHeight: '1' }}>↓</span>
+                    <span style={{ fontSize: isMobile ? '11px' : '13px', fontWeight: '700' }}>{change}</span>
+                </div>
+            );
+        } else {
+            // Giữ nguyên
+            return (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#999' }}>
+                    <span style={{ fontSize: isMobile ? '14px' : '16px', lineHeight: '1' }}>=</span>
+                </div>
+            );
+        }
+    };
+
     async function fetchData() {
         setLoading(true);
         const now = new Date();
-        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
 
-        // Lấy TẤT CẢ giao dịch (cả tiền vào và tiền ra) để tính tổng quỹ chính xác
-        const { data, error } = await supabase
+        // Calculate date ranges based on active tab
+        let startDate, endDate;
+
+        if (activeTab === 'this-month') {
+            // Tháng này: từ đầu tháng đến giờ
+            startDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+            endDate = null; // No end date = up to now
+        } else if (activeTab === 'last-month') {
+            // Tháng trước: từ đầu tháng trước đến cuối tháng trước
+            startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString();
+            endDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+        } else {
+            // All-time: không filter date
+            startDate = null;
+            endDate = null;
+        }
+
+        // Lấy TẤT CẢ giao dịch (cả tiền vào và tiền ra) theo date range
+        let query = supabase
             .from('quy_pickleball')
-            .select('nguoi_nop, so_tien, huong_giao_dich, loai_giao_dich')
-            .gte('created_at', startOfMonth);
+            .select('nguoi_nop, so_tien, huong_giao_dich, loai_giao_dich');
+
+        if (startDate) query = query.gte('created_at', startDate);
+        if (endDate) query = query.lt('created_at', endDate);
+
+        const { data, error } = await query;
+
+        // Lấy snapshot gần nhất để so sánh rank
+        const { data: snapshotData } = await supabase
+            .from('ranking_snapshots')
+            .select('nguoi_nop, rank_position, snapshot_date')
+            .lt('snapshot_date', new Date().toISOString().split('T')[0]) // Lấy snapshot trước hôm nay
+            .order('snapshot_date', { ascending: false })
+            .limit(100); // Lấy nhiều record để đảm bảo có đủ của ngày gần nhất
+
+        // Tạo map previous ranking từ snapshot gần nhất
+        const prevRankMap = {};
+        if (snapshotData && snapshotData.length > 0) {
+            const latestDate = snapshotData[0].snapshot_date;
+            snapshotData
+                .filter(s => s.snapshot_date === latestDate)
+                .forEach(snapshot => {
+                    prevRankMap[snapshot.nguoi_nop] = snapshot.rank_position;
+                });
+        }
+        setPreviousRanking(prevRankMap);
 
         if (error) {
             console.log(error);
@@ -277,6 +353,129 @@ export default function Home() {
                     </div>
                 </div>
 
+                {/* Time Period Tabs */}
+                <div style={{
+                    display: 'flex',
+                    gap: isMobile ? '8px' : '12px',
+                    marginBottom: isMobile ? '20px' : '30px',
+                    justifyContent: 'center',
+                    flexWrap: 'wrap'
+                }}>
+                    <button
+                        onClick={() => setActiveTab('this-month')}
+                        style={{
+                            flex: isMobile ? '1 1 calc(33% - 6px)' : '0 1 auto',
+                            padding: isMobile ? '12px 8px' : '14px 24px',
+                            background: activeTab === 'this-month'
+                                ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                                : 'rgba(255, 255, 255, 0.95)',
+                            color: activeTab === 'this-month' ? '#fff' : '#667eea',
+                            border: activeTab === 'this-month' ? 'none' : '2px solid rgba(102, 126, 234, 0.3)',
+                            borderRadius: '12px',
+                            fontSize: isMobile ? '12px' : '15px',
+                            fontWeight: '700',
+                            cursor: 'pointer',
+                            boxShadow: activeTab === 'this-month'
+                                ? '0 4px 15px rgba(102, 126, 234, 0.4)'
+                                : '0 2px 8px rgba(0,0,0,0.1)',
+                            transition: 'all 0.3s',
+                            whiteSpace: 'nowrap'
+                        }}
+                        onMouseEnter={(e) => {
+                            if (!isMobile && activeTab !== 'this-month') {
+                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                            }
+                        }}
+                        onMouseLeave={(e) => {
+                            if (!isMobile) {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = activeTab === 'this-month'
+                                    ? '0 4px 15px rgba(102, 126, 234, 0.4)'
+                                    : '0 2px 8px rgba(0,0,0,0.1)';
+                            }
+                        }}
+                    >
+                        📅 Tháng này
+                    </button>
+
+                    <button
+                        onClick={() => setActiveTab('last-month')}
+                        style={{
+                            flex: isMobile ? '1 1 calc(33% - 6px)' : '0 1 auto',
+                            padding: isMobile ? '12px 8px' : '14px 24px',
+                            background: activeTab === 'last-month'
+                                ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                                : 'rgba(255, 255, 255, 0.95)',
+                            color: activeTab === 'last-month' ? '#fff' : '#667eea',
+                            border: activeTab === 'last-month' ? 'none' : '2px solid rgba(102, 126, 234, 0.3)',
+                            borderRadius: '12px',
+                            fontSize: isMobile ? '12px' : '15px',
+                            fontWeight: '700',
+                            cursor: 'pointer',
+                            boxShadow: activeTab === 'last-month'
+                                ? '0 4px 15px rgba(102, 126, 234, 0.4)'
+                                : '0 2px 8px rgba(0,0,0,0.1)',
+                            transition: 'all 0.3s',
+                            whiteSpace: 'nowrap'
+                        }}
+                        onMouseEnter={(e) => {
+                            if (!isMobile && activeTab !== 'last-month') {
+                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                            }
+                        }}
+                        onMouseLeave={(e) => {
+                            if (!isMobile) {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = activeTab === 'last-month'
+                                    ? '0 4px 15px rgba(102, 126, 234, 0.4)'
+                                    : '0 2px 8px rgba(0,0,0,0.1)';
+                            }
+                        }}
+                    >
+                        📆 Tháng trước
+                    </button>
+
+                    <button
+                        onClick={() => setActiveTab('all-time')}
+                        style={{
+                            flex: isMobile ? '1 1 calc(33% - 6px)' : '0 1 auto',
+                            padding: isMobile ? '12px 8px' : '14px 24px',
+                            background: activeTab === 'all-time'
+                                ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                                : 'rgba(255, 255, 255, 0.95)',
+                            color: activeTab === 'all-time' ? '#fff' : '#667eea',
+                            border: activeTab === 'all-time' ? 'none' : '2px solid rgba(102, 126, 234, 0.3)',
+                            borderRadius: '12px',
+                            fontSize: isMobile ? '12px' : '15px',
+                            fontWeight: '700',
+                            cursor: 'pointer',
+                            boxShadow: activeTab === 'all-time'
+                                ? '0 4px 15px rgba(102, 126, 234, 0.4)'
+                                : '0 2px 8px rgba(0,0,0,0.1)',
+                            transition: 'all 0.3s',
+                            whiteSpace: 'nowrap'
+                        }}
+                        onMouseEnter={(e) => {
+                            if (!isMobile && activeTab !== 'all-time') {
+                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                            }
+                        }}
+                        onMouseLeave={(e) => {
+                            if (!isMobile) {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = activeTab === 'all-time'
+                                    ? '0 4px 15px rgba(102, 126, 234, 0.4)'
+                                    : '0 2px 8px rgba(0,0,0,0.1)';
+                            }
+                        }}
+                    >
+                        🏆 Tất cả
+                    </button>
+                </div>
+
                 {loading ? (
                     <div style={{ textAlign: 'center', padding: '60px', color: '#fff', fontSize: '18px' }}>
                         ⏳ Đang tải bảng xếp hạng...
@@ -291,7 +490,13 @@ export default function Home() {
                             fontWeight: '700',
                             textShadow: '2px 2px 4px rgba(0,0,0,0.2)'
                         }}>
-                            🏆 BẢNG XẾP HẠNG &quot;ĐÓNG GÓP&quot;
+                            🏆 BẢNG XẾP HẠNG {
+                                activeTab === 'this-month'
+                                    ? `THÁNG ${new Date().getMonth() + 1}/${new Date().getFullYear()}`
+                                    : activeTab === 'last-month'
+                                        ? `THÁNG ${new Date().getMonth() === 0 ? 12 : new Date().getMonth()}/${new Date().getMonth() === 0 ? new Date().getFullYear() - 1 : new Date().getFullYear()}`
+                                        : 'TẤT CẢ THỜI GIAN'
+                            }
                         </h2>
 
                         {stats.length === 0 ? (
@@ -352,17 +557,57 @@ export default function Home() {
                                                     }
                                                 }}
                                             >
-                                                {/* Rank Number */}
+                                                {/* Rank Number with Previous Rank */}
                                                 <div style={{
-                                                    fontSize: isMobile ? '32px' : '48px',
-                                                    fontWeight: '900',
-                                                    width: isMobile ? '50px' : '80px',
-                                                    textAlign: 'center',
-                                                    color: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : '#999',
-                                                    textShadow: '2px 2px 4px rgba(0,0,0,0.1)',
+                                                    display: 'flex',
+                                                    flexDirection: isMobile ? 'column' : 'row',
+                                                    alignItems: 'center',
+                                                    gap: isMobile ? '4px' : '12px',
+                                                    width: isMobile ? '70px' : '120px',
                                                     flexShrink: 0
                                                 }}>
-                                                    {index + 1}
+                                                    {/* Current Rank - Large */}
+                                                    <div style={{
+                                                        fontSize: isMobile ? '32px' : '48px',
+                                                        fontWeight: '900',
+                                                        color: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : '#999',
+                                                        textShadow: '2px 2px 4px rgba(0,0,0,0.1)',
+                                                        lineHeight: '1'
+                                                    }}>
+                                                        {index + 1}
+                                                    </div>
+
+                                                    {/* Previous Rank & Change Icon */}
+                                                    <div style={{
+                                                        display: 'flex',
+                                                        flexDirection: 'column',
+                                                        alignItems: 'center',
+                                                        gap: '2px'
+                                                    }}>
+                                                        <div style={{
+                                                            fontSize: isMobile ? '9px' : '11px',
+                                                            color: '#999',
+                                                            fontWeight: '600',
+                                                            textTransform: 'uppercase',
+                                                            letterSpacing: '0.5px'
+                                                        }}>
+                                                            Prev
+                                                        </div>
+                                                        <div style={{
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            gap: '3px'
+                                                        }}>
+                                                            <span style={{
+                                                                fontSize: isMobile ? '13px' : '16px',
+                                                                fontWeight: '700',
+                                                                color: '#666'
+                                                            }}>
+                                                                {previousRanking[item.name] || '-'}
+                                                            </span>
+                                                            {getRankChangeIcon(index + 1, previousRanking[item.name])}
+                                                        </div>
+                                                    </div>
                                                 </div>
 
                                                 {/* Avatar */}

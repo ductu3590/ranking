@@ -55,6 +55,22 @@ export default function Home() {
         return nicknames[Math.min(index, nicknames.length - 1)];
     };
 
+    // Hàm format số tiền cho mobile (compact) và desktop (full)
+    const formatAmount = (amount, isMobile) => {
+        if (isMobile) {
+            // Mobile: 200.000 -> 200K, 1.500.000 -> 1,5Tr
+            if (amount >= 1000000) {
+                return (amount / 1000000).toFixed(amount % 1000000 === 0 ? 0 : 1) + 'Tr';
+            } else if (amount >= 1000) {
+                return (amount / 1000).toFixed(amount % 1000 === 0 ? 0 : 0) + 'K';
+            }
+            return amount.toString();
+        } else {
+            // Desktop: Format đầy đủ với dấu phẩy
+            return new Intl.NumberFormat('vi-VN').format(amount) + ' đ';
+        }
+    };
+
     // Hàm render icon thay đổi rank
     const getRankChangeIcon = (currentRank, previousRank) => {
         if (!previousRank) {
@@ -674,7 +690,7 @@ export default function Home() {
                                                         marginBottom: '3px',
                                                         whiteSpace: 'nowrap'
                                                     }}>
-                                                        {new Intl.NumberFormat('vi-VN').format(item.amount)} đ
+                                                        {formatAmount(item.amount, isMobile)}
                                                     </div>
                                                     <div style={{
                                                         fontSize: isSmallMobile ? '8px' : isMobile ? '9px' : '12px',

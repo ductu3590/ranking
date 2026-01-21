@@ -24,7 +24,11 @@ export default function AdminPage() {
 
     // Member modal
     const [addingMember, setAddingMember] = useState(false);
-    const [newMember, setNewMember] = useState({ full_name: '', phone: '', email: '' });
+    const [newMember, setNewMember] = useState({ full_name: '', aliasesText: '' });
+
+    // Edit member modal
+    const [editingMember, setEditingMember] = useState(null);
+    const [editMemberForm, setEditMemberForm] = useState({});
 
     // Bulk edit states
     const [selectedTransactions, setSelectedTransactions] = useState([]);
@@ -114,12 +118,20 @@ export default function AdminPage() {
             return;
         }
 
+        // Parse aliases from textarea (one per line)
+        let aliasesArray = [];
+        if (newMember.aliasesText) {
+            aliasesArray = newMember.aliasesText
+                .split('\n')
+                .map(line => line.trim())
+                .filter(line => line.length > 0);
+        }
+
         const { error } = await supabase
             .from('club_members')
             .insert([{
                 full_name: newMember.full_name.toUpperCase().trim(),
-                phone: newMember.phone.trim() || null,
-                email: newMember.email.trim() || null
+                aliases: aliasesArray.length > 0 ? aliasesArray : null
             }]);
 
         if (error) {
@@ -127,7 +139,7 @@ export default function AdminPage() {
         } else {
             loadMembers();
             setAddingMember(false);
-            setNewMember({ full_name: '', phone: '', email: '' });
+            setNewMember({ full_name: '', aliasesText: '' });
         }
     }
 
@@ -143,6 +155,38 @@ export default function AdminPage() {
             alert('Lỗi xóa: ' + error.message);
         } else {
             loadMembers();
+        }
+    }
+
+    async function updateMember() {
+        if (!editMemberForm.full_name?.trim()) {
+            alert('Tên thành viên không được để trống');
+            return;
+        }
+
+        // Parse aliases from textarea (one per line)
+        let aliasesArray = [];
+        if (editMemberForm.aliasesText) {
+            aliasesArray = editMemberForm.aliasesText
+                .split('\n')
+                .map(line => line.trim())
+                .filter(line => line.length > 0);
+        }
+
+        const { error } = await supabase
+            .from('club_members')
+            .update({
+                aliases: aliasesArray.length > 0 ? aliasesArray : null,
+                is_active: editMemberForm.is_active
+            })
+            .eq('id', editingMember.id);
+
+        if (error) {
+            alert('Lỗi cập nhật: ' + error.message);
+        } else {
+            loadMembers();
+            setEditingMember(null);
+            setEditMemberForm({});
         }
     }
 
@@ -470,25 +514,41 @@ export default function AdminPage() {
                             <table>
                                 <thead>
                                     <tr>
+                                        <th>STT</th>
                                         <th>Tên đầy đủ</th>
-                                        <th>Điện thoại</th>
-                                        <th>Email</th>
+                                        <th>Aliases</th>
                                         <th>Trạng thái</th>
                                         <th>Thao tác</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {members.map(m => (
+                                    {members.map((m, index) => (
                                         <tr key={m.id}>
+                                            <td style={{ textAlign: 'center', fontWeight: '500' }}>{index + 1}</td>
                                             <td className="font-medium">{m.full_name}</td>
-                                            <td>{m.phone || '-'}</td>
-                                            <td>{m.email || '-'}</td>
+                                            <td style={{ fontSize: '0.85rem', color: '#6b7280' }}>
+                                                {m.aliases && m.aliases.length > 0 ? m.aliases.join(', ') : '-'}
+                                            </td>
                                             <td>
                                                 <span className={`badge ${m.is_active ? 'badge-active' : 'badge-inactive'}`}>
                                                     {m.is_active ? '✅ Hoạt động' : '⏸️ Ngừng'}
                                                 </span>
                                             </td>
                                             <td>
+                                                <button
+                                                    className="btn-edit"
+                                                    onClick={() => {
+                                                        setEditingMember(m);
+                                                        setEditMemberForm({
+                                                            full_name: m.full_name,
+                                                            aliasesText: m.aliases ? m.aliases.join('\n') : '',
+                                                            is_active: m.is_active
+                                                        });
+                                                    }}
+                                                    style={{ marginRight: '8px' }}
+                                                >
+                                                    ✏️ Sửa
+                                                </button>
                                                 <button className="btn-delete" onClick={() => deleteMember(m.id)}>
                                                     🗑️ Xóa
                                                 </button>
@@ -624,23 +684,16 @@ export default function AdminPage() {
                         </div>
 
                         <div className="form-group">
-                            <label>Điện thoại</label>
-                            <input
-                                type="text"
-                                value={newMember.phone}
-                                onChange={(e) => setNewMember({ ...newMember, phone: e.target.value })}
-                                placeholder="0123456789"
+                            <label>Aliases (Các tên khác)</label>
+                            <textarea
+                                value={newMember.aliasesText}
+                                onChange={(e) => setNewMember({ ...newMember, aliasesText: e.target.value })}
+                                rows="5"
+                                placeholder="Nhập mỗi alias trên một dòng, VD:&#10;NGUYEN VAN A&#10;VAN A&#10;NV A"
                             />
-                        </div>
-
-                        <div className="form-group">
-                            <label>Email</label>
-                            <input
-                                type="email"
-                                value={newMember.email}
-                                onChange={(e) => setNewMember({ ...newMember, email: e.target.value })}
-                                placeholder="email@example.com"
-                            />
+                            <small style={{ color: '#6b7280', fontSize: '0.875rem', marginTop: '5px', display: 'block' }}>
+                                💡 Nhập mỗi alias trên một dòng. Aliases giúp hệ thống nhận diện tên thành viên từ giao dịch.
+                            </small>
                         </div>
 
                         <div className="modal-actions">
@@ -651,7 +704,69 @@ export default function AdminPage() {
                                 className="btn-secondary"
                                 onClick={() => {
                                     setAddingMember(false);
-                                    setNewMember({ full_name: '', phone: '', email: '' });
+                                    setNewMember({ full_name: '', aliasesText: '' });
+                                }}
+                            >
+                                ❌ Hủy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Edit Member Modal */}
+            {editingMember && (
+                <div className="modal-overlay" onClick={() => setEditingMember(null)}>
+                    <div className="modal" onClick={(e) => e.stopPropagation()}>
+                        <h2>✏️ Chỉnh sửa thành viên</h2>
+
+                        <div className="form-group">
+                            <label>Tên đầy đủ</label>
+                            <input
+                                type="text"
+                                value={editMemberForm.full_name}
+                                disabled
+                                style={{ backgroundColor: '#f3f4f6', cursor: 'not-allowed' }}
+                            />
+                            <small style={{ color: '#6b7280', fontSize: '0.875rem', marginTop: '5px', display: 'block' }}>
+                                Tên không thể sửa đổi
+                            </small>
+                        </div>
+
+                        <div className="form-group">
+                            <label>Aliases (Các tên khác)</label>
+                            <textarea
+                                value={editMemberForm.aliasesText}
+                                onChange={(e) => setEditMemberForm({ ...editMemberForm, aliasesText: e.target.value })}
+                                rows="5"
+                                placeholder="Nhập mỗi alias trên một dòng, VD:&#10;DO DUC TU&#10;DUC TU&#10;DD TU"
+                            />
+                            <small style={{ color: '#6b7280', fontSize: '0.875rem', marginTop: '5px', display: 'block' }}>
+                                💡 Nhập mỗi alias trên một dòng. Aliases giúp hệ thống nhận diện tên thành viên từ giao dịch.
+                            </small>
+                        </div>
+
+                        <div className="form-group">
+                            <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                <input
+                                    type="checkbox"
+                                    checked={editMemberForm.is_active}
+                                    onChange={(e) => setEditMemberForm({ ...editMemberForm, is_active: e.target.checked })}
+                                    style={{ marginRight: '8px', width: 'auto' }}
+                                />
+                                <span>Thành viên đang hoạt động</span>
+                            </label>
+                        </div>
+
+                        <div className="modal-actions">
+                            <button className="btn-primary" onClick={updateMember}>
+                                💾 Lưu
+                            </button>
+                            <button
+                                className="btn-secondary"
+                                onClick={() => {
+                                    setEditingMember(null);
+                                    setEditMemberForm({});
                                 }}
                             >
                                 ❌ Hủy

@@ -8,6 +8,7 @@ export default function Home() {
     const [baseFund, setBaseFund] = useState(0);
     const [loading, setLoading] = useState(true);
     const [isMobile, setIsMobile] = useState(false);
+    const [isSmallMobile, setIsSmallMobile] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [previousRanking, setPreviousRanking] = useState({}); // Map: nguoi_nop -> previous rank
     const [activeTab, setActiveTab] = useState('this-month'); // 'this-month' | 'last-month' | 'all-time'
@@ -19,6 +20,7 @@ export default function Home() {
         // Detect mobile viewport
         const checkMobile = () => {
             setIsMobile(window.innerWidth <= 768);
+            setIsSmallMobile(window.innerWidth <= 360);
         };
 
         checkMobile();
@@ -512,7 +514,7 @@ export default function Home() {
                             </div>
                         ) : (
                             <>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '12px' : '20px' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '10px' : '20px' }}>
                                     {stats.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((item, idx) => {
                                         const index = (currentPage - 1) * itemsPerPage + idx; // Real index for ranking
                                         const nickname = getFunnyNickname(index, item.name);
@@ -526,7 +528,7 @@ export default function Home() {
                                                         ? 'linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.95) 100%)'
                                                         : 'rgba(255, 255, 255, 0.92)',
                                                     borderRadius: isMobile ? '15px' : '20px',
-                                                    padding: isMobile ? '15px' : '25px',
+                                                    padding: isMobile ? '12px' : '25px',
                                                     display: 'flex',
                                                     alignItems: 'center',
                                                     gap: isMobile ? '10px' : '20px',
@@ -560,12 +562,12 @@ export default function Home() {
                                                     flexDirection: isMobile ? 'column' : 'row',
                                                     alignItems: 'center',
                                                     gap: isMobile ? '4px' : '12px',
-                                                    width: isMobile ? '70px' : '120px',
+                                                    width: isSmallMobile ? '55px' : isMobile ? '60px' : '120px',
                                                     flexShrink: 0
                                                 }}>
                                                     {/* Current Rank - Large */}
                                                     <div style={{
-                                                        fontSize: isMobile ? '32px' : '48px',
+                                                        fontSize: isSmallMobile ? '24px' : isMobile ? '28px' : '48px',
                                                         fontWeight: '900',
                                                         color: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : '#999',
                                                         textShadow: '2px 2px 4px rgba(0,0,0,0.1)',
@@ -609,35 +611,35 @@ export default function Home() {
 
                                                 {/* Avatar */}
                                                 <div style={{
-                                                    width: isMobile ? '60px' : '100px',
-                                                    height: isMobile ? '60px' : '100px',
+                                                    width: isSmallMobile ? '45px' : isMobile ? '50px' : '100px',
+                                                    height: isSmallMobile ? '45px' : isMobile ? '50px' : '100px',
                                                     borderRadius: '50%',
                                                     overflow: 'hidden',
-                                                    border: '4px solid ' + (index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : '#ddd'),
+                                                    border: isSmallMobile ? '3px solid ' : '4px solid ' + (index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : '#ddd'),
                                                     boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                                                     flexShrink: 0,
                                                     background: '#f0f0f0',
                                                     display: 'flex',
                                                     alignItems: 'center',
                                                     justifyContent: 'center',
-                                                    fontSize: isMobile ? '32px' : '48px'
+                                                    fontSize: isSmallMobile ? '28px' : isMobile ? '32px' : '48px'
                                                 }}>
                                                     {/* Fallback emoji avatar */}
                                                     {index === 0 ? '👑' : index === 1 ? '🥈' : index === 2 ? '🥉' : '😊'}
                                                 </div>
 
                                                 {/* Info */}
-                                                <div style={{ flex: 1, minWidth: 0 }}>
+                                                <div style={{ flex: 1, minWidth: isMobile ? '40%' : 0 }}>
                                                     <div style={{
-                                                        fontSize: isMobile ? '11px' : '14px',
+                                                        fontSize: isSmallMobile ? '10px' : isMobile ? '11px' : '14px',
                                                         fontWeight: '700',
                                                         color: '#667eea',
-                                                        marginBottom: '4px'
+                                                        marginBottom: isMobile ? '3px' : '4px'
                                                     }}>
                                                         {nickname.title}
                                                     </div>
                                                     <div style={{
-                                                        fontSize: isMobile ? '16px' : '22px',
+                                                        fontSize: isSmallMobile ? '16px' : isMobile ? '18px' : '22px',
                                                         fontWeight: '700',
                                                         color: '#333',
                                                         marginBottom: isMobile ? '4px' : '8px'
@@ -645,9 +647,9 @@ export default function Home() {
                                                         {item.name}
                                                     </div>
                                                     <div style={{
-                                                        fontSize: isMobile ? '11px' : '13px',
-                                                        color: '#666',
-                                                        lineHeight: '1.4',
+                                                        fontSize: isSmallMobile ? '10px' : isMobile ? '11px' : '13px',
+                                                        color: '#555',
+                                                        lineHeight: '1.5',
                                                         fontStyle: 'italic',
                                                         display: isMobile ? '-webkit-box' : 'block',
                                                         WebkitLineClamp: isMobile ? '2' : 'unset',
@@ -662,10 +664,11 @@ export default function Home() {
                                                 <div style={{
                                                     textAlign: 'right',
                                                     paddingRight: isMobile ? '5px' : '10px',
-                                                    flexShrink: 0
+                                                    flexShrink: 0,
+                                                    minWidth: isMobile ? 'auto' : '120px'
                                                 }}>
                                                     <div style={{
-                                                        fontSize: isMobile ? '18px' : '28px',
+                                                        fontSize: isSmallMobile ? '17px' : isMobile ? '20px' : '28px',
                                                         fontWeight: '800',
                                                         color: index === 0 ? '#e74c3c' : index === 1 ? '#3498db' : index === 2 ? '#f39c12' : '#27ae60',
                                                         marginBottom: '3px',
@@ -674,7 +677,7 @@ export default function Home() {
                                                         {new Intl.NumberFormat('vi-VN').format(item.amount)} đ
                                                     </div>
                                                     <div style={{
-                                                        fontSize: isMobile ? '10px' : '12px',
+                                                        fontSize: isSmallMobile ? '8px' : isMobile ? '9px' : '12px',
                                                         color: '#999',
                                                         whiteSpace: 'nowrap'
                                                     }}>

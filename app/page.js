@@ -163,11 +163,11 @@ export default function Home() {
             // Tách riêng tài khoản gốc
             const baseAccount = data.filter(item => item.nguoi_nop === 'TAI KHOAN GOC');
 
-            // Chỉ lấy giao dịch TIỀN VÀO và chỉ hiển thị các giao dịch NỘP PHẠT (≤100K hoặc đã được phân loại là nộp phạt)
+            // Chỉ lấy giao dịch TIỀN VÀO và chỉ hiển thị các giao dịch NỘP PHẠT (≤200K hoặc đã được phân loại là nộp phạt)
             const incomingTransactions = data.filter(
                 item => item.nguoi_nop !== 'TAI KHOAN GOC'
                     && item.huong_giao_dich === 'in'
-                    && (item.loai_giao_dich === 'nop_phat' || item.so_tien <= 100000)
+                    && (item.loai_giao_dich === 'nop_phat' || item.so_tien <= 200000)
             );
 
             // Lấy tất cả giao dịch TIỀN RA để tính tổng quỹ

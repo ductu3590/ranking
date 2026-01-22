@@ -293,6 +293,36 @@ export default function Home() {
                         }}>
                         💰 Theo dõi quỹ
                     </a>
+                    <a href="/tournament" style={{
+                        flex: isMobile ? '1 1 100%' : '0 1 auto',
+                        padding: isMobile ? '14px 20px' : '16px 28px',
+                        background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                        color: '#fff',
+                        textDecoration: 'none',
+                        borderRadius: '12px',
+                        fontSize: isMobile ? '14px' : '16px',
+                        fontWeight: '800',
+                        textAlign: 'center',
+                        boxShadow: '0 6px 20px rgba(245, 158, 11, 0.4)',
+                        transition: 'all 0.2s',
+                        border: '2px solid rgba(255, 255, 255, 0.5)',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px'
+                    }}
+                        onMouseEnter={(e) => {
+                            if (!isMobile) {
+                                e.currentTarget.style.transform = 'translateY(-3px) scale(1.02)';
+                                e.currentTarget.style.boxShadow = '0 8px 25px rgba(245, 158, 11, 0.6)';
+                            }
+                        }}
+                        onMouseLeave={(e) => {
+                            if (!isMobile) {
+                                e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                                e.currentTarget.style.boxShadow = '0 6px 20px rgba(245, 158, 11, 0.4)';
+                            }
+                        }}>
+                        🏆 Giải Tất Niên ⚡
+                    </a>
                     <a href="/admin" style={{
                         flex: isMobile ? '1 1 100%' : '0 1 auto',
                         padding: isMobile ? '12px 16px' : '14px 24px',

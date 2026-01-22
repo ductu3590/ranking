@@ -248,7 +248,7 @@ export default function Tournament() {
         <h2>1. THỂ THỨC & TÍNH ĐIỂM</h2>
         <div class="rules-box">
             <ul>
-                <li><strong>Thời gian & Địa điểm:</strong> 17:30 - 20:30 (Dự kiến 3 tiếng) tại 02 sân nhà của CLB.</li>
+                <li><strong>Thời gian & Địa điểm:</strong> 17:30 - 19:30 (Dự kiến 3 tiếng) tại 02 sân nhà của CLB.</li>
                 
                 <!-- Added: Cách chia đội -->
                 <li><strong>Cách chia đội ("Draft Day"):</strong> Chọn ra 2 đội trưởng (có uy tín hoặc hay "kháy" nhau nhất). Hai người này sẽ lần lượt "đi chợ" (draft) để chọn thành viên về đội mình cho đến khi đủ 8 người/đội.</li>

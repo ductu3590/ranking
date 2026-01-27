@@ -65,7 +65,7 @@ export default function Tournament() {
                                         <li>📌 <strong>Vòng 2 - THÁCH ĐẤU (4 trận):</strong>
                                             <ul>
                                                 <li><strong>Luật đổi cặp:</strong> Không được giữ nguyên cặp của Vòng 1. Phải ghép cặp mới hoàn toàn.</li>
-                                                <li><strong>Luật thách đấu:</strong> Đội THẮNG Vòng 1 phải công bố danh sách 4 cặp đấu trước. Đội THUA Vòng 1 sẽ nhìn vào danh sách đó để <strong>sắp xếp cặp đối đầu</strong> (chọn cặp "ngon" để gỡ điểm).</li>
+                                                <li><strong>Luật thách đấu:</strong> Đội THẮNG Vòng 1 phải công bố danh sách 4 cặp đấu trước. Đội THUA Vòng 1 sẽ nhìn vào danh sách đó để <strong>sắp xếp cặp đối đầu</strong> (chọn cặp &quot;ngon&quot; để gỡ điểm).</li>
                                                 <li>Nếu Vòng 1 hòa (2-2): Bốc thăm xem đội nào chọn cặp.</li>
                                             </ul>
                                         </li>

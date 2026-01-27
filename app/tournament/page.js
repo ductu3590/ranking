@@ -11,7 +11,7 @@ export default function Tournament() {
                 <header className="card-header">
                     <h1 className="tournament-title">PICKLEBALL YEAR-END CUP</h1>
                     <div className="tournament-subtitle">
-                        16 Chiến binh - 1 Ngày duy nhất - Quyết đấu vì bữa nhậu
+                        16 Chiến binh - 1 Ngày duy nhất - 3 Vòng Kịch Tính
                     </div>
                     <div className="tournament-badge">
                         THỂ THỨC RYDER CUP: TEAM A vs TEAM B
@@ -36,32 +36,32 @@ export default function Tournament() {
                     <h2 className="section-heading">1. THỂ THỨC & TÍNH ĐIỂM</h2>
                     <div className="rules-box">
                         <ul>
-                            <li><strong>Thời gian & Địa điểm:</strong> 17:30 - 19:30 (Dự kiến 02 tiếng) tại 02 sân nhà của CLB.</li>
+                            <li><strong>Thời gian & Địa điểm:</strong> 17:00 - 20:05 (Dự kiến 3 tiếng) tại 02 sân nhà của CLB.</li>
 
-                            <li><strong>Cách chia đội (&quot;Draft Day&quot;):</strong> Chọn ra 2 đội trưởng (có uy tín hoặc hay &quot;kháy&quot; nhau nhất). Hai người này sẽ lần lượt &quot;đi chợ&quot; (draft) để chọn thành viên về đội mình cho đến khi đủ 8 người/đội.</li>
+                            <li><strong>Cách chia đội ("Draft Day"):</strong> Chọn ra 2 đội trưởng (có uy tín hoặc hay "kháy" nhau nhất). Hai người này sẽ lần lượt "đi chợ" (draft) để chọn thành viên về đội mình cho đến khi đủ 8 người/đội.</li>
 
-                            <li><strong>Thể thức thi đấu chi tiết:</strong>
+                            <li><strong>Thể thức thi đấu chi tiết - 3 VÒNG CHIẾN THUẬT:</strong>
                                 <ul>
-                                    <li>📌 <strong>Vòng 1 (4 trận đôi ngẫu nhiên):</strong> Đội trưởng sắp xếp cặp đôi bí mật, nộp danh sách cho Ban Tổ Chức (BTC). Mở bài ra cặp nào đấu cặp đó.</li>
-                                    <li>📌 <strong>Vòng 2 (4 trận đôi chiến thuật):</strong> Bên thua vòng 1 được quyền chọn cặp đấu (ví dụ: &quot;Cặp mạnh nhất của tôi thách đấu cặp mạnh nhất của ông&quot;).</li>
-                                    <li>📌 <strong>Vòng 3 (8 trận đơn):</strong> Nếu anh em đủ sức khỏe sẽ đánh đơn, hoặc tiếp tục đánh đôi nhưng đổi người đánh cặp. (Quyết định cụ thể vào ngày thi đấu).</li>
+                                    <li>📌 <strong>Vòng 1 - ĐÁNH ĐÔI BÍ MẬT (4 trận):</strong> Đội trưởng chia 8 người thành 4 cặp đôi, nộp danh sách kín cho BTC. Mở phong bì, cặp nào gặp cặp nào theo số thứ tự.</li>
+                                    <li>📌 <strong>Vòng 2 - ĐỔI CẶP XOAY VÒNG (4 trận):</strong> LUẬT BẮT BUỘC: Không ai được đánh với người cùng cặp ở Vòng 1. Đội trưởng phải xoay cặp tạo 4 cặp đôi hoàn toàn mới. Đội thua Vòng 1 được quyền chọn cặp đấu.</li>
+                                    <li>📌 <strong>Vòng 3 - ĐỒNG ĐỘI (1 trận):</strong> CẢ ĐỘI RA SÂN CÙNG 1 TRẬN DUY NHẤT! Chạm 25 điểm, ăn điểm trực tiếp. Cứ sau mỗi 4 điểm được ghi thì mỗi team thay 1 cặp đôi vào sân. Đội trưởng sắp xếp 4 cặp theo thứ tự 1-2-3-4 để xoay vòng.</li>
                                 </ul>
                             </li>
 
                             <li><strong>Cách tính điểm đồng đội:</strong>
                                 <ul>
-                                    <li>Tổng giải có <strong>16 trận đấu</strong> (8 trận Đôi + 8 trận Đơn).</li>
-                                    <li>Mỗi trận thắng mang về <strong>1 điểm</strong> cho Team.</li>
-                                    <li>Đội nào chạm mốc <strong>8.5 điểm</strong> trước là VÔ ĐỊCH.</li>
-                                    <li>Nếu hòa 8-8: Mỗi đội cử 1 cặp mạnh nhất đánh Tie-break &quot;bàn thắng vàng&quot; (Golden Point).</li>
+                                    <li><strong>Vòng 1-2:</strong> Tổng có 8 trận đấu, mỗi trận thắng = <strong>1 điểm</strong>.</li>
+                                    <li><strong>Vòng 3 - ĐỒNG ĐỘI:</strong> Đội thắng nhận = <strong>+3 ĐIỂM</strong> 🔥</li>
+                                    <li>🎯 <strong>Tổng điểm tối đa:</strong> 8 điểm (Vòng 1-2) + 3 điểm (Vòng 3) = <strong>11 điểm</strong></li>
+                                    <li>🏆 <strong>Điều kiện vô địch:</strong> Đội nào có tổng điểm cao hơn sau Vòng 3.</li>
+                                    <li>⚡ <strong>Yếu tố bất ngờ:</strong> Dù thua 3-5 sau Vòng 1-2, nếu thắng ĐỒNG ĐỘI +3 điểm = 6 điểm! Cục diện có thể thay đổi hoàn toàn ở vòng cuối.</li>
                                 </ul>
                             </li>
 
-                            <li><strong>Luật thi đấu (Cập nhật):</strong>
+                            <li><strong>Luật thi đấu:</strong>
                                 <ul>
-                                    <li>🏓 <strong>Đánh Đôi:</strong> 1 Set 15 điểm, cách 2 điểm thắng (Nếu hòa 16-16 thì ai lên 17 trước là thắng - <strong>Chạm 17</strong>).</li>
-                                    <li>🏓 <strong>Đánh Đơn:</strong> 1 Set 11 điểm, cách 2 điểm thắng (Nếu hòa 12-12 thì ai lên 13 trước là thắng - <strong>Chạm 13</strong>).</li>
-                                    <li>Đổi sân khi đạt 8 điểm (với Đôi) hoặc 6 điểm (với Đơn).</li>
+                                    <li>🏓 <strong>Vòng 1 & 2:</strong> 1 Set 15 điểm, cách 2 điểm thắng (Nếu hòa 16-16 thì chạm 17). Đổi sân khi đạt 8 điểm.</li>
+                                    <li>🏓 <strong>Vòng 3 - ĐỒNG ĐỘI:</strong> Chạm 25 điểm trực tiếp (không cần cách 2 điểm). Thay cặp đôi sau mỗi 4 điểm được ghi. Đổi sân khi đạt 13 điểm.</li>
                                 </ul>
                             </li>
                         </ul>
@@ -72,24 +72,26 @@ export default function Tournament() {
                     <table className="schedule-table">
                         <thead>
                             <tr>
-                                <th width="15%">Giờ</th>
-                                <th width="15%">Sân</th>
-                                <th width="25%">Team XANH</th>
-                                <th width="10%">VS</th>
-                                <th width="25%">Team ĐỎ</th>
-                                <th width="10%">Loại</th>
+                                <th width="12%">Giờ</th>
+                                <th width="8%">Số trận</th>
+                                <th width="12%">Sân</th>
+                                <th width="23%">Team XANH</th>
+                                <th width="8%">VS</th>
+                                <th width="23%">Team ĐỎ</th>
+                                <th width="8%">Loại</th>
                             </tr>
                         </thead>
                         <tbody>
                             {/* Phase 1 */}
                             <tr>
-                                <td colSpan="6" className="phase-header">
+                                <td colSpan="7" className="phase-header">
                                     VÒNG 1: ĐÁNH ĐÔI BÍ MẬT<br />
                                     <span style={{ fontWeight: 'normal', fontSize: '0.85rem' }}>Đội trưởng nộp danh sách kín - Set 15 (Chạm 17)</span>
                                 </td>
                             </tr>
                             <tr>
-                                <td rowSpan="2">17:45 - 18:10</td>
+                                <td rowSpan="2">17:00 - 17:25</td>
+                                <td>1</td>
                                 <td className="court-col">Sân 1</td>
                                 <td>Cặp Xanh 1</td>
                                 <td>-</td>
@@ -97,6 +99,7 @@ export default function Tournament() {
                                 <td>Đôi</td>
                             </tr>
                             <tr>
+                                <td>2</td>
                                 <td className="court-col">Sân 2</td>
                                 <td>Cặp Xanh 2</td>
                                 <td>-</td>
@@ -104,7 +107,8 @@ export default function Tournament() {
                                 <td>Đôi</td>
                             </tr>
                             <tr>
-                                <td rowSpan="2">18:10 - 18:35</td>
+                                <td rowSpan="2">17:25 - 17:50</td>
+                                <td>3</td>
                                 <td className="court-col">Sân 1</td>
                                 <td>Cặp Xanh 3</td>
                                 <td>-</td>
@@ -112,6 +116,7 @@ export default function Tournament() {
                                 <td>Đôi</td>
                             </tr>
                             <tr>
+                                <td>4</td>
                                 <td className="court-col">Sân 2</td>
                                 <td>Cặp Xanh 4</td>
                                 <td>-</td>
@@ -121,13 +126,14 @@ export default function Tournament() {
 
                             {/* Phase 2 */}
                             <tr>
-                                <td colSpan="6" className="phase-header">
-                                    VÒNG 2: ĐÁNH ĐÔI THÁCH ĐẤU<br />
-                                    <span style={{ fontWeight: 'normal', fontSize: '0.85rem' }}>Đội THUA Vòng 1 được quyền chọn cặp đấu - Set 15 (Chạm 17)</span>
+                                <td colSpan="7" className="phase-header">
+                                    VÒNG 2: ĐỔI CẶP XOAY VÒNG<br />
+                                    <span style={{ fontWeight: 'normal', fontSize: '0.85rem' }}>Bắt buộc đổi cặp - Đội THUA Vòng 1 chọn đối thủ - Set 15 (Chạm 17)</span>
                                 </td>
                             </tr>
                             <tr>
-                                <td rowSpan="2">18:40 - 19:05</td>
+                                <td rowSpan="2">17:55 - 18:20</td>
+                                <td>5</td>
                                 <td className="court-col">Sân 1</td>
                                 <td>Cặp Xanh A</td>
                                 <td>-</td>
@@ -135,6 +141,7 @@ export default function Tournament() {
                                 <td>Đôi</td>
                             </tr>
                             <tr>
+                                <td>6</td>
                                 <td className="court-col">Sân 2</td>
                                 <td>Cặp Xanh B</td>
                                 <td>-</td>
@@ -142,7 +149,8 @@ export default function Tournament() {
                                 <td>Đôi</td>
                             </tr>
                             <tr>
-                                <td rowSpan="2">19:05 - 19:30</td>
+                                <td rowSpan="2">18:20 - 18:45</td>
+                                <td>7</td>
                                 <td className="court-col">Sân 1</td>
                                 <td>Cặp Xanh C</td>
                                 <td>-</td>
@@ -150,6 +158,7 @@ export default function Tournament() {
                                 <td>Đôi</td>
                             </tr>
                             <tr>
+                                <td>8</td>
                                 <td className="court-col">Sân 2</td>
                                 <td>Cặp Xanh D</td>
                                 <td>-</td>
@@ -159,77 +168,37 @@ export default function Tournament() {
 
                             {/* Phase 3 */}
                             <tr>
-                                <td colSpan="6" className="phase-header">
-                                    VÒNG 3: SOLO 1vs1 QUYẾT ĐỊNH<br />
-                                    <span style={{ fontWeight: 'normal', fontSize: '0.85rem' }}>Khớp cặp theo trình độ tương đương - Set 11 (Chạm 13)</span>
+                                <td colSpan="7" className="phase-header">
+                                    VÒNG 3: ĐỒNG ĐỘI<br />
+                                    <span style={{ fontWeight: 'normal', fontSize: '0.85rem' }}>Cả đội ra sân - Chạm 25 - Thay cặp sau mỗi 4 điểm</span>
                                 </td>
                             </tr>
                             <tr>
-                                <td rowSpan="2">19:35 - 19:50</td>
+                                <td>18:50 - 20:05</td>
+                                <td>9</td>
                                 <td className="court-col">Sân 1</td>
-                                <td>Đơn Nam 8</td>
-                                <td>-</td>
-                                <td>Đơn Nam 8</td>
-                                <td>Đơn</td>
+                                <td colSpan="3" style={{ textAlign: 'center', fontWeight: 'bold' }}>Team XANH vs Team ĐỎ</td>
+                                <td>Đồng Đội</td>
                             </tr>
                             <tr>
-                                <td className="court-col">Sân 2</td>
-                                <td>Đơn Nam 7</td>
-                                <td>-</td>
-                                <td>Đơn Nam 7</td>
-                                <td>Đơn</td>
-                            </tr>
-                            <tr>
-                                <td rowSpan="2">19:50 - 20:05</td>
-                                <td className="court-col">Sân 1</td>
-                                <td>Đơn Nam 6</td>
-                                <td>-</td>
-                                <td>Đơn Nam 6</td>
-                                <td>Đơn</td>
-                            </tr>
-                            <tr>
-                                <td className="court-col">Sân 2</td>
-                                <td>Đơn Nam 5</td>
-                                <td>-</td>
-                                <td>Đơn Nam 5</td>
-                                <td>Đơn</td>
-                            </tr>
-                            <tr>
-                                <td rowSpan="2">20:05 - 20:20</td>
-                                <td className="court-col">Sân 1</td>
-                                <td>Đơn Nam 4</td>
-                                <td>-</td>
-                                <td>Đơn Nam 4</td>
-                                <td>Đơn</td>
-                            </tr>
-                            <tr>
-                                <td className="court-col">Sân 2</td>
-                                <td>Đơn Nam 3</td>
-                                <td>-</td>
-                                <td>Đơn Nam 3</td>
-                                <td>Đơn</td>
-                            </tr>
-                            <tr>
-                                <td rowSpan="2">20:20 - 20:35</td>
-                                <td className="court-col">Sân 1</td>
-                                <td>Đơn Nam 2 (Ace)</td>
-                                <td>-</td>
-                                <td>Đơn Nam 2 (Ace)</td>
-                                <td>Đơn</td>
-                            </tr>
-                            <tr>
-                                <td className="court-col">Sân 2</td>
-                                <td>Đơn Nam 1 (Super Ace)</td>
-                                <td>-</td>
-                                <td>Đơn Nam 1 (Super Ace)</td>
-                                <td>Đơn</td>
+                                <td colSpan="7" style={{ padding: '10px', fontSize: '0.85rem', background: 'rgba(139, 92, 246, 0.1)' }}>
+                                    <strong>Luật Đồng Đội:</strong> Đội trưởng sắp xếp 4 cặp đôi theo thứ tự 1-2-3-4 (khuyến khích sắp xếp cặp mới không trùng với Vòng 1 và 2). Cặp 1 ra sân trước, sau mỗi 4 điểm được ghi thì thay cặp tiếp theo (1→2→3→4→1...). Đội nào chạm 25 điểm trước thắng. Tất cả 8 người đều được ra sân.
+                                </td>
                             </tr>
                         </tbody>
                     </table>
 
                     {/* Prizes & Finance */}
                     <div className="prize-section">
-                        <h3 style={{ marginTop: 0, color: 'var(--secondary)' }}>💰 CƠ CẤU GIẢI THƯỞNG & TÀI CHÍNH</h3>
+                        <h3 style={{ marginTop: 0, color: 'var(--secondary)' }}>🏆 GIẢI THƯỞNG & LỄ TRAO CÚP</h3>
+                        <p><strong>Đội Vô Địch nhận:</strong></p>
+                        <ul style={{ listStyle: 'none', padding: 0, marginBottom: '15px' }}>
+                            <li>🏆 01 Cúp Vô Địch</li>
+                            <li>👏 Toàn bộ đội thua phải đứng lên vỗ tay chúc mừng</li>
+                            <li>🤝 Đội trưởng đội thua lên trao cúp cho đội thắng</li>
+                        </ul>
+
+                        <h3 style={{ marginTop: '20px', color: 'var(--secondary)' }}>💰 CƠ CẤU TÀI CHÍNH</h3>
                         <p>Toàn bộ thành viên tham gia Gala Dinner tổng kết ngay sau trận đấu.</p>
                         <p><strong>QUY TẮC THANH TOÁN BILL:</strong></p>
                         <ul style={{ listStyle: 'none', padding: 0 }}>

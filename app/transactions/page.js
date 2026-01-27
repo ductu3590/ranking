@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import './transactions.css';
+import UserStatusBadge from '@/components/UserStatusBadge';
 
 export default function TransactionsPage() {
     const [transactions, setTransactions] = useState([]);
@@ -87,7 +88,10 @@ export default function TransactionsPage() {
                         <h1>💰 Theo dõi Quỹ</h1>
                         <p className="page-subtitle">Lịch sử giao dịch tiền vào & tiền ra</p>
                     </div>
-                    <a href="/" className="btn-back">← Trang chủ</a>
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                        <UserStatusBadge />
+                        <a href="/" className="btn-back">← Trang chủ</a>
+                    </div>
                 </div>
 
                 {/* Stats Cards */}

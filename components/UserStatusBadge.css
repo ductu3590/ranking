@@ -1,0 +1,56 @@
+.user-badge {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s;
+}
+
+.user-badge.loading {
+    background: rgba(156, 163, 175, 0.2);
+    color: #6b7280;
+}
+
+.admin-badge {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    color: white;
+}
+
+.admin-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+}
+
+.captain-badge {
+    color: white;
+}
+
+.captain-badge.captain-blue {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.captain-badge.captain-red {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.captain-badge:hover {
+    transform: translateY(-2px);
+}
+
+.guest-badge {
+    background: rgba(156, 163, 175, 0.2);
+    color: #4b5563;
+    border: 2px solid rgba(156, 163, 175, 0.3);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .user-badge {
+        padding: 6px 12px;
+        font-size: 0.75rem;
+    }
+}

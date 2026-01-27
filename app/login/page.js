@@ -25,8 +25,16 @@ export default function LoginPage() {
 
             if (error) throw error;
 
-            // Redirect to admin page
-            router.push('/admin');
+            // Check user role for redirect
+            const userRole = data.user?.user_metadata?.role;
+
+            if (userRole === 'captain') {
+                // Redirect captains to tournament dashboard
+                router.push('/tournament/captain');
+            } else {
+                // Redirect others to admin page
+                router.push('/admin');
+            }
         } catch (error) {
             setError(error.message || 'Đăng nhập thất bại');
         } finally {

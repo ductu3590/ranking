@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
 import './admin.css';
+import UserStatusBadge from '@/components/UserStatusBadge';
 
 export default function AdminPage() {
     const [transactions, setTransactions] = useState([]);
@@ -316,6 +317,7 @@ export default function AdminPage() {
                             <p className="admin-subtitle">Hệ thống theo dõi giao dịch và thành viên</p>
                         </div>
                         <div className="header-buttons">
+                            <UserStatusBadge />
                             <a href="/" className="btn-home">
                                 🏠 Trang chủ
                             </a>

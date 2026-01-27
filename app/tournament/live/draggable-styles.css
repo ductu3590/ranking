@@ -1,0 +1,57 @@
+/* ===================================
+   CSS for Draggable Pairing Boxes
+   Add to: app/tournament/live/live.css
+   =================================== */
+
+/* Draggable cursor styles */
+.pair-box.draggable,
+.order-item.draggable {
+    cursor: grab;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.pair-box.draggable:active,
+.order-item.draggable:active {
+    cursor: grabbing;
+    opacity: 0.6;
+    transform: scale(1.05);
+    z-index: 1000;
+}
+
+.pair-box.draggable:hover,
+.order-item.draggable:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    transform: translateY(-2px);
+}
+
+/* Visual feedback when dragging over */
+.pair-box.draggable:hover::after,
+.order-item.draggable:hover::after {
+    content: '⇅';
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+    color: #10b981;
+    animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(-50%);
+    }
+
+    50% {
+        transform: translateY(-45%);
+    }
+}
+
+/* Admin helper text */
+.round-pairings h3 span {
+    font-weight: 400;
+    margin-left: 10px;
+}

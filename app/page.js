@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
+import UserStatusBadge from '@/components/UserStatusBadge';
 
 export default function Home() {
     const [stats, setStats] = useState([]);
@@ -217,7 +218,10 @@ export default function Home() {
         }}>
             <div style={{ maxWidth: '900px', margin: '0 auto' }}>
                 {/* Header */}
-                <div style={{ textAlign: 'center', marginBottom: isMobile ? '20px' : '30px', color: '#fff' }}>
+                <div style={{ textAlign: 'center', marginBottom: isMobile ? '20px' : '30px', color: '#fff', position: 'relative' }}>
+                    <div style={{ position: 'absolute', top: 0, right: 0 }}>
+                        <UserStatusBadge />
+                    </div>
                     <h1 style={{
                         fontSize: isMobile ? '28px' : '42px',
                         fontWeight: '800',

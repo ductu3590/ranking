@@ -1,0 +1,41 @@
+// ==============================================
+// FIX SYNTAX ERROR - live/page.js
+// ==============================================
+
+// LỖI: Ở cuối file (dòng 495-498) có:
+                </div>
+            </div>
+            );
+}
+
+// PHẢI SỬA THÀNH (đúng indent và closing):
+                </div>
+        </div>
+    );
+}
+
+// ==============================================
+// HƯỚNG DẪN SỬA:
+// ==============================================
+// 1. Mở file: app/tournament/live/page.js
+// 2. Scroll xuống cuối file (dòng ~495-498)
+// 3. Tìm đoạn:
+//        </div>
+//            );
+// 4. Xóa 2 dòng đó
+// 5. Thay bằng:
+//        </div>
+//    );
+// 6. Save file
+
+// CHI TIẾT:
+// - Dòng 496 phải là:         </div>  (8 spaces)
+// - Dòng 497 phải là:     );          (4 spaces)
+// - Dòng 498: }
+
+// HOẶC đơn giản: Copy 4 dòng bên dưới và paste thay cho 4 dòng cuối file:
+
+                </div>
+        </div>
+    );
+}

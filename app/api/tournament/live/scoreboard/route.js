@@ -2,21 +2,42 @@ import { supabaseServer as supabase } from '@/lib/supabaseServer';
 import { NextResponse } from 'next/server';
 import { calculateTeamScore } from '@/lib/tournamentHelpers';
 
+// Force dynamic rendering and disable caching
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // GET /api/tournament/live/scoreboard
 // Calculate and return team scores
 export async function GET() {
     try {
-        // Fetch all completed matches
+        // Fetch all matches - USE EXACT SAME QUERY AS /api/tournament/live/matches
         const { data: matches, error } = await supabase
             .from('tournament_matches')
             .select('*')
-            .eq('tournament_id', 1);
+            .eq('tournament_id', 1)
+            .order('match_number'); // Add order to prevent caching issues
 
-        if (error) throw error;
+        if (error) {
+            console.error('[Scoreboard API] Database error:', error);
+            throw error;
+        }
+
+        console.log('[Scoreboard API] Total matches:', matches?.length);
+        console.log('[Scoreboard API] Matches:', JSON.stringify(matches?.map(m => ({
+            id: m.id,
+            round: m.round_number,
+            status: m.match_status,
+            blue_score: m.blue_score,
+            red_score: m.red_score,
+            winner: m.winner_team
+        })), null, 2));
 
         // Calculate scores for both teams
         const blueScore = calculateTeamScore(matches || [], 'blue');
         const redScore = calculateTeamScore(matches || [], 'red');
+
+        console.log('[Scoreboard API] Blue score:', blueScore);
+        console.log('[Scoreboard API] Red score:', redScore);
 
         // Determine leader
         const leader = blueScore.total > redScore.total ? 'blue' :

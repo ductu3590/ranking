@@ -45,7 +45,7 @@ export async function GET() {
 export async function POST(request) {
     try {
         const body = await request.json();
-        const { matchId, blueScore, redScore, status } = body;
+        const { matchId, blueScore, redScore, status, isReset } = body;
 
         if (!matchId) {
             return NextResponse.json(
@@ -54,21 +54,37 @@ export async function POST(request) {
             );
         }
 
-        // Determine winner
-        let winner = null;
-        if (status === 'completed' && blueScore != null && redScore != null) {
-            winner = blueScore > redScore ? 'blue' : 'red';
-        }
-
-        // Update match
-        const updateData = {
+        let updateData = {
             updated_at: new Date().toISOString()
         };
 
-        if (blueScore != null) updateData.blue_score = blueScore;
-        if (redScore != null) updateData.red_score = redScore;
-        if (status) updateData.match_status = status;
-        if (winner) updateData.winner_team = winner;
+        if (isReset) {
+            // Reset match to initial state
+            updateData = {
+                ...updateData,
+                blue_score: null,
+                red_score: null,
+                match_status: 'pending',
+                winner_team: null
+            };
+        } else {
+            // Determine winner
+            let winner = null;
+            if (status === 'completed' && blueScore != null && redScore != null) {
+                if (blueScore !== redScore) {
+                    winner = blueScore > redScore ? 'blue' : 'red';
+                }
+                // If blueScore === redScore, winner stays null (tie)
+            }
+
+            if (blueScore != null) updateData.blue_score = blueScore;
+            if (redScore != null) updateData.red_score = redScore;
+            if (status) updateData.match_status = status;
+            if (winner) updateData.winner_team = winner;
+        }
+
+        console.log('[UPDATE MATCH] Updating match:', matchId);
+        console.log('[UPDATE MATCH] Update data:', updateData);
 
         const { data, error } = await supabase
             .from('tournament_matches')
@@ -77,11 +93,16 @@ export async function POST(request) {
             .select()
             .single();
 
-        if (error) throw error;
+        if (error) {
+            console.error('[UPDATE MATCH] Database error:', error);
+            throw error;
+        }
+
+        console.log('[UPDATE MATCH] Update successful:', data);
 
         return NextResponse.json({
             success: true,
-            message: 'Cập nhật điểm số thành công',
+            message: isReset ? 'Đã xoá tỉ số' : 'Cập nhật điểm số thành công',
             match: data
         });
 

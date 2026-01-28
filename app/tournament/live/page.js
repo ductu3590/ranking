@@ -28,7 +28,8 @@ export default function LiveTournament() {
                 event: '*',
                 schema: 'public',
                 table: 'tournament_matches'
-            }, () => {
+            }, (payload) => {
+                console.log('[Realtime] tournament_matches changed:', payload);
                 fetchMatches();
                 fetchScoreboard();
             })
@@ -36,7 +37,8 @@ export default function LiveTournament() {
                 event: '*',
                 schema: 'public',
                 table: 'tournament_pairings'
-            }, () => {
+            }, (payload) => {
+                console.log('[Realtime] tournament_pairings changed:', payload);
                 fetchPairings();
             })
             .subscribe();
@@ -114,9 +116,11 @@ export default function LiveTournament() {
 
     async function fetchScoreboard() {
         try {
-            const res = await fetch('/api/tournament/live/scoreboard');
+            const res = await fetch(`/api/tournament/live/scoreboard?t=${Date.now()}`, { cache: 'no-store' });
             const data = await res.json();
+            console.log('Scoreboard fetch result:', data);
             if (data.success) {
+                console.log('Setting scoreboard:', data.scoreboard);
                 setScoreboard(data.scoreboard);
             }
         } catch (err) {
@@ -151,21 +155,49 @@ export default function LiveTournament() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     matchId,
-                    blue_score: parseInt(blueScore),
-                    red_score: parseInt(redScore),
-                    match_status: 'live'
+                    blueScore: parseInt(blueScore),
+                    redScore: parseInt(redScore),
+                    status: 'completed'
                 })
             });
 
             const data = await res.json();
             if (data.success) {
-                fetchMatches(); // Refresh data
+                await fetchMatches(); // Refresh data
+                await fetchScoreboard(); // Update scoreboard
                 setEditingScore(null);
             } else {
                 alert('Lỗi cập nhật: ' + (data.error || 'Unknown error'));
             }
         } catch (err) {
             console.error('Update score error:', err);
+            alert('Lỗi kết nối');
+        }
+    }
+
+    async function deleteScore(matchId) {
+        if (!confirm('Bạn có chắc chắn muốn xoá tỉ số trận này?')) return;
+
+        try {
+            const res = await fetch('/api/tournament/live/matches', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    matchId,
+                    isReset: true
+                })
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                await fetchMatches(); // Refresh data
+                await fetchScoreboard(); // Update scoreboard
+                setEditingScore(null);
+            } else {
+                alert('Lỗi xoá: ' + (data.error || 'Unknown error'));
+            }
+        } catch (err) {
+            console.error('Delete score error:', err);
             alert('Lỗi kết nối');
         }
     }
@@ -455,32 +487,36 @@ export default function LiveTournament() {
                             </thead>
                             <tbody>
                                 {matches.map((match, index) => {
-                                    // Calculate/Derive Round and Pair Order from match index/number
-                                    // Assuming 12 matches sorted by order:
-                                    // 0-3: Round 1
-                                    // 4-7: Round 2
-                                    // 8-11: Round 3
-                                    let round = 1;
-                                    let pairIndex = index;
+                                    // Determine match content based on match_type
+                                    let blueDisplay, redDisplay;
 
-                                    if (index >= 4 && index < 8) {
-                                        round = 2;
-                                        pairIndex = index - 4;
-                                    } else if (index >= 8) {
-                                        round = 3;
-                                        pairIndex = index - 8;
+                                    if (match.match_type === 'team') {
+                                        // ALL TEAM match in Round 3
+                                        blueDisplay = 'ALL TEAM XANH';
+                                        redDisplay = 'ALL TEAM ĐỎ';
+                                    } else {
+                                        // Regular doubles match - get pairing from database
+                                        // Use match.round_number and calculate pair index
+                                        let round = match.round_number;
+
+                                        // For round 1 and 2, matches 1-4 map to pair_order 1-4
+                                        // match_number 1,2,3,4 => pair_order 1,2,3,4 (round 1)
+                                        // match_number 5,6,7,8 => pair_order 1,2,3,4 (round 2)
+                                        let pairIndex = ((match.match_number - 1) % 4);
+
+                                        const bluePairing = pairings.blue[`round${round}`]?.[pairIndex];
+                                        const redPairing = pairings.red[`round${round}`]?.[pairIndex];
+
+                                        blueDisplay = bluePairing ? renderPair(bluePairing) : '---';
+                                        redDisplay = redPairing ? renderPair(redPairing) : '---';
                                     }
-
-                                    // Get dynamic pairing from state
-                                    const bluePairing = pairings.blue[`round${round}`]?.[pairIndex];
-                                    const redPairing = pairings.red[`round${round}`]?.[pairIndex];
 
                                     return (
                                         <tr key={match.id} className={`match-row ${match.match_status}`}>
                                             <td>{match.scheduled_time}</td>
                                             <td className="court-cell">Sân {match.court_number || 1}</td>
                                             <td className="team-cell blue-cell">
-                                                {bluePairing ? renderPair(bluePairing) : '---'}
+                                                {blueDisplay}
                                             </td>
                                             <td className="score-cell">
                                                 {userRole === 'admin' ? (
@@ -513,6 +549,13 @@ export default function LiveTournament() {
                                                             >
                                                                 ✖
                                                             </button>
+                                                            <button
+                                                                onClick={() => deleteScore(match.id)}
+                                                                style={{ padding: '4px 8px', fontSize: '12px', cursor: 'pointer', background: '#ef4444', color: 'white', border: 'none', borderRadius: '4px', marginLeft: '4px' }}
+                                                                title="Xoá tỉ số"
+                                                            >
+                                                                🗑️
+                                                            </button>
                                                         </div>
                                                     ) : (
                                                         <span
@@ -532,7 +575,7 @@ export default function LiveTournament() {
                                                 )}
                                             </td>
                                             <td className="team-cell red-cell">
-                                                {redPairing ? renderPair(redPairing) : '---'}
+                                                {redDisplay}
                                             </td>
                                             <td className="status-cell">
                                                 {getMatchStatus(match)}

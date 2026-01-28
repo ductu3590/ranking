@@ -318,6 +318,9 @@ export default function AdminPage() {
                         </div>
                         <div className="header-buttons">
                             <UserStatusBadge />
+                            <a href="/admin/tournament" className="btn-tournament">
+                                🏆 Quản lý giải đấu
+                            </a>
                             <a href="/" className="btn-home">
                                 🏠 Trang chủ
                             </a>

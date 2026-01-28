@@ -85,6 +85,29 @@
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
+.btn-tournament {
+    background: white;
+    border: 2px solid #ed8936;
+    color: #ed8936;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-tournament:hover {
+    background: #ed8936;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(237, 137, 54, 0.3);
+}
+
 .btn-logout {
     background: white;
     border: 2px solid #f56565;
@@ -680,7 +703,15 @@ tbody tr.selected:hover {
         align-items: flex-start;
     }
 
-    .btn-home {
+    .header-buttons {
+        width: 100%;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .btn-home,
+    .btn-tournament,
+    .btn-logout {
         width: 100%;
         justify-content: center;
     }

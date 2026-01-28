@@ -198,6 +198,7 @@ export default function AdminTournamentPanel() {
             <div className="admin-tournament-header">
                 <h1>🎾 Quản Lý Giải Đấu</h1>
                 <div className="header-actions">
+                    <a href="/admin/tournament/pairings" className="btn-secondary">📝 Manage Pairings</a>
                     <a href="/admin" className="btn-secondary">← Admin Dashboard</a>
                     <a href="/tournament/live" className="btn-secondary">👁️ Xem Live</a>
                 </div>

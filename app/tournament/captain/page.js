@@ -22,6 +22,7 @@ export default function CaptainDashboard() {
     const [submitStatus, setSubmitStatus] = useState({});
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [pairingsLocked, setPairingsLocked] = useState(false);
 
     // Password Change State
     const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -59,6 +60,9 @@ export default function CaptainDashboard() {
                 if (!metadata.password_changed) {
                     setShowPasswordModal(true);
                 }
+
+                // Check pairings lock status
+                await checkPairingsLock();
 
                 setLoading(false);
             } catch (err) {
@@ -199,9 +203,25 @@ export default function CaptainDashboard() {
         return (teamData?.players || []).filter(p => !selectedIds.includes(p.id));
     }
 
+    async function checkPairingsLock() {
+        try {
+            const res = await fetch('/api/tournament/admin/toggle-pairings-lock');
+            const data = await res.json();
+            setPairingsLocked(data.locked || false);
+        } catch (error) {
+            console.error('Error checking lock status:', error);
+        }
+    }
+
     async function saveDraft() {
         setError('');
         setSuccess('');
+
+        // Check if pairings are locked
+        if (pairingsLocked) {
+            setError('🔒 Pairings đã bị khoá bởi admin. Không thể chỉnh sửa.');
+            return;
+        }
 
         // Check deadline for Round 1
         if (currentRound === 1) {
@@ -252,6 +272,12 @@ export default function CaptainDashboard() {
         setError('');
         setSuccess('');
 
+        // Check if pairings are locked
+        if (pairingsLocked) {
+            setError('🔒 Pairings đã bị khoá bởi admin. Không thể chỉnh sửa.');
+            return;
+        }
+
         // Check deadline for Round 1
         if (currentRound === 1) {
             const now = new Date();
@@ -295,6 +321,12 @@ export default function CaptainDashboard() {
     }
 
     async function unlockForEdit() {
+        // Check if pairings are locked
+        if (pairingsLocked) {
+            setError('🔒 Pairings đã bị khoá bởi admin. Không thể chỉnh sửa.');
+            return;
+        }
+
         // Check if past deadline (16:30)
         const now = new Date();
         const deadline = new Date('2026-01-28T16:30:00+07:00');

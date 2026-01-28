@@ -89,7 +89,7 @@ export default function LiveTournament() {
 
     async function fetchPairings() {
         try {
-            const res = await fetch('/api/tournament/live/pairings');
+            const res = await fetch('/api/tournament/live/pairings', { cache: 'no-store' });
             const data = await res.json();
             if (data.success) {
                 setPairings(data.pairings);

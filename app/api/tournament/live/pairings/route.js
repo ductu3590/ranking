@@ -2,6 +2,9 @@ import { supabaseServer as supabase } from '@/lib/supabaseServer';
 import { NextResponse } from 'next/server';
 import { canRevealRound1 } from '@/lib/tournamentHelpers';
 
+export const dynamic = 'force-dynamic';
+
+
 // GET /api/tournament/live/pairings
 // Fetch all pairings for public display (filter hidden Round 1 if not time)
 export async function GET() {
@@ -39,7 +42,9 @@ export async function GET() {
         // - If past 16:30 deadline: reveal all
         // - If RED team submitted: reveal all
         // - Otherwise: hide BLUE team (keep it blurred)
-        const canReveal = isPastDeadline || redHasSubmitted;
+        // const canReveal = isPastDeadline || redHasSubmitted;
+        const canReveal = true; // FORCED UNLOCK by Admin request
+
 
         console.log('[LIVE API] Past deadline:', isPastDeadline);
         console.log('[LIVE API] RED team submitted:', redHasSubmitted);

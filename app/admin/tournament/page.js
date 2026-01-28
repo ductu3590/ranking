@@ -156,17 +156,22 @@ export default function AdminTournamentPanel() {
     async function handleRevealRound1() {
         if (!confirm('Bạn có chắc muốn công bố danh sách Round 1?')) return;
 
-        const now = new Date().toISOString();
-        const { error } = await supabase
-            .from('tournament_settings')
-            .update({ round1_reveal_time: now })
-            .eq('id', settings.id);
+        try {
+            const res = await fetch('/api/tournament/admin/toggle-round1', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reveal: true })
+            });
 
-        if (error) {
-            alert('Lỗi: ' + error.message);
-        } else {
-            alert('Đã công bố Round 1!');
-            loadSettings();
+            const data = await res.json();
+            if (data.success) {
+                alert('✅ Đã công bố Round 1!');
+                loadSettings();
+            } else {
+                alert('❌ Lỗi: ' + data.error);
+            }
+        } catch (err) {
+            alert('❌ Lỗi kết nối');
         }
     }
 

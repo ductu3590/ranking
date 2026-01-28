@@ -199,14 +199,88 @@
     color: #a78bfa;
 }
 
-.hidden-notice {
+/* Round 1 Blur Effect */
+.round-1-container {
+    position: relative;
+}
+
+.blurred-round .pairing-grid,
+.blurred-round .pair-box,
+.blurred-round .team-order {
+    filter: blur(8px);
+    pointer-events: none;
+    user-select: none;
+}
+
+.blur-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    backdrop-filter: blur(2px);
+    background: rgba(15, 23, 42, 0.3);
+}
+
+.lock-message {
     text-align: center;
-    padding: 40px;
-    background: rgba(139, 92, 246, 0.1);
-    border: 2px dashed #8b5cf6;
+    padding: 30px 40px;
+    background: rgba(139, 92, 246, 0.95);
+    border: 2px solid #a78bfa;
+    border-radius: 12px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: white;
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+    animation: pulse-glow 2s infinite;
+}
+
+.lock-message-small {
+    text-align: center;
+    padding: 15px 25px;
+    background: rgba(139, 92, 246, 0.95);
+    border: 2px solid #a78bfa;
     border-radius: 8px;
-    font-size: 1.2rem;
-    color: #a78bfa;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: white;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+}
+
+/* Round 2 Column Layout */
+.round2-column {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    flex: 1;
+}
+
+.round2-pair-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.round2-pair-row .vs-small {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #94a3b8;
+}
+
+@keyframes pulse-glow {
+
+    0%,
+    100% {
+        box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 8px 35px rgba(139, 92, 246, 0.6);
+    }
 }
 
 .pairing-grid {

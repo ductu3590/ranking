@@ -1,0 +1,39 @@
+﻿{
+    "success":  true,
+    "tests":  {
+                  "test1_all":  {
+                                    "count":  12
+                                },
+                  "test2_submitted":  {
+                                          "count":  12
+                                      },
+                  "test3_withTeam":  {
+                                         "count":  1,
+                                         "data":  [
+                                                      {
+                                                          "id":  25,
+                                                          "tournament_id":  1,
+                                                          "team_id":  1,
+                                                          "round_number":  1,
+                                                          "pair_order":  1,
+                                                          "player1_id":  4,
+                                                          "player2_id":  6,
+                                                          "status":  "submitted",
+                                                          "is_hidden":  true,
+                                                          "submitted_at":  "2026-01-28T01:18:13.147+00:00",
+                                                          "created_at":  "2026-01-28T01:18:11.793028+00:00",
+                                                          "updated_at":  "2026-01-28T01:18:11.793028+00:00",
+                                                          "team":  {
+                                                                       "id":  1,
+                                                                       "team_code":  "blue",
+                                                                       "team_name":  "TEAM XANH",
+                                                                       "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                                                       "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                                                       "tournament_id":  1,
+                                                                       "captain_user_id":  "a1a4e30f-ae81-429b-b429-50c70a5fd810"
+                                                                   }
+                                                      }
+                                                  ]
+                                     }
+              }
+}

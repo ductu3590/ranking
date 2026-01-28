@@ -1,0 +1,652 @@
+﻿{
+    "success":  true,
+    "total":  12,
+    "pairings":  {
+                     "blue":  {
+                                  "round1":  [
+                                                 {
+                                                     "id":  25,
+                                                     "pair_order":  1,
+                                                     "player1":  "NGUYỄN MẠNH THẮNG",
+                                                     "player2":  "ĐINH TRỌNG GIÁP",
+                                                     "status":  "submitted",
+                                                     "is_hidden":  true,
+                                                     "submitted_at":  "2026-01-28T01:18:13.147+00:00",
+                                                     "created_at":  "2026-01-28T01:18:11.793028+00:00"
+                                                 },
+                                                 {
+                                                     "id":  26,
+                                                     "pair_order":  2,
+                                                     "player1":  "KM - SƠN BÉO",
+                                                     "player2":  "KM - HẢI BVT",
+                                                     "status":  "submitted",
+                                                     "is_hidden":  true,
+                                                     "submitted_at":  "2026-01-28T01:18:13.147+00:00",
+                                                     "created_at":  "2026-01-28T01:18:11.793028+00:00"
+                                                 },
+                                                 {
+                                                     "id":  27,
+                                                     "pair_order":  3,
+                                                     "player1":  "ĐỖ ĐỨC TÚ",
+                                                     "player2":  "TRẦN TẤT HẢO",
+                                                     "status":  "submitted",
+                                                     "is_hidden":  true,
+                                                     "submitted_at":  "2026-01-28T01:18:13.147+00:00",
+                                                     "created_at":  "2026-01-28T01:18:11.793028+00:00"
+                                                 },
+                                                 {
+                                                     "id":  28,
+                                                     "pair_order":  4,
+                                                     "player1":  "VŨ NGỌC HƯNG",
+                                                     "player2":  "ĐẶNG NGỌC DƯƠNG",
+                                                     "status":  "submitted",
+                                                     "is_hidden":  true,
+                                                     "submitted_at":  "2026-01-28T01:18:13.147+00:00",
+                                                     "created_at":  "2026-01-28T01:18:11.793028+00:00"
+                                                 }
+                                             ],
+                                  "round2":  [
+                                                 {
+                                                     "id":  29,
+                                                     "pair_order":  1,
+                                                     "player1":  "ĐỖ ĐỨC TÚ",
+                                                     "player2":  "ĐẶNG NGỌC DƯƠNG",
+                                                     "status":  "submitted",
+                                                     "is_hidden":  false,
+                                                     "submitted_at":  "2026-01-28T01:18:21.727+00:00",
+                                                     "created_at":  "2026-01-28T01:18:20.642863+00:00"
+                                                 },
+                                                 {
+                                                     "id":  30,
+                                                     "pair_order":  2,
+                                                     "player1":  "ĐINH TRỌNG GIÁP",
+                                                     "player2":  "KM - HẢI BVT",
+                                                     "status":  "submitted",
+                                                     "is_hidden":  false,
+                                                     "submitted_at":  "2026-01-28T01:18:21.727+00:00",
+                                                     "created_at":  "2026-01-28T01:18:20.642863+00:00"
+                                                 },
+                                                 {
+                                                     "id":  31,
+                                                     "pair_order":  3,
+                                                     "player1":  "VŨ NGỌC HƯNG",
+                                                     "player2":  "NGUYỄN MẠNH THẮNG",
+                                                     "status":  "submitted",
+                                                     "is_hidden":  false,
+                                                     "submitted_at":  "2026-01-28T01:18:21.727+00:00",
+                                                     "created_at":  "2026-01-28T01:18:20.642863+00:00"
+                                                 },
+                                                 {
+                                                     "id":  32,
+                                                     "pair_order":  4,
+                                                     "player1":  "TRẦN TẤT HẢO",
+                                                     "player2":  "KM - SƠN BÉO",
+                                                     "status":  "submitted",
+                                                     "is_hidden":  false,
+                                                     "submitted_at":  "2026-01-28T01:18:21.727+00:00",
+                                                     "created_at":  "2026-01-28T01:18:20.642863+00:00"
+                                                 }
+                                             ],
+                                  "round3":  [
+                                                 {
+                                                     "id":  33,
+                                                     "pair_order":  1,
+                                                     "player1":  "VŨ NGỌC HƯNG",
+                                                     "player2":  "ĐỖ ĐỨC TÚ",
+                                                     "status":  "submitted",
+                                                     "is_hidden":  false,
+                                                     "submitted_at":  "2026-01-28T01:18:28.503+00:00",
+                                                     "created_at":  "2026-01-28T01:18:27.898667+00:00"
+                                                 },
+                                                 {
+                                                     "id":  34,
+                                                     "pair_order":  2,
+                                                     "player1":  "ĐẶNG NGỌC DƯƠNG",
+                                                     "player2":  "ĐINH TRỌNG GIÁP",
+                                                     "status":  "submitted",
+                                                     "is_hidden":  false,
+                                                     "submitted_at":  "2026-01-28T01:18:28.503+00:00",
+                                                     "created_at":  "2026-01-28T01:18:27.898667+00:00"
+                                                 },
+                                                 {
+                                                     "id":  35,
+                                                     "pair_order":  3,
+                                                     "player1":  "TRẦN TẤT HẢO",
+                                                     "player2":  "KM - SƠN BÉO",
+                                                     "status":  "submitted",
+                                                     "is_hidden":  false,
+                                                     "submitted_at":  "2026-01-28T01:18:28.503+00:00",
+                                                     "created_at":  "2026-01-28T01:18:27.898667+00:00"
+                                                 },
+                                                 {
+                                                     "id":  36,
+                                                     "pair_order":  4,
+                                                     "player1":  "NGUYỄN MẠNH THẮNG",
+                                                     "player2":  "KM - HẢI BVT",
+                                                     "status":  "submitted",
+                                                     "is_hidden":  false,
+                                                     "submitted_at":  "2026-01-28T01:18:28.503+00:00",
+                                                     "created_at":  "2026-01-28T01:18:27.898667+00:00"
+                                                 }
+                                             ]
+                              }
+                 },
+    "raw":  [
+                {
+                    "id":  25,
+                    "tournament_id":  1,
+                    "team_id":  1,
+                    "round_number":  1,
+                    "pair_order":  1,
+                    "player1_id":  4,
+                    "player2_id":  6,
+                    "status":  "submitted",
+                    "is_hidden":  true,
+                    "submitted_at":  "2026-01-28T01:18:13.147+00:00",
+                    "created_at":  "2026-01-28T01:18:11.793028+00:00",
+                    "updated_at":  "2026-01-28T01:18:11.793028+00:00",
+                    "team":  {
+                                 "id":  1,
+                                 "team_code":  "blue",
+                                 "team_name":  "TEAM XANH",
+                                 "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                 "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                 "tournament_id":  1,
+                                 "captain_user_id":  "a1a4e30f-ae81-429b-b429-50c70a5fd810"
+                             },
+                    "player1":  {
+                                    "id":  4,
+                                    "team_id":  1,
+                                    "is_active":  true,
+                                    "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "player_name":  "NGUYỄN MẠNH THẮNG",
+                                    "display_order":  4,
+                                    "tournament_id":  1
+                                },
+                    "player2":  {
+                                    "id":  6,
+                                    "team_id":  1,
+                                    "is_active":  true,
+                                    "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "player_name":  "ĐINH TRỌNG GIÁP",
+                                    "display_order":  6,
+                                    "tournament_id":  1
+                                }
+                },
+                {
+                    "id":  26,
+                    "tournament_id":  1,
+                    "team_id":  1,
+                    "round_number":  1,
+                    "pair_order":  2,
+                    "player1_id":  8,
+                    "player2_id":  7,
+                    "status":  "submitted",
+                    "is_hidden":  true,
+                    "submitted_at":  "2026-01-28T01:18:13.147+00:00",
+                    "created_at":  "2026-01-28T01:18:11.793028+00:00",
+                    "updated_at":  "2026-01-28T01:18:11.793028+00:00",
+                    "team":  {
+                                 "id":  1,
+                                 "team_code":  "blue",
+                                 "team_name":  "TEAM XANH",
+                                 "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                 "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                 "tournament_id":  1,
+                                 "captain_user_id":  "a1a4e30f-ae81-429b-b429-50c70a5fd810"
+                             },
+                    "player1":  {
+                                    "id":  8,
+                                    "team_id":  1,
+                                    "is_active":  true,
+                                    "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "player_name":  "KM - SƠN BÉO",
+                                    "display_order":  8,
+                                    "tournament_id":  1
+                                },
+                    "player2":  {
+                                    "id":  7,
+                                    "team_id":  1,
+                                    "is_active":  true,
+                                    "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "player_name":  "KM - HẢI BVT",
+                                    "display_order":  7,
+                                    "tournament_id":  1
+                                }
+                },
+                {
+                    "id":  27,
+                    "tournament_id":  1,
+                    "team_id":  1,
+                    "round_number":  1,
+                    "pair_order":  3,
+                    "player1_id":  3,
+                    "player2_id":  5,
+                    "status":  "submitted",
+                    "is_hidden":  true,
+                    "submitted_at":  "2026-01-28T01:18:13.147+00:00",
+                    "created_at":  "2026-01-28T01:18:11.793028+00:00",
+                    "updated_at":  "2026-01-28T01:18:11.793028+00:00",
+                    "team":  {
+                                 "id":  1,
+                                 "team_code":  "blue",
+                                 "team_name":  "TEAM XANH",
+                                 "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                 "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                 "tournament_id":  1,
+                                 "captain_user_id":  "a1a4e30f-ae81-429b-b429-50c70a5fd810"
+                             },
+                    "player1":  {
+                                    "id":  3,
+                                    "team_id":  1,
+                                    "is_active":  true,
+                                    "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "player_name":  "ĐỖ ĐỨC TÚ",
+                                    "display_order":  3,
+                                    "tournament_id":  1
+                                },
+                    "player2":  {
+                                    "id":  5,
+                                    "team_id":  1,
+                                    "is_active":  true,
+                                    "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "player_name":  "TRẦN TẤT HẢO",
+                                    "display_order":  5,
+                                    "tournament_id":  1
+                                }
+                },
+                {
+                    "id":  28,
+                    "tournament_id":  1,
+                    "team_id":  1,
+                    "round_number":  1,
+                    "pair_order":  4,
+                    "player1_id":  1,
+                    "player2_id":  2,
+                    "status":  "submitted",
+                    "is_hidden":  true,
+                    "submitted_at":  "2026-01-28T01:18:13.147+00:00",
+                    "created_at":  "2026-01-28T01:18:11.793028+00:00",
+                    "updated_at":  "2026-01-28T01:18:11.793028+00:00",
+                    "team":  {
+                                 "id":  1,
+                                 "team_code":  "blue",
+                                 "team_name":  "TEAM XANH",
+                                 "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                 "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                 "tournament_id":  1,
+                                 "captain_user_id":  "a1a4e30f-ae81-429b-b429-50c70a5fd810"
+                             },
+                    "player1":  {
+                                    "id":  1,
+                                    "team_id":  1,
+                                    "is_active":  true,
+                                    "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "player_name":  "VŨ NGỌC HƯNG",
+                                    "display_order":  1,
+                                    "tournament_id":  1
+                                },
+                    "player2":  {
+                                    "id":  2,
+                                    "team_id":  1,
+                                    "is_active":  true,
+                                    "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "player_name":  "ĐẶNG NGỌC DƯƠNG",
+                                    "display_order":  2,
+                                    "tournament_id":  1
+                                }
+                },
+                {
+                    "id":  29,
+                    "tournament_id":  1,
+                    "team_id":  1,
+                    "round_number":  2,
+                    "pair_order":  1,
+                    "player1_id":  3,
+                    "player2_id":  2,
+                    "status":  "submitted",
+                    "is_hidden":  false,
+                    "submitted_at":  "2026-01-28T01:18:21.727+00:00",
+                    "created_at":  "2026-01-28T01:18:20.642863+00:00",
+                    "updated_at":  "2026-01-28T01:18:20.642863+00:00",
+                    "team":  {
+                                 "id":  1,
+                                 "team_code":  "blue",
+                                 "team_name":  "TEAM XANH",
+                                 "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                 "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                 "tournament_id":  1,
+                                 "captain_user_id":  "a1a4e30f-ae81-429b-b429-50c70a5fd810"
+                             },
+                    "player1":  {
+                                    "id":  3,
+                                    "team_id":  1,
+                                    "is_active":  true,
+                                    "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "player_name":  "ĐỖ ĐỨC TÚ",
+                                    "display_order":  3,
+                                    "tournament_id":  1
+                                },
+                    "player2":  {
+                                    "id":  2,
+                                    "team_id":  1,
+                                    "is_active":  true,
+                                    "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "player_name":  "ĐẶNG NGỌC DƯƠNG",
+                                    "display_order":  2,
+                                    "tournament_id":  1
+                                }
+                },
+                {
+                    "id":  30,
+                    "tournament_id":  1,
+                    "team_id":  1,
+                    "round_number":  2,
+                    "pair_order":  2,
+                    "player1_id":  6,
+                    "player2_id":  7,
+                    "status":  "submitted",
+                    "is_hidden":  false,
+                    "submitted_at":  "2026-01-28T01:18:21.727+00:00",
+                    "created_at":  "2026-01-28T01:18:20.642863+00:00",
+                    "updated_at":  "2026-01-28T01:18:20.642863+00:00",
+                    "team":  {
+                                 "id":  1,
+                                 "team_code":  "blue",
+                                 "team_name":  "TEAM XANH",
+                                 "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                 "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                 "tournament_id":  1,
+                                 "captain_user_id":  "a1a4e30f-ae81-429b-b429-50c70a5fd810"
+                             },
+                    "player1":  {
+                                    "id":  6,
+                                    "team_id":  1,
+                                    "is_active":  true,
+                                    "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "player_name":  "ĐINH TRỌNG GIÁP",
+                                    "display_order":  6,
+                                    "tournament_id":  1
+                                },
+                    "player2":  {
+                                    "id":  7,
+                                    "team_id":  1,
+                                    "is_active":  true,
+                                    "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "player_name":  "KM - HẢI BVT",
+                                    "display_order":  7,
+                                    "tournament_id":  1
+                                }
+                },
+                {
+                    "id":  31,
+                    "tournament_id":  1,
+                    "team_id":  1,
+                    "round_number":  2,
+                    "pair_order":  3,
+                    "player1_id":  1,
+                    "player2_id":  4,
+                    "status":  "submitted",
+                    "is_hidden":  false,
+                    "submitted_at":  "2026-01-28T01:18:21.727+00:00",
+                    "created_at":  "2026-01-28T01:18:20.642863+00:00",
+                    "updated_at":  "2026-01-28T01:18:20.642863+00:00",
+                    "team":  {
+                                 "id":  1,
+                                 "team_code":  "blue",
+                                 "team_name":  "TEAM XANH",
+                                 "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                 "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                 "tournament_id":  1,
+                                 "captain_user_id":  "a1a4e30f-ae81-429b-b429-50c70a5fd810"
+                             },
+                    "player1":  {
+                                    "id":  1,
+                                    "team_id":  1,
+                                    "is_active":  true,
+                                    "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "player_name":  "VŨ NGỌC HƯNG",
+                                    "display_order":  1,
+                                    "tournament_id":  1
+                                },
+                    "player2":  {
+                                    "id":  4,
+                                    "team_id":  1,
+                                    "is_active":  true,
+                                    "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "player_name":  "NGUYỄN MẠNH THẮNG",
+                                    "display_order":  4,
+                                    "tournament_id":  1
+                                }
+                },
+                {
+                    "id":  32,
+                    "tournament_id":  1,
+                    "team_id":  1,
+                    "round_number":  2,
+                    "pair_order":  4,
+                    "player1_id":  5,
+                    "player2_id":  8,
+                    "status":  "submitted",
+                    "is_hidden":  false,
+                    "submitted_at":  "2026-01-28T01:18:21.727+00:00",
+                    "created_at":  "2026-01-28T01:18:20.642863+00:00",
+                    "updated_at":  "2026-01-28T01:18:20.642863+00:00",
+                    "team":  {
+                                 "id":  1,
+                                 "team_code":  "blue",
+                                 "team_name":  "TEAM XANH",
+                                 "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                 "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                 "tournament_id":  1,
+                                 "captain_user_id":  "a1a4e30f-ae81-429b-b429-50c70a5fd810"
+                             },
+                    "player1":  {
+                                    "id":  5,
+                                    "team_id":  1,
+                                    "is_active":  true,
+                                    "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "player_name":  "TRẦN TẤT HẢO",
+                                    "display_order":  5,
+                                    "tournament_id":  1
+                                },
+                    "player2":  {
+                                    "id":  8,
+                                    "team_id":  1,
+                                    "is_active":  true,
+                                    "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "player_name":  "KM - SƠN BÉO",
+                                    "display_order":  8,
+                                    "tournament_id":  1
+                                }
+                },
+                {
+                    "id":  33,
+                    "tournament_id":  1,
+                    "team_id":  1,
+                    "round_number":  3,
+                    "pair_order":  1,
+                    "player1_id":  1,
+                    "player2_id":  3,
+                    "status":  "submitted",
+                    "is_hidden":  false,
+                    "submitted_at":  "2026-01-28T01:18:28.503+00:00",
+                    "created_at":  "2026-01-28T01:18:27.898667+00:00",
+                    "updated_at":  "2026-01-28T01:18:27.898667+00:00",
+                    "team":  {
+                                 "id":  1,
+                                 "team_code":  "blue",
+                                 "team_name":  "TEAM XANH",
+                                 "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                 "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                 "tournament_id":  1,
+                                 "captain_user_id":  "a1a4e30f-ae81-429b-b429-50c70a5fd810"
+                             },
+                    "player1":  {
+                                    "id":  1,
+                                    "team_id":  1,
+                                    "is_active":  true,
+                                    "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "player_name":  "VŨ NGỌC HƯNG",
+                                    "display_order":  1,
+                                    "tournament_id":  1
+                                },
+                    "player2":  {
+                                    "id":  3,
+                                    "team_id":  1,
+                                    "is_active":  true,
+                                    "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "player_name":  "ĐỖ ĐỨC TÚ",
+                                    "display_order":  3,
+                                    "tournament_id":  1
+                                }
+                },
+                {
+                    "id":  34,
+                    "tournament_id":  1,
+                    "team_id":  1,
+                    "round_number":  3,
+                    "pair_order":  2,
+                    "player1_id":  2,
+                    "player2_id":  6,
+                    "status":  "submitted",
+                    "is_hidden":  false,
+                    "submitted_at":  "2026-01-28T01:18:28.503+00:00",
+                    "created_at":  "2026-01-28T01:18:27.898667+00:00",
+                    "updated_at":  "2026-01-28T01:18:27.898667+00:00",
+                    "team":  {
+                                 "id":  1,
+                                 "team_code":  "blue",
+                                 "team_name":  "TEAM XANH",
+                                 "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                 "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                 "tournament_id":  1,
+                                 "captain_user_id":  "a1a4e30f-ae81-429b-b429-50c70a5fd810"
+                             },
+                    "player1":  {
+                                    "id":  2,
+                                    "team_id":  1,
+                                    "is_active":  true,
+                                    "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "player_name":  "ĐẶNG NGỌC DƯƠNG",
+                                    "display_order":  2,
+                                    "tournament_id":  1
+                                },
+                    "player2":  {
+                                    "id":  6,
+                                    "team_id":  1,
+                                    "is_active":  true,
+                                    "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "player_name":  "ĐINH TRỌNG GIÁP",
+                                    "display_order":  6,
+                                    "tournament_id":  1
+                                }
+                },
+                {
+                    "id":  35,
+                    "tournament_id":  1,
+                    "team_id":  1,
+                    "round_number":  3,
+                    "pair_order":  3,
+                    "player1_id":  5,
+                    "player2_id":  8,
+                    "status":  "submitted",
+                    "is_hidden":  false,
+                    "submitted_at":  "2026-01-28T01:18:28.503+00:00",
+                    "created_at":  "2026-01-28T01:18:27.898667+00:00",
+                    "updated_at":  "2026-01-28T01:18:27.898667+00:00",
+                    "team":  {
+                                 "id":  1,
+                                 "team_code":  "blue",
+                                 "team_name":  "TEAM XANH",
+                                 "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                 "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                 "tournament_id":  1,
+                                 "captain_user_id":  "a1a4e30f-ae81-429b-b429-50c70a5fd810"
+                             },
+                    "player1":  {
+                                    "id":  5,
+                                    "team_id":  1,
+                                    "is_active":  true,
+                                    "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "player_name":  "TRẦN TẤT HẢO",
+                                    "display_order":  5,
+                                    "tournament_id":  1
+                                },
+                    "player2":  {
+                                    "id":  8,
+                                    "team_id":  1,
+                                    "is_active":  true,
+                                    "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "player_name":  "KM - SƠN BÉO",
+                                    "display_order":  8,
+                                    "tournament_id":  1
+                                }
+                },
+                {
+                    "id":  36,
+                    "tournament_id":  1,
+                    "team_id":  1,
+                    "round_number":  3,
+                    "pair_order":  4,
+                    "player1_id":  4,
+                    "player2_id":  7,
+                    "status":  "submitted",
+                    "is_hidden":  false,
+                    "submitted_at":  "2026-01-28T01:18:28.503+00:00",
+                    "created_at":  "2026-01-28T01:18:27.898667+00:00",
+                    "updated_at":  "2026-01-28T01:18:27.898667+00:00",
+                    "team":  {
+                                 "id":  1,
+                                 "team_code":  "blue",
+                                 "team_name":  "TEAM XANH",
+                                 "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                 "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                 "tournament_id":  1,
+                                 "captain_user_id":  "a1a4e30f-ae81-429b-b429-50c70a5fd810"
+                             },
+                    "player1":  {
+                                    "id":  4,
+                                    "team_id":  1,
+                                    "is_active":  true,
+                                    "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "player_name":  "NGUYỄN MẠNH THẮNG",
+                                    "display_order":  4,
+                                    "tournament_id":  1
+                                },
+                    "player2":  {
+                                    "id":  7,
+                                    "team_id":  1,
+                                    "is_active":  true,
+                                    "created_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "updated_at":  "2026-01-27T08:00:23.59019+00:00",
+                                    "player_name":  "KM - HẢI BVT",
+                                    "display_order":  7,
+                                    "tournament_id":  1
+                                }
+                }
+            ]
+}

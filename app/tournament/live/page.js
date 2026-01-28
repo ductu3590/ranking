@@ -313,11 +313,14 @@ export default function LiveTournament() {
                     {/* Round 1 */}
                     <div className="round-pairings">
                         <h3>Vòng 1 - Bí Mật</h3>
-                        {!canRevealRound1 ? (
-                            <div className="hidden-notice">
-                                🔒 Danh sách sẽ được mở vào 16:30
-                            </div>
-                        ) : (
+                        <div className={`round-1-container ${!canRevealRound1 ? 'blurred-round' : ''}`}>
+                            {!canRevealRound1 && (
+                                <div className="blur-overlay">
+                                    <div className="lock-message">
+                                        🔒 Danh sách sẽ được mở khi Team ĐỎ nộp<br />hoặc sau 16:30
+                                    </div>
+                                </div>
+                            )}
                             <div className="pairing-grid">
                                 {[1, 2, 3, 4].map(i => (
                                     <div key={i} className="pairing-row">
@@ -331,57 +334,87 @@ export default function LiveTournament() {
                                     </div>
                                 ))}
                             </div>
-                        )}
+                        </div>
                     </div>
 
                     {/* Round 2 */}
                     <div className="round-pairings">
                         <h3>Vòng 2 - Thách Đấu {userRole === 'admin' && <span style={{ fontSize: '14px', color: '#10b981' }}>(Kéo thả để sắp xếp)</span>}</h3>
-                        <div className="pairing-grid">
-                            {[1, 2, 3, 4].map(i => (
-                                <div key={i} className="pairing-row">
-                                    <div
-                                        className={`pair-box blue-box ${userRole === 'admin' ? 'draggable' : ''}`}
-                                        draggable={userRole === 'admin'}
-                                        onDragStart={(e) => pairings.blue.round2?.[i - 1] && handleDragStart(e, 2, 'blue', pairings.blue.round2[i - 1])}
-                                        onDragOver={handleDragOver}
-                                        onDrop={(e) => pairings.blue.round2?.[i - 1] && handleDrop(e, 2, 'blue', pairings.blue.round2[i - 1])}
-                                    >
-                                        {pairings.blue.round2?.[i - 1] ? renderPair(pairings.blue.round2[i - 1]) : '---'}
+                        <div className="team-battle">
+                            {/* BLUE team column - blur if not revealed */}
+                            <div className={`round-1-container ${!canRevealRound1 ? 'blurred-round' : ''}`}>
+                                {!canRevealRound1 && (
+                                    <div className="blur-overlay" style={{ fontSize: '0.9rem' }}>
+                                        <div className="lock-message-small">
+                                            🔒 Ẩn đến khi ĐỎ nộp
+                                        </div>
                                     </div>
-                                    <span className="vs-small">vs</span>
-                                    <div
-                                        className={`pair-box red-box ${userRole === 'admin' ? 'draggable' : ''}`}
-                                        draggable={userRole === 'admin'}
-                                        onDragStart={(e) => pairings.red.round2?.[i - 1] && handleDragStart(e, 2, 'red', pairings.red.round2[i - 1])}
-                                        onDragOver={handleDragOver}
-                                        onDrop={(e) => pairings.red.round2?.[i - 1] && handleDrop(e, 2, 'red', pairings.red.round2[i - 1])}
-                                    >
-                                        {pairings.red.round2?.[i - 1] ? renderPair(pairings.red.round2[i - 1]) : '---'}
-                                    </div>
+                                )}
+                                <div className="round2-column">
+                                    {[1, 2, 3, 4].map(i => (
+                                        <div key={i} className="round2-pair-row">
+                                            <div
+                                                className={`pair-box blue-box ${userRole === 'admin' ? 'draggable' : ''}`}
+                                                draggable={userRole === 'admin' && canRevealRound1}
+                                                onDragStart={(e) => pairings.blue.round2?.[i - 1] && handleDragStart(e, 2, 'blue', pairings.blue.round2[i - 1])}
+                                                onDragOver={handleDragOver}
+                                                onDrop={(e) => pairings.blue.round2?.[i - 1] && handleDrop(e, 2, 'blue', pairings.blue.round2[i - 1])}
+                                            >
+                                                {pairings.blue.round2?.[i - 1] ? renderPair(pairings.blue.round2[i - 1]) : '---'}
+                                            </div>
+                                            <span className="vs-small">vs</span>
+                                        </div>
+                                    ))}
                                 </div>
-                            ))}
+                            </div>
+                            {/* RED team column - no blur */}
+                            <div className="round2-column">
+                                {[1, 2, 3, 4].map(i => (
+                                    <div key={i} className="round2-pair-row">
+                                        <div
+                                            className={`pair-box red-box ${userRole === 'admin' ? 'draggable' : ''}`}
+                                            draggable={userRole === 'admin'}
+                                            onDragStart={(e) => pairings.red.round2?.[i - 1] && handleDragStart(e, 2, 'red', pairings.red.round2[i - 1])}
+                                            onDragOver={handleDragOver}
+                                            onDrop={(e) => pairings.red.round2?.[i - 1] && handleDrop(e, 2, 'red', pairings.red.round2[i - 1])}
+                                        >
+                                            {pairings.red.round2?.[i - 1] ? renderPair(pairings.red.round2[i - 1]) : '---'}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
                     {/* Round 3 */}
                     <div className="round-pairings">
                         <h3>Vòng 3 - Super Team {userRole === 'admin' && <span style={{ fontSize: '14px', color: '#10b981' }}>(Kéo thả để sắp xếp)</span>}</h3>
                         <div className="team-battle">
-                            <div className="team-order blue-order">
-                                <h4>Thứ tự TEAM XANH:</h4>
-                                {[1, 2, 3, 4].map(i => (
-                                    <div
-                                        key={i}
-                                        className={`order-item ${userRole === 'admin' ? 'draggable' : ''}`}
-                                        draggable={userRole === 'admin'}
-                                        onDragStart={(e) => pairings.blue.round3?.[i - 1] && handleDragStart(e, 3, 'blue', pairings.blue.round3[i - 1])}
-                                        onDragOver={handleDragOver}
-                                        onDrop={(e) => pairings.blue.round3?.[i - 1] && handleDrop(e, 3, 'blue', pairings.blue.round3[i - 1])}
-                                    >
-                                        {i}. {pairings.blue.round3?.[i - 1] ? renderPair(pairings.blue.round3[i - 1]) : '---'}
+                            {/* BLUE team - blur if not revealed */}
+                            <div className={`round-1-container ${!canRevealRound1 ? 'blurred-round' : ''}`}>
+                                {!canRevealRound1 && (
+                                    <div className="blur-overlay" style={{ fontSize: '0.9rem' }}>
+                                        <div className="lock-message-small">
+                                            🔒 Ẩn đến khi ĐỎ nộp
+                                        </div>
                                     </div>
-                                ))}
+                                )}
+                                <div className="team-order blue-order">
+                                    <h4>Thứ tự TEAM XANH:</h4>
+                                    {[1, 2, 3, 4].map(i => (
+                                        <div
+                                            key={i}
+                                            className={`order-item ${userRole === 'admin' ? 'draggable' : ''}`}
+                                            draggable={userRole === 'admin' && canRevealRound1}
+                                            onDragStart={(e) => pairings.blue.round3?.[i - 1] && handleDragStart(e, 3, 'blue', pairings.blue.round3[i - 1])}
+                                            onDragOver={handleDragOver}
+                                            onDrop={(e) => pairings.blue.round3?.[i - 1] && handleDrop(e, 3, 'blue', pairings.blue.round3[i - 1])}
+                                        >
+                                            {i}. {pairings.blue.round3?.[i - 1] ? renderPair(pairings.blue.round3[i - 1]) : '---'}
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
+                            {/* RED team - no blur */}
                             <div className="team-order red-order">
                                 <h4>Thứ tự TEAM ĐỎ:</h4>
                                 {[1, 2, 3, 4].map(i => (

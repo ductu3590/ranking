@@ -1,0 +1,28 @@
+﻿{
+    "success":  true,
+    "canRevealRound1":  true,
+    "pairings":  {
+                     "blue":  {
+                                  "round1":  [
+
+                                             ],
+                                  "round2":  [
+
+                                             ],
+                                  "round3":  [
+
+                                             ]
+                              },
+                     "red":  {
+                                 "round1":  [
+
+                                            ],
+                                 "round2":  [
+
+                                            ],
+                                 "round3":  [
+
+                                            ]
+                             }
+                 }
+}

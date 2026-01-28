@@ -244,6 +244,25 @@
     box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
 }
 
+.btn-edit {
+    padding: 15px 40px;
+    border: 2px solid #f59e0b;
+    background: white;
+    color: #f59e0b;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-edit:hover {
+    background: #f59e0b;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+}
+
 .submitted-badge {
     background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     color: white;

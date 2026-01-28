@@ -203,6 +203,16 @@ export default function CaptainDashboard() {
         setError('');
         setSuccess('');
 
+        // Check deadline for Round 1
+        if (currentRound === 1) {
+            const now = new Date();
+            const deadline = new Date('2026-01-28T16:30:00+07:00');
+            if (now >= deadline) {
+                setError('⏰ Đã quá thời hạn 16:30. Không thể lưu danh sách nữa.');
+                return;
+            }
+        }
+
         // Validate: all 4 pairs must have 2 players
         const invalidPairs = pairings.filter(p => !p.player1_id || !p.player2_id);
         if (invalidPairs.length > 0) {
@@ -242,7 +252,17 @@ export default function CaptainDashboard() {
         setError('');
         setSuccess('');
 
-        if (!window.confirm(`Xác nhận nộp danh sách Vòng ${currentRound}? Sau khi nộp sẽ không thể sửa.`)) {
+        // Check deadline for Round 1
+        if (currentRound === 1) {
+            const now = new Date();
+            const deadline = new Date('2026-01-28T16:30:00+07:00');
+            if (now >= deadline) {
+                setError('⏰ Đã quá thời hạn 16:30. Không thể nộp danh sách nữa.');
+                return;
+            }
+        }
+
+        if (!window.confirm(`Xác nhận nộp danh sách Vòng ${currentRound}?`)) {
             return;
         }
 
@@ -268,6 +288,45 @@ export default function CaptainDashboard() {
                 fetchPairings();
             } else {
                 setError(data.error || 'Lỗi khi nộp');
+            }
+        } catch (err) {
+            setError('Lỗi kết nối');
+        }
+    }
+
+    async function unlockForEdit() {
+        // Check if past deadline (16:30)
+        const now = new Date();
+        const deadline = new Date('2026-01-28T16:30:00+07:00');
+
+        if (now >= deadline) {
+            setError('⏰ Đã quá thời hạn 16:30. Không thể chỉnh sửa danh sách nữa.');
+            return;
+        }
+
+        if (!window.confirm(`Mở khoá để sửa lại danh sách Vòng ${currentRound}? Bạn sẽ cần nộp lại sau khi chỉnh sửa.`)) {
+            return;
+        }
+
+        try {
+            // Change status back to draft
+            const res = await fetch('/api/tournament/captain/pairings/unlock', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    teamCode,
+                    round: currentRound
+                })
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                setSuccess('🔓 Đã mở khóa! Bạn có thể chỉnh sửa và nộp lại.');
+                setSubmitStatus(prev => ({ ...prev, [currentRound]: 'draft' }));
+                fetchPairings();
+            } else {
+                setError(data.error || 'Lỗi khi mở khóa');
             }
         } catch (err) {
             setError('Lỗi kết nối');
@@ -448,9 +507,14 @@ export default function CaptainDashboard() {
                             </button>
                         </>
                     ) : (
-                        <div className="submitted-badge">
-                            ✅ Đã nộp danh sách Vòng {currentRound}
-                        </div>
+                        <>
+                            <div className="submitted-badge">
+                                ✅ Đã nộp danh sách Vòng {currentRound}
+                            </div>
+                            <button onClick={unlockForEdit} className="btn-edit">
+                                ✏️ Sửa lại
+                            </button>
+                        </>
                     )}
                 </div>
             </div>

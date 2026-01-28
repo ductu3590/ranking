@@ -1,6 +1,5 @@
 'use client';
 import './tournament.css';
-import UserStatusBadge from '@/components/UserStatusBadge';
 import TournamentNavBar from '@/components/TournamentNavBar';
 
 export default function Tournament() {
@@ -17,20 +16,7 @@ export default function Tournament() {
                         <div className="tournament-badge">
                             THỂ THỨC RYDER CUP: TEAM A vs TEAM B
                         </div>
-
-                        <div className="tournament-actions">
-                            <a href="/tournament/live" className="btn-action btn-live">
-                                🔴 Xem Live Score
-                            </a>
-                            <a href="/tournament/captain" className="btn-action btn-captain">
-                                👑 Đội Trưởng Login
-                            </a>
-                        </div>
                     </header>
-
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '15px' }}>
-                        <UserStatusBadge />
-                    </div>
 
                     <div className="tournament-content">
                         {/* Teams */}

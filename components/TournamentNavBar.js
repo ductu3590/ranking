@@ -50,6 +50,7 @@ export default function TournamentNavBar() {
 
     function getNavLinks() {
         const commonLinks = [
+            { href: '/', label: '🏠 Trang chủ', roles: ['admin', 'captain', 'member', 'guest'] },
             { href: '/tournament', label: '📜 Điều lệ', roles: ['admin', 'captain', 'member', 'guest'] },
             { href: '/tournament/live', label: '🔴 Live', roles: ['admin', 'captain', 'member', 'guest'] },
         ];

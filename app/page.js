@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
-import UserStatusBadge from '@/components/UserStatusBadge';
+import HomeHeader from '@/components/HomeHeader';
 
 export default function Home() {
     const [stats, setStats] = useState([]);
@@ -213,149 +213,18 @@ export default function Home() {
         <div style={{
             minHeight: '100vh',
             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            padding: isMobile ? '12px' : '20px',
+            padding: '0',
             fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
         }}>
-            <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-                {/* Header */}
-                <div style={{ textAlign: 'center', marginBottom: isMobile ? '20px' : '30px', color: '#fff', position: 'relative' }}>
-                    <div style={{ position: 'absolute', top: 0, right: 0 }}>
-                        <UserStatusBadge />
-                    </div>
-                    <h1 style={{
-                        fontSize: isMobile ? '28px' : '42px',
-                        fontWeight: '800',
-                        margin: '0 0 10px 0',
-                        textShadow: '2px 2px 4px rgba(0,0,0,0.2)',
-                        lineHeight: '1.2'
-                    }}>
-                        🏓 PICKLEBALL 246 CLUB
-                    </h1>
-                </div>
+            {/* New Sticky Header */}
+            <HomeHeader />
 
-                {/* Navigation Menu */}
-                <div style={{
-                    display: 'flex',
-                    gap: isMobile ? '8px' : '12px',
-                    marginBottom: isMobile ? '20px' : '30px',
-                    flexWrap: 'wrap',
-                    justifyContent: 'center'
-                }}>
-                    <a href="/" style={{
-                        flex: isMobile ? '1 1 calc(50% - 4px)' : '0 1 auto',
-                        padding: isMobile ? '12px 16px' : '14px 24px',
-                        background: 'rgba(255, 255, 255, 0.95)',
-                        color: '#667eea',
-                        textDecoration: 'none',
-                        borderRadius: '12px',
-                        fontSize: isMobile ? '13px' : '15px',
-                        fontWeight: '700',
-                        textAlign: 'center',
-                        boxShadow: '0 4px 15px rgba(0,0,0,0.15)',
-                        transition: 'all 0.2s',
-                        border: '2px solid rgba(255,255,255,0.3)'
-                    }}
-                        onMouseEnter={(e) => {
-                            if (!isMobile) {
-                                e.currentTarget.style.transform = 'translateY(-2px)';
-                                e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.2)';
-                            }
-                        }}
-                        onMouseLeave={(e) => {
-                            if (!isMobile) {
-                                e.currentTarget.style.transform = 'translateY(0)';
-                                e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.15)';
-                            }
-                        }}>
-                        🏆 Bảng xếp hạng
-                    </a>
-                    <a href="/transactions" style={{
-                        flex: isMobile ? '1 1 calc(50% - 4px)' : '0 1 auto',
-                        padding: isMobile ? '12px 16px' : '14px 24px',
-                        background: 'rgba(255, 255, 255, 0.95)',
-                        color: '#667eea',
-                        textDecoration: 'none',
-                        borderRadius: '12px',
-                        fontSize: isMobile ? '13px' : '15px',
-                        fontWeight: '700',
-                        textAlign: 'center',
-                        boxShadow: '0 4px 15px rgba(0,0,0,0.15)',
-                        transition: 'all 0.2s',
-                        border: '2px solid rgba(255,255,255,0.3)'
-                    }}
-                        onMouseEnter={(e) => {
-                            if (!isMobile) {
-                                e.currentTarget.style.transform = 'translateY(-2px)';
-                                e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.2)';
-                            }
-                        }}
-                        onMouseLeave={(e) => {
-                            if (!isMobile) {
-                                e.currentTarget.style.transform = 'translateY(0)';
-                                e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.15)';
-                            }
-                        }}>
-                        💰 Theo dõi quỹ
-                    </a>
-                    <a href="/tournament" style={{
-                        flex: isMobile ? '1 1 100%' : '0 1 auto',
-                        padding: isMobile ? '14px 20px' : '16px 28px',
-                        background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                        color: '#fff',
-                        textDecoration: 'none',
-                        borderRadius: '12px',
-                        fontSize: isMobile ? '14px' : '16px',
-                        fontWeight: '800',
-                        textAlign: 'center',
-                        boxShadow: '0 6px 20px rgba(245, 158, 11, 0.4)',
-                        transition: 'all 0.2s',
-                        border: '2px solid rgba(255, 255, 255, 0.5)',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.5px'
-                    }}
-                        onMouseEnter={(e) => {
-                            if (!isMobile) {
-                                e.currentTarget.style.transform = 'translateY(-3px) scale(1.02)';
-                                e.currentTarget.style.boxShadow = '0 8px 25px rgba(245, 158, 11, 0.6)';
-                            }
-                        }}
-                        onMouseLeave={(e) => {
-                            if (!isMobile) {
-                                e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                                e.currentTarget.style.boxShadow = '0 6px 20px rgba(245, 158, 11, 0.4)';
-                            }
-                        }}>
-                        🏆 Giải Tất Niên ⚡
-                    </a>
-                    <a href="/admin" style={{
-                        flex: isMobile ? '1 1 100%' : '0 1 auto',
-                        padding: isMobile ? '12px 16px' : '14px 24px',
-                        background: 'rgba(255, 255, 255, 0.95)',
-                        color: '#667eea',
-                        textDecoration: 'none',
-                        borderRadius: '12px',
-                        fontSize: isMobile ? '13px' : '15px',
-                        fontWeight: '700',
-                        textAlign: 'center',
-                        boxShadow: '0 4px 15px rgba(0,0,0,0.15)',
-                        transition: 'all 0.2s',
-                        border: '2px solid rgba(255,255,255,0.3)'
-                    }}
-                        onMouseEnter={(e) => {
-                            if (!isMobile) {
-                                e.currentTarget.style.transform = 'translateY(-2px)';
-                                e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.2)';
-                            }
-                        }}
-                        onMouseLeave={(e) => {
-                            if (!isMobile) {
-                                e.currentTarget.style.transform = 'translateY(0)';
-                                e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.15)';
-                            }
-                        }}>
-                        ⚙️ Quản trị
-                    </a>
-                </div>
+            {/* Main Content */}
+            <div style={{
+                maxWidth: '900px',
+                margin: '0 auto',
+                padding: isMobile ? '20px 12px' : '30px 20px'
+            }}>
 
                 {/* Total Fund Card */}
                 <div style={{

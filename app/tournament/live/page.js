@@ -193,9 +193,15 @@ export default function LiveTournament() {
             return;
         }
 
-        const teamPairings = pairings.filter(p =>
-            p.round === round && p.team_code === teamCode
-        ).sort((a, b) => a.pair_order - b.pair_order);
+        const roundKey = `round${round}`;
+        const currentList = pairings[teamCode]?.[roundKey];
+
+        if (!currentList) {
+            setDraggedPairing(null);
+            return;
+        }
+
+        const teamPairings = [...currentList].sort((a, b) => a.pair_order - b.pair_order);
 
         const draggedIndex = teamPairings.findIndex(p => p.id === draggedPairing.pairing.id);
         const targetIndex = teamPairings.findIndex(p => p.id === targetPairing.id);
@@ -448,70 +454,92 @@ export default function LiveTournament() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {matches.map(match => (
-                                    <tr key={match.id} className={`match-row ${match.match_status}`}>
-                                        <td>{match.scheduled_time}</td>
-                                        <td className="court-cell">Sân {match.court_number || 1}</td>
-                                        <td className="team-cell blue-cell">
-                                            {match.blue_pairing ? renderPair(match.blue_pairing) : '---'}
-                                        </td>
-                                        <td className="score-cell">
-                                            {userRole === 'admin' ? (
-                                                editingScore?.matchId === match.id ? (
-                                                    <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
-                                                        <input
-                                                            type="number"
-                                                            value={editingScore.blueScore}
-                                                            onChange={(e) => setEditingScore({ ...editingScore, blueScore: e.target.value })}
-                                                            style={{ width: '40px', padding: '4px', textAlign: 'center' }}
-                                                            min="0"
-                                                        />
-                                                        <span>-</span>
-                                                        <input
-                                                            type="number"
-                                                            value={editingScore.redScore}
-                                                            onChange={(e) => setEditingScore({ ...editingScore, redScore: e.target.value })}
-                                                            style={{ width: '40px', padding: '4px', textAlign: 'center' }}
-                                                            min="0"
-                                                        />
-                                                        <button
-                                                            onClick={() => updateScore(match.id, editingScore.blueScore, editingScore.redScore)}
-                                                            style={{ padding: '4px 8px', fontSize: '12px', cursor: 'pointer' }}
+                                {matches.map((match, index) => {
+                                    // Calculate/Derive Round and Pair Order from match index/number
+                                    // Assuming 12 matches sorted by order:
+                                    // 0-3: Round 1
+                                    // 4-7: Round 2
+                                    // 8-11: Round 3
+                                    let round = 1;
+                                    let pairIndex = index;
+
+                                    if (index >= 4 && index < 8) {
+                                        round = 2;
+                                        pairIndex = index - 4;
+                                    } else if (index >= 8) {
+                                        round = 3;
+                                        pairIndex = index - 8;
+                                    }
+
+                                    // Get dynamic pairing from state
+                                    const bluePairing = pairings.blue[`round${round}`]?.[pairIndex];
+                                    const redPairing = pairings.red[`round${round}`]?.[pairIndex];
+
+                                    return (
+                                        <tr key={match.id} className={`match-row ${match.match_status}`}>
+                                            <td>{match.scheduled_time}</td>
+                                            <td className="court-cell">Sân {match.court_number || 1}</td>
+                                            <td className="team-cell blue-cell">
+                                                {bluePairing ? renderPair(bluePairing) : '---'}
+                                            </td>
+                                            <td className="score-cell">
+                                                {userRole === 'admin' ? (
+                                                    editingScore?.matchId === match.id ? (
+                                                        <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
+                                                            <input
+                                                                type="number"
+                                                                value={editingScore.blueScore}
+                                                                onChange={(e) => setEditingScore({ ...editingScore, blueScore: e.target.value })}
+                                                                style={{ width: '40px', padding: '4px', textAlign: 'center' }}
+                                                                min="0"
+                                                            />
+                                                            <span>-</span>
+                                                            <input
+                                                                type="number"
+                                                                value={editingScore.redScore}
+                                                                onChange={(e) => setEditingScore({ ...editingScore, redScore: e.target.value })}
+                                                                style={{ width: '40px', padding: '4px', textAlign: 'center' }}
+                                                                min="0"
+                                                            />
+                                                            <button
+                                                                onClick={() => updateScore(match.id, editingScore.blueScore, editingScore.redScore)}
+                                                                style={{ padding: '4px 8px', fontSize: '12px', cursor: 'pointer' }}
+                                                            >
+                                                                ✓
+                                                            </button>
+                                                            <button
+                                                                onClick={() => setEditingScore(null)}
+                                                                style={{ padding: '4px 8px', fontSize: '12px', cursor: 'pointer' }}
+                                                            >
+                                                                ✖
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <span
+                                                            onClick={() => setEditingScore({ matchId: match.id, blueScore: match.blue_score || 0, redScore: match.red_score || 0 })}
+                                                            style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                                                            className={match.winner_team === 'blue' ? 'winner-blue' : match.winner_team === 'red' ? 'winner-red' : ''}
                                                         >
-                                                            ✓
-                                                        </button>
-                                                        <button
-                                                            onClick={() => setEditingScore(null)}
-                                                            style={{ padding: '4px 8px', fontSize: '12px', cursor: 'pointer' }}
-                                                        >
-                                                            ✖
-                                                        </button>
-                                                    </div>
+                                                            {match.match_status === 'completed' || match.match_status === 'live' ? `${match.blue_score} - ${match.red_score}` : '- (Click để nhập)'}
+                                                        </span>
+                                                    )
                                                 ) : (
-                                                    <span
-                                                        onClick={() => setEditingScore({ matchId: match.id, blueScore: match.blue_score || 0, redScore: match.red_score || 0 })}
-                                                        style={{ cursor: 'pointer', textDecoration: 'underline' }}
-                                                        className={match.winner_team === 'blue' ? 'winner-blue' : match.winner_team === 'red' ? 'winner-red' : ''}
-                                                    >
-                                                        {match.match_status === 'completed' || match.match_status === 'live' ? `${match.blue_score} - ${match.red_score}` : '- (Click để nhập)'}
-                                                    </span>
-                                                )
-                                            ) : (
-                                                match.match_status === 'completed' || match.match_status === 'live' ? (
-                                                    <span className={match.winner_team === 'blue' ? 'winner-blue' : match.winner_team === 'red' ? 'winner-red' : ''}>
-                                                        {match.blue_score} - {match.red_score}
-                                                    </span>
-                                                ) : '-'
-                                            )}
-                                        </td>
-                                        <td className="team-cell red-cell">
-                                            {match.red_pairing ? renderPair(match.red_pairing) : '---'}
-                                        </td>
-                                        <td className="status-cell">
-                                            {getMatchStatus(match)}
-                                        </td>
-                                    </tr>
-                                ))}
+                                                    match.match_status === 'completed' || match.match_status === 'live' ? (
+                                                        <span className={match.winner_team === 'blue' ? 'winner-blue' : match.winner_team === 'red' ? 'winner-red' : ''}>
+                                                            {match.blue_score} - {match.red_score}
+                                                        </span>
+                                                    ) : '-'
+                                                )}
+                                            </td>
+                                            <td className="team-cell red-cell">
+                                                {redPairing ? renderPair(redPairing) : '---'}
+                                            </td>
+                                            <td className="status-cell">
+                                                {getMatchStatus(match)}
+                                            </td>
+                                        </tr>
+                                    )
+                                })}
                             </tbody>
                         </table>
                     </div>

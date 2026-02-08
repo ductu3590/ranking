@@ -127,13 +127,11 @@ export default function Home() {
             endDate = null;
         }
 
-        // Lấy TẤT CẢ giao dịch (cả tiền vào và tiền ra) theo date range
+        // Lấy TẤT CẢ giao dịch để tính toán đúng luỹ kế
         let query = supabase
             .from('quy_pickleball')
-            .select('nguoi_nop, so_tien, huong_giao_dich, loai_giao_dich');
-
-        if (startDate) query = query.gte('created_at', startDate);
-        if (endDate) query = query.lt('created_at', endDate);
+            .select('nguoi_nop, so_tien, huong_giao_dich, loai_giao_dich, created_at')
+            .order('created_at', { ascending: true });
 
         const { data, error } = await query;
 
@@ -161,39 +159,55 @@ export default function Home() {
             console.log(error);
             setLoading(false);
         } else {
-            // Tách riêng tài khoản gốc
-            const baseAccount = data.filter(item => item.nguoi_nop === 'TAI KHOAN GOC');
+            // 1. Xử lý dữ liệu cho TỔNG QUỸ (Tính luỹ kế đến thời điểm endDate)
+            // Nếu activeTab là 'this-month' hoặc 'all-time', endDate = null (tức là đến hiện tại)
+            const fundData = data.filter(item => {
+                if (endDate && item.created_at >= endDate) return false;
+                return true;
+            });
 
-            // Chỉ lấy giao dịch TIỀN VÀO và chỉ hiển thị các giao dịch NỘP PHẠT (≤200K hoặc đã được phân loại là nộp phạt)
-            const incomingTransactions = data.filter(
+            const baseAccountForFund = fundData.filter(item => item.nguoi_nop === 'TAI KHOAN GOC');
+            const incomingForFund = fundData.filter(
+                item => item.nguoi_nop !== 'TAI KHOAN GOC'
+                    && item.huong_giao_dich === 'in'
+                    && (item.loai_giao_dich === 'nop_phat' || item.so_tien <= 200000)
+            );
+            const outgoingForFund = fundData.filter(item => item.huong_giao_dich === 'out');
+
+            let base = 0;
+            baseAccountForFund.forEach(item => base += item.so_tien);
+
+            let penaltyTotalForFund = 0;
+            incomingForFund.forEach(item => penaltyTotalForFund += item.so_tien);
+
+            let totalOut = 0;
+            outgoingForFund.forEach(item => totalOut += Math.abs(item.so_tien));
+
+            setBaseFund(base);
+            // Tổng quỹ = Gốc + Tiền phạt - Tiền ra
+            setTotalFund(base + penaltyTotalForFund - totalOut);
+
+
+            // 2. Xử lý dữ liệu cho BẢNG XẾP HẠNG (Chỉ tính trong khoảng thời gian selected)
+            const rankingData = data.filter(item => {
+                const itemDate = item.created_at;
+                if (startDate && itemDate < startDate) return false;
+                if (endDate && itemDate >= endDate) return false;
+                return true;
+            });
+
+            const incomingForRanking = rankingData.filter(
                 item => item.nguoi_nop !== 'TAI KHOAN GOC'
                     && item.huong_giao_dich === 'in'
                     && (item.loai_giao_dich === 'nop_phat' || item.so_tien <= 200000)
             );
 
-            // Lấy tất cả giao dịch TIỀN RA để tính tổng quỹ
-            const outgoingTransactions = data.filter(item => item.huong_giao_dich === 'out');
-
-            // Tính tài khoản gốc
-            let base = 0;
-            baseAccount.forEach(item => {
-                base += item.so_tien;
-            });
-
-            // Tính toán xếp hạng (chỉ từ giao dịch tiền vào)
+            // Tính toán xếp hạng (chỉ từ giao dịch tiền vào trong kỳ)
             const ranking = {};
-            let penaltyTotal = 0;
 
-            incomingTransactions.forEach(item => {
-                penaltyTotal += item.so_tien;
+            incomingForRanking.forEach(item => {
                 if (!ranking[item.nguoi_nop]) ranking[item.nguoi_nop] = 0;
                 ranking[item.nguoi_nop] += item.so_tien;
-            });
-
-            // Tính tổng tiền ra
-            let totalOut = 0;
-            outgoingTransactions.forEach(item => {
-                totalOut += Math.abs(item.so_tien); // Dùng abs vì tiền ra có thể là số âm
             });
 
             // Chuyển object thành array và sort giảm dần
@@ -202,9 +216,6 @@ export default function Home() {
                 .sort((a, b) => b.amount - a.amount);
 
             setStats(sortedRanking);
-            setBaseFund(base);
-            // Tổng quỹ = Gốc + Tiền vào - Tiền ra
-            setTotalFund(base + penaltyTotal - totalOut);
             setLoading(false);
         }
     }

@@ -9,30 +9,26 @@ export default function HomeHeader({ showAdmin = true }) {
     const [menuOpen, setMenuOpen] = useState(false);
 
     const navLinks = [
-        { href: '/', label: '🏆 Bảng xếp hạng', icon: '🏆' },
-        { href: '/transactions', label: '💰 Theo dõi quỹ', icon: '💰' },
-        { href: '/tournament', label: '🏆 Giải Tất Niên', icon: '⚡', highlight: true },
+        { href: '/', label: '💰 Quản lý quỹ', icon: '💰' },
+        { href: '/transactions', label: '📑 Lịch sử GD', icon: '📑' },
+        { href: '/members', label: '👥 Thành viên', icon: '👥' },
+        { href: '/tournament', label: '⚡ Giải Tất Niên', icon: '⚡', highlight: true },
     ];
 
-    const toggleMenu = () => {
-        setMenuOpen(!menuOpen);
-    };
-
-    const closeMenu = () => {
-        setMenuOpen(false);
-    };
+    const toggleMenu = () => setMenuOpen(!menuOpen);
+    const closeMenu = () => setMenuOpen(false);
 
     return (
         <header className="home-header">
             <div className="header-container">
-                {/* Logo / Club Name */}
+                {/* Logo */}
                 <div className="header-logo">
                     <a href="/">
                         <h1>🏓 PICKLEBALL 246 CLUB</h1>
                     </a>
                 </div>
 
-                {/* Hamburger Menu Icon (Mobile) */}
+                {/* Hamburger (Mobile) */}
                 <button
                     className={`hamburger ${menuOpen ? 'open' : ''}`}
                     onClick={toggleMenu}
@@ -43,7 +39,7 @@ export default function HomeHeader({ showAdmin = true }) {
                     <span></span>
                 </button>
 
-                {/* Navigation Links */}
+                {/* Navigation */}
                 <nav className={`header-nav ${menuOpen ? 'open' : ''}`}>
                     {navLinks.map((link) => (
                         <a
@@ -62,7 +58,7 @@ export default function HomeHeader({ showAdmin = true }) {
                     )}
                 </nav>
 
-                {/* Right Section: User Badge */}
+                {/* Right: User Badge */}
                 <div className="header-right">
                     <UserStatusBadge />
                 </div>

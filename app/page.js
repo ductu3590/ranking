@@ -289,7 +289,7 @@ export default function HomePage() {
                             <div className="empty-state">
                                 <div className="empty-icon">📋</div>
                                 <p>Chưa có sự kiện đóng quỹ nào</p>
-                                {user && <p className="empty-hint">Nhấn "+ Tạo sự kiện đóng quỹ" để bắt đầu</p>}
+                                {user && <p className="empty-hint">Nhấn &quot;+ Tạo sự kiện đóng quỹ&quot; để bắt đầu</p>}
                             </div>
                         ) : (
                             <div className="events-list">

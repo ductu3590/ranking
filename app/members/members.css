@@ -1,0 +1,319 @@
+/* =====================================================
+   MEMBERS PAGE - DARK THEME
+   ===================================================== */
+
+.members-page {
+    min-height: 100vh;
+    background: #0d1117;
+    color: #e6edf3;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.members-main {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 24px 20px;
+}
+
+/* ─── Header ─── */
+.members-header {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 14px;
+    padding: 24px 28px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.members-title {
+    margin: 0 0 6px 0;
+    font-size: 26px;
+    font-weight: 700;
+    color: #e6edf3;
+}
+
+.members-subtitle {
+    margin: 0;
+    font-size: 14px;
+    color: #6e7681;
+}
+
+.members-summary {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.summary-badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.active-badge {
+    background: rgba(63, 185, 80, 0.12);
+    color: #3fb950;
+    border: 1px solid rgba(63, 185, 80, 0.25);
+}
+
+.inactive-badge {
+    background: rgba(139, 148, 158, 0.1);
+    color: #8b949e;
+    border: 1px solid rgba(139, 148, 158, 0.2);
+}
+
+/* ─── Filter ─── */
+.members-filter {
+    display: flex;
+    gap: 8px;
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    flex: 1;
+    min-width: 140px;
+    padding: 10px 16px;
+    border: 1px solid #30363d;
+    background: transparent;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #8b949e;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.filter-btn:hover {
+    border-color: #0ea5e9;
+    color: #e6edf3;
+    background: #21262d;
+}
+
+.filter-btn.active {
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+    color: white;
+    border-color: #0ea5e9;
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+}
+
+/* ─── Table ─── */
+.members-table-wrap {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.members-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.members-table thead tr {
+    background: #0d1117;
+    border-bottom: 2px solid #30363d;
+}
+
+.members-table th {
+    padding: 14px 20px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #6e7681;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    text-align: left;
+}
+
+.col-stt { width: 70px; text-align: center; }
+.col-status { width: 180px; }
+
+.members-table tbody tr {
+    border-bottom: 1px solid #21262d;
+    transition: background 0.15s;
+}
+
+.members-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.members-table tbody tr:hover {
+    background: #1c2128;
+}
+
+.inactive-row {
+    opacity: 0.6;
+}
+
+.members-table td {
+    padding: 14px 20px;
+    vertical-align: middle;
+}
+
+.col-stt td, td.col-stt {
+    text-align: center;
+}
+
+/* STT badge */
+.stt-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    background: #21262d;
+    border-radius: 50%;
+    font-size: 13px;
+    font-weight: 700;
+    color: #6e7681;
+    margin: 0 auto;
+}
+
+/* Member name */
+.member-name-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.member-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+    text-transform: uppercase;
+}
+
+.inactive-row .member-avatar {
+    background: #30363d;
+}
+
+.member-fullname {
+    font-size: 15px;
+    font-weight: 600;
+    color: #e6edf3;
+}
+
+.inactive-row .member-fullname {
+    color: #8b949e;
+}
+
+/* Status badge */
+.status-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-active {
+    background: rgba(63, 185, 80, 0.12);
+    color: #3fb950;
+    border: 1px solid rgba(63, 185, 80, 0.25);
+}
+
+.status-inactive {
+    background: rgba(139, 148, 158, 0.1);
+    color: #8b949e;
+    border: 1px solid rgba(139, 148, 158, 0.2);
+}
+
+/* ─── Loading / Empty ─── */
+.loading-state {
+    text-align: center;
+    padding: 60px;
+    font-size: 16px;
+    color: #6e7681;
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 14px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-icon {
+    font-size: 56px;
+    margin-bottom: 16px;
+}
+
+.empty-state p {
+    color: #6e7681;
+    font-size: 15px;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+    .members-main {
+        padding: 16px 12px;
+    }
+
+    .members-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 18px 20px;
+    }
+
+    .members-title {
+        font-size: 22px;
+    }
+
+    .members-filter {
+        flex-direction: column;
+    }
+
+    .filter-btn {
+        min-width: unset;
+        width: 100%;
+    }
+
+    .members-table th,
+    .members-table td {
+        padding: 12px 14px;
+    }
+
+    .col-status {
+        width: 140px;
+    }
+
+    .member-fullname {
+        font-size: 14px;
+    }
+
+    .status-badge {
+        font-size: 11px;
+        padding: 4px 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .member-avatar {
+        width: 30px;
+        height: 30px;
+        font-size: 13px;
+    }
+
+    .members-table th,
+    .members-table td {
+        padding: 10px 10px;
+    }
+}

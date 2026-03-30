@@ -1,734 +1,639 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import HomeHeader from '@/components/HomeHeader';
+import './page.css';
 
-export default function Home() {
-    const [stats, setStats] = useState([]);
-    const [totalFund, setTotalFund] = useState(0);
-    const [baseFund, setBaseFund] = useState(0);
-    const [loading, setLoading] = useState(true);
-    const [isMobile, setIsMobile] = useState(false);
-    const [isSmallMobile, setIsSmallMobile] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [previousRanking, setPreviousRanking] = useState({}); // Map: nguoi_nop -> previous rank
-    const [activeTab, setActiveTab] = useState('this-month'); // 'this-month' | 'last-month' | 'all-time'
-    const itemsPerPage = 10;
+export default function HomePage() {
+    const [user, setUser] = useState(null);
+    const [activeTab, setActiveTab] = useState('events');
+
+    // Transactions state
+    const [transactions, setTransactions] = useState([]);
+    const [loadingTx, setLoadingTx] = useState(true);
+    const [filterDirection, setFilterDirection] = useState('all');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [txPage, setTxPage] = useState(1);
+    const txPerPage = 15;
+
+    // Fund Events state
+    const [events, setEvents] = useState([]);
+    const [members, setMembers] = useState([]);
+    const [loadingEvents, setLoadingEvents] = useState(true);
+    const [expandedEvent, setExpandedEvent] = useState(null);
+
+    // Create Event modal
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [createForm, setCreateForm] = useState({
+        title: '',
+        description: '',
+        amount_per_person: '',
+        event_date: new Date().toISOString().split('T')[0],
+        selectedMembers: []
+    });
+    const [savingEvent, setSavingEvent] = useState(false);
+
+    // Delete event
+    const [deletingEvent, setDeletingEvent] = useState(null);
 
     useEffect(() => {
-        fetchData();
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setUser(session?.user || null);
+        });
+        loadTransactions();
+        loadEvents();
+        loadMembers();
+    }, []);
 
-        // Detect mobile viewport
-        const checkMobile = () => {
-            setIsMobile(window.innerWidth <= 768);
-            setIsSmallMobile(window.innerWidth <= 360);
-        };
+    // ─── Transactions ────────────────────────────────────────────
 
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-
-        return () => window.removeEventListener('resize', checkMobile);
-    }, [activeTab]); // Re-fetch when tab changes
-
-    // Hàm tạo avatar dựa trên rank
-    const getAvatar = (index) => {
-        if (index === 0) return '/avatar_rank_1.png';
-        if (index === 1) return '/avatar_rank_2.png';
-        if (index === 2) return '/avatar_rank_3.png';
-        return '/avatar_default.png';
-    };
-
-    // Hàm tạo biệt danh hài hước
-    const getFunnyNickname = (index, name) => {
-        const nicknames = [
-            { title: '👑 VUA NỘP PHẠT', desc: `"Người dẫn đầu bảng xếp hạng danh dự! Cứ phạm lỗi rồi nộp tiền, chu kỳ hoàn hảo!" 😎` },
-            { title: '🥈 Á VƯƠNG PHẠT NGUỘI', desc: `"Gần lắm rồi nhưng chưa đủ! Cố lên nữa là lên top 1 nha bạn ơi!" 😏` },
-            { title: '🥉 ĐỒNG HẠNG BA', desc: `"Ít nhất cũng lọt top 3! Danh dự mà, đừng buồn!" 🤗` },
-            { title: '💀 TÂN BINH MỚI VỀ ĐỘI', desc: `"Mới toanh! Làm quen với việc nộp phạt đi nhé!" 🔰` },
-            { title: '😅 CAO THỦ PHẠM LỖI', desc: `"Đã có kinh nghiệm nộp phạt rồi đấy!" 💪` },
-            { title: '🤡 VUA HÀI HƯỚC', desc: `"Nộp ít nhưng vui là được!" 🎭` },
-            { title: '🐢 CHẬM MÀ CHẮC', desc: `"Từ từ nộp phạt, đừng vội!" 🚶` },
-            { title: '💸 THẦN TÀI NHỎ', desc: `"Đóng góp ít nhưng có tâm!" 🙏` },
-            { title: '🎯 XẠ THỦ BỦA', desc: `"Lỡ tay phạm lỗi thôi mà!" 😬` },
-            { title: '🌟 NGÔI SAO MỚI NỔI', desc: `"Tài năng trẻ của làng pickleball!" ✨` }
-        ];
-
-        return nicknames[Math.min(index, nicknames.length - 1)];
-    };
-
-    // Hàm format số tiền cho mobile (compact) và desktop (full)
-    const formatAmount = (amount, isMobile) => {
-        if (isMobile) {
-            // Mobile: 200.000 -> 200K, 1.500.000 -> 1,5Tr
-            if (amount >= 1000000) {
-                return (amount / 1000000).toFixed(amount % 1000000 === 0 ? 0 : 1) + 'Tr';
-            } else if (amount >= 1000) {
-                return (amount / 1000).toFixed(amount % 1000 === 0 ? 0 : 0) + 'K';
-            }
-            return amount.toString();
-        } else {
-            // Desktop: Format đầy đủ với dấu phẩy
-            return new Intl.NumberFormat('vi-VN').format(amount) + ' đ';
-        }
-    };
-
-    // Hàm render icon thay đổi rank
-    const getRankChangeIcon = (currentRank, previousRank) => {
-        if (!previousRank) {
-            return <span style={{ fontSize: isMobile ? '10px' : '12px', color: '#999', fontWeight: '600' }}>NEW</span>;
-        }
-
-        const change = previousRank - currentRank; // Positive = tăng hạng, Negative = giảm hạng
-
-        if (change > 0) {
-            // Tăng hạng (số rank nhỏ hơn = tốt hơn)
-            return (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#00C853' }}>
-                    <span style={{ fontSize: isMobile ? '18px' : '22px', lineHeight: '1' }}>↑</span>
-                    <span style={{ fontSize: isMobile ? '11px' : '13px', fontWeight: '700' }}>+{change}</span>
-                </div>
-            );
-        } else if (change < 0) {
-            // Giảm hạng
-            return (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#FF3D00' }}>
-                    <span style={{ fontSize: isMobile ? '18px' : '22px', lineHeight: '1' }}>↓</span>
-                    <span style={{ fontSize: isMobile ? '11px' : '13px', fontWeight: '700' }}>{change}</span>
-                </div>
-            );
-        } else {
-            // Giữ nguyên
-            return (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#999' }}>
-                    <span style={{ fontSize: isMobile ? '14px' : '16px', lineHeight: '1' }}>=</span>
-                </div>
-            );
-        }
-    };
-
-    async function fetchData() {
-        setLoading(true);
-        const now = new Date();
-
-        // Calculate date ranges based on active tab
-        let startDate, endDate;
-
-        if (activeTab === 'this-month') {
-            // Tháng này: từ đầu tháng đến giờ
-            startDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-            endDate = null; // No end date = up to now
-        } else if (activeTab === 'last-month') {
-            // Tháng trước: từ đầu tháng trước đến cuối tháng trước
-            startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString();
-            endDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-        } else {
-            // All-time: không filter date
-            startDate = null;
-            endDate = null;
-        }
-
-        // Lấy TẤT CẢ giao dịch để tính toán đúng luỹ kế
-        let query = supabase
+    async function loadTransactions() {
+        setLoadingTx(true);
+        const { data, error } = await supabase
             .from('quy_pickleball')
-            .select('nguoi_nop, so_tien, huong_giao_dich, loai_giao_dich, created_at')
-            .order('created_at', { ascending: true });
+            .select('*')
+            .order('created_at', { ascending: false });
+        if (!error) setTransactions(data || []);
+        setLoadingTx(false);
+    }
 
-        const { data, error } = await query;
-
-        // Lấy snapshot gần nhất để so sánh rank
-        const { data: snapshotData } = await supabase
-            .from('ranking_snapshots')
-            .select('nguoi_nop, rank_position, snapshot_date')
-            .lt('snapshot_date', new Date().toISOString().split('T')[0]) // Lấy snapshot trước hôm nay
-            .order('snapshot_date', { ascending: false })
-            .limit(100); // Lấy nhiều record để đảm bảo có đủ của ngày gần nhất
-
-        // Tạo map previous ranking từ snapshot gần nhất
-        const prevRankMap = {};
-        if (snapshotData && snapshotData.length > 0) {
-            const latestDate = snapshotData[0].snapshot_date;
-            snapshotData
-                .filter(s => s.snapshot_date === latestDate)
-                .forEach(snapshot => {
-                    prevRankMap[snapshot.nguoi_nop] = snapshot.rank_position;
-                });
+    const filteredTx = transactions.filter(t => {
+        if (filterDirection !== 'all' && t.huong_giao_dich !== filterDirection) return false;
+        if (searchQuery) {
+            const q = searchQuery.toLowerCase();
+            return (t.noi_dung_goc || '').toLowerCase().includes(q)
+                || (t.nguoi_nop || '').toLowerCase().includes(q)
+                || (t.ma_giao_dich || '').toLowerCase().includes(q);
         }
-        setPreviousRanking(prevRankMap);
+        return true;
+    });
 
-        if (error) {
-            console.log(error);
-            setLoading(false);
-        } else {
-            // 1. Xử lý dữ liệu cho TỔNG QUỸ (Tính luỹ kế đến thời điểm endDate)
-            // Nếu activeTab là 'this-month' hoặc 'all-time', endDate = null (tức là đến hiện tại)
-            const fundData = data.filter(item => {
-                if (endDate && item.created_at >= endDate) return false;
-                return true;
+    const paginatedTx = filteredTx.slice((txPage - 1) * txPerPage, txPage * txPerPage);
+    const totalTxPages = Math.ceil(filteredTx.length / txPerPage);
+
+    const stats = {
+        totalIn: transactions.filter(t => t.huong_giao_dich === 'in').reduce((s, t) => s + (t.so_tien || 0), 0),
+        totalOut: transactions.filter(t => t.huong_giao_dich === 'out').reduce((s, t) => s + Math.abs(t.so_tien || 0), 0),
+    };
+    stats.balance = stats.totalIn - stats.totalOut;
+
+    // ─── Fund Events ─────────────────────────────────────────────
+
+    async function loadEvents() {
+        setLoadingEvents(true);
+        const { data: eventsData, error: eventsErr } = await supabase
+            .from('fund_events')
+            .select(`
+                *,
+                fund_event_participants (
+                    id,
+                    member_id,
+                    has_paid,
+                    paid_at,
+                    notes,
+                    club_members ( id, full_name, is_active )
+                )
+            `)
+            .order('created_at', { ascending: false });
+
+        if (!eventsErr) setEvents(eventsData || []);
+        setLoadingEvents(false);
+    }
+
+    async function loadMembers() {
+        const { data } = await supabase
+            .from('club_members')
+            .select('id, full_name, is_active')
+            .eq('is_active', true)
+            .order('full_name');
+        setMembers(data || []);
+    }
+
+    async function handleCreateEvent(e) {
+        e.preventDefault();
+        if (!createForm.title.trim()) return;
+        if (createForm.selectedMembers.length === 0) {
+            alert('Vui lòng chọn ít nhất 1 thành viên tham gia đóng quỹ!');
+            return;
+        }
+        setSavingEvent(true);
+        try {
+            // Tạo event
+            const { data: eventData, error: eventErr } = await supabase
+                .from('fund_events')
+                .insert({
+                    title: createForm.title.trim(),
+                    description: createForm.description.trim() || null,
+                    amount_per_person: parseFloat(createForm.amount_per_person) || 0,
+                    event_date: createForm.event_date || null,
+                })
+                .select()
+                .single();
+
+            if (eventErr) throw eventErr;
+
+            // Thêm participants
+            const participants = createForm.selectedMembers.map(memberId => ({
+                event_id: eventData.id,
+                member_id: memberId,
+                has_paid: false,
+            }));
+
+            const { error: partErr } = await supabase
+                .from('fund_event_participants')
+                .insert(participants);
+
+            if (partErr) throw partErr;
+
+            // Reset form
+            setCreateForm({
+                title: '',
+                description: '',
+                amount_per_person: '',
+                event_date: new Date().toISOString().split('T')[0],
+                selectedMembers: []
             });
-
-            const baseAccountForFund = fundData.filter(item => item.nguoi_nop === 'TAI KHOAN GOC');
-            const incomingForFund = fundData.filter(
-                item => item.nguoi_nop !== 'TAI KHOAN GOC'
-                    && item.huong_giao_dich === 'in'
-                    && (item.loai_giao_dich === 'nop_phat' || item.so_tien <= 200000)
-            );
-            const outgoingForFund = fundData.filter(item => item.huong_giao_dich === 'out');
-
-            let base = 0;
-            baseAccountForFund.forEach(item => base += item.so_tien);
-
-            let penaltyTotalForFund = 0;
-            incomingForFund.forEach(item => penaltyTotalForFund += item.so_tien);
-
-            let totalOut = 0;
-            outgoingForFund.forEach(item => totalOut += Math.abs(item.so_tien));
-
-            setBaseFund(base);
-            // Tổng quỹ = Gốc + Tiền phạt - Tiền ra
-            setTotalFund(base + penaltyTotalForFund - totalOut);
-
-
-            // 2. Xử lý dữ liệu cho BẢNG XẾP HẠNG (Chỉ tính trong khoảng thời gian selected)
-            const rankingData = data.filter(item => {
-                const itemDate = item.created_at;
-                if (startDate && itemDate < startDate) return false;
-                if (endDate && itemDate >= endDate) return false;
-                return true;
-            });
-
-            const incomingForRanking = rankingData.filter(
-                item => item.nguoi_nop !== 'TAI KHOAN GOC'
-                    && item.huong_giao_dich === 'in'
-                    && (item.loai_giao_dich === 'nop_phat' || item.so_tien <= 200000)
-            );
-
-            // Tính toán xếp hạng (chỉ từ giao dịch tiền vào trong kỳ)
-            const ranking = {};
-
-            incomingForRanking.forEach(item => {
-                if (!ranking[item.nguoi_nop]) ranking[item.nguoi_nop] = 0;
-                ranking[item.nguoi_nop] += item.so_tien;
-            });
-
-            // Chuyển object thành array và sort giảm dần
-            const sortedRanking = Object.entries(ranking)
-                .map(([name, amount]) => ({ name, amount }))
-                .sort((a, b) => b.amount - a.amount);
-
-            setStats(sortedRanking);
-            setLoading(false);
+            setShowCreateModal(false);
+            await loadEvents();
+        } catch (err) {
+            alert('Lỗi khi tạo sự kiện: ' + err.message);
+        } finally {
+            setSavingEvent(false);
         }
     }
 
+    async function togglePayment(participantId, currentStatus, eventId) {
+        const { error } = await supabase
+            .from('fund_event_participants')
+            .update({
+                has_paid: !currentStatus,
+                paid_at: !currentStatus ? new Date().toISOString() : null,
+            })
+            .eq('id', participantId);
+
+        if (!error) {
+            setEvents(prev => prev.map(ev => {
+                if (ev.id !== eventId) return ev;
+                return {
+                    ...ev,
+                    fund_event_participants: ev.fund_event_participants.map(p =>
+                        p.id === participantId
+                            ? { ...p, has_paid: !currentStatus, paid_at: !currentStatus ? new Date().toISOString() : null }
+                            : p
+                    )
+                };
+            }));
+        }
+    }
+
+    async function handleDeleteEvent(eventId) {
+        if (!confirm('Xóa sự kiện này? Thao tác không thể hoàn tác.')) return;
+        setDeletingEvent(eventId);
+        const { error } = await supabase.from('fund_events').delete().eq('id', eventId);
+        if (!error) {
+            setEvents(prev => prev.filter(ev => ev.id !== eventId));
+            if (expandedEvent === eventId) setExpandedEvent(null);
+        }
+        setDeletingEvent(null);
+    }
+
+    function toggleMemberInForm(memberId) {
+        setCreateForm(prev => ({
+            ...prev,
+            selectedMembers: prev.selectedMembers.includes(memberId)
+                ? prev.selectedMembers.filter(id => id !== memberId)
+                : [...prev.selectedMembers, memberId]
+        }));
+    }
+
+    function selectAllMembers() {
+        setCreateForm(prev => ({
+            ...prev,
+            selectedMembers: members.map(m => m.id)
+        }));
+    }
+
+    function clearMemberSelection() {
+        setCreateForm(prev => ({ ...prev, selectedMembers: [] }));
+    }
+
+    // ─── Render ──────────────────────────────────────────────────
+
+    const formatMoney = (amount) => new Intl.NumberFormat('vi-VN').format(amount) + 'đ';
+
     return (
-        <div style={{
-            minHeight: '100vh',
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            padding: '0',
-            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
-        }}>
-            {/* New Sticky Header */}
+        <div className="home-dark">
             <HomeHeader />
 
-            {/* Main Content */}
-            <div style={{
-                maxWidth: '900px',
-                margin: '0 auto',
-                padding: isMobile ? '20px 12px' : '30px 20px'
-            }}>
+            <div className="home-main">
 
-                {/* Total Fund Card */}
-                <div style={{
-                    background: 'rgba(255, 255, 255, 0.95)',
-                    borderRadius: isMobile ? '15px' : '20px',
-                    padding: isMobile ? '20px' : '30px',
-                    marginBottom: isMobile ? '20px' : '30px',
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
-                    backdropFilter: 'blur(10px)'
-                }}>
-                    <div style={{ textAlign: 'center' }}>
-                        <h3 style={{
-                            color: '#667eea',
-                            margin: '0 0 15px 0',
-                            fontSize: isMobile ? '15px' : '18px',
-                            fontWeight: '600'
-                        }}>
-                            💰 TỔNG QUỸ HIỆN TẠI
-                        </h3>
-                        <div style={{
-                            fontSize: isMobile ? '36px' : '48px',
-                            fontWeight: '800',
-                            color: '#764ba2',
-                            marginBottom: '15px'
-                        }}>
-                            {new Intl.NumberFormat('vi-VN').format(totalFund)} đ
+                {/* Stats */}
+                <div className="stats-grid">
+                    <div className="stat-card balance-card">
+                        <div className="stat-icon">💰</div>
+                        <div className="stat-info">
+                            <div className="stat-label">Số dư quỹ</div>
+                            <div className={`stat-value ${stats.balance >= 0 ? 'positive' : 'negative'}`}>
+                                {formatMoney(stats.balance)}
+                            </div>
                         </div>
-                        <div style={{
-                            display: 'flex',
-                            flexDirection: isMobile ? 'column' : 'row',
-                            justifyContent: 'center',
-                            gap: isMobile ? '8px' : '30px',
-                            fontSize: isMobile ? '13px' : '14px'
-                        }}>
-                            <div>
-                                <span style={{ color: '#666' }}>🏦 Tài khoản gốc: </span>
-                                <strong style={{ color: '#0070f3' }}>{new Intl.NumberFormat('vi-VN').format(baseFund)} đ</strong>
-                            </div>
-                            <div>
-                                <span style={{ color: '#666' }}>💸 Tiền phạt: </span>
-                                <strong style={{ color: '#e74c3c' }}>{new Intl.NumberFormat('vi-VN').format(totalFund - baseFund)} đ</strong>
-                            </div>
+                    </div>
+                    <div className="stat-card">
+                        <div className="stat-icon in-icon">⬇️</div>
+                        <div className="stat-info">
+                            <div className="stat-label">Tiền vào</div>
+                            <div className="stat-value positive">{formatMoney(stats.totalIn)}</div>
+                        </div>
+                    </div>
+                    <div className="stat-card">
+                        <div className="stat-icon out-icon">⬆️</div>
+                        <div className="stat-info">
+                            <div className="stat-label">Tiền ra</div>
+                            <div className="stat-value negative">{formatMoney(stats.totalOut)}</div>
                         </div>
                     </div>
                 </div>
 
-                {/* Time Period Tabs */}
-                <div style={{
-                    display: 'flex',
-                    gap: isMobile ? '8px' : '12px',
-                    marginBottom: isMobile ? '20px' : '30px',
-                    justifyContent: 'center',
-                    flexWrap: 'wrap'
-                }}>
+                {/* Tabs */}
+                <div className="tab-bar">
                     <button
-                        onClick={() => setActiveTab('this-month')}
-                        style={{
-                            flex: isMobile ? '1 1 calc(33% - 6px)' : '0 1 auto',
-                            padding: isMobile ? '12px 8px' : '14px 24px',
-                            background: activeTab === 'this-month'
-                                ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                                : 'rgba(255, 255, 255, 0.95)',
-                            color: activeTab === 'this-month' ? '#fff' : '#667eea',
-                            border: activeTab === 'this-month' ? 'none' : '2px solid rgba(102, 126, 234, 0.3)',
-                            borderRadius: '12px',
-                            fontSize: isMobile ? '12px' : '15px',
-                            fontWeight: '700',
-                            cursor: 'pointer',
-                            boxShadow: activeTab === 'this-month'
-                                ? '0 4px 15px rgba(102, 126, 234, 0.4)'
-                                : '0 2px 8px rgba(0,0,0,0.1)',
-                            transition: 'all 0.3s',
-                            whiteSpace: 'nowrap'
-                        }}
-                        onMouseEnter={(e) => {
-                            if (!isMobile && activeTab !== 'this-month') {
-                                e.currentTarget.style.transform = 'translateY(-2px)';
-                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-                            }
-                        }}
-                        onMouseLeave={(e) => {
-                            if (!isMobile) {
-                                e.currentTarget.style.transform = 'translateY(0)';
-                                e.currentTarget.style.boxShadow = activeTab === 'this-month'
-                                    ? '0 4px 15px rgba(102, 126, 234, 0.4)'
-                                    : '0 2px 8px rgba(0,0,0,0.1)';
-                            }
-                        }}
+                        className={`tab-btn ${activeTab === 'events' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('events')}
                     >
-                        📅 Tháng này
+                        📋 Sự kiện đóng quỹ
                     </button>
-
                     <button
-                        onClick={() => setActiveTab('last-month')}
-                        style={{
-                            flex: isMobile ? '1 1 calc(33% - 6px)' : '0 1 auto',
-                            padding: isMobile ? '12px 8px' : '14px 24px',
-                            background: activeTab === 'last-month'
-                                ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                                : 'rgba(255, 255, 255, 0.95)',
-                            color: activeTab === 'last-month' ? '#fff' : '#667eea',
-                            border: activeTab === 'last-month' ? 'none' : '2px solid rgba(102, 126, 234, 0.3)',
-                            borderRadius: '12px',
-                            fontSize: isMobile ? '12px' : '15px',
-                            fontWeight: '700',
-                            cursor: 'pointer',
-                            boxShadow: activeTab === 'last-month'
-                                ? '0 4px 15px rgba(102, 126, 234, 0.4)'
-                                : '0 2px 8px rgba(0,0,0,0.1)',
-                            transition: 'all 0.3s',
-                            whiteSpace: 'nowrap'
-                        }}
-                        onMouseEnter={(e) => {
-                            if (!isMobile && activeTab !== 'last-month') {
-                                e.currentTarget.style.transform = 'translateY(-2px)';
-                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-                            }
-                        }}
-                        onMouseLeave={(e) => {
-                            if (!isMobile) {
-                                e.currentTarget.style.transform = 'translateY(0)';
-                                e.currentTarget.style.boxShadow = activeTab === 'last-month'
-                                    ? '0 4px 15px rgba(102, 126, 234, 0.4)'
-                                    : '0 2px 8px rgba(0,0,0,0.1)';
-                            }
-                        }}
+                        className={`tab-btn ${activeTab === 'transactions' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('transactions')}
                     >
-                        📆 Tháng trước
-                    </button>
-
-                    <button
-                        onClick={() => setActiveTab('all-time')}
-                        style={{
-                            flex: isMobile ? '1 1 calc(33% - 6px)' : '0 1 auto',
-                            padding: isMobile ? '12px 8px' : '14px 24px',
-                            background: activeTab === 'all-time'
-                                ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                                : 'rgba(255, 255, 255, 0.95)',
-                            color: activeTab === 'all-time' ? '#fff' : '#667eea',
-                            border: activeTab === 'all-time' ? 'none' : '2px solid rgba(102, 126, 234, 0.3)',
-                            borderRadius: '12px',
-                            fontSize: isMobile ? '12px' : '15px',
-                            fontWeight: '700',
-                            cursor: 'pointer',
-                            boxShadow: activeTab === 'all-time'
-                                ? '0 4px 15px rgba(102, 126, 234, 0.4)'
-                                : '0 2px 8px rgba(0,0,0,0.1)',
-                            transition: 'all 0.3s',
-                            whiteSpace: 'nowrap'
-                        }}
-                        onMouseEnter={(e) => {
-                            if (!isMobile && activeTab !== 'all-time') {
-                                e.currentTarget.style.transform = 'translateY(-2px)';
-                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-                            }
-                        }}
-                        onMouseLeave={(e) => {
-                            if (!isMobile) {
-                                e.currentTarget.style.transform = 'translateY(0)';
-                                e.currentTarget.style.boxShadow = activeTab === 'all-time'
-                                    ? '0 4px 15px rgba(102, 126, 234, 0.4)'
-                                    : '0 2px 8px rgba(0,0,0,0.1)';
-                            }
-                        }}
-                    >
-                        🏆 Tất cả
+                        📑 Lịch sử giao dịch
                     </button>
                 </div>
 
-                {loading ? (
-                    <div style={{ textAlign: 'center', padding: '60px', color: '#fff', fontSize: '18px' }}>
-                        ⏳ Đang tải bảng xếp hạng...
-                    </div>
-                ) : (
-                    <>
-                        <h2 style={{
-                            color: '#fff',
-                            textAlign: 'center',
-                            marginBottom: isMobile ? '15px' : '25px',
-                            fontSize: isMobile ? '22px' : '28px',
-                            fontWeight: '700',
-                            textShadow: '2px 2px 4px rgba(0,0,0,0.2)'
-                        }}>
-                            🏆 BẢNG XẾP HẠNG {
-                                activeTab === 'this-month'
-                                    ? `THÁNG ${new Date().getMonth() + 1}/${new Date().getFullYear()}`
-                                    : activeTab === 'last-month'
-                                        ? `THÁNG ${new Date().getMonth() === 0 ? 12 : new Date().getMonth()}/${new Date().getMonth() === 0 ? new Date().getFullYear() - 1 : new Date().getFullYear()}`
-                                        : 'TẤT CẢ THỜI GIAN'
-                            }
-                        </h2>
+                {/* ── Tab: Sự kiện đóng quỹ ── */}
+                {activeTab === 'events' && (
+                    <div className="tab-content">
+                        {/* Admin: Tạo sự kiện */}
+                        {user && (
+                            <div className="admin-bar">
+                                <span className="admin-note">👑 Chế độ admin</span>
+                                <button className="btn-create" onClick={() => setShowCreateModal(true)}>
+                                    + Tạo sự kiện đóng quỹ
+                                </button>
+                            </div>
+                        )}
 
-                        {stats.length === 0 ? (
-                            <div style={{
-                                background: 'rgba(255, 255, 255, 0.9)',
-                                borderRadius: '15px',
-                                padding: isMobile ? '40px 20px' : '60px',
-                                textAlign: 'center',
-                                color: '#666'
-                            }}>
-                                <div style={{ fontSize: isMobile ? '48px' : '64px', marginBottom: '20px' }}>🎾</div>
-                                <p style={{ fontSize: isMobile ? '16px' : '18px', margin: 0 }}>Chưa có ai nộp phạt trong tháng này!</p>
-                                <p style={{ fontSize: isMobile ? '13px' : '14px', color: '#999', margin: '10px 0 0 0' }}>
-                                    Hãy là người đầu tiên &quot;đóng góp&quot; nha! 😄
-                                </p>
+                        {loadingEvents ? (
+                            <div className="loading-state">⏳ Đang tải sự kiện...</div>
+                        ) : events.length === 0 ? (
+                            <div className="empty-state">
+                                <div className="empty-icon">📋</div>
+                                <p>Chưa có sự kiện đóng quỹ nào</p>
+                                {user && <p className="empty-hint">Nhấn "+ Tạo sự kiện đóng quỹ" để bắt đầu</p>}
                             </div>
                         ) : (
-                            <>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '10px' : '20px' }}>
-                                    {stats.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((item, idx) => {
-                                        const index = (currentPage - 1) * itemsPerPage + idx; // Real index for ranking
-                                        const nickname = getFunnyNickname(index, item.name);
-                                        const isTopThree = index < 3;
+                            <div className="events-list">
+                                {events.map(event => {
+                                    const participants = event.fund_event_participants || [];
+                                    const paidCount = participants.filter(p => p.has_paid).length;
+                                    const total = participants.length;
+                                    const pct = total > 0 ? Math.round((paidCount / total) * 100) : 0;
+                                    const isExpanded = expandedEvent === event.id;
 
-                                        return (
+                                    return (
+                                        <div key={event.id} className="event-card">
+                                            {/* Event header */}
                                             <div
-                                                key={index}
-                                                style={{
-                                                    background: isTopThree
-                                                        ? 'linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.95) 100%)'
-                                                        : 'rgba(255, 255, 255, 0.92)',
-                                                    borderRadius: isMobile ? '15px' : '20px',
-                                                    padding: isMobile ? '12px' : '25px',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: isMobile ? '10px' : '20px',
-                                                    boxShadow: isTopThree
-                                                        ? '0 8px 24px rgba(0,0,0,0.15)'
-                                                        : '0 4px 12px rgba(0,0,0,0.1)',
-                                                    border: isTopThree ? '3px solid ' + (index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : '#CD7F32') : 'none',
-                                                    transition: 'transform 0.2s, box-shadow 0.2s',
-                                                    cursor: 'pointer',
-                                                    position: 'relative',
-                                                    overflow: 'hidden'
-                                                }}
-                                                onMouseEnter={(e) => {
-                                                    if (!isMobile) {
-                                                        e.currentTarget.style.transform = 'translateY(-5px)';
-                                                        e.currentTarget.style.boxShadow = '0 12px 32px rgba(0,0,0,0.2)';
-                                                    }
-                                                }}
-                                                onMouseLeave={(e) => {
-                                                    if (!isMobile) {
-                                                        e.currentTarget.style.transform = 'translateY(0)';
-                                                        e.currentTarget.style.boxShadow = isTopThree
-                                                            ? '0 8px 24px rgba(0,0,0,0.15)'
-                                                            : '0 4px 12px rgba(0,0,0,0.1)';
-                                                    }
-                                                }}
+                                                className="event-header"
+                                                onClick={() => setExpandedEvent(isExpanded ? null : event.id)}
                                             >
-                                                {/* Rank Number with Previous Rank */}
-                                                <div style={{
-                                                    display: 'flex',
-                                                    flexDirection: isMobile ? 'column' : 'row',
-                                                    alignItems: 'center',
-                                                    gap: isMobile ? '4px' : '12px',
-                                                    width: isSmallMobile ? '55px' : isMobile ? '60px' : '120px',
-                                                    flexShrink: 0
-                                                }}>
-                                                    {/* Current Rank - Large */}
-                                                    <div style={{
-                                                        fontSize: isSmallMobile ? '24px' : isMobile ? '28px' : '48px',
-                                                        fontWeight: '900',
-                                                        color: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : '#999',
-                                                        textShadow: '2px 2px 4px rgba(0,0,0,0.1)',
-                                                        lineHeight: '1'
-                                                    }}>
-                                                        {index + 1}
-                                                    </div>
-
-                                                    {/* Previous Rank & Change Icon */}
-                                                    <div style={{
-                                                        display: 'flex',
-                                                        flexDirection: 'column',
-                                                        alignItems: 'center',
-                                                        gap: '2px'
-                                                    }}>
-                                                        <div style={{
-                                                            fontSize: isMobile ? '9px' : '11px',
-                                                            color: '#999',
-                                                            fontWeight: '600',
-                                                            textTransform: 'uppercase',
-                                                            letterSpacing: '0.5px'
-                                                        }}>
-                                                            Prev
-                                                        </div>
-                                                        <div style={{
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            gap: '3px'
-                                                        }}>
-                                                            <span style={{
-                                                                fontSize: isMobile ? '13px' : '16px',
-                                                                fontWeight: '700',
-                                                                color: '#666'
-                                                            }}>
-                                                                {previousRanking[item.name] || '-'}
+                                                <div className="event-meta">
+                                                    <h3 className="event-title">{event.title}</h3>
+                                                    <div className="event-details">
+                                                        {event.event_date && (
+                                                            <span className="event-date">
+                                                                📅 {new Date(event.event_date).toLocaleDateString('vi-VN')}
                                                             </span>
-                                                            {getRankChangeIcon(index + 1, previousRanking[item.name])}
-                                                        </div>
+                                                        )}
+                                                        {event.amount_per_person > 0 && (
+                                                            <span className="event-amount">
+                                                                💵 {formatMoney(event.amount_per_person)}/người
+                                                            </span>
+                                                        )}
+                                                        {event.description && (
+                                                            <span className="event-desc">{event.description}</span>
+                                                        )}
                                                     </div>
                                                 </div>
 
-                                                {/* Avatar */}
-                                                <div style={{
-                                                    width: isSmallMobile ? '45px' : isMobile ? '50px' : '100px',
-                                                    height: isSmallMobile ? '45px' : isMobile ? '50px' : '100px',
-                                                    borderRadius: '50%',
-                                                    overflow: 'hidden',
-                                                    border: isSmallMobile ? '3px solid ' : '4px solid ' + (index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : '#ddd'),
-                                                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                                                    flexShrink: 0,
-                                                    background: '#f0f0f0',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    fontSize: isSmallMobile ? '28px' : isMobile ? '32px' : '48px'
-                                                }}>
-                                                    {/* Fallback emoji avatar */}
-                                                    {index === 0 ? '👑' : index === 1 ? '🥈' : index === 2 ? '🥉' : '😊'}
-                                                </div>
-
-                                                {/* Info */}
-                                                <div style={{ flex: 1, minWidth: isMobile ? '40%' : 0 }}>
-                                                    <div style={{
-                                                        fontSize: isSmallMobile ? '10px' : isMobile ? '11px' : '14px',
-                                                        fontWeight: '700',
-                                                        color: '#667eea',
-                                                        marginBottom: isMobile ? '3px' : '4px'
-                                                    }}>
-                                                        {nickname.title}
+                                                <div className="event-progress-wrap">
+                                                    <div className="event-count">
+                                                        <span className="paid-count">{paidCount}</span>
+                                                        <span className="total-count">/{total}</span>
+                                                        <span className="paid-label"> đã đóng</span>
                                                     </div>
-                                                    <div style={{
-                                                        fontSize: isSmallMobile ? '16px' : isMobile ? '18px' : '22px',
-                                                        fontWeight: '700',
-                                                        color: '#333',
-                                                        marginBottom: isMobile ? '4px' : '8px'
-                                                    }}>
-                                                        {item.name}
+                                                    <div className="progress-bar-bg">
+                                                        <div
+                                                            className="progress-bar-fill"
+                                                            style={{ width: `${pct}%` }}
+                                                        />
                                                     </div>
-                                                    <div style={{
-                                                        fontSize: isSmallMobile ? '10px' : isMobile ? '11px' : '13px',
-                                                        color: '#555',
-                                                        lineHeight: '1.5',
-                                                        fontStyle: 'italic',
-                                                        display: isMobile ? '-webkit-box' : 'block',
-                                                        WebkitLineClamp: isMobile ? '2' : 'unset',
-                                                        WebkitBoxOrient: 'vertical',
-                                                        overflow: isMobile ? 'hidden' : 'visible'
-                                                    }}>
-                                                        {nickname.desc}
-                                                    </div>
-                                                </div>
-
-                                                {/* Amount */}
-                                                <div style={{
-                                                    textAlign: 'right',
-                                                    paddingRight: isMobile ? '5px' : '10px',
-                                                    flexShrink: 0,
-                                                    minWidth: isMobile ? 'auto' : '120px'
-                                                }}>
-                                                    <div style={{
-                                                        fontSize: isSmallMobile ? '17px' : isMobile ? '20px' : '28px',
-                                                        fontWeight: '800',
-                                                        color: index === 0 ? '#e74c3c' : index === 1 ? '#3498db' : index === 2 ? '#f39c12' : '#27ae60',
-                                                        marginBottom: '3px',
-                                                        whiteSpace: 'nowrap'
-                                                    }}>
-                                                        {formatAmount(item.amount, isMobile)}
-                                                    </div>
-                                                    <div style={{
-                                                        fontSize: isSmallMobile ? '8px' : isMobile ? '9px' : '12px',
-                                                        color: '#999',
-                                                        whiteSpace: 'nowrap'
-                                                    }}>
-                                                        {((item.amount / (totalFund - baseFund)) * 100).toFixed(1)}% tổng phạt
-                                                    </div>
+                                                    <div className="progress-pct">{pct}%</div>
+                                                    <span className="expand-icon">{isExpanded ? '▲' : '▼'}</span>
                                                 </div>
                                             </div>
-                                        );
-                                    })}
+
+                                            {/* Member list (expanded) */}
+                                            {isExpanded && (
+                                                <div className="event-body">
+                                                    {user && (
+                                                        <div className="event-actions">
+                                                            <button
+                                                                className="btn-danger-sm"
+                                                                onClick={() => handleDeleteEvent(event.id)}
+                                                                disabled={deletingEvent === event.id}
+                                                            >
+                                                                {deletingEvent === event.id ? '...' : '🗑 Xóa sự kiện'}
+                                                            </button>
+                                                        </div>
+                                                    )}
+
+                                                    <div className="members-grid">
+                                                        {/* Chưa đóng */}
+                                                        <div className="members-column">
+                                                            <div className="column-header unpaid-header">
+                                                                ❌ Chưa đóng ({participants.filter(p => !p.has_paid).length})
+                                                            </div>
+                                                            {participants
+                                                                .filter(p => !p.has_paid)
+                                                                .map(p => (
+                                                                    <div key={p.id} className="member-row unpaid">
+                                                                        <span className="member-name">
+                                                                            {p.club_members?.full_name || 'N/A'}
+                                                                        </span>
+                                                                        {user && (
+                                                                            <button
+                                                                                className="btn-toggle unpaid-toggle"
+                                                                                onClick={() => togglePayment(p.id, p.has_paid, event.id)}
+                                                                                title="Đánh dấu đã đóng"
+                                                                            >
+                                                                                ✓ Đánh dấu đã đóng
+                                                                            </button>
+                                                                        )}
+                                                                    </div>
+                                                                ))
+                                                            }
+                                                            {participants.filter(p => !p.has_paid).length === 0 && (
+                                                                <div className="all-paid-msg">✅ Tất cả đã đóng!</div>
+                                                            )}
+                                                        </div>
+
+                                                        {/* Đã đóng */}
+                                                        <div className="members-column">
+                                                            <div className="column-header paid-header">
+                                                                ✅ Đã đóng ({participants.filter(p => p.has_paid).length})
+                                                            </div>
+                                                            {participants
+                                                                .filter(p => p.has_paid)
+                                                                .map(p => (
+                                                                    <div key={p.id} className="member-row paid">
+                                                                        <span className="member-name">
+                                                                            {p.club_members?.full_name || 'N/A'}
+                                                                        </span>
+                                                                        <div className="paid-info">
+                                                                            {p.paid_at && (
+                                                                                <span className="paid-at">
+                                                                                    {new Date(p.paid_at).toLocaleDateString('vi-VN')}
+                                                                                </span>
+                                                                            )}
+                                                                            {user && (
+                                                                                <button
+                                                                                    className="btn-toggle paid-toggle"
+                                                                                    onClick={() => togglePayment(p.id, p.has_paid, event.id)}
+                                                                                    title="Hủy đánh dấu"
+                                                                                >
+                                                                                    Hoàn tác
+                                                                                </button>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                ))
+                                                            }
+                                                            {participants.filter(p => p.has_paid).length === 0 && (
+                                                                <div className="none-paid-msg">Chưa có ai đóng</div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* ── Tab: Lịch sử giao dịch ── */}
+                {activeTab === 'transactions' && (
+                    <div className="tab-content">
+                        {/* Filter bar */}
+                        <div className="filter-bar">
+                            {[
+                                { key: 'all', label: `📋 Tất cả (${transactions.length})` },
+                                { key: 'in', label: `⬇️ Tiền vào (${transactions.filter(t => t.huong_giao_dich === 'in').length})` },
+                                { key: 'out', label: `⬆️ Tiền ra (${transactions.filter(t => t.huong_giao_dich === 'out').length})` },
+                            ].map(f => (
+                                <button
+                                    key={f.key}
+                                    className={`filter-btn ${filterDirection === f.key ? 'active' : ''}`}
+                                    onClick={() => { setFilterDirection(f.key); setTxPage(1); }}
+                                >
+                                    {f.label}
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Search */}
+                        <div className="search-bar">
+                            <input
+                                type="text"
+                                placeholder="🔍 Tìm theo nội dung, người gửi, mã GD..."
+                                value={searchQuery}
+                                onChange={e => { setSearchQuery(e.target.value); setTxPage(1); }}
+                                className="search-input"
+                            />
+                            {searchQuery && (
+                                <div className="search-result-count">Tìm thấy {filteredTx.length} kết quả</div>
+                            )}
+                        </div>
+
+                        {/* Transactions list */}
+                        {loadingTx ? (
+                            <div className="loading-state">⏳ Đang tải giao dịch...</div>
+                        ) : (
+                            <>
+                                <div className="tx-list">
+                                    {paginatedTx.map(t => (
+                                        <div key={t.id} className={`tx-item ${t.huong_giao_dich}`}>
+                                            <div className="tx-top">
+                                                <span className="tx-date">
+                                                    📅 {new Date(t.created_at).toLocaleString('vi-VN')}
+                                                </span>
+                                                <span className={`tx-amount ${t.huong_giao_dich}`}>
+                                                    {t.huong_giao_dich === 'in' ? '+' : '-'}{t.so_tien?.toLocaleString()}đ
+                                                </span>
+                                            </div>
+                                            <div className="tx-body">
+                                                <div className="tx-row">
+                                                    <span className="tx-label">👤 Người gửi</span>
+                                                    <span className="tx-val">{t.nguoi_nop}</span>
+                                                </div>
+                                                <div className="tx-row">
+                                                    <span className="tx-label">📝 Nội dung</span>
+                                                    <span className="tx-val content">{t.noi_dung_goc || 'Không có nội dung'}</span>
+                                                </div>
+                                                <div className="tx-footer">
+                                                    <span className={`badge badge-${t.loai_giao_dich}`}>
+                                                        {t.loai_giao_dich === 'nop_phat' ? '🚨 Nộp phạt' :
+                                                            t.loai_giao_dich === 'nop_quy' ? '🏆 Nộp quỹ' : '📝 Khác'}
+                                                    </span>
+                                                    <span className="tx-code">🔢 {t.ma_giao_dich || 'N/A'}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {paginatedTx.length === 0 && (
+                                        <div className="empty-state">
+                                            <div className="empty-icon">📭</div>
+                                            <p>Không có giao dịch nào</p>
+                                        </div>
+                                    )}
                                 </div>
 
-                                {/* Pagination Controls */}
-                                {stats.length > itemsPerPage && (
-                                    <div style={{
-                                        display: 'flex',
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
-                                        gap: '10px',
-                                        marginTop: '30px'
-                                    }}>
+                                {/* Pagination */}
+                                {totalTxPages > 1 && (
+                                    <div className="pagination">
                                         <button
-                                            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                                            disabled={currentPage === 1}
-                                            style={{
-                                                padding: isMobile ? '10px 20px' : '12px 24px',
-                                                background: currentPage === 1 ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.95)',
-                                                color: currentPage === 1 ? '#999' : '#667eea',
-                                                border: 'none',
-                                                borderRadius: '10px',
-                                                fontSize: isMobile ? '14px' : '16px',
-                                                fontWeight: '700',
-                                                cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
-                                                transition: 'all 0.2s'
-                                            }}
-                                        >
-                                            ← Trước
-                                        </button>
-
-                                        <span style={{
-                                            color: '#fff',
-                                            fontSize: isMobile ? '14px' : '16px',
-                                            fontWeight: '600',
-                                            padding: '0 10px'
-                                        }}>
-                                            Trang {currentPage} / {Math.ceil(stats.length / itemsPerPage)}
-                                        </span>
-
+                                            className="page-btn"
+                                            onClick={() => setTxPage(p => Math.max(1, p - 1))}
+                                            disabled={txPage === 1}
+                                        >← Trước</button>
+                                        <span className="page-info">Trang {txPage} / {totalTxPages}</span>
                                         <button
-                                            onClick={() => setCurrentPage(prev => Math.min(Math.ceil(stats.length / itemsPerPage), prev + 1))}
-                                            disabled={currentPage >= Math.ceil(stats.length / itemsPerPage)}
-                                            style={{
-                                                padding: isMobile ? '10px 20px' : '12px 24px',
-                                                background: currentPage >= Math.ceil(stats.length / itemsPerPage) ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.95)',
-                                                color: currentPage >= Math.ceil(stats.length / itemsPerPage) ? '#999' : '#667eea',
-                                                border: 'none',
-                                                borderRadius: '10px',
-                                                fontSize: isMobile ? '14px' : '16px',
-                                                fontWeight: '700',
-                                                cursor: currentPage >= Math.ceil(stats.length / itemsPerPage) ? 'not-allowed' : 'pointer',
-                                                transition: 'all 0.2s'
-                                            }}
-                                        >
-                                            Sau →
-                                        </button>
+                                            className="page-btn"
+                                            onClick={() => setTxPage(p => Math.min(totalTxPages, p + 1))}
+                                            disabled={txPage >= totalTxPages}
+                                        >Sau →</button>
                                     </div>
                                 )}
                             </>
                         )}
-
-                        {/* Refresh Button */}
-                        <button
-                            onClick={fetchData}
-                            style={{
-                                marginTop: isMobile ? '20px' : '30px',
-                                width: '100%',
-                                padding: isMobile ? '14px' : '18px',
-                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                color: '#fff',
-                                border: 'none',
-                                borderRadius: '15px',
-                                fontSize: isMobile ? '16px' : '18px',
-                                fontWeight: '700',
-                                cursor: 'pointer',
-                                boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
-                                transition: 'all 0.3s',
-                                WebkitTapHighlightColor: 'transparent'
-                            }}
-                            onMouseEnter={(e) => {
-                                if (!isMobile) {
-                                    e.currentTarget.style.transform = 'scale(1.02)';
-                                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.6)';
-                                }
-                            }}
-                            onMouseLeave={(e) => {
-                                if (!isMobile) {
-                                    e.currentTarget.style.transform = 'scale(1)';
-                                    e.currentTarget.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
-                                }
-                            }}
-                        >
-                            🔄 Làm mới bảng xếp hạng
-                        </button>
-
-                        {/* Footer */}
-                        <div style={{
-                            textAlign: 'center',
-                            marginTop: isMobile ? '30px' : '40px',
-                            padding: isMobile ? '15px' : '20px',
-                            color: 'rgba(255,255,255,0.8)',
-                            fontSize: isMobile ? '13px' : '14px'
-                        }}>
-                            <p style={{ margin: '0 0 5px 0' }}>
-                                💡 <strong>Mẹo:</strong> Chuyển khoản với nội dung &quot;PKB + TÊN&quot; để hệ thống tự động ghi nhận!
-                            </p>
-                            <p style={{ margin: 0, fontSize: isMobile ? '11px' : '12px', opacity: 0.7 }}>
-                                Ví dụ: &quot;PKB TUAN&quot; hoặc &quot;PKB HUNG NOP PHAT&quot;
-                            </p>
-                        </div>
-                    </>
+                    </div>
                 )}
             </div>
-        </div >
+
+            {/* ── Modal tạo sự kiện ── */}
+            {showCreateModal && (
+                <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
+                    <div className="modal" onClick={e => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h2>📋 Tạo sự kiện đóng quỹ</h2>
+                            <button className="modal-close" onClick={() => setShowCreateModal(false)}>✕</button>
+                        </div>
+
+                        <form onSubmit={handleCreateEvent} className="modal-form">
+                            <div className="form-group">
+                                <label>Tên sự kiện <span className="required">*</span></label>
+                                <input
+                                    type="text"
+                                    placeholder="VD: Quỹ tháng 3, Tiền đi ăn ngày 30/3..."
+                                    value={createForm.title}
+                                    onChange={e => setCreateForm(p => ({ ...p, title: e.target.value }))}
+                                    required
+                                    className="form-input"
+                                />
+                            </div>
+
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label>Số tiền / người (đ)</label>
+                                    <input
+                                        type="number"
+                                        placeholder="VD: 200000"
+                                        value={createForm.amount_per_person}
+                                        onChange={e => setCreateForm(p => ({ ...p, amount_per_person: e.target.value }))}
+                                        min="0"
+                                        className="form-input"
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Ngày sự kiện</label>
+                                    <input
+                                        type="date"
+                                        value={createForm.event_date}
+                                        onChange={e => setCreateForm(p => ({ ...p, event_date: e.target.value }))}
+                                        className="form-input"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="form-group">
+                                <label>Ghi chú</label>
+                                <input
+                                    type="text"
+                                    placeholder="Mô tả thêm về sự kiện..."
+                                    value={createForm.description}
+                                    onChange={e => setCreateForm(p => ({ ...p, description: e.target.value }))}
+                                    className="form-input"
+                                />
+                            </div>
+
+                            {/* Chọn thành viên */}
+                            <div className="form-group">
+                                <div className="member-select-header">
+                                    <label>
+                                        Thành viên tham gia <span className="required">*</span>
+                                        <span className="member-count-badge">
+                                            {createForm.selectedMembers.length}/{members.length}
+                                        </span>
+                                    </label>
+                                    <div className="member-select-actions">
+                                        <button type="button" className="btn-select-all" onClick={selectAllMembers}>
+                                            Chọn tất cả
+                                        </button>
+                                        <button type="button" className="btn-clear" onClick={clearMemberSelection}>
+                                            Bỏ chọn
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="member-checkboxes">
+                                    {members.map(m => (
+                                        <label key={m.id} className={`member-checkbox ${createForm.selectedMembers.includes(m.id) ? 'checked' : ''}`}>
+                                            <input
+                                                type="checkbox"
+                                                checked={createForm.selectedMembers.includes(m.id)}
+                                                onChange={() => toggleMemberInForm(m.id)}
+                                            />
+                                            <span className="checkbox-name">{m.full_name}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="modal-footer">
+                                <button type="button" className="btn-cancel" onClick={() => setShowCreateModal(false)}>
+                                    Hủy
+                                </button>
+                                <button type="submit" className="btn-submit" disabled={savingEvent}>
+                                    {savingEvent ? '⏳ Đang lưu...' : '✅ Tạo sự kiện'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+        </div>
     );
 }

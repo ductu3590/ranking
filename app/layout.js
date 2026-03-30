@@ -1,8 +1,8 @@
 import './globals.css'
 
 export const metadata = {
-    title: 'Quỹ Pickleball - Bảng Xếp Hạng',
-    description: 'Theo dõi quỹ đóng góp và bảng xếp hạng thành viên Pickleball',
+    title: 'Quỹ CLB Pickleball 246',
+    description: 'Hệ thống quản lý quỹ và sự kiện đóng quỹ CLB Pickleball 246',
     viewport: 'width=device-width, initial-scale=1, maximum-scale=5',
 }
 

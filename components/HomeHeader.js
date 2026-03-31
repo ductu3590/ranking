@@ -10,9 +10,9 @@ export default function HomeHeader({ showAdmin = true }) {
 
     const navLinks = [
         { href: '/', label: '💰 Quản lý quỹ', icon: '💰' },
-        { href: '/transactions', label: '📑 Lịch sử GD', icon: '📑' },
+        // { href: '/transactions', label: '📑 Lịch sử GD', icon: '📑' },
         { href: '/members', label: '👥 Thành viên', icon: '👥' },
-        { href: '/tournament', label: '⚡ Giải Tất Niên', icon: '⚡', highlight: true },
+        // { href: '/tournament', label: '⚡ Giải Tất Niên', icon: '⚡', highlight: true },
     ];
 
     const toggleMenu = () => setMenuOpen(!menuOpen);

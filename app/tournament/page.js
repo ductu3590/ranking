@@ -56,6 +56,7 @@ export default function Tournament() {
                                         <li>📌 <strong>Vòng 3 - SUPER TEAM (1 trận - 3 điểm):</strong>
                                             <ul>
                                                 <li><strong>Chạm 31 điểm</strong> - Ăn điểm trực tiếp.</li>
+                                                <li><strong>Luật đổi cặp:</strong> Không được giữ nguyên cặp đôi của Vòng 1 và Vòng 2. Phải ghép cặp mới hoàn toàn.</li>
                                                 <li><strong>Thay người liên tục:</strong> Cứ mỗi <strong>4 điểm tổng</strong> (VD: 2-2, 3-1, 4-0) thì <strong>CẢ 2 ĐỘI đổi cặp kế tiếp</strong> vào sân.</li>
                                                 <li>Đội trưởng sắp xếp thứ tự 5 cặp (1-2-3-4-5) từ trước. Các cặp xoay vòng liên tục đến khi chạm 31.</li>
                                             </ul>

@@ -6,35 +6,36 @@ export async function POST(req) {
     try {
         const data = await req.json();
 
-        // Log để debug
-        console.log('Webhook received:', JSON.stringify(data, null, 2));
+        // ═══ LOG TOÀN BỘ PAYLOAD ĐỂ DEBUG ═══
+        // Xem log này trên Vercel để biết SePay gửi field nào
+        console.log('=== SEPAY WEBHOOK RAW PAYLOAD ===');
+        console.log(JSON.stringify(data, null, 2));
+        console.log('=== ALL KEYS:', Object.keys(data));
+        console.log('================================');
 
-        // 1. Lấy thông tin từ SePay
-        const amount = data.transferAmount;
-        const content = data.transferContent || data.content || '';
-        const reference = data.referenceCode;
-        const accountName = data.accountName || '';
+        // Field names theo tài liệu chính thức SePay:
+        // id, gateway, transactionDate, accountNumber, subAccount,
+        // code, content, transferType, description, transferAmount,
+        // accumulated, referenceCode
+        const amount = data.transferAmount || 0; // Luôn số dương theo docs SePay
+        const content = data.content || data.transferContent || ''; // SePay dùng "content"
+        const reference = data.referenceCode || data.code || String(data.id || '');
+        const accountName = data.description || data.accountName || ''; // SePay dùng "description"
 
-        console.log('Parsed data:', { amount, content, reference, accountName });
+        // ═══ XÁC ĐỊNH HƯỚNG GIAO DỊCH ═══
+        // Theo tài liệu chính thức SePay: field `transferType` = "in" hoặc "out"
+        // transferAmount luôn là số dương, không phân biệt hướng bằng dấu.
+        const huongGiaoDich = (data.transferType === 'out') ? 'out' : 'in';
+        console.log(`transferType: "${data.transferType}" → hướng: ${huongGiaoDich}`);
 
-        // 2. Parse transaction sử dụng module mới
-        const parseResult = await parseTransaction(content, amount, accountName);
+        console.log('Final direction:', huongGiaoDich, '| Amount:', amount, '| Content:', content);
+
+        // 2. Parse transaction
+        const parseResult = await parseTransaction(content, amount, accountName, huongGiaoDich);
 
         console.log('Parse result:', parseResult);
 
-        // 3. Lưu vào Supabase với thông tin đầy đủ
-        console.log('Attempting to insert:', {
-            nguoi_nop: parseResult.memberName,
-            so_tien: amount,
-            noi_dung_goc: content,
-            ma_giao_dich: reference,
-            confidence_score: parseResult.confidence,
-            bank_detected: parseResult.bankDetected,
-            parsing_method: parseResult.parsingMethod,
-            loai_giao_dich: parseResult.loaiGiaoDich,
-            huong_giao_dich: parseResult.huongGiaoDich
-        });
-
+        // 3. Lưu vào Supabase
         const { data: insertedData, error } = await supabaseServer
             .from('quy_pickleball')
             .insert({
@@ -46,23 +47,23 @@ export async function POST(req) {
                 bank_detected: parseResult.bankDetected,
                 parsing_method: parseResult.parsingMethod,
                 loai_giao_dich: parseResult.loaiGiaoDich,
-                huong_giao_dich: parseResult.huongGiaoDich,
+                huong_giao_dich: huongGiaoDich, // Dùng giá trị đã xác định ở trên
                 is_manually_categorized: false
             });
 
         if (error) {
-            // Nếu lỗi do trùng mã giao dịch (Unique key) thì bỏ qua
             if (error.code === '23505') {
                 console.log('Transaction already exists:', reference);
                 return NextResponse.json({ message: 'Transaction exists' }, { status: 200 });
             }
-            console.error("Supabase Error:", JSON.stringify(error, null, 2));
+            console.error('Supabase Error:', JSON.stringify(error, null, 2));
             return NextResponse.json({ message: 'Error saving', error: error.message }, { status: 500 });
         }
 
         console.log('Successfully inserted:', insertedData);
         return NextResponse.json({
             message: 'Success',
+            direction: huongGiaoDich,
             user: parseResult.memberName,
             confidence: parseResult.confidence,
             method: parseResult.parsingMethod,
@@ -74,4 +75,3 @@ export async function POST(req) {
         return NextResponse.json({ message: 'Invalid Request', error: error.message }, { status: 400 });
     }
 }
-

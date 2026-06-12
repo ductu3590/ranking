@@ -29,11 +29,16 @@ export default function TournamentModuleNav() {
         };
     }, []);
 
+    if (pathname === '/giai-dau') {
+        return null;
+    }
+
+    const basePath = getTournamentBasePath(pathname);
     const links = [
-        { href: '/giai-dau', label: 'Điều lệ', icon: '📜', roles: ['admin', 'captain', 'member', 'guest'] },
-        { href: '/giai-dau/live', label: 'Live', icon: '🔴', roles: ['admin', 'captain', 'member', 'guest'] },
-        { href: '/giai-dau/captain', label: 'Captain', icon: '👤', roles: ['guest'] },
-        { href: '/giai-dau/admin', label: 'Admin', icon: '⚙️', roles: ['admin'] },
+        { href: basePath, label: 'Điều lệ', icon: '📜', roles: ['admin', 'captain', 'member', 'guest'] },
+        { href: `${basePath}/live`, label: 'Live', icon: '🔴', roles: ['admin', 'captain', 'member', 'guest'] },
+        { href: `${basePath}/captain`, label: 'Captain', icon: '👤', roles: ['guest'] },
+        { href: `${basePath}/admin`, label: 'Admin', icon: '⚙️', roles: ['admin'] },
     ].filter((link) => link.roles.includes(userRole));
 
     return (
@@ -54,8 +59,19 @@ export default function TournamentModuleNav() {
     );
 }
 
+function getTournamentBasePath(pathname) {
+    const parts = pathname.split('/').filter(Boolean);
+    const tournamentId = parts[1];
+
+    if (parts[0] !== 'giai-dau' || !tournamentId || !/^\d+$/.test(tournamentId)) {
+        return '/giai-dau/1';
+    }
+
+    return `/giai-dau/${tournamentId}`;
+}
+
 function isActivePath(pathname, href) {
     if (pathname === href) return true;
-    if (href === '/giai-dau') return false;
+    if (/^\/giai-dau\/\d+$/.test(href)) return false;
     return pathname.startsWith(`${href}/`);
 }

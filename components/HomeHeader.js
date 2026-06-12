@@ -26,7 +26,7 @@ export default function HomeHeader({ showAdmin = true }) {
                         <a
                             key={link.href}
                             href={link.href}
-                            className={`nav-link ${pathname === link.href ? 'active' : ''} ${link.className || ''}`}
+                            className={`nav-link ${isActivePath(pathname, link.href) ? 'active' : ''} ${link.className || ''}`}
                         >
                             {link.label}
                         </a>
@@ -45,4 +45,11 @@ export default function HomeHeader({ showAdmin = true }) {
 
         </header>
     );
+}
+
+function isActivePath(pathname, href) {
+    if (pathname === href) return true;
+    if (href === '/giai-dau') return pathname.startsWith('/giai-dau/');
+    if (href === '/quy') return false;
+    return pathname.startsWith(`${href}/`);
 }

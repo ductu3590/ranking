@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import './live.css';
 import { supabase } from '@/lib/supabaseClient';
 import UserStatusBadge from '@/components/UserStatusBadge';
-import TournamentNavBar from '@/components/TournamentNavBar';
 
 export default function LiveTournament() {
     const [teams, setTeams] = useState([]);
@@ -287,9 +286,7 @@ export default function LiveTournament() {
     const redTeam = teams.find(t => t.team_code === 'red');
 
     return (
-        <>
-            <TournamentNavBar />
-            <div className="live-container">
+        <div className="live-container">
                 {/* Page Title Section */}
                 <div className="live-title-section">
                     <h1>🎾 PICKLEBALL YEAR-END CUP - LIVE</h1>
@@ -598,7 +595,6 @@ export default function LiveTournament() {
                         </p>
                     </div>
                 </div>
-            </div>
-        </>
+        </div>
     );
 }

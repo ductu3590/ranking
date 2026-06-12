@@ -1,11 +1,9 @@
 'use client';
 import './tournament.css';
-import TournamentNavBar from '@/components/TournamentNavBar';
 
 export default function Tournament() {
     return (
-        <>
-            <TournamentNavBar />
+        <div className="tournament-module-page">
             <div className="app-background">
                 <div className="card-container">
                     <header className="card-header">
@@ -258,6 +256,6 @@ export default function Tournament() {
                     </div>
                 </div>
             </div>
-        </>
+        </div>
     );
 }

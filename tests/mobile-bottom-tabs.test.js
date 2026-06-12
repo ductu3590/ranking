@@ -7,10 +7,13 @@ const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 
 const homeHeaderJs = read('components/HomeHeader.js');
 const homeHeaderCss = read('components/HomeHeader.css');
-const tournamentNavJs = read('components/TournamentNavBar.js');
-const tournamentNavCss = read('components/TournamentNavBar.css');
 const quyLayoutJs = read('app/quy/layout.js');
 const giaiDauLayoutJs = read('app/giai-dau/layout.js');
+const giaiDauPageJs = read('app/giai-dau/page.js');
+const giaiDauLivePageJs = read('app/giai-dau/live/page.js');
+const giaiDauPairingsPageJs = read('app/giai-dau/admin/pairings/page.js');
+const quyPageJs = read('app/quy/page.js');
+const quyMembersPageJs = read('app/quy/members/page.js');
 const globalsCss = read('app/globals.css');
 
 assert(
@@ -26,13 +29,35 @@ const mobileBottomNavCss = fs.existsSync(path.join(root, 'components/MobileBotto
     : '';
 
 assert(
-    quyLayoutJs.includes('MobileBottomNav') && quyLayoutJs.includes('area="fund"'),
+    quyLayoutJs.includes('MobileBottomNav') && !quyLayoutJs.includes('area='),
     'Fund layout should mount MobileBottomNav for every /quy page.'
 );
 
 assert(
-    giaiDauLayoutJs.includes('MobileBottomNav') && giaiDauLayoutJs.includes('area="tournament"'),
+    giaiDauLayoutJs.includes('MobileBottomNav') && !giaiDauLayoutJs.includes('area='),
     'Tournament layout should mount MobileBottomNav for every /giai-dau page.'
+);
+
+assert(
+    quyLayoutJs.includes('HomeHeader') && giaiDauLayoutJs.includes('HomeHeader'),
+    'Fund and Tournament layouts should share the same HomeHeader app shell.'
+);
+
+assert(
+    giaiDauLayoutJs.includes('TournamentModuleNav'),
+    'Tournament layout should render a module subnav instead of a separate app navbar.'
+);
+
+assert(
+    !giaiDauPageJs.includes('TournamentNavBar') &&
+    !giaiDauLivePageJs.includes('TournamentNavBar') &&
+    !giaiDauPairingsPageJs.includes('TournamentNavBar'),
+    'Tournament pages should not import or render TournamentNavBar.'
+);
+
+assert(
+    !quyPageJs.includes('<HomeHeader') && !quyMembersPageJs.includes('<HomeHeader'),
+    'Fund pages should rely on the shared layout HomeHeader instead of rendering their own.'
 );
 
 assert(
@@ -51,8 +76,8 @@ assert(
 );
 
 assert(
-    mobileBottomNavJs.includes('/giai-dau/live') && mobileBottomNavJs.includes('/giai-dau/admin') && mobileBottomNavJs.includes('/giai-dau/captain'),
-    'MobileBottomNav tournament tabs should include live plus role-specific admin/captain destinations.'
+    !mobileBottomNavJs.includes('getTournamentTabs') && !mobileBottomNavJs.includes('/giai-dau/live') && !mobileBottomNavJs.includes('/giai-dau/captain'),
+    'MobileBottomNav should use one global tab set instead of tournament-specific tabs.'
 );
 
 assert(
@@ -61,13 +86,14 @@ assert(
 );
 
 assert(
-    !tournamentNavJs.includes('tournament-mobile-bottom-tabs'),
-    'TournamentNavBar should not render the mobile bottom tab bar directly.'
+    mobileBottomNavJs.includes("href === '/giai-dau'") && mobileBottomNavJs.includes("pathname.startsWith('/giai-dau/')"),
+    'MobileBottomNav should keep the global tournament tab active on tournament subroutes.'
 );
 
 assert(
-    !tournamentNavJs.includes('isMenuOpen') && !tournamentNavJs.includes('mobile-menu'),
-    'TournamentNavBar should not keep mobile dropdown menu state or markup.'
+    !fs.existsSync(path.join(root, 'components/TournamentNavBar.js')) &&
+    !fs.existsSync(path.join(root, 'components/TournamentNavBar.css')),
+    'TournamentNavBar files should be removed so the app has one shared shell.'
 );
 
 assert(

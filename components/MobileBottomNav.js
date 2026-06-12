@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 import './MobileBottomNav.css';
 
-export default function MobileBottomNav({ area }) {
+export default function MobileBottomNav() {
     const pathname = usePathname();
     const [userRole, setUserRole] = useState('guest');
 
@@ -29,12 +29,10 @@ export default function MobileBottomNav({ area }) {
         };
     }, []);
 
-    const tabs = area === 'tournament' ? getTournamentTabs(userRole) : getFundTabs();
-    const variantClass = area === 'tournament' ? 'mobile-bottom-nav-tournament' : 'mobile-bottom-nav-fund';
-    const label = area === 'tournament' ? 'Điều hướng giải đấu trên mobile' : 'Điều hướng chính trên mobile';
+    const tabs = getGlobalTabs(userRole);
 
     return (
-        <nav className={`mobile-bottom-nav ${variantClass}`} aria-label={label}>
+        <nav className="mobile-bottom-nav" aria-label="Điều hướng chính trên mobile">
             {tabs.map((link) => (
                 <a
                     key={link.href}
@@ -51,27 +49,18 @@ export default function MobileBottomNav({ area }) {
 
 function isActivePath(pathname, href) {
     if (pathname === href) return true;
-    if (href === '/quy' || href === '/giai-dau') return false;
+    if (href === '/giai-dau') return pathname.startsWith('/giai-dau/');
+    if (href === '/quy') return false;
     return pathname.startsWith(`${href}/`);
 }
 
-function getFundTabs() {
-    return [
+function getGlobalTabs(userRole) {
+    const tabs = [
         { href: '/quy', label: 'Quỹ', icon: '💰' },
         { href: '/quy/members', label: 'TV', icon: '👥' },
         { href: '/giai-dau', label: 'Giải', icon: '🏆' },
-        { href: '/quy/admin', label: 'Admin', icon: '⚙️' },
-    ];
-}
-
-function getTournamentTabs(userRole) {
-    const links = [
-        { href: '/quy', label: 'Home', icon: '🏠', roles: ['admin', 'captain', 'member', 'guest'] },
-        { href: '/giai-dau', label: 'Điều lệ', icon: '📜', roles: ['admin', 'captain', 'member', 'guest'] },
-        { href: '/giai-dau/live', label: 'Live', icon: '🔴', roles: ['admin', 'captain', 'member', 'guest'] },
-        { href: '/giai-dau/admin', label: 'Admin', icon: '⚙️', roles: ['admin'] },
-        { href: '/giai-dau/captain', label: 'Captain', icon: '👤', roles: ['guest'] },
+        { href: '/quy/admin', label: 'Admin', icon: '⚙️', roles: ['admin', 'guest', 'member', 'captain'] },
     ];
 
-    return links.filter((link) => link.roles.includes(userRole)).slice(0, 4);
+    return tabs.filter((link) => !link.roles || link.roles.includes(userRole));
 }

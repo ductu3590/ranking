@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import TournamentNavBar from '@/components/TournamentNavBar';
 import './admin-pairings.css';
 
 export default function AdminPairingsPage() {
@@ -147,7 +146,6 @@ export default function AdminPairingsPage() {
     if (loading) {
         return (
             <>
-                <TournamentNavBar />
                 <div className="admin-pairings-page">
                     <div className="loading">⏳ Loading...</div>
                 </div>
@@ -157,7 +155,6 @@ export default function AdminPairingsPage() {
 
     return (
         <>
-            <TournamentNavBar />
             <div className="admin-pairings-page">
                 <div className="page-header">
                     <h1>📝 Admin Pairings Management</h1>

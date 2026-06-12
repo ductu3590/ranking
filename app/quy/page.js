@@ -1,7 +1,6 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabaseClient';
-import HomeHeader from '@/components/HomeHeader';
 import './page.css';
 
 export default function HomePage() {
@@ -223,8 +222,6 @@ export default function HomePage() {
 
     return (
         <div className="home-dark">
-            <HomeHeader />
-
             <div className="home-main">
 
                 {/* Stats */}

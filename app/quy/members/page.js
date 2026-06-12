@@ -1,7 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
-import HomeHeader from '@/components/HomeHeader';
 import './members.css';
 
 export default function MembersPage() {
@@ -35,8 +34,6 @@ export default function MembersPage() {
 
     return (
         <div className="members-page">
-            <HomeHeader />
-
             <div className="members-main">
                 {/* Header */}
                 <div className="members-header">

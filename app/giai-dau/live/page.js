@@ -592,7 +592,7 @@ export default function LiveTournament() {
                         <p>⚡ Cập nhật tự động mỗi 10 giây</p>
                         <p>Giải đấu diễn ra: 17:00 - 20:05</p>
                         <p style={{ marginTop: '10px' }}>
-                            <a href="/tournament/captain" style={{ color: '#4f46e5', textDecoration: 'none', fontSize: '0.8rem' }}>
+                            <a href="/giai-dau/captain" style={{ color: '#4f46e5', textDecoration: 'none', fontSize: '0.8rem' }}>
                                 Admin/Captain Login
                             </a>
                         </p>

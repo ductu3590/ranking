@@ -49,7 +49,7 @@ export default function CaptainDashboard() {
 
                 // Check role
                 if (metadata.role !== 'captain') {
-                    router.push('/');
+                    router.push('/giai-dau');
                     return;
                 }
 
@@ -434,10 +434,10 @@ export default function CaptainDashboard() {
                 </div>
                 <div className="header-actions">
                     <UserStatusBadge />
-                    <a href="/tournament" className="btn-secondary" style={{ marginRight: '10px' }}>
+                    <a href="/giai-dau" className="btn-secondary" style={{ marginRight: '10px' }}>
                         📜 Điều lệ
                     </a>
-                    <a href="/tournament/live" className="btn-secondary">
+                    <a href="/giai-dau/live" className="btn-secondary">
                         👁️ Xem Live
                     </a>
                     <button onClick={handleLogout} className="btn-logout">

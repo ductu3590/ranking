@@ -1,5 +1,5 @@
 /* =====================================================
-   HOME HEADER - DARK THEME
+   HOME HEADER — LIGHT THEME, MODERN
    ===================================================== */
 
 .home-header {
@@ -8,10 +8,12 @@
     left: 0;
     right: 0;
     z-index: 1000;
-    background: #161b22;
-    border-bottom: 1px solid #30363d;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-    padding: 14px 20px;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid #E2E8F0;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
+    padding: 12px 20px;
     transition: all 0.3s ease;
 }
 
@@ -21,22 +23,22 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 20px;
+    gap: 16px;
     flex-wrap: wrap;
 }
 
 /* Logo */
 .header-logo a {
     text-decoration: none;
-    color: #e6edf3;
+    color: #0F172A;
 }
 
 .header-logo h1 {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 800;
     margin: 0;
     white-space: nowrap;
-    background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+    background: linear-gradient(135deg, #2563EB, #1D4ED8);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -45,15 +47,15 @@
 /* Navigation */
 .header-nav {
     display: flex;
-    gap: 8px;
+    gap: 4px;
     align-items: center;
     flex-wrap: wrap;
 }
 
 .nav-link {
-    padding: 9px 16px;
+    padding: 8px 14px;
     background: transparent;
-    color: #8b949e;
+    color: #64748B;
     text-decoration: none;
     border-radius: 8px;
     font-size: 14px;
@@ -64,46 +66,60 @@
 }
 
 .nav-link:hover {
-    background: #21262d;
-    color: #e6edf3;
-    border-color: #30363d;
+    background: #F1F5F9;
+    color: #1E293B;
+    border-color: #E2E8F0;
 }
 
 .nav-link.active {
-    background: rgba(14, 165, 233, 0.15);
-    color: #38bdf8;
-    border-color: rgba(14, 165, 233, 0.4);
+    background: #EFF6FF;
+    color: #2563EB;
+    border-color: rgba(37, 99, 235, 0.2);
 }
 
 .nav-link.highlight {
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.2) 100%);
-    color: #fbbf24;
-    border-color: rgba(245, 158, 11, 0.4);
+    background: #FFF7ED;
+    color: #EA580C;
+    border-color: rgba(234, 88, 12, 0.2);
 }
 
 .nav-link.highlight:hover {
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.3) 0%, rgba(217, 119, 6, 0.3) 100%);
+    background: #FFEDD5;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+    box-shadow: 0 4px 12px rgba(234, 88, 12, 0.15);
 }
 
 .nav-link.admin-link {
-    background: rgba(139, 148, 158, 0.08);
-    color: #6e7681;
-    border-color: #21262d;
+    background: #F8FAFC;
+    color: #94A3B8;
+    border-color: #E2E8F0;
     font-size: 13px;
 }
 
 .nav-link.admin-link:hover {
-    color: #8b949e;
-    background: #21262d;
+    color: #475569;
+    background: #F1F5F9;
+}
+
+/* Tournament link — special badge style */
+.nav-link.tournament-link {
+    background: linear-gradient(135deg, #EFF6FF, #DBEAFE);
+    color: #2563EB;
+    border-color: rgba(37, 99, 235, 0.25);
+    font-weight: 700;
+}
+
+.nav-link.tournament-link:hover {
+    background: linear-gradient(135deg, #DBEAFE, #BFDBFE);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
 }
 
 /* Right section */
 .header-right {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 12px;
 }
 
 /* Hamburger (Mobile) */
@@ -120,16 +136,16 @@
 
 .hamburger span {
     display: block;
-    width: 24px;
+    width: 22px;
     height: 2px;
-    background: #8b949e;
+    background: #64748B;
     border-radius: 2px;
     transition: all 0.3s ease;
 }
 
 .hamburger.open span:nth-child(1) {
     transform: rotate(45deg) translate(7px, 7px);
-    background: #38bdf8;
+    background: #2563EB;
 }
 
 .hamburger.open span:nth-child(2) {
@@ -138,47 +154,47 @@
 
 .hamburger.open span:nth-child(3) {
     transform: rotate(-45deg) translate(6px, -6px);
-    background: #38bdf8;
+    background: #2563EB;
 }
 
-/* Fund display (optional) */
+/* Fund display */
 .header-fund {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    background: rgba(14, 165, 233, 0.1);
+    background: #EFF6FF;
     padding: 6px 14px;
     border-radius: 8px;
-    border: 1px solid rgba(14, 165, 233, 0.2);
+    border: 1px solid rgba(37, 99, 235, 0.15);
 }
 
 .fund-label {
     font-size: 10px;
-    color: #6e7681;
+    color: #94A3B8;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
 .fund-amount {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 800;
-    color: #38bdf8;
+    color: #2563EB;
 }
 
 /* ─── Mobile Responsive ─── */
 @media (max-width: 768px) {
     .home-header {
-        padding: 12px 15px;
+        padding: 10px 15px;
     }
 
     .header-container {
         flex-wrap: nowrap;
-        gap: 10px;
+        gap: 8px;
     }
 
     .header-logo h1 {
-        font-size: 17px;
+        font-size: 16px;
     }
 
     /* Show hamburger */
@@ -186,19 +202,19 @@
         display: flex;
     }
 
-    /* Mobile nav (slide-in drawer) */
+    /* Mobile nav — slide-in drawer */
     .header-nav {
         position: fixed;
         top: 0;
         left: -100%;
         width: 260px;
         height: 100vh;
-        background: #161b22;
-        border-right: 1px solid #30363d;
+        background: #FFFFFF;
+        border-right: 1px solid #E2E8F0;
         flex-direction: column;
         gap: 0;
-        padding: 70px 0 20px;
-        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+        padding: 64px 0 20px;
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.1);
         transition: left 0.3s ease;
         z-index: 999;
         overflow-y: auto;
@@ -214,40 +230,38 @@
         padding: 14px 20px;
         border-radius: 0;
         border: none;
-        border-bottom: 1px solid #21262d;
+        border-bottom: 1px solid #F1F5F9;
         font-size: 15px;
     }
 
     .nav-link:hover {
-        background: #21262d;
-        border-color: #21262d;
+        background: #F8FAFC;
+        border-color: #F1F5F9;
     }
 
     .nav-link.active {
-        background: rgba(14, 165, 233, 0.1);
-        border-left: 3px solid #0ea5e9;
-        color: #38bdf8;
+        background: #EFF6FF;
+        border-left: 3px solid #2563EB;
+        color: #2563EB;
     }
 
     .nav-link.highlight {
-        border-left: 3px solid #fbbf24;
+        border-left: 3px solid #EA580C;
+    }
+
+    .nav-link.tournament-link {
+        border-left: 3px solid #2563EB;
+        background: #EFF6FF;
     }
 
     .header-right {
-        gap: 8px;
+        gap: 6px;
     }
 
-    .fund-label {
-        font-size: 9px;
-    }
-
-    .fund-amount {
-        font-size: 13px;
-    }
+    .fund-label { font-size: 9px; }
+    .fund-amount { font-size: 13px; }
 }
 
 @media (max-width: 480px) {
-    .header-logo h1 {
-        font-size: 14px;
-    }
+    .header-logo h1 { font-size: 14px; }
 }

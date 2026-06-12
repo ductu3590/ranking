@@ -161,7 +161,7 @@ export default function AdminPairingsPage() {
             <div className="admin-pairings-page">
                 <div className="page-header">
                     <h1>📝 Admin Pairings Management</h1>
-                    <button onClick={() => router.push('/admin/tournament')} className="btn-back">
+                    <button onClick={() => router.push('/giai-dau/admin')} className="btn-back">
                         ← Back to Admin
                     </button>
                 </div>

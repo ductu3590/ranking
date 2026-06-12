@@ -198,9 +198,9 @@ export default function AdminTournamentPanel() {
             <div className="admin-tournament-header">
                 <h1>🎾 Quản Lý Giải Đấu</h1>
                 <div className="header-actions">
-                    <a href="/admin/tournament/pairings" className="btn-secondary">📝 Manage Pairings</a>
-                    <a href="/admin" className="btn-secondary">← Admin Dashboard</a>
-                    <a href="/tournament/live" className="btn-secondary">👁️ Xem Live</a>
+                    <a href="/giai-dau/admin/pairings" className="btn-secondary">📝 Manage Pairings</a>
+                    <a href="/quy/admin" className="btn-secondary">← Admin Dashboard</a>
+                    <a href="/giai-dau/live" className="btn-secondary">👁️ Xem Live</a>
                 </div>
             </div>
 
@@ -329,7 +329,7 @@ export default function AdminTournamentPanel() {
                     <button onClick={handleRevealRound1} className="btn-action btn-reveal">
                         🔓 Công Bố Round 1
                     </button>
-                    <button onClick={() => router.push('/admin/tournament/pairings')} className="btn-action">
+                    <button onClick={() => router.push('/giai-dau/admin/pairings')} className="btn-action">
                         📋 Quản Lý Pairings
                     </button>
                     <button onClick={loadData} className="btn-action">

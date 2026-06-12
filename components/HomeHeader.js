@@ -9,10 +9,9 @@ export default function HomeHeader({ showAdmin = true }) {
     const [menuOpen, setMenuOpen] = useState(false);
 
     const navLinks = [
-        { href: '/', label: '💰 Quản lý quỹ', icon: '💰' },
-        // { href: '/transactions', label: '📑 Lịch sử GD', icon: '📑' },
-        { href: '/members', label: '👥 Thành viên', icon: '👥' },
-        // { href: '/tournament', label: '⚡ Giải Tất Niên', icon: '⚡', highlight: true },
+        { href: '/quy', label: '💰 Quản lý quỹ' },
+        { href: '/quy/members', label: '👥 Thành viên' },
+        { href: '/giai-dau', label: '🏆 Giải đấu', className: 'tournament-link' },
     ];
 
     const toggleMenu = () => setMenuOpen(!menuOpen);
@@ -23,7 +22,7 @@ export default function HomeHeader({ showAdmin = true }) {
             <div className="header-container">
                 {/* Logo */}
                 <div className="header-logo">
-                    <a href="/">
+                    <a href="/quy">
                         <h1>🏓 PICKLEBALL 246 CLUB</h1>
                     </a>
                 </div>
@@ -52,7 +51,7 @@ export default function HomeHeader({ showAdmin = true }) {
                         </a>
                     ))}
                     {showAdmin && (
-                        <a href="/admin" className="nav-link admin-link" onClick={closeMenu}>
+                        <a href="/quy/admin" className="nav-link admin-link" onClick={closeMenu}>
                             ⚙️ Quản trị
                         </a>
                     )}

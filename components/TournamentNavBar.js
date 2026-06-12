@@ -31,7 +31,7 @@ export default function TournamentNavBar() {
     async function handleLogout() {
         try {
             await supabase.auth.signOut();
-            window.location.href = '/';
+            window.location.href = '/quy';
         } catch (err) {
             console.error('Logout error:', err);
         }
@@ -50,14 +50,14 @@ export default function TournamentNavBar() {
 
     function getNavLinks() {
         const commonLinks = [
-            { href: '/', label: '🏠 Trang chủ', roles: ['admin', 'captain', 'member', 'guest'] },
-            { href: '/tournament', label: '📜 Điều lệ', roles: ['admin', 'captain', 'member', 'guest'] },
-            { href: '/tournament/live', label: '🔴 Live', roles: ['admin', 'captain', 'member', 'guest'] },
+            { href: '/quy', label: '🏠 Trang chủ', roles: ['admin', 'captain', 'member', 'guest'] },
+            { href: '/giai-dau', label: '📜 Điều lệ', roles: ['admin', 'captain', 'member', 'guest'] },
+            { href: '/giai-dau/live', label: '🔴 Live', roles: ['admin', 'captain', 'member', 'guest'] },
         ];
 
         const roleLinks = [
-            { href: '/admin/tournament', label: '⚙️ Admin Panel', roles: ['admin'] },
-            { href: '/tournament/captain', label: '👤 Đăng nhập', roles: ['guest'] },
+            { href: '/giai-dau/admin', label: '⚙️ Admin Panel', roles: ['admin'] },
+            { href: '/giai-dau/captain', label: '👤 Đăng nhập', roles: ['guest'] },
         ];
 
         return [...commonLinks, ...roleLinks].filter(link =>
@@ -70,7 +70,7 @@ export default function TournamentNavBar() {
             <div className="navbar-container">
                 {/* Logo / Brand */}
                 <div className="navbar-brand">
-                    <a href="/tournament">
+                    <a href="/giai-dau">
                         <span className="brand-icon">🎾</span>
                         <span className="brand-text">PICKLEBALL CUP</span>
                     </a>

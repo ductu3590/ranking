@@ -318,10 +318,10 @@ export default function AdminPage() {
                         </div>
                         <div className="header-buttons">
                             <UserStatusBadge />
-                            <a href="/admin/tournament" className="btn-tournament">
+                            <a href="/giai-dau/admin" className="btn-tournament">
                                 🏆 Quản lý giải đấu
                             </a>
-                            <a href="/" className="btn-home">
+                            <a href="/quy" className="btn-home">
                                 🏠 Trang chủ
                             </a>
                             <button onClick={handleLogout} className="btn-logout">
@@ -694,7 +694,7 @@ export default function AdminPage() {
                                 value={newMember.aliasesText}
                                 onChange={(e) => setNewMember({ ...newMember, aliasesText: e.target.value })}
                                 rows="5"
-                                placeholder="Nhập mỗi alias trên một dòng, VD:&#10;NGUYEN VAN A&#10;VAN A&#10;NV A"
+                                placeholder="Nhập mỗi alias trên một dòng, VD:&#10;NGUYÊN VĂN A&#10;VĂN A&#10;NV A"
                             />
                             <small style={{ color: '#6b7280', fontSize: '0.875rem', marginTop: '5px', display: 'block' }}>
                                 💡 Nhập mỗi alias trên một dòng. Aliases giúp hệ thống nhận diện tên thành viên từ giao dịch.

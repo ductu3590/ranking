@@ -4,6 +4,12 @@
     padding: 20px;
 }
 
+.admin-tournament-container.embedded {
+    min-height: auto;
+    background: transparent;
+    padding: 0;
+}
+
 .admin-tournament-header {
     display: flex;
     justify-content: space-between;

@@ -59,7 +59,7 @@ function getGlobalTabs(userRole) {
         { href: '/quy', label: 'Quỹ', icon: '💰' },
         { href: '/quy/members', label: 'TV', icon: '👥' },
         { href: '/giai-dau', label: 'Giải', icon: '🏆' },
-        { href: '/quy/admin', label: 'Admin', icon: '⚙️', roles: ['admin', 'guest', 'member', 'captain'] },
+        { href: '/admin', label: 'Admin', icon: '⚙️', roles: ['admin', 'guest', 'member', 'captain'] },
     ];
 
     return tabs.filter((link) => !link.roles || link.roles.includes(userRole));

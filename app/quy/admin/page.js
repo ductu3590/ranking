@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import './admin.css';
 import UserStatusBadge from '@/components/UserStatusBadge';
 
-export default function AdminPage() {
+export default function AdminPage({ embedded = false }) {
     const [transactions, setTransactions] = useState([]);
     const [members, setMembers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -47,8 +47,13 @@ export default function AdminPage() {
 
     // Check authentication
     useEffect(() => {
+        if (!embedded) {
+            router.replace('/admin');
+            return;
+        }
+
         checkAuth();
-    }, []);
+    }, [embedded, router]);
 
     async function checkAuth() {
         const { data: { session } } = await supabase.auth.getSession();
@@ -310,7 +315,7 @@ export default function AdminPage() {
     return (
         <div className="admin-container">
             <div className="admin-content">
-                <div className="admin-header">
+                {!embedded && <div className="admin-header">
                     <div className="header-content">
                         <div>
                             <h1>🎾 Quản lý Quỹ Pickleball</h1>
@@ -318,9 +323,6 @@ export default function AdminPage() {
                         </div>
                         <div className="header-buttons">
                             <UserStatusBadge />
-                            <a href="/giai-dau/admin" className="btn-tournament">
-                                🏆 Quản lý giải đấu
-                            </a>
                             <a href="/quy" className="btn-home">
                                 🏠 Trang chủ
                             </a>
@@ -329,7 +331,7 @@ export default function AdminPage() {
                             </button>
                         </div>
                     </div>
-                </div>
+                </div>}
 
                 {/* Tabs */}
                 <div className="tabs">

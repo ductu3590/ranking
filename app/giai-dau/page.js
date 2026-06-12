@@ -12,7 +12,7 @@ export default async function TournamentDashboard() {
                     <h1>Danh sách giải đã tạo</h1>
                     <p>Chọn một giải để xem điều lệ, live, đội trưởng và quản trị.</p>
                 </div>
-                <a href="/giai-dau/1/admin" className="dashboard-action">
+                <a href="/admin?section=tournament" className="dashboard-action">
                     Quản trị giải
                 </a>
             </section>

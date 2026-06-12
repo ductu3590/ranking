@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
 import './admin-tournament.css';
 
-export default function AdminTournamentPanel() {
+export default function AdminTournamentPanel({ embedded = false }) {
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [settings, setSettings] = useState(null);
@@ -33,8 +33,13 @@ export default function AdminTournamentPanel() {
     });
 
     useEffect(() => {
+        if (!embedded) {
+            router.replace('/admin?section=tournament');
+            return;
+        }
+
         checkAuth();
-    }, []);
+    }, [embedded, router]);
 
     async function checkAuth() {
         const { data: { user } } = await supabase.auth.getUser();
@@ -194,15 +199,15 @@ export default function AdminTournamentPanel() {
     }
 
     return (
-        <div className="admin-tournament-container">
-            <div className="admin-tournament-header">
+        <div className={`admin-tournament-container ${embedded ? 'embedded' : ''}`}>
+            {!embedded && <div className="admin-tournament-header">
                 <h1>🎾 Quản Lý Giải Đấu</h1>
                 <div className="header-actions">
-                    <a href="/giai-dau/admin/pairings" className="btn-secondary">📝 Manage Pairings</a>
-                    <a href="/quy/admin" className="btn-secondary">← Admin Dashboard</a>
-                    <a href="/giai-dau/live" className="btn-secondary">👁️ Xem Live</a>
+                    <a href="/admin?section=tournament&view=pairings" className="btn-secondary">📝 Manage Pairings</a>
+                    <a href="/admin" className="btn-secondary">← Admin Dashboard</a>
+                    <a href="/giai-dau/1/live" className="btn-secondary">👁️ Xem Live</a>
                 </div>
-            </div>
+            </div>}
 
             {/* Stats Cards */}
             <div className="stats-grid">
@@ -329,7 +334,7 @@ export default function AdminTournamentPanel() {
                     <button onClick={handleRevealRound1} className="btn-action btn-reveal">
                         🔓 Công Bố Round 1
                     </button>
-                    <button onClick={() => router.push('/giai-dau/admin/pairings')} className="btn-action">
+                    <button onClick={() => router.push('/admin?section=tournament&view=pairings')} className="btn-action">
                         📋 Quản Lý Pairings
                     </button>
                     <button onClick={loadData} className="btn-action">

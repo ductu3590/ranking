@@ -32,7 +32,7 @@ export default function HomeHeader({ showAdmin = true }) {
                         </a>
                     ))}
                     {showAdmin && (
-                        <a href="/quy/admin" className={`nav-link admin-link ${pathname === '/quy/admin' ? 'active' : ''}`}>
+                        <a href="/admin" className={`nav-link admin-link ${isActivePath(pathname, '/admin') ? 'active' : ''}`}>
                             ⚙️ Quản trị
                         </a>
                     )}

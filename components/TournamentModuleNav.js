@@ -38,7 +38,7 @@ export default function TournamentModuleNav() {
         { href: basePath, label: 'Điều lệ', icon: '📜', roles: ['admin', 'captain', 'member', 'guest'] },
         { href: `${basePath}/live`, label: 'Live', icon: '🔴', roles: ['admin', 'captain', 'member', 'guest'] },
         { href: `${basePath}/captain`, label: 'Captain', icon: '👤', roles: ['guest'] },
-        { href: `${basePath}/admin`, label: 'Admin', icon: '⚙️', roles: ['admin'] },
+        { href: '/admin?section=tournament', label: 'Admin', icon: '⚙️', roles: ['admin'] },
     ].filter((link) => link.roles.includes(userRole));
 
     return (

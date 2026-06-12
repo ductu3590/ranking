@@ -14,6 +14,16 @@
     color: var(--text-primary);
 }
 
+.admin-center .admin-container {
+    min-height: auto;
+    background: transparent;
+    padding: 0;
+}
+
+.admin-center .admin-content {
+    max-width: none;
+}
+
 .admin-container.loading {
     display: flex;
     align-items: center;

@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import './admin-pairings.css';
 
-export default function AdminPairingsPage() {
+export default function AdminPairingsPage({ embedded = false }) {
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -16,8 +16,13 @@ export default function AdminPairingsPage() {
     const [message, setMessage] = useState('');
 
     useEffect(() => {
+        if (!embedded) {
+            router.replace('/admin?section=tournament&view=pairings');
+            return;
+        }
+
         fetchData();
-    }, []);
+    }, [embedded, router]);
 
     async function fetchData() {
         try {
@@ -146,7 +151,7 @@ export default function AdminPairingsPage() {
     if (loading) {
         return (
             <>
-                <div className="admin-pairings-page">
+                <div className={`admin-pairings-page ${embedded ? 'embedded' : ''}`}>
                     <div className="loading">⏳ Loading...</div>
                 </div>
             </>
@@ -155,10 +160,10 @@ export default function AdminPairingsPage() {
 
     return (
         <>
-            <div className="admin-pairings-page">
+            <div className={`admin-pairings-page ${embedded ? 'embedded' : ''}`}>
                 <div className="page-header">
                     <h1>📝 Admin Pairings Management</h1>
-                    <button onClick={() => router.push('/giai-dau/admin')} className="btn-back">
+                    <button onClick={() => router.push('/admin?section=tournament')} className="btn-back">
                         ← Back to Admin
                     </button>
                 </div>

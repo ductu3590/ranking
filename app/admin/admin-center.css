@@ -1,0 +1,87 @@
+.admin-center-shell {
+    min-height: 100vh;
+    background: var(--bg-primary);
+    padding-bottom: var(--mobile-bottom-nav-height);
+}
+
+.admin-center-loading {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-primary);
+    color: var(--text-secondary);
+    font-weight: 800;
+}
+
+.admin-center {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px 20px 104px;
+}
+
+.admin-center-heading {
+    margin-bottom: 16px;
+}
+
+.admin-center-eyebrow {
+    margin: 0 0 6px;
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.admin-center-heading h1 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 30px;
+    line-height: 1.15;
+}
+
+.admin-center-heading p {
+    margin: 8px 0 0;
+    color: var(--text-secondary);
+}
+
+.admin-center-tabs,
+.admin-center-subtabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    overflow-x: auto;
+}
+
+.admin-center-tabs button,
+.admin-center-subtabs button {
+    min-height: 40px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-weight: 800;
+    padding: 0 16px;
+    white-space: nowrap;
+}
+
+.admin-center-tabs button.active,
+.admin-center-subtabs button.active {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: #fff;
+}
+
+.admin-center-panel {
+    min-width: 0;
+}
+
+@media (max-width: 768px) {
+    .admin-center {
+        padding: 18px 12px 96px;
+    }
+
+    .admin-center-heading h1 {
+        font-size: 24px;
+    }
+}

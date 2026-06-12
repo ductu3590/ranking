@@ -61,7 +61,7 @@ assert(
 );
 
 assert(
-    mobileBottomNavJs.includes('/quy/members') && mobileBottomNavJs.includes('/giai-dau') && mobileBottomNavJs.includes('/quy/admin'),
+    mobileBottomNavJs.includes('/quy/members') && mobileBottomNavJs.includes('/giai-dau') && mobileBottomNavJs.includes('/admin'),
     'MobileBottomNav fund tabs should include members, tournament, and admin links.'
 );
 

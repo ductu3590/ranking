@@ -19,16 +19,10 @@ const nextConfig = {
                 destination: '/giai-dau/:path*',
                 permanent: true,
             },
-            // Admin quỹ
-            {
-                source: '/admin',
-                destination: '/quy/admin',
-                permanent: true,
-            },
             // Admin tournament
             {
                 source: '/admin/tournament',
-                destination: '/giai-dau/admin',
+                destination: '/admin?section=tournament',
                 permanent: true,
             },
             // Members

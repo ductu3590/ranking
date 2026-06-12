@@ -1,36 +1,8 @@
-'use client';
-
-import { useEffect, useState } from 'react';
+import { getTournaments } from '@/lib/tournaments';
 import './dashboard.css';
 
-export default function TournamentDashboard() {
-    const [tournaments, setTournaments] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
-
-    useEffect(() => {
-        loadTournaments();
-    }, []);
-
-    async function loadTournaments() {
-        setLoading(true);
-        setError('');
-
-        try {
-            const res = await fetch('/api/tournaments', { cache: 'no-store' });
-            const data = await res.json();
-
-            if (!res.ok) {
-                throw new Error(data.error || 'Không tải được danh sách giải đấu');
-            }
-
-            setTournaments(data.tournaments || []);
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
-    }
+export default async function TournamentDashboard() {
+    const { tournaments, fallback } = await getTournaments();
 
     return (
         <main className="tournament-dashboard">
@@ -45,11 +17,11 @@ export default function TournamentDashboard() {
                 </a>
             </section>
 
-            {loading ? (
-                <div className="dashboard-state">Đang tải danh sách giải đấu...</div>
-            ) : error ? (
-                <div className="dashboard-state dashboard-error">{error}</div>
-            ) : tournaments.length === 0 ? (
+            {fallback ? (
+                <p className="dashboard-note">Đang dùng dữ liệu mặc định cho giải hiện tại.</p>
+            ) : null}
+
+            {tournaments.length === 0 ? (
                 <div className="dashboard-state">Chưa có giải đấu nào.</div>
             ) : (
                 <section className="tournament-card-grid">
@@ -97,4 +69,3 @@ function formatDate(value) {
         year: 'numeric',
     }).format(new Date(value));
 }
-

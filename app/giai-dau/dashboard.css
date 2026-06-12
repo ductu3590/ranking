@@ -47,6 +47,14 @@
     white-space: nowrap;
 }
 
+.dashboard-note {
+    max-width: 1200px;
+    margin: 0 auto 14px;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 700;
+}
+
 .tournament-card-grid {
     max-width: 1200px;
     margin: 0 auto;

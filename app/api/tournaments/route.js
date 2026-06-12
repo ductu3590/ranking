@@ -1,27 +1,10 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabaseServer';
-import { DEFAULT_TOURNAMENT } from '@/lib/tournamentDefaults';
+import { getTournaments } from '@/lib/tournaments';
 
 export async function GET() {
-    try {
-        const { data, error } = await supabaseServer
-            .from('tournaments')
-            .select('*')
-            .order('event_date', { ascending: false });
-
-        if (error) {
-            console.warn('Tournaments table unavailable, using default tournament:', error.message);
-            return NextResponse.json({ tournaments: [DEFAULT_TOURNAMENT], fallback: true });
-        }
-
-        return NextResponse.json({
-            tournaments: data?.length ? data : [DEFAULT_TOURNAMENT],
-            fallback: !data?.length,
-        });
-    } catch (err) {
-        console.error('Tournaments GET error:', err);
-        return NextResponse.json({ tournaments: [DEFAULT_TOURNAMENT], fallback: true });
-    }
+    const result = await getTournaments();
+    return NextResponse.json(result);
 }
 
 export async function POST(request) {
@@ -57,4 +40,3 @@ export async function POST(request) {
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }
-

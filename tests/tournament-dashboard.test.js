@@ -17,12 +17,13 @@ const dashboardPage = read('app/giai-dau/page.js');
 const detailPage = read('app/giai-dau/[id]/page.js');
 const moduleNav = read('components/TournamentModuleNav.js');
 const apiRoute = read('app/api/tournaments/route.js');
+const tournamentsHelper = read('lib/tournaments.js');
 
 assert(
     dashboardPage.includes('TournamentDashboard') &&
-    dashboardPage.includes('/api/tournaments') &&
+    dashboardPage.includes('getTournaments') &&
     dashboardPage.includes('tournament-dashboard'),
-    '/giai-dau should render the tournament dashboard list.'
+    '/giai-dau should render the tournament dashboard list on the server.'
 );
 
 assert(
@@ -43,8 +44,9 @@ assert(
 );
 
 assert(
-    apiRoute.includes('DEFAULT_TOURNAMENT') &&
-    apiRoute.includes("from('tournaments')"),
+    apiRoute.includes('getTournaments') &&
+    tournamentsHelper.includes('DEFAULT_TOURNAMENT') &&
+    tournamentsHelper.includes("from('tournaments')"),
     'Tournaments API should read tournaments and provide a default fallback.'
 );
 

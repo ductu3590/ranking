@@ -1,14 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 import './TournamentNavBar.css';
 
 export default function TournamentNavBar() {
+    const pathname = usePathname();
     const [user, setUser] = useState(null);
     const [userRole, setUserRole] = useState('guest');
     const [userName, setUserName] = useState('Khách');
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     useEffect(() => {
         checkAuth();
@@ -68,7 +69,6 @@ export default function TournamentNavBar() {
     return (
         <nav className="tournament-navbar">
             <div className="navbar-container">
-                {/* Logo / Brand */}
                 <div className="navbar-brand">
                     <a href="/giai-dau">
                         <span className="brand-icon">🎾</span>
@@ -76,16 +76,18 @@ export default function TournamentNavBar() {
                     </a>
                 </div>
 
-                {/* Desktop Navigation */}
                 <div className="navbar-links desktop-only">
                     {getNavLinks().map(link => (
-                        <a key={link.href} href={link.href} className="nav-link">
+                        <a
+                            key={link.href}
+                            href={link.href}
+                            className={`nav-link ${pathname === link.href ? 'active' : ''}`}
+                        >
                             {link.label}
                         </a>
                     ))}
                 </div>
 
-                {/* User Info */}
                 <div className="navbar-user">
                     {getRoleBadge()}
                     <div className="user-info">
@@ -96,42 +98,9 @@ export default function TournamentNavBar() {
                             </button>
                         )}
                     </div>
-
-                    {/* Mobile Menu Toggle */}
-                    <button
-                        className="mobile-menu-toggle"
-                        onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        aria-label="Toggle menu"
-                    >
-                        <span className={`hamburger ${isMenuOpen ? 'open' : ''}`}>
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </span>
-                    </button>
                 </div>
             </div>
 
-            {/* Mobile Navigation */}
-            {isMenuOpen && (
-                <div className="mobile-menu">
-                    {getNavLinks().map(link => (
-                        <a
-                            key={link.href}
-                            href={link.href}
-                            className="mobile-nav-link"
-                            onClick={() => setIsMenuOpen(false)}
-                        >
-                            {link.label}
-                        </a>
-                    ))}
-                    {user && (
-                        <button onClick={handleLogout} className="mobile-logout-btn">
-                            🚪 Đăng xuất
-                        </button>
-                    )}
-                </div>
-            )}
         </nav>
     );
 }

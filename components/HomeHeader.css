@@ -1,5 +1,5 @@
 /* =====================================================
-   HOME HEADER — LIGHT THEME, MODERN
+   HOME HEADER - LIGHT THEME, MODERN
    ===================================================== */
 
 .home-header {
@@ -27,7 +27,6 @@
     flex-wrap: wrap;
 }
 
-/* Logo */
 .header-logo a {
     text-decoration: none;
     color: #0F172A;
@@ -44,7 +43,6 @@
     background-clip: text;
 }
 
-/* Navigation */
 .header-nav {
     display: flex;
     gap: 4px;
@@ -101,7 +99,6 @@
     background: #F1F5F9;
 }
 
-/* Tournament link — special badge style */
 .nav-link.tournament-link {
     background: linear-gradient(135deg, #EFF6FF, #DBEAFE);
     color: #2563EB;
@@ -115,49 +112,12 @@
     box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
 }
 
-/* Right section */
 .header-right {
     display: flex;
     align-items: center;
     gap: 12px;
 }
 
-/* Hamburger (Mobile) */
-.hamburger {
-    display: none;
-    flex-direction: column;
-    gap: 5px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 8px;
-    z-index: 1001;
-}
-
-.hamburger span {
-    display: block;
-    width: 22px;
-    height: 2px;
-    background: #64748B;
-    border-radius: 2px;
-    transition: all 0.3s ease;
-}
-
-.hamburger.open span:nth-child(1) {
-    transform: rotate(45deg) translate(7px, 7px);
-    background: #2563EB;
-}
-
-.hamburger.open span:nth-child(2) {
-    opacity: 0;
-}
-
-.hamburger.open span:nth-child(3) {
-    transform: rotate(-45deg) translate(6px, -6px);
-    background: #2563EB;
-}
-
-/* Fund display */
 .header-fund {
     display: flex;
     flex-direction: column;
@@ -182,7 +142,6 @@
     color: #2563EB;
 }
 
-/* ─── Mobile Responsive ─── */
 @media (max-width: 768px) {
     .home-header {
         padding: 10px 15px;
@@ -197,61 +156,8 @@
         font-size: 16px;
     }
 
-    /* Show hamburger */
-    .hamburger {
-        display: flex;
-    }
-
-    /* Mobile nav — slide-in drawer */
     .header-nav {
-        position: fixed;
-        top: 0;
-        left: -100%;
-        width: 260px;
-        height: 100vh;
-        background: #FFFFFF;
-        border-right: 1px solid #E2E8F0;
-        flex-direction: column;
-        gap: 0;
-        padding: 64px 0 20px;
-        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.1);
-        transition: left 0.3s ease;
-        z-index: 999;
-        overflow-y: auto;
-    }
-
-    .header-nav.open {
-        left: 0;
-    }
-
-    .nav-link {
-        width: 100%;
-        text-align: left;
-        padding: 14px 20px;
-        border-radius: 0;
-        border: none;
-        border-bottom: 1px solid #F1F5F9;
-        font-size: 15px;
-    }
-
-    .nav-link:hover {
-        background: #F8FAFC;
-        border-color: #F1F5F9;
-    }
-
-    .nav-link.active {
-        background: #EFF6FF;
-        border-left: 3px solid #2563EB;
-        color: #2563EB;
-    }
-
-    .nav-link.highlight {
-        border-left: 3px solid #EA580C;
-    }
-
-    .nav-link.tournament-link {
-        border-left: 3px solid #2563EB;
-        background: #EFF6FF;
+        display: none;
     }
 
     .header-right {

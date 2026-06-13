@@ -16,4 +16,13 @@ assert(
     'Migration 010 should create group_bank_accounts with a unique account_number, FK to groups, and RLS scoped by membership.'
 );
 
+const webhook = read('app/api/webhook/route.js');
+assert(
+    webhook.includes('group_bank_accounts') &&
+    webhook.includes('accountNumber') &&
+    webhook.includes('account_number') &&
+    !webhook.includes('const groupId = DEFAULT_GROUP_ID;'),
+    'Webhook should resolve group_id from group_bank_accounts by accountNumber (not hardcode the default).'
+);
+
 console.log('multitenant phase 5 contract ok');

@@ -31,8 +31,24 @@ export async function POST(req) {
 
         console.log('Final direction:', huongGiaoDich, '| Amount:', amount, '| Content:', content);
 
-        // 2. Parse transaction
-        const groupId = DEFAULT_GROUP_ID;
+        // 2. Resolve which club this transfer belongs to, by the receiving bank account.
+        const accountNumber = String(data.accountNumber || data.subAccount || '').trim();
+        let groupId = DEFAULT_GROUP_ID;
+        if (accountNumber) {
+            const { data: bankAccount } = await supabaseServer
+                .from('group_bank_accounts')
+                .select('group_id')
+                .eq('account_number', accountNumber)
+                .eq('is_active', true)
+                .maybeSingle();
+            if (bankAccount) {
+                groupId = bankAccount.group_id;
+            } else {
+                console.warn(`No club registered for accountNumber "${accountNumber}" — falling back to default group.`);
+            }
+        }
+
+        // Parse transaction
         const parseResult = await parseTransaction(content, amount, accountName, huongGiaoDich, groupId);
 
         console.log('Parse result:', parseResult);

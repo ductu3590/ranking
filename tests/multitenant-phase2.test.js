@@ -85,4 +85,14 @@ assert(
     'app/quy/page.js should read and write club data through the server APIs.'
 );
 
+const membersPage = read('app/quy/members/page.js');
+assert(
+    !membersPage.includes('@/lib/supabaseClient') && !membersPage.includes('.from('),
+    'app/quy/members/page.js should not query Supabase directly.'
+);
+assert(
+    membersPage.includes('/api/club/members'),
+    'app/quy/members/page.js should read members through the server API.'
+);
+
 console.log('multitenant phase 2 contract ok');

@@ -1,7 +1,5 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabaseClient';
-import { getCurrentGroupIdClient, isMissingGroupColumnError } from '@/lib/groupClient';
 import './members.css';
 
 export default function MembersPage() {
@@ -15,22 +13,9 @@ export default function MembersPage() {
 
     async function loadMembers() {
         setLoading(true);
-        const groupId = getCurrentGroupIdClient();
-        const { data, error } = await supabase
-            .from('club_members')
-            .select('id, full_name, is_active, created_at')
-            .eq('group_id', groupId)
-            .order('full_name', { ascending: true });
-
-        if (!error) {
-            setMembers(data || []);
-        } else if (isMissingGroupColumnError(error)) {
-            const { data: fallbackData } = await supabase
-                .from('club_members')
-                .select('id, full_name, is_active, created_at')
-                .order('full_name', { ascending: true });
-            setMembers(fallbackData || []);
-        }
+        const res = await fetch('/api/club/members');
+        const data = await res.json();
+        setMembers(res.ok ? (data.members || []) : []);
         setLoading(false);
     }
 

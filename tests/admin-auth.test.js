@@ -50,4 +50,15 @@ assert(
     'Group session helper should expose clearGroupSessionCookie.'
 );
 
+// The status badge should reflect the current group + role, not just Supabase Auth.
+const badge = read('components/UserStatusBadge.js');
+assert(
+    badge.includes('teamfund-current-group'),
+    'UserStatusBadge should read the current group session from storage.'
+);
+assert(
+    badge.includes('Thành viên') && badge.includes('Quản trị'),
+    'UserStatusBadge should label both admin and member group roles.'
+);
+
 console.log('admin auth contract ok');

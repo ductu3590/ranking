@@ -5,56 +5,73 @@ import { supabase } from '@/lib/supabaseClient';
 import './UserStatusBadge.css';
 
 export default function UserStatusBadge() {
-    const [userRole, setUserRole] = useState('guest');
-    const [teamCode, setTeamCode] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [state, setState] = useState({ kind: 'loading' });
 
     useEffect(() => {
-        checkAuth();
+        // 1. Group session (multi-club flow) takes priority.
+        try {
+            const stored = window.localStorage.getItem('teamfund-current-group');
+            if (stored) {
+                const group = JSON.parse(stored);
+                if (group?.role) {
+                    setState({
+                        kind: 'group',
+                        name: group.name || 'Nhóm của tôi',
+                        role: group.role === 'admin' ? 'admin' : 'member',
+                    });
+                    return;
+                }
+            }
+        } catch {
+            window.localStorage.removeItem('teamfund-current-group');
+        }
+
+        // 2. Fall back to the legacy Supabase session (tournament captain flow).
+        checkSupabaseAuth();
     }, []);
 
-    async function checkAuth() {
+    async function checkSupabaseAuth() {
         try {
             const { data: { user }, error } = await supabase.auth.getUser();
-
             if (error || !user) {
-                setUserRole('guest');
-                setLoading(false);
+                setState({ kind: 'guest' });
                 return;
             }
 
             const metadata = user.user_metadata || {};
-
             if (metadata.role === 'captain') {
-                setUserRole('captain');
-                setTeamCode(metadata.team);
+                setState({ kind: 'captain', team: metadata.team });
             } else if (metadata.role === 'admin') {
-                setUserRole('admin');
+                setState({ kind: 'group', name: 'Quản trị', role: 'admin' });
             } else {
-                setUserRole('guest');
+                setState({ kind: 'guest' });
             }
-
-            setLoading(false);
         } catch (err) {
             console.error('Auth check error:', err);
-            setUserRole('guest');
-            setLoading(false);
+            setState({ kind: 'guest' });
         }
     }
 
-    if (loading) {
+    if (state.kind === 'loading') {
         return <div className="user-badge loading">⏳</div>;
     }
 
-    if (userRole === 'admin') {
+    if (state.kind === 'group') {
+        const isAdmin = state.role === 'admin';
+        const roleLabel = isAdmin ? 'Quản trị viên' : 'Thành viên';
         return (
-            <div className="user-badge admin-badge">
-                🔐 Admin
+            <div
+                className={`user-badge group-badge ${isAdmin ? 'admin-badge' : 'member-badge'}`}
+                title={`${state.name} · ${roleLabel}`}
+            >
+                <span className="user-badge-group">{state.name}</span>
+                <span className="user-badge-role">{isAdmin ? '🔐' : '👤'} {roleLabel}</span>
             </div>
         );
     }
 
-    if (userRole === 'captain') {
+    if (state.kind === 'captain') {
+        const teamCode = state.team;
         const teamName = teamCode === 'blue' ? 'XANH' : teamCode === 'red' ? 'ĐỎ' : teamCode?.toUpperCase();
         return (
             <div className={`user-badge captain-badge captain-${teamCode}`}>

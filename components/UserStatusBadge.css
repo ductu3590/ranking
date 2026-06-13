@@ -25,6 +25,41 @@
     box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
 }
 
+.member-badge {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+}
+
+.member-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+}
+
+/* Two-line layout: group name on top, role below */
+.group-badge {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1px;
+    line-height: 1.15;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+.user-badge-group {
+    font-size: 0.78rem;
+    font-weight: 800;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.user-badge-role {
+    font-size: 0.68rem;
+    font-weight: 600;
+    opacity: 0.92;
+}
+
 .captain-badge {
     color: white;
 }

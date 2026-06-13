@@ -7,6 +7,7 @@ import MobileBottomNav from '@/components/MobileBottomNav';
 import FundAdminPage from '@/app/quy/admin/page';
 import AdminTournamentPanel from '@/app/giai-dau/admin/page';
 import AdminPairingsPage from '@/app/giai-dau/admin/pairings/page';
+import ClubSettings from '@/app/admin/ClubSettings';
 import './admin-center.css';
 
 export default function UnifiedAdminCenter() {
@@ -59,11 +60,22 @@ function UnifiedAdminCenterContent() {
                     >
                         Giải đấu
                     </button>
+                    <button
+                        type="button"
+                        className={section === 'settings' ? 'active' : ''}
+                        onClick={() => setSection('settings')}
+                    >
+                        Cài đặt
+                    </button>
                 </nav>
 
-                {section === 'fund' ? (
-                    <FundAdminPage embedded />
-                ) : (
+                {section === 'fund' && <FundAdminPage embedded />}
+                {section === 'settings' && (
+                    <section className="admin-center-panel">
+                        <ClubSettings />
+                    </section>
+                )}
+                {section === 'tournament' && (
                     <section className="admin-center-panel">
                         <div className="admin-center-subtabs">
                             <button

@@ -33,4 +33,12 @@ assert(
     'ClubSettings should load settings and support rename, member-password change, and code regeneration.'
 );
 
+const adminCenter = read('app/admin/page.js');
+assert(
+    adminCenter.includes('ClubSettings') &&
+    adminCenter.includes("section === 'settings'") &&
+    adminCenter.includes('Cài đặt'),
+    'Admin center should render a Cài đặt (settings) section using ClubSettings.'
+);
+
 console.log('multitenant phase 3 contract ok');

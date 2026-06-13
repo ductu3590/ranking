@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
-import { getCurrentGroupIdClient } from '@/lib/groupClient';
+import { getCurrentGroupClient, getCurrentGroupIdClient } from '@/lib/groupClient';
 import './admin-tournament.css';
 
 export default function AdminTournamentPanel({ embedded = false }) {
@@ -42,10 +42,10 @@ export default function AdminTournamentPanel({ embedded = false }) {
         checkAuth();
     }, [embedded, router]);
 
-    async function checkAuth() {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user || user.user_metadata?.role !== 'admin') {
-            router.push('/login');
+    function checkAuth() {
+        const group = getCurrentGroupClient();
+        if (group.role !== 'admin') {
+            router.replace('/');
             return;
         }
         loadData();

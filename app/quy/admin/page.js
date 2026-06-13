@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
-import { getCurrentGroupIdClient, isMissingGroupColumnError } from '@/lib/groupClient';
+import { getCurrentGroupClient, getCurrentGroupIdClient, isMissingGroupColumnError } from '@/lib/groupClient';
 import { useRouter } from 'next/navigation';
 import './admin.css';
 import UserStatusBadge from '@/components/UserStatusBadge';
@@ -56,10 +56,10 @@ export default function AdminPage({ embedded = false }) {
         checkAuth();
     }, [embedded, router]);
 
-    async function checkAuth() {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
-            router.push('/login');
+    function checkAuth() {
+        const group = getCurrentGroupClient();
+        if (group.role !== 'admin') {
+            router.replace('/');
             return;
         }
         loadData();
@@ -336,8 +336,15 @@ export default function AdminPage({ embedded = false }) {
     stats.balance = stats.totalIn - stats.totalOut;
 
     async function handleLogout() {
-        await supabase.auth.signOut();
-        router.push('/login');
+        try {
+            await fetch('/api/groups/session', { method: 'DELETE' });
+        } catch {
+            // Ignore network errors; still clear local state below.
+        }
+        if (typeof window !== 'undefined') {
+            window.localStorage.removeItem('teamfund-current-group');
+        }
+        router.push('/');
     }
 
     if (loading) {

@@ -1,0 +1,126 @@
+.club-settings {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 520px;
+}
+
+.club-settings-loading,
+.club-settings-error {
+    padding: 24px;
+    text-align: center;
+    color: #6b7280;
+}
+
+.club-settings-msg {
+    margin: 0;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 650;
+}
+
+.club-settings-msg.error {
+    background: #fff2ef;
+    color: #c43c2e;
+    border: 1px solid rgba(231, 76, 60, .22);
+}
+
+.club-settings-msg.ok {
+    background: #eef8f2;
+    color: #0f8c59;
+    border: 1px solid rgba(15, 168, 103, .25);
+}
+
+.club-settings-form {
+    display: grid;
+    gap: 14px;
+}
+
+.club-settings-form label {
+    display: grid;
+    gap: 7px;
+    color: #343a45;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.club-settings-form input,
+.club-settings-form textarea {
+    width: 100%;
+    border: 1px solid #dfe4ed;
+    border-radius: 12px;
+    padding: 12px 13px;
+    color: #20242c;
+    background: #f8fafc;
+    font: inherit;
+    font-size: 16px;
+    outline: none;
+}
+
+.club-settings-form input:focus,
+.club-settings-form textarea:focus {
+    border-color: #20ad72;
+    box-shadow: 0 0 0 3px rgba(32, 173, 114, .16);
+}
+
+.club-settings-save,
+.club-settings-regen {
+    min-height: 44px;
+    border: 0;
+    border-radius: 12px;
+    padding: 0 18px;
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.club-settings-save {
+    background: linear-gradient(145deg, #35d678, #0fa867);
+    color: #fff;
+}
+
+.club-settings-save:disabled {
+    opacity: .7;
+    cursor: wait;
+}
+
+.club-settings-code {
+    border: 1px solid #e9edf3;
+    border-radius: 16px;
+    padding: 18px;
+    text-align: center;
+    background: #fff;
+}
+
+.club-settings-code-label {
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    font-size: 12px;
+    font-weight: 800;
+    color: #6a7180;
+}
+
+.club-settings-code-value {
+    display: block;
+    margin-top: 4px;
+    font-size: 26px;
+    letter-spacing: .08em;
+    color: #20242c;
+}
+
+.club-settings-code img {
+    width: 180px;
+    height: 180px;
+    display: block;
+    margin: 14px auto;
+    border: 1px solid #edf0f5;
+    border-radius: 14px;
+}
+
+.club-settings-regen {
+    background: #eef1f6;
+    color: #596170;
+    border: 1px solid #dfe4ed;
+}

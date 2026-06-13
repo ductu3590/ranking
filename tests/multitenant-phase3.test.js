@@ -24,4 +24,13 @@ assert(
     'Regenerate-code route should be admin-guarded and return a new unique code + QR.'
 );
 
+const comp = read('app/admin/ClubSettings.js');
+assert(
+    comp.includes("'use client'") &&
+    comp.includes('/api/club/settings') &&
+    comp.includes('/api/club/settings/regenerate-code') &&
+    comp.includes('Tạo lại mã'),
+    'ClubSettings should load settings and support rename, member-password change, and code regeneration.'
+);
+
 console.log('multitenant phase 3 contract ok');

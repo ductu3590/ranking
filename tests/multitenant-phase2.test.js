@@ -95,4 +95,20 @@ assert(
     'app/quy/members/page.js should read members through the server API.'
 );
 
+const rls = read('database/migrations/009_enable_rls.sql');
+for (const table of [
+    'groups', 'group_members', 'club_members', 'quy_pickleball', 'fund_events',
+    'fund_event_participants', 'tournaments', 'tournament_teams', 'tournament_players',
+    'tournament_pairings', 'tournament_matches', 'tournament_settings',
+]) {
+    assert(
+        rls.includes(`ALTER TABLE ${table} ENABLE ROW LEVEL SECURITY`),
+        `Migration 009 should enable RLS on ${table}.`
+    );
+}
+assert(
+    rls.includes('group_members gm') && rls.includes('gm.user_id = auth.uid()'),
+    'RLS policies should scope access by the caller\'s group_members rows.'
+);
+
 console.log('multitenant phase 2 contract ok');

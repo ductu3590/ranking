@@ -45,4 +45,16 @@ assert(
     'Admin session route should mint a group_session cookie from the user\'s membership.'
 );
 
+for (const route of [
+    'app/api/club/transactions/route.js',
+    'app/api/club/members/route.js',
+    'app/api/club/events/route.js',
+]) {
+    const src = read(route);
+    assert(
+        src.includes('getGroupIdForDatabase') && src.includes(".eq('group_id', groupId)"),
+        `${route} should scope reads to the current group via the signed cookie.`
+    );
+}
+
 console.log('multitenant phase 2 contract ok');

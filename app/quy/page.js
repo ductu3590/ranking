@@ -1,11 +1,10 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
-import { supabase } from '@/lib/supabaseClient';
-import { getCurrentGroupIdClient, isMissingGroupColumnError } from '@/lib/groupClient';
+import { getCurrentGroupClient } from '@/lib/groupClient';
 import './page.css';
 
 export default function HomePage() {
-    const [user, setUser] = useState(null);
+    const [isAdmin, setIsAdmin] = useState(false);
     const [activeTab, setActiveTab] = useState('events');
 
     // Transactions state
@@ -37,9 +36,8 @@ export default function HomePage() {
     const [deletingEvent, setDeletingEvent] = useState(null);
 
     useEffect(() => {
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            setUser(session?.user || null);
-        });
+        const group = getCurrentGroupClient();
+        setIsAdmin(group.role === 'admin');
         loadTransactions();
         loadEvents();
         loadMembers();
@@ -49,21 +47,9 @@ export default function HomePage() {
 
     async function loadTransactions() {
         setLoadingTx(true);
-        const groupId = getCurrentGroupIdClient();
-        const { data, error } = await supabase
-            .from('quy_pickleball')
-            .select('*')
-            .eq('group_id', groupId)
-            .order('created_at', { ascending: false });
-        if (!error) {
-            setTransactions(data || []);
-        } else if (isMissingGroupColumnError(error)) {
-            const { data: fallbackData } = await supabase
-                .from('quy_pickleball')
-                .select('*')
-                .order('created_at', { ascending: false });
-            setTransactions(fallbackData || []);
-        }
+        const res = await fetch('/api/club/transactions');
+        const data = await res.json();
+        setTransactions(res.ok ? (data.transactions || []) : []);
         setLoadingTx(false);
     }
 
@@ -91,63 +77,16 @@ export default function HomePage() {
 
     async function loadEvents() {
         setLoadingEvents(true);
-        const groupId = getCurrentGroupIdClient();
-        const { data: eventsData, error: eventsErr } = await supabase
-            .from('fund_events')
-            .select(`
-                *,
-                fund_event_participants (
-                    id,
-                    member_id,
-                    has_paid,
-                    paid_at,
-                    notes,
-                    club_members ( id, full_name, is_active )
-                )
-            `)
-            .eq('group_id', groupId)
-            .order('created_at', { ascending: false });
-
-        if (!eventsErr) {
-            setEvents(eventsData || []);
-        } else if (isMissingGroupColumnError(eventsErr)) {
-            const { data: fallbackEvents } = await supabase
-                .from('fund_events')
-                .select(`
-                *,
-                fund_event_participants (
-                    id,
-                    member_id,
-                    has_paid,
-                    paid_at,
-                    notes,
-                    club_members ( id, full_name, is_active )
-                )
-            `)
-                .order('created_at', { ascending: false });
-            setEvents(fallbackEvents || []);
-        }
+        const res = await fetch('/api/club/events');
+        const data = await res.json();
+        setEvents(res.ok ? (data.events || []) : []);
         setLoadingEvents(false);
     }
 
     async function loadMembers() {
-        const groupId = getCurrentGroupIdClient();
-        const { data, error } = await supabase
-            .from('club_members')
-            .select('id, full_name, is_active')
-            .eq('group_id', groupId)
-            .eq('is_active', true)
-            .order('full_name');
-        if (!error) {
-            setMembers(data || []);
-        } else if (isMissingGroupColumnError(error)) {
-            const { data: fallbackMembers } = await supabase
-                .from('club_members')
-                .select('id, full_name, is_active')
-                .eq('is_active', true)
-                .order('full_name');
-            setMembers(fallbackMembers || []);
-        }
+        const res = await fetch('/api/club/members');
+        const data = await res.json();
+        setMembers(res.ok ? (data.members || []).filter((m) => m.is_active) : []);
     }
 
     async function handleCreateEvent(e) {
@@ -159,53 +98,21 @@ export default function HomePage() {
         }
         setSavingEvent(true);
         try {
-            const groupId = getCurrentGroupIdClient();
-            // Tạo event
-            const { data: eventData, error: eventErr } = await supabase
-                .from('fund_events')
-                .insert({
-                    group_id: groupId,
+            const res = await fetch('/api/club/events', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
                     title: createForm.title.trim(),
                     description: createForm.description.trim() || null,
-                    amount_per_person: parseFloat(createForm.amount_per_person) || 0,
+                    amount_per_person: createForm.amount_per_person,
                     event_date: createForm.event_date || null,
-                })
-                .select()
-                .single();
-
-            let createdEvent = eventData;
-            if (eventErr && isMissingGroupColumnError(eventErr)) {
-                const { data: fallbackEventData, error: fallbackEventErr } = await supabase
-                    .from('fund_events')
-                    .insert({
-                        title: createForm.title.trim(),
-                        description: createForm.description.trim() || null,
-                        amount_per_person: parseFloat(createForm.amount_per_person) || 0,
-                        event_date: createForm.event_date || null,
-                    })
-                    .select()
-                    .single();
-
-                if (fallbackEventErr) throw fallbackEventErr;
-                createdEvent = fallbackEventData;
-            } else if (eventErr) {
-                throw eventErr;
+                    memberIds: createForm.selectedMembers,
+                }),
+            });
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.error || 'Không thể tạo sự kiện');
             }
-
-            // Thêm participants
-            const participants = createForm.selectedMembers.map(memberId => ({
-                event_id: createdEvent.id,
-                member_id: memberId,
-                has_paid: false,
-            }));
-
-            const { error: partErr } = await supabase
-                .from('fund_event_participants')
-                .insert(participants);
-
-            if (partErr) throw partErr;
-
-            // Reset form
             setCreateForm({
                 title: '',
                 description: '',
@@ -223,15 +130,12 @@ export default function HomePage() {
     }
 
     async function togglePayment(participantId, currentStatus, eventId) {
-        const { error } = await supabase
-            .from('fund_event_participants')
-            .update({
-                has_paid: !currentStatus,
-                paid_at: !currentStatus ? new Date().toISOString() : null,
-            })
-            .eq('id', participantId);
-
-        if (!error) {
+        const res = await fetch('/api/club/participants', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ participantId, hasPaid: !currentStatus }),
+        });
+        if (res.ok) {
             setEvents(prev => prev.map(ev => {
                 if (ev.id !== eventId) return ev;
                 return {
@@ -249,12 +153,8 @@ export default function HomePage() {
     async function handleDeleteEvent(eventId) {
         if (!confirm('Xóa sự kiện này? Thao tác không thể hoàn tác.')) return;
         setDeletingEvent(eventId);
-        const groupId = getCurrentGroupIdClient();
-        const { error } = await supabase.from('fund_events').delete().eq('id', eventId).eq('group_id', groupId);
-        if (!error || isMissingGroupColumnError(error)) {
-            if (isMissingGroupColumnError(error)) {
-                await supabase.from('fund_events').delete().eq('id', eventId);
-            }
+        const res = await fetch(`/api/club/events?id=${eventId}`, { method: 'DELETE' });
+        if (res.ok) {
             setEvents(prev => prev.filter(ev => ev.id !== eventId));
             if (expandedEvent === eventId) setExpandedEvent(null);
         }
@@ -336,7 +236,7 @@ export default function HomePage() {
                 {activeTab === 'events' && (
                     <div className="tab-content">
                         {/* Admin: Tạo sự kiện */}
-                        {user && (
+                        {isAdmin && (
                             <div className="admin-bar">
                                 <span className="admin-note">👑 Chế độ admin</span>
                                 <button className="btn-create" onClick={() => setShowCreateModal(true)}>
@@ -351,7 +251,7 @@ export default function HomePage() {
                             <div className="empty-state">
                                 <div className="empty-icon">📋</div>
                                 <p>Chưa có sự kiện đóng quỹ nào</p>
-                                {user && <p className="empty-hint">Nhấn &quot;+ Tạo sự kiện đóng quỹ&quot; để bắt đầu</p>}
+                                {isAdmin && <p className="empty-hint">Nhấn &quot;+ Tạo sự kiện đóng quỹ&quot; để bắt đầu</p>}
                             </div>
                         ) : (
                             <div className="events-list">
@@ -408,7 +308,7 @@ export default function HomePage() {
                                             {/* Member list (expanded) */}
                                             {isExpanded && (
                                                 <div className="event-body">
-                                                    {user && (
+                                                    {isAdmin && (
                                                         <div className="event-actions">
                                                             <button
                                                                 className="btn-danger-sm"
@@ -433,7 +333,7 @@ export default function HomePage() {
                                                                         <span className="member-name">
                                                                             {p.club_members?.full_name || 'N/A'}
                                                                         </span>
-                                                                        {user && (
+                                                                        {isAdmin && (
                                                                             <button
                                                                                 className="btn-toggle unpaid-toggle"
                                                                                 onClick={() => togglePayment(p.id, p.has_paid, event.id)}
@@ -468,7 +368,7 @@ export default function HomePage() {
                                                                                     {new Date(p.paid_at).toLocaleDateString('vi-VN')}
                                                                                 </span>
                                                                             )}
-                                                                            {user && (
+                                                                            {isAdmin && (
                                                                                 <button
                                                                                     className="btn-toggle paid-toggle"
                                                                                     onClick={() => togglePayment(p.id, p.has_paid, event.id)}

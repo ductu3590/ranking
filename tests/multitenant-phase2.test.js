@@ -72,4 +72,17 @@ assert(
     'Club participants route should support an admin-guarded paid toggle.'
 );
 
+const quyPage = read('app/quy/page.js');
+assert(
+    !quyPage.includes('@/lib/supabaseClient') && !quyPage.includes('.from('),
+    'app/quy/page.js should not query Supabase directly from the browser.'
+);
+assert(
+    quyPage.includes('/api/club/transactions') &&
+    quyPage.includes('/api/club/events') &&
+    quyPage.includes('/api/club/members') &&
+    quyPage.includes('/api/club/participants'),
+    'app/quy/page.js should read and write club data through the server APIs.'
+);
+
 console.log('multitenant phase 2 contract ok');

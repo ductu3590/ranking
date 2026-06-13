@@ -122,4 +122,11 @@ assert(
     'supabaseServer should hard-fail in production when the service key is missing.'
 );
 
+const homePageAuth = read('app/page.js');
+assert(
+    homePageAuth.includes('signInWithPassword') &&
+    homePageAuth.includes("from '@/lib/supabaseClient'"),
+    'Home page should sign the new admin into Supabase Auth after creating a club.'
+);
+
 console.log('multitenant phase 2 contract ok');

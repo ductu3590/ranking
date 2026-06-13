@@ -3,11 +3,6 @@ const nextConfig = {
     async redirects() {
         return [
             // Trang chủ → Quỹ (module chính)
-            {
-                source: '/',
-                destination: '/quy',
-                permanent: false,
-            },
             // Tournament → Giải đấu
             {
                 source: '/tournament',

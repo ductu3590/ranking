@@ -1,19 +1,19 @@
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { NextResponse } from 'next/server';
+import { getGroupIdForDatabase, requireGroupAdmin } from '@/lib/groupSession';
 
 export async function POST(request) {
     try {
-        // Verify admin authentication
-        const authHeader = request.headers.get('authorization');
-        if (!authHeader) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
+        const adminCheck = requireGroupAdmin();
+        if (!adminCheck.ok) return adminCheck.response;
+        const groupId = getGroupIdForDatabase();
 
         // Get current lock status
         const { data: currentSetting, error: fetchError } = await supabaseAdmin
             .from('tournament_settings')
             .select('setting_value')
             .eq('setting_key', 'pairings_locked')
+            .eq('group_id', groupId)
             .single();
 
         if (fetchError) {
@@ -29,11 +29,13 @@ export async function POST(request) {
         const { error: updateError } = await supabaseAdmin
             .from('tournament_settings')
             .upsert({
+                tournament_id: 1,
+                group_id: groupId,
                 setting_key: 'pairings_locked',
                 setting_value: newLocked,
                 updated_at: new Date().toISOString()
             }, {
-                onConflict: 'tournament_id,setting_key'
+                onConflict: 'group_id,tournament_id,setting_key'
             });
 
         if (updateError) {
@@ -56,10 +58,12 @@ export async function POST(request) {
 // GET endpoint to check lock status
 export async function GET() {
     try {
+        const groupId = getGroupIdForDatabase();
         const { data, error } = await supabaseAdmin
             .from('tournament_settings')
             .select('setting_value')
             .eq('setting_key', 'pairings_locked')
+            .eq('group_id', groupId)
             .single();
 
         if (error) {

@@ -1,6 +1,7 @@
 import { supabaseServer as supabase } from '@/lib/supabaseServer';
 import { NextResponse } from 'next/server';
 import { canRevealRound1 } from '@/lib/tournamentHelpers';
+import { getGroupIdForDatabase } from '@/lib/groupSession';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,6 +10,7 @@ export const dynamic = 'force-dynamic';
 // Fetch all pairings for public display (filter hidden Round 1 if not time)
 export async function GET() {
     try {
+        const groupId = getGroupIdForDatabase();
         // Check if we're past the deadline (16:30)
         const now = new Date();
         const deadline = new Date('2026-01-28T16:30:00+07:00');
@@ -19,12 +21,14 @@ export async function GET() {
             .from('tournament_teams')
             .select('id')
             .eq('team_code', 'blue')
+            .eq('group_id', groupId)
             .single();
 
         const { data: redTeam } = await supabase
             .from('tournament_teams')
             .select('id')
             .eq('team_code', 'red')
+            .eq('group_id', groupId)
             .single();
 
         // Check if RED team has submitted Round 1
@@ -32,6 +36,7 @@ export async function GET() {
             .from('tournament_pairings')
             .select('id')
             .eq('team_id', redTeam?.id)
+            .eq('group_id', groupId)
             .eq('round_number', 1)
             .eq('status', 'submitted')
             .limit(1);
@@ -60,6 +65,7 @@ export async function GET() {
                 player2:tournament_players!player2_id(*)
             `)
             .eq('tournament_id', 1)
+            .eq('group_id', groupId)
             .eq('status', 'submitted')
             .order('round_number')
             .order('pair_order');

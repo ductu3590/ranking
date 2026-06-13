@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
+import { getCurrentGroupIdClient, isMissingGroupColumnError } from '@/lib/groupClient';
 import { useRouter } from 'next/navigation';
 import './admin.css';
 import UserStatusBadge from '@/components/UserStatusBadge';
@@ -71,26 +72,54 @@ export default function AdminPage({ embedded = false }) {
     }
 
     async function loadTransactions() {
+        const groupId = getCurrentGroupIdClient();
         const { data, error } = await supabase
             .from('quy_pickleball')
             .select('*')
+            .eq('group_id', groupId)
             .order('created_at', { ascending: false });
 
         if (error) {
-            console.error('Error loading transactions:', error);
+            if (isMissingGroupColumnError(error)) {
+                const { data: fallbackData, error: fallbackError } = await supabase
+                    .from('quy_pickleball')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                if (fallbackError) {
+                    console.error('Error loading transactions:', fallbackError);
+                } else {
+                    setTransactions(fallbackData || []);
+                }
+            } else {
+                console.error('Error loading transactions:', error);
+            }
         } else {
             setTransactions(data || []);
         }
     }
 
     async function loadMembers() {
+        const groupId = getCurrentGroupIdClient();
         const { data, error } = await supabase
             .from('club_members')
             .select('*')
+            .eq('group_id', groupId)
             .order('full_name', { ascending: true });
 
         if (error) {
-            console.error('Error loading members:', error);
+            if (isMissingGroupColumnError(error)) {
+                const { data: fallbackData, error: fallbackError } = await supabase
+                    .from('club_members')
+                    .select('*')
+                    .order('full_name', { ascending: true });
+                if (fallbackError) {
+                    console.error('Error loading members:', fallbackError);
+                } else {
+                    setMembers(fallbackData || []);
+                }
+            } else {
+                console.error('Error loading members:', error);
+            }
         } else {
             setMembers(data || []);
         }
@@ -105,10 +134,12 @@ export default function AdminPage({ embedded = false }) {
     });
 
     async function updateTransaction(id, updates) {
+        const groupId = getCurrentGroupIdClient();
         const { error } = await supabase
             .from('quy_pickleball')
             .update(updates)
-            .eq('id', id);
+            .eq('id', id)
+            .eq('group_id', groupId);
 
         if (error) {
             alert('Lỗi cập nhật: ' + error.message);
@@ -136,6 +167,7 @@ export default function AdminPage({ embedded = false }) {
         const { error } = await supabase
             .from('club_members')
             .insert([{
+                group_id: getCurrentGroupIdClient(),
                 full_name: newMember.full_name.toUpperCase().trim(),
                 aliases: aliasesArray.length > 0 ? aliasesArray : null
             }]);
@@ -155,7 +187,8 @@ export default function AdminPage({ embedded = false }) {
         const { error } = await supabase
             .from('club_members')
             .delete()
-            .eq('id', id);
+            .eq('id', id)
+            .eq('group_id', getCurrentGroupIdClient());
 
         if (error) {
             alert('Lỗi xóa: ' + error.message);
@@ -185,7 +218,8 @@ export default function AdminPage({ embedded = false }) {
                 aliases: aliasesArray.length > 0 ? aliasesArray : null,
                 is_active: editMemberForm.is_active
             })
-            .eq('id', editingMember.id);
+            .eq('id', editingMember.id)
+            .eq('group_id', getCurrentGroupIdClient());
 
         if (error) {
             alert('Lỗi cập nhật: ' + error.message);
@@ -231,7 +265,8 @@ export default function AdminPage({ embedded = false }) {
                 loai_giao_dich: bulkEditCategory,
                 is_manually_categorized: true
             })
-            .in('id', selectedTransactions);
+            .in('id', selectedTransactions)
+            .eq('group_id', getCurrentGroupIdClient());
 
         if (error) {
             alert('Lỗi cập nhật: ' + error.message);
@@ -255,6 +290,7 @@ export default function AdminPage({ embedded = false }) {
 
         const timestamp = Date.now();
         const transactionData = {
+            group_id: getCurrentGroupIdClient(),
             ma_giao_dich: `MANUAL_CHI_${timestamp}`,
             so_tien: -Math.abs(parseFloat(expenseForm.so_tien)),
             noi_dung_goc: expenseForm.noi_dung.trim(),

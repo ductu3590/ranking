@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { parseTransaction } from '@/lib/transaction-parser';
+import { DEFAULT_GROUP_ID } from '@/lib/groupConstants';
 
 export async function POST(req) {
     try {
@@ -31,7 +32,8 @@ export async function POST(req) {
         console.log('Final direction:', huongGiaoDich, '| Amount:', amount, '| Content:', content);
 
         // 2. Parse transaction
-        const parseResult = await parseTransaction(content, amount, accountName, huongGiaoDich);
+        const groupId = DEFAULT_GROUP_ID;
+        const parseResult = await parseTransaction(content, amount, accountName, huongGiaoDich, groupId);
 
         console.log('Parse result:', parseResult);
 
@@ -39,6 +41,7 @@ export async function POST(req) {
         const { data: insertedData, error } = await supabaseServer
             .from('quy_pickleball')
             .insert({
+                group_id: groupId,
                 nguoi_nop: parseResult.memberName,
                 so_tien: amount,
                 noi_dung_goc: content,

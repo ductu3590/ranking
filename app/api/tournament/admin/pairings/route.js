@@ -1,11 +1,13 @@
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { NextResponse } from 'next/server';
+import { getGroupIdForDatabase, requireGroupAdmin } from '@/lib/groupSession';
 
 export const dynamic = 'force-dynamic';
 
 // GET all pairings for admin view
 export async function GET() {
     try {
+        const groupId = getGroupIdForDatabase();
         if (!supabaseAdmin) {
             return NextResponse.json({
                 error: 'Configuration Error',
@@ -20,6 +22,7 @@ export async function GET() {
         const { data, error } = await supabaseAdmin
             .from('tournament_pairings')
             .select('*')
+            .eq('group_id', groupId)
             .order('round_number', { ascending: true })
             .order('pair_order', { ascending: true });
 
@@ -69,6 +72,9 @@ export async function GET() {
 // PUT - Update pairings for a specific team and round
 export async function PUT(request) {
     try {
+        const adminCheck = requireGroupAdmin();
+        if (!adminCheck.ok) return adminCheck.response;
+        const groupId = getGroupIdForDatabase();
         const { team, round_number, pairings } = await request.json();
 
         if (!team || !round_number || !pairings) {
@@ -95,6 +101,7 @@ export async function PUT(request) {
                     updated_at: new Date().toISOString()
                 })
                 .eq('team', team)
+                .eq('group_id', groupId)
                 .eq('round_number', round_number)
                 .eq('pair_order', pairing.pair_order); // UPDATED
 

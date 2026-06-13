@@ -1,8 +1,14 @@
 import { supabaseServer as supabase } from '@/lib/supabaseServer';
 import { NextResponse } from 'next/server';
+import { debugGuard } from '@/lib/debugGuard';
+
+// Debug-only route: never prerender or run in production.
+export const dynamic = 'force-dynamic';
 
 // POST /api/debug/fix-reveal-time
 export async function POST() {
+    const blocked = debugGuard();
+    if (blocked) return blocked;
     try {
         // Update the setting - store as plain text in JSONB
         const newRevealTime = '2026-01-28T16:30:00+07:00';

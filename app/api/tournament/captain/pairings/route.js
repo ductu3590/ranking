@@ -1,11 +1,13 @@
 import { supabaseServer as supabase } from '@/lib/supabaseServer';
 import { NextResponse } from 'next/server';
 import { validatePairings } from '@/lib/tournamentHelpers';
+import { getGroupIdForDatabase } from '@/lib/groupSession';
 
 // GET /api/tournament/captain/pairings?round=1&team=blue
 // Fetch pairings for a specific team and round
 export async function GET(request) {
     try {
+        const groupId = getGroupIdForDatabase();
         const { searchParams } = new URL(request.url);
         const round = parseInt(searchParams.get('round')) || 1;
         const teamCode = searchParams.get('team');
@@ -22,6 +24,7 @@ export async function GET(request) {
             .from('tournament_teams')
             .select('id')
             .eq('team_code', teamCode)
+            .eq('group_id', groupId)
             .single();
 
         if (!team) {
@@ -38,8 +41,9 @@ export async function GET(request) {
         *,
         player1:tournament_players!tournament_pairings_player1_id_fkey(*),
         player2:tournament_players!tournament_pairings_player2_id_fkey(*)
-      `)
+            `)
             .eq('team_id', team.id)
+            .eq('group_id', groupId)
             .eq('round_number', round)
             .order('pair_order');
 
@@ -63,6 +67,7 @@ export async function GET(request) {
 // Save or update pairings (draft mode)
 export async function POST(request) {
     try {
+        const groupId = getGroupIdForDatabase();
         const body = await request.json();
         const { teamCode, round, pairings } = body;
 
@@ -78,6 +83,7 @@ export async function POST(request) {
             .from('tournament_teams')
             .select('id')
             .eq('team_code', teamCode)
+            .eq('group_id', groupId)
             .single();
 
         if (!team) {
@@ -92,6 +98,7 @@ export async function POST(request) {
             .from('tournament_pairings')
             .select('*')
             .eq('team_id', team.id)
+            .eq('group_id', groupId)
             .lt('round_number', round);
 
         // Validate pairings
@@ -108,11 +115,13 @@ export async function POST(request) {
             .from('tournament_pairings')
             .delete()
             .eq('team_id', team.id)
+            .eq('group_id', groupId)
             .eq('round_number', round);
 
         // Insert new pairings
         const pairingsToInsert = pairings.map((pair, index) => ({
             tournament_id: 1,
+            group_id: groupId,
             team_id: team.id,
             round_number: round,
             pair_order: index + 1,
@@ -148,6 +157,7 @@ export async function POST(request) {
 // Submit and lock pairings
 export async function PUT(request) {
     try {
+        const groupId = getGroupIdForDatabase();
         const body = await request.json();
         const { teamCode, round } = body;
 
@@ -163,6 +173,7 @@ export async function PUT(request) {
             .from('tournament_teams')
             .select('id')
             .eq('team_code', teamCode)
+            .eq('group_id', groupId)
             .single();
 
         if (!team) {
@@ -180,6 +191,7 @@ export async function PUT(request) {
                 submitted_at: new Date().toISOString()
             })
             .eq('team_id', team.id)
+            .eq('group_id', groupId)
             .eq('round_number', round)
             .select();
 

@@ -1,1022 +1,498 @@
-/* =====================================================
-   HOMEPAGE - DARK THEME
-   Quản lý Quỹ CLB Pickleball
-   ===================================================== */
-
-.home-dark {
+.teamfund-home {
     min-height: 100vh;
-    background: #0d1117;
-    color: #e6edf3;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(160deg, #0aa7a5 0%, #31b86b 52%, #f6f7fb 52.2%, #f6f7fb 100%);
+    color: #20242c;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 28px 18px 42px;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-.home-main {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 24px 20px;
+.teamfund-stage {
+    width: min(100%, 440px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
 }
 
-/* ─── Stats Grid ─── */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-    margin-bottom: 28px;
+.teamfund-hero-copy {
+    text-align: center;
+    color: #fff;
+    padding-top: 2px;
 }
 
-.stat-card {
-    background: #161b22;
-    border: 1px solid #30363d;
-    border-radius: 14px;
-    padding: 20px;
+.teamfund-hero-copy h1 {
+    margin: 0;
+    font-size: 25px;
+    line-height: 1.08;
+    font-weight: 850;
+    letter-spacing: 0;
+}
+
+.teamfund-hero-copy p {
+    margin: 9px 0 0;
+    font-size: 13px;
+    opacity: .92;
+    font-weight: 500;
+}
+
+.teamfund-phone {
+    width: 300px;
+    min-height: 610px;
+    border: 4px solid #1f1713;
+    border-radius: 38px;
+    background: #f5f6fa;
+    box-shadow: 0 26px 60px rgba(18, 38, 45, .32), inset 0 0 0 1px rgba(255, 255, 255, .7);
+    padding: 14px 13px 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.teamfund-phone::before {
+    content: "";
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    width: 86px;
+    height: 26px;
+    transform: translateX(-50%);
+    background: #111319;
+    border-radius: 999px;
+    z-index: 2;
+}
+
+.teamfund-status {
+    height: 30px;
     display: flex;
     align-items: center;
-    gap: 16px;
-    transition: border-color 0.2s, transform 0.2s;
+    justify-content: space-between;
+    font-size: 10px;
+    font-weight: 750;
+    color: #111319;
+    padding: 0 14px 0 13px;
 }
 
-.stat-card:hover {
-    border-color: #0ea5e9;
-    transform: translateY(-2px);
+.teamfund-status-icons {
+    display: flex;
+    align-items: center;
+    gap: 5px;
 }
 
-.balance-card {
-    background: linear-gradient(135deg, #0c1a2e 0%, #0a2744 100%);
-    border-color: #0369a1;
+.teamfund-signal {
+    width: 15px;
+    height: 9px;
+    background: linear-gradient(90deg, #111 20%, transparent 20% 30%, #111 30% 50%, transparent 50% 60%, #111 60% 80%, transparent 80%);
+    border-radius: 2px;
 }
 
-.stat-icon {
-    font-size: 32px;
-    flex-shrink: 0;
+.teamfund-battery {
+    width: 18px;
+    height: 9px;
+    border: 1.5px solid #111;
+    border-radius: 3px;
+    position: relative;
 }
 
-.stat-info {
+.teamfund-battery::after {
+    content: "";
+    position: absolute;
+    right: -4px;
+    top: 2px;
+    width: 2px;
+    height: 4px;
+    background: #111;
+    border-radius: 0 2px 2px 0;
+}
+
+.teamfund-screen {
+    padding: 34px 12px 0;
+}
+
+.teamfund-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 22px;
+}
+
+.teamfund-app-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 15px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(145deg, #35d678, #0fa867);
+    box-shadow: 0 10px 26px rgba(20, 166, 100, .28);
+    margin-bottom: 13px;
+}
+
+.teamfund-app-icon svg {
+    width: 34px;
+    height: 34px;
+}
+
+.teamfund-brand h2 {
+    margin: 0;
+    font-size: 26px;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: 0;
+    color: #20242c;
+}
+
+.teamfund-brand p {
+    margin: 9px 0 0;
+    color: #7d828d;
+    font-size: 11px;
+    font-weight: 560;
+}
+
+.teamfund-section-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0 0 8px;
+    color: #333842;
+    font-size: 11px;
+    font-weight: 780;
+}
+
+.teamfund-section-title svg {
+    width: 13px;
+    height: 13px;
+}
+
+.teamfund-group-card,
+.teamfund-action-row {
+    width: 100%;
+    border: 1px solid #edf0f5;
+    background: rgba(255, 255, 255, .96);
+    box-shadow: 0 8px 22px rgba(28, 37, 55, .055);
+    border-radius: 13px;
+}
+
+.teamfund-group-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 11px 12px;
+    margin-bottom: 20px;
+}
+
+.teamfund-row-main {
+    display: flex;
+    align-items: center;
+    gap: 11px;
     min-width: 0;
 }
 
-.stat-label {
-    font-size: 13px;
-    color: #8b949e;
-    font-weight: 600;
-    margin-bottom: 6px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+.teamfund-tile {
+    width: 36px;
+    height: 36px;
+    border-radius: 11px;
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
 }
 
-.stat-value {
-    font-size: 22px;
-    font-weight: 700;
-    color: #e6edf3;
+.teamfund-tile svg {
+    width: 20px;
+    height: 20px;
+}
+
+.teamfund-tile-orange {
+    background: #fff4dd;
+    color: #f2a20c;
+}
+
+.teamfund-tile-purple {
+    background: #efe9ff;
+    color: #7957f3;
+}
+
+.teamfund-tile-violet {
+    background: #efe8ff;
+    color: #7057d9;
+}
+
+.teamfund-item-text {
+    min-width: 0;
+    text-align: left;
+}
+
+.teamfund-item-text strong {
+    display: block;
+    color: #252a33;
+    font-size: 13px;
+    line-height: 1.12;
+    font-weight: 820;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.stat-value.positive { color: #3fb950; }
-.stat-value.negative { color: #f85149; }
-
-/* ─── Tabs ─── */
-.tab-bar {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 20px;
-    background: #161b22;
-    border: 1px solid #30363d;
-    border-radius: 12px;
-    padding: 6px;
-}
-
-.tab-btn {
-    flex: 1;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    background: transparent;
-    color: #8b949e;
-    transition: all 0.2s;
-}
-
-.tab-btn:hover {
-    background: #21262d;
-    color: #e6edf3;
-}
-
-.tab-btn.active {
-    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
-    color: white;
-    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4);
-}
-
-/* ─── Tab Content ─── */
-.tab-content {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-/* ─── Admin Bar ─── */
-.admin-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #161b22;
-    border: 1px solid #30363d;
-    border-radius: 12px;
-    padding: 14px 20px;
-}
-
-.admin-note {
-    font-size: 13px;
-    color: #f59e0b;
+.teamfund-item-text span {
+    display: block;
+    margin-top: 3px;
+    color: #848996;
+    font-size: 9.5px;
+    line-height: 1.2;
     font-weight: 600;
 }
 
-.btn-create {
-    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
+.teamfund-role-pill {
+    display: inline-flex !important;
+    margin-top: 5px !important;
+    color: #eb8c05 !important;
+    background: #fff3d8;
+    border-radius: 999px;
+    padding: 3px 8px;
+    font-size: 9px !important;
+    font-weight: 800 !important;
 }
 
-.btn-create:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(14, 165, 233, 0.5);
-}
-
-/* ─── Events List ─── */
-.events-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.event-card {
-    background: #161b22;
-    border: 1px solid #30363d;
-    border-radius: 14px;
-    overflow: hidden;
-    transition: border-color 0.2s;
-}
-
-.event-card:hover {
-    border-color: #0ea5e9;
-}
-
-.event-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 18px 20px;
-    cursor: pointer;
-    gap: 16px;
-    transition: background 0.15s;
-}
-
-.event-header:hover {
-    background: #21262d;
-}
-
-.event-meta {
-    flex: 1;
-    min-width: 0;
-}
-
-.event-title {
-    font-size: 17px;
-    font-weight: 700;
-    color: #e6edf3;
-    margin: 0 0 8px 0;
-}
-
-.event-details {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: center;
-}
-
-.event-date, .event-amount, .event-desc {
-    font-size: 13px;
-    color: #8b949e;
-}
-
-.event-amount {
-    color: #3fb950;
-    font-weight: 600;
-}
-
-.event-progress-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 6px;
-    min-width: 140px;
-    flex-shrink: 0;
-}
-
-.event-count {
-    font-size: 14px;
-    color: #8b949e;
-}
-
-.paid-count {
-    font-size: 20px;
-    font-weight: 800;
-    color: #3fb950;
-}
-
-.total-count {
-    font-size: 16px;
-    color: #6e7681;
-    font-weight: 600;
-}
-
-.paid-label {
-    font-size: 12px;
-    color: #6e7681;
-}
-
-.progress-bar-bg {
-    width: 120px;
-    height: 6px;
-    background: #21262d;
-    border-radius: 3px;
-    overflow: hidden;
-}
-
-.progress-bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #3fb950, #2ea043);
-    border-radius: 3px;
-    transition: width 0.4s ease;
-}
-
-.progress-pct {
-    font-size: 12px;
-    color: #6e7681;
-    font-weight: 600;
-}
-
-.expand-icon {
-    font-size: 11px;
-    color: #6e7681;
-    margin-top: 4px;
-}
-
-/* ─── Event Body ─── */
-.event-body {
-    border-top: 1px solid #30363d;
-    padding: 20px;
-}
-
-.event-actions {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 16px;
-}
-
-.btn-danger-sm {
-    background: rgba(248, 81, 73, 0.15);
-    color: #f85149;
-    border: 1px solid rgba(248, 81, 73, 0.3);
-    padding: 8px 14px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btn-danger-sm:hover {
-    background: rgba(248, 81, 73, 0.25);
-}
-
-.btn-danger-sm:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.members-grid {
+.teamfund-more {
+    width: 18px;
+    height: 18px;
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-}
-
-.members-column {
-    background: #0d1117;
-    border: 1px solid #21262d;
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-.column-header {
-    padding: 10px 16px;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.3px;
-}
-
-.unpaid-header {
-    background: rgba(248, 81, 73, 0.1);
-    color: #f85149;
-    border-bottom: 1px solid rgba(248, 81, 73, 0.2);
-}
-
-.paid-header {
-    background: rgba(63, 185, 80, 0.1);
-    color: #3fb950;
-    border-bottom: 1px solid rgba(63, 185, 80, 0.2);
-}
-
-.member-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 16px;
-    border-bottom: 1px solid #161b22;
-    gap: 8px;
-}
-
-.member-row:last-child {
-    border-bottom: none;
-}
-
-.member-row.unpaid {
-    background: rgba(248, 81, 73, 0.03);
-}
-
-.member-row.paid {
-    background: rgba(63, 185, 80, 0.03);
-}
-
-.member-name {
+    place-items: center;
+    border-radius: 999px;
+    color: #9ba1ad;
+    background: #f0f2f6;
+    flex: 0 0 auto;
+    text-decoration: none;
     font-size: 14px;
-    font-weight: 500;
-    color: #e6edf3;
-    flex: 1;
+    font-weight: 800;
 }
 
-.btn-toggle {
-    border: none;
-    border-radius: 6px;
-    padding: 5px 10px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: all 0.15s;
-    flex-shrink: 0;
-}
-
-.unpaid-toggle {
-    background: rgba(63, 185, 80, 0.15);
-    color: #3fb950;
-}
-
-.unpaid-toggle:hover {
-    background: rgba(63, 185, 80, 0.3);
-}
-
-.paid-toggle {
-    background: rgba(248, 81, 73, 0.1);
-    color: #f85149;
-}
-
-.paid-toggle:hover {
-    background: rgba(248, 81, 73, 0.2);
-}
-
-.paid-info {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-shrink: 0;
-}
-
-.paid-at {
-    font-size: 11px;
-    color: #6e7681;
-}
-
-.all-paid-msg, .none-paid-msg {
-    padding: 16px;
-    text-align: center;
-    font-size: 13px;
-    color: #6e7681;
-    font-style: italic;
-}
-
-/* ─── Transactions ─── */
-.filter-bar {
-    display: flex;
-    gap: 8px;
-    background: #161b22;
-    border: 1px solid #30363d;
-    border-radius: 12px;
-    padding: 8px;
-    flex-wrap: wrap;
-}
-
-.filter-btn {
-    flex: 1;
-    min-width: 130px;
-    padding: 10px 16px;
-    border: 1px solid #30363d;
-    background: transparent;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #8b949e;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.filter-btn:hover {
-    border-color: #0ea5e9;
-    color: #e6edf3;
-    background: #21262d;
-}
-
-.filter-btn.active {
-    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
-    color: white;
-    border-color: #0ea5e9;
-}
-
-.search-bar {
-    background: #161b22;
-    border: 1px solid #30363d;
-    border-radius: 12px;
-    padding: 12px 16px;
-}
-
-.search-input {
-    width: 100%;
-    background: #21262d;
-    border: 1px solid #30363d;
-    border-radius: 8px;
-    padding: 12px 16px;
-    font-size: 14px;
-    color: #e6edf3;
-    outline: none;
-    transition: border-color 0.2s;
-    font-family: inherit;
-}
-
-.search-input::placeholder { color: #6e7681; }
-.search-input:focus { border-color: #0ea5e9; }
-
-.search-result-count {
-    font-size: 13px;
-    color: #6e7681;
-    margin-top: 8px;
-    text-align: center;
-}
-
-.tx-list {
-    display: flex;
-    flex-direction: column;
+.teamfund-actions {
+    display: grid;
     gap: 12px;
 }
 
-.tx-item {
-    background: #161b22;
-    border: 1px solid #30363d;
-    border-radius: 12px;
-    padding: 18px;
-    border-left: 4px solid #30363d;
-    transition: all 0.2s;
-}
-
-.tx-item.in { border-left-color: #3fb950; }
-.tx-item.out { border-left-color: #f85149; }
-
-.tx-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-    border-color: #0ea5e9;
-}
-
-.tx-top {
+.teamfund-action-row {
     display: flex;
+    align-items: center;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 14px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid #21262d;
-}
-
-.tx-date {
-    font-size: 13px;
-    color: #6e7681;
-    font-weight: 500;
-}
-
-.tx-amount {
-    font-size: 22px;
-    font-weight: 700;
-}
-
-.tx-amount.in { color: #3fb950; }
-.tx-amount.out { color: #f85149; }
-
-.tx-body {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.tx-row {
-    display: flex;
-    gap: 10px;
-    align-items: flex-start;
-}
-
-.tx-label {
-    font-size: 13px;
-    font-weight: 600;
-    color: #6e7681;
-    min-width: 100px;
-    flex-shrink: 0;
-}
-
-.tx-val {
-    font-size: 14px;
-    color: #c9d1d9;
-    word-break: break-word;
-}
-
-.tx-val.content {
-    background: #0d1117;
-    padding: 6px 10px;
-    border-radius: 6px;
-    font-family: 'Courier New', monospace;
-    font-size: 12px;
-    border: 1px solid #21262d;
-    color: #8b949e;
-}
-
-.tx-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 6px;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-.badge {
-    display: inline-block;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.badge-nop_phat {
-    background: rgba(248, 81, 73, 0.15);
-    color: #f85149;
-}
-
-.badge-nop_quy {
-    background: rgba(63, 185, 80, 0.15);
-    color: #3fb950;
-}
-
-.badge-khac {
-    background: rgba(139, 148, 158, 0.15);
-    color: #8b949e;
-}
-
-.tx-code {
-    font-size: 12px;
-    color: #6e7681;
-    font-family: 'Courier New', monospace;
-}
-
-/* ─── Pagination ─── */
-.pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 16px;
-    padding: 20px 0;
-}
-
-.page-btn {
-    padding: 10px 20px;
-    background: #161b22;
-    border: 1px solid #30363d;
-    border-radius: 8px;
-    color: #8b949e;
-    font-size: 14px;
-    font-weight: 600;
+    padding: 13px 12px;
     cursor: pointer;
-    transition: all 0.2s;
+    font: inherit;
+    text-align: left;
 }
 
-.page-btn:hover:not(:disabled) {
-    border-color: #0ea5e9;
-    color: #e6edf3;
+.teamfund-action-row:hover,
+.teamfund-action-row:focus-visible {
+    border-color: #d9def0;
+    transform: translateY(-1px);
 }
 
-.page-btn:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
+.teamfund-chevron {
+    width: 18px;
+    height: 18px;
+    color: #a3a9b5;
+    flex: 0 0 auto;
 }
 
-.page-info {
-    font-size: 15px;
-    color: #8b949e;
-    font-weight: 600;
+.teamfund-bottom-bar {
+    width: 108px;
+    height: 4px;
+    background: #111319;
+    border-radius: 999px;
+    position: absolute;
+    left: 50%;
+    bottom: 10px;
+    transform: translateX(-50%);
 }
 
-/* ─── Loading / Empty ─── */
-.loading-state {
-    text-align: center;
-    padding: 48px;
-    font-size: 16px;
-    color: #6e7681;
-}
-
-.empty-state {
-    text-align: center;
-    padding: 60px 20px;
-    background: #161b22;
-    border: 1px solid #30363d;
-    border-radius: 14px;
-}
-
-.empty-icon {
-    font-size: 56px;
-    margin-bottom: 16px;
-}
-
-.empty-state p {
-    margin: 4px 0;
-    color: #6e7681;
-    font-size: 15px;
-}
-
-.empty-hint {
-    color: #484f58 !important;
-    font-size: 13px !important;
-    margin-top: 8px !important;
-}
-
-/* ─── Modal ─── */
-.modal-overlay {
+.teamfund-modal-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(4px);
+    z-index: 50;
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 2000;
+    padding: 18px;
+    background: rgba(10, 18, 25, .62);
+    backdrop-filter: blur(8px);
+}
+
+.teamfund-modal {
+    width: min(100%, 430px);
+    max-height: 92vh;
+    overflow: auto;
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 28px 80px rgba(10, 20, 30, .34);
+}
+
+.teamfund-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 20px;
+    border-bottom: 1px solid #edf0f5;
+}
+
+.teamfund-modal-header h2 {
+    margin: 0;
+    font-size: 18px;
+    color: #20242c;
+}
+
+.teamfund-modal-header button {
+    width: 32px;
+    height: 32px;
+    border: 0;
+    border-radius: 999px;
+    background: #f1f3f7;
+    color: #606775;
+    cursor: pointer;
+    font-size: 22px;
+    line-height: 1;
+}
+
+.teamfund-form,
+.teamfund-success {
     padding: 20px;
 }
 
-.modal {
-    background: #161b22;
-    border: 1px solid #30363d;
-    border-radius: 16px;
-    width: 100%;
-    max-width: 580px;
-    max-height: 90vh;
-    overflow-y: auto;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 24px;
-    border-bottom: 1px solid #30363d;
-}
-
-.modal-header h2 {
-    margin: 0;
-    font-size: 18px;
-    color: #e6edf3;
-}
-
-.modal-close {
-    background: none;
-    border: none;
-    font-size: 20px;
-    color: #6e7681;
-    cursor: pointer;
-    padding: 4px 8px;
-    border-radius: 6px;
-    transition: all 0.2s;
-}
-
-.modal-close:hover {
-    background: #21262d;
-    color: #e6edf3;
-}
-
-.modal-form {
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.form-group label {
-    font-size: 14px;
-    font-weight: 600;
-    color: #c9d1d9;
-}
-
-.required {
-    color: #f85149;
-}
-
-.form-input {
-    background: #0d1117;
-    border: 1px solid #30363d;
-    border-radius: 8px;
-    padding: 12px 14px;
-    font-size: 14px;
-    color: #e6edf3;
-    outline: none;
-    font-family: inherit;
-    transition: border-color 0.2s;
-}
-
-.form-input:focus {
-    border-color: #0ea5e9;
-    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
-}
-
-.form-input::placeholder { color: #484f58; }
-
-.form-row {
+.teamfund-form {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    gap: 14px;
 }
 
-/* Member selection in modal */
-.member-select-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-.member-count-badge {
-    display: inline-block;
-    background: rgba(14, 165, 233, 0.2);
-    color: #0ea5e9;
-    font-size: 12px;
-    padding: 2px 8px;
-    border-radius: 10px;
-    margin-left: 8px;
-}
-
-.member-select-actions {
-    display: flex;
-    gap: 8px;
-}
-
-.btn-select-all, .btn-clear {
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    border: 1px solid;
-    transition: all 0.2s;
-}
-
-.btn-select-all {
-    background: rgba(14, 165, 233, 0.15);
-    color: #0ea5e9;
-    border-color: rgba(14, 165, 233, 0.3);
-}
-
-.btn-select-all:hover {
-    background: rgba(14, 165, 233, 0.25);
-}
-
-.btn-clear {
-    background: rgba(139, 148, 158, 0.1);
-    color: #8b949e;
-    border-color: #30363d;
-}
-
-.btn-clear:hover {
-    background: rgba(139, 148, 158, 0.2);
-}
-
-.member-checkboxes {
-    background: #0d1117;
-    border: 1px solid #30363d;
-    border-radius: 10px;
-    padding: 8px;
+.teamfund-form label {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4px;
-    max-height: 240px;
-    overflow-y: auto;
-}
-
-.member-checkbox {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.15s;
-    border: 1px solid transparent;
-}
-
-.member-checkbox:hover {
-    background: #161b22;
-}
-
-.member-checkbox.checked {
-    background: rgba(14, 165, 233, 0.1);
-    border-color: rgba(14, 165, 233, 0.3);
-}
-
-.member-checkbox input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    accent-color: #0ea5e9;
-    cursor: pointer;
-    flex-shrink: 0;
-}
-
-.checkbox-name {
+    gap: 7px;
+    color: #343a45;
     font-size: 13px;
-    color: #c9d1d9;
-    font-weight: 500;
+    font-weight: 760;
 }
 
-.member-checkbox.checked .checkbox-name {
-    color: #38bdf8;
+.teamfund-form input,
+.teamfund-form textarea {
+    width: 100%;
+    border: 1px solid #dfe4ed;
+    border-radius: 12px;
+    padding: 12px 13px;
+    color: #20242c;
+    background: #f8fafc;
+    font: inherit;
+    font-size: 14px;
+    outline: none;
 }
 
-/* Modal footer */
-.modal-footer {
+.teamfund-form input:focus,
+.teamfund-form textarea:focus {
+    border-color: #20ad72;
+    box-shadow: 0 0 0 3px rgba(32, 173, 114, .16);
+}
+
+.teamfund-error {
+    margin: 0;
+    border: 1px solid rgba(231, 76, 60, .22);
+    border-radius: 12px;
+    padding: 10px 12px;
+    background: #fff2ef;
+    color: #c43c2e;
+    font-size: 13px;
+    font-weight: 650;
+}
+
+.teamfund-modal-actions {
     display: flex;
-    gap: 12px;
     justify-content: flex-end;
-    padding-top: 4px;
-    border-top: 1px solid #21262d;
+    gap: 10px;
+    margin-top: 6px;
+}
+
+.teamfund-cancel,
+.teamfund-submit,
+.teamfund-save-image {
+    min-height: 42px;
+    border: 0;
+    border-radius: 12px;
+    padding: 0 16px;
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.teamfund-cancel {
+    background: #eef1f6;
+    color: #596170;
+}
+
+.teamfund-submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(145deg, #35d678, #0fa867);
+    color: #fff;
+    text-decoration: none;
+}
+
+.teamfund-submit:disabled {
+    cursor: wait;
+    opacity: .7;
+}
+
+.teamfund-save-image {
+    background: #eef8f2;
+    color: #0f8c59;
+    border: 1px solid rgba(15, 168, 103, .2);
+}
+
+.teamfund-save-image:hover {
+    background: #def5e8;
+}
+
+.teamfund-success {
+    text-align: center;
+}
+
+.teamfund-success img {
+    width: 190px;
+    height: 190px;
+    display: block;
+    margin: 12px auto;
+    border: 1px solid #edf0f5;
+    border-radius: 16px;
+}
+
+.teamfund-success p {
+    margin: 0;
+    color: #687081;
+    font-size: 13px;
+}
+
+.teamfund-code-label {
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    font-weight: 800;
+}
+
+.teamfund-code {
+    display: block;
     margin-top: 4px;
-    padding-top: 16px;
+    color: #20242c;
+    font-size: 28px;
+    letter-spacing: .08em;
 }
 
-.btn-cancel {
-    padding: 12px 24px;
-    background: #21262d;
-    border: 1px solid #30363d;
-    border-radius: 8px;
-    color: #8b949e;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btn-cancel:hover {
-    background: #30363d;
-    color: #e6edf3;
-}
-
-.btn-submit {
-    padding: 12px 28px;
-    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
-    border: none;
-    border-radius: 8px;
-    color: white;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btn-submit:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(14, 165, 233, 0.5);
-}
-
-.btn-submit:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-/* ─── Responsive ─── */
-@media (max-width: 768px) {
-    .home-main {
-        padding: 16px 12px;
+@media (max-width: 380px) {
+    .teamfund-home {
+        padding: 22px 12px 32px;
     }
 
-    .stats-grid {
-        grid-template-columns: 1fr;
-        gap: 10px;
+    .teamfund-phone {
+        width: min(100%, 292px);
     }
 
-    .stat-card {
-        padding: 16px;
-    }
-
-    .stat-value {
-        font-size: 18px;
-    }
-
-    .tab-bar {
-        flex-direction: column;
-    }
-
-    .event-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-    }
-
-    .event-progress-wrap {
-        align-items: flex-start;
-        min-width: unset;
-        width: 100%;
-    }
-
-    .progress-bar-bg {
-        width: 100%;
-    }
-
-    .members-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .filter-bar {
-        flex-direction: column;
-    }
-
-    .filter-btn {
-        min-width: unset;
-        width: 100%;
-    }
-
-    .tx-top {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 6px;
-    }
-
-    .tx-row {
-        flex-direction: column;
-        gap: 4px;
-    }
-
-    .tx-label {
-        min-width: unset;
-    }
-
-    .form-row {
-        grid-template-columns: 1fr;
-    }
-
-    .member-checkboxes {
-        grid-template-columns: 1fr;
-    }
-
-    .member-select-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .modal {
-        max-height: 95vh;
-    }
-
-    .admin-bar {
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    .btn-create {
-        width: 100%;
+    .teamfund-hero-copy h1 {
+        font-size: 23px;
     }
 }

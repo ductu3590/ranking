@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
+import { getCurrentGroupIdClient } from '@/lib/groupClient';
 import './admin-tournament.css';
 
 export default function AdminTournamentPanel({ embedded = false }) {
@@ -90,9 +91,11 @@ export default function AdminTournamentPanel({ embedded = false }) {
     }
 
     async function loadMatches() {
+        const groupId = getCurrentGroupIdClient();
         const { data } = await supabase
             .from('tournament_matches')
             .select('*')
+            .eq('group_id', groupId)
             .order('round', { ascending: true })
             .order('match_order', { ascending: true });
 
@@ -100,6 +103,7 @@ export default function AdminTournamentPanel({ embedded = false }) {
     }
 
     async function loadPairings() {
+        const groupId = getCurrentGroupIdClient();
         const { data } = await supabase
             .from('tournament_pairings')
             .select(`
@@ -107,6 +111,7 @@ export default function AdminTournamentPanel({ embedded = false }) {
                 player1:tournament_players!tournament_pairings_player1_id_fkey(full_name),
                 player2:tournament_players!tournament_pairings_player2_id_fkey(full_name)
             `)
+            .eq('group_id', groupId)
             .order('round', { ascending: true })
             .order('team_code', { ascending: true })
             .order('pair_order', { ascending: true });
@@ -115,17 +120,21 @@ export default function AdminTournamentPanel({ embedded = false }) {
     }
 
     async function loadStats() {
+        const groupId = getCurrentGroupIdClient();
         const { data: players } = await supabase
             .from('tournament_players')
-            .select('id');
+            .select('id')
+            .eq('group_id', groupId);
 
         const { data: allMatches } = await supabase
             .from('tournament_matches')
-            .select('match_status');
+            .select('match_status')
+            .eq('group_id', groupId);
 
         const { data: submissions } = await supabase
             .from('tournament_pairings')
             .select('submission_status')
+            .eq('group_id', groupId)
             .eq('submission_status', 'draft');
 
         setStats({
@@ -184,11 +193,12 @@ export default function AdminTournamentPanel({ embedded = false }) {
         if (!confirm('⚠️ BẠN CÓ CHẮC? Điều này sẽ XÓA TẤT CẢ dữ liệu giải đấu!')) return;
         if (!confirm('Xác nhận lần cuối: XÓA TOÀN BỘ dữ liệu giải đấu?')) return;
 
-        // Delete all tournament data
-        await supabase.from('tournament_matches').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-        await supabase.from('tournament_pairings').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-        await supabase.from('tournament_players').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-        await supabase.from('tournament_teams').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        // Delete tournament data only inside the current group.
+        const groupId = getCurrentGroupIdClient();
+        await supabase.from('tournament_matches').delete().eq('group_id', groupId).neq('id', '00000000-0000-0000-0000-000000000000');
+        await supabase.from('tournament_pairings').delete().eq('group_id', groupId).neq('id', '00000000-0000-0000-0000-000000000000');
+        await supabase.from('tournament_players').delete().eq('group_id', groupId).neq('id', '00000000-0000-0000-0000-000000000000');
+        await supabase.from('tournament_teams').delete().eq('group_id', groupId).neq('id', '00000000-0000-0000-0000-000000000000');
 
         alert('Đã reset giải đấu!');
         loadData();

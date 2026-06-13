@@ -1,12 +1,15 @@
 import { supabaseServer } from '@/lib/supabaseServer';
+import { getGroupIdForDatabase, requireGroupAdmin } from '@/lib/groupSession';
 import { NextResponse } from 'next/server';
 
 // GET - Fetch tournament settings
 export async function GET(request) {
     try {
+        const groupId = getGroupIdForDatabase();
         const { data: settings, error } = await supabaseServer
             .from('tournament_settings')
             .select('*')
+            .eq('group_id', groupId)
             .order('created_at', { ascending: false })
             .limit(1)
             .single();
@@ -25,6 +28,9 @@ export async function GET(request) {
 // POST - Update tournament settings (Admin only)
 export async function POST(request) {
     try {
+        const adminCheck = requireGroupAdmin();
+        if (!adminCheck.ok) return adminCheck.response;
+        const groupId = getGroupIdForDatabase();
         const body = await request.json();
         const {
             tournament_name,
@@ -48,6 +54,7 @@ export async function POST(request) {
         const { data: existing } = await supabaseServer
             .from('tournament_settings')
             .select('id')
+            .eq('group_id', groupId)
             .limit(1)
             .single();
 
@@ -66,9 +73,11 @@ export async function POST(request) {
                     break_duration_minutes,
                     round1_reveal_time,
                     is_active,
+                    group_id: groupId,
                     updated_at: new Date().toISOString()
                 })
                 .eq('id', existing.id)
+                .eq('group_id', groupId)
                 .select()
                 .single();
 
@@ -87,7 +96,8 @@ export async function POST(request) {
                     match_duration_minutes,
                     break_duration_minutes,
                     round1_reveal_time,
-                    is_active
+                    is_active,
+                    group_id: groupId
                 }])
                 .select()
                 .single();

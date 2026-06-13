@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabaseClient';
+import { getCurrentGroupIdClient, isMissingGroupColumnError } from '@/lib/groupClient';
 import './page.css';
 
 export default function HomePage() {
@@ -48,11 +49,21 @@ export default function HomePage() {
 
     async function loadTransactions() {
         setLoadingTx(true);
+        const groupId = getCurrentGroupIdClient();
         const { data, error } = await supabase
             .from('quy_pickleball')
             .select('*')
+            .eq('group_id', groupId)
             .order('created_at', { ascending: false });
-        if (!error) setTransactions(data || []);
+        if (!error) {
+            setTransactions(data || []);
+        } else if (isMissingGroupColumnError(error)) {
+            const { data: fallbackData } = await supabase
+                .from('quy_pickleball')
+                .select('*')
+                .order('created_at', { ascending: false });
+            setTransactions(fallbackData || []);
+        }
         setLoadingTx(false);
     }
 
@@ -80,6 +91,7 @@ export default function HomePage() {
 
     async function loadEvents() {
         setLoadingEvents(true);
+        const groupId = getCurrentGroupIdClient();
         const { data: eventsData, error: eventsErr } = await supabase
             .from('fund_events')
             .select(`
@@ -93,19 +105,49 @@ export default function HomePage() {
                     club_members ( id, full_name, is_active )
                 )
             `)
+            .eq('group_id', groupId)
             .order('created_at', { ascending: false });
 
-        if (!eventsErr) setEvents(eventsData || []);
+        if (!eventsErr) {
+            setEvents(eventsData || []);
+        } else if (isMissingGroupColumnError(eventsErr)) {
+            const { data: fallbackEvents } = await supabase
+                .from('fund_events')
+                .select(`
+                *,
+                fund_event_participants (
+                    id,
+                    member_id,
+                    has_paid,
+                    paid_at,
+                    notes,
+                    club_members ( id, full_name, is_active )
+                )
+            `)
+                .order('created_at', { ascending: false });
+            setEvents(fallbackEvents || []);
+        }
         setLoadingEvents(false);
     }
 
     async function loadMembers() {
-        const { data } = await supabase
+        const groupId = getCurrentGroupIdClient();
+        const { data, error } = await supabase
             .from('club_members')
             .select('id, full_name, is_active')
+            .eq('group_id', groupId)
             .eq('is_active', true)
             .order('full_name');
-        setMembers(data || []);
+        if (!error) {
+            setMembers(data || []);
+        } else if (isMissingGroupColumnError(error)) {
+            const { data: fallbackMembers } = await supabase
+                .from('club_members')
+                .select('id, full_name, is_active')
+                .eq('is_active', true)
+                .order('full_name');
+            setMembers(fallbackMembers || []);
+        }
     }
 
     async function handleCreateEvent(e) {
@@ -117,10 +159,12 @@ export default function HomePage() {
         }
         setSavingEvent(true);
         try {
+            const groupId = getCurrentGroupIdClient();
             // Tạo event
             const { data: eventData, error: eventErr } = await supabase
                 .from('fund_events')
                 .insert({
+                    group_id: groupId,
                     title: createForm.title.trim(),
                     description: createForm.description.trim() || null,
                     amount_per_person: parseFloat(createForm.amount_per_person) || 0,
@@ -129,11 +173,28 @@ export default function HomePage() {
                 .select()
                 .single();
 
-            if (eventErr) throw eventErr;
+            let createdEvent = eventData;
+            if (eventErr && isMissingGroupColumnError(eventErr)) {
+                const { data: fallbackEventData, error: fallbackEventErr } = await supabase
+                    .from('fund_events')
+                    .insert({
+                        title: createForm.title.trim(),
+                        description: createForm.description.trim() || null,
+                        amount_per_person: parseFloat(createForm.amount_per_person) || 0,
+                        event_date: createForm.event_date || null,
+                    })
+                    .select()
+                    .single();
+
+                if (fallbackEventErr) throw fallbackEventErr;
+                createdEvent = fallbackEventData;
+            } else if (eventErr) {
+                throw eventErr;
+            }
 
             // Thêm participants
             const participants = createForm.selectedMembers.map(memberId => ({
-                event_id: eventData.id,
+                event_id: createdEvent.id,
                 member_id: memberId,
                 has_paid: false,
             }));
@@ -188,8 +249,12 @@ export default function HomePage() {
     async function handleDeleteEvent(eventId) {
         if (!confirm('Xóa sự kiện này? Thao tác không thể hoàn tác.')) return;
         setDeletingEvent(eventId);
-        const { error } = await supabase.from('fund_events').delete().eq('id', eventId);
-        if (!error) {
+        const groupId = getCurrentGroupIdClient();
+        const { error } = await supabase.from('fund_events').delete().eq('id', eventId).eq('group_id', groupId);
+        if (!error || isMissingGroupColumnError(error)) {
+            if (isMissingGroupColumnError(error)) {
+                await supabase.from('fund_events').delete().eq('id', eventId);
+            }
             setEvents(prev => prev.filter(ev => ev.id !== eventId));
             if (expandedEvent === eventId) setExpandedEvent(null);
         }

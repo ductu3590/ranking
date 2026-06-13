@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { getTournaments } from '@/lib/tournaments';
+import { getEffectiveGroupContext } from '@/lib/groupSession';
 
 export async function GET() {
     const result = await getTournaments();
@@ -11,12 +12,14 @@ export async function POST(request) {
     try {
         const body = await request.json();
         const name = body.name?.trim();
+        const { group_id: groupId } = getEffectiveGroupContext();
 
         if (!name) {
             return NextResponse.json({ error: 'Tournament name is required' }, { status: 400 });
         }
 
         const payload = {
+            group_id: groupId,
             name,
             description: body.description?.trim() || null,
             event_date: body.event_date || null,

@@ -8,8 +8,14 @@
 
 import { NextResponse } from 'next/server';
 import { parseTransaction } from '@/lib/transaction-parser';
+import { debugGuard } from '@/lib/debugGuard';
+
+// Debug-only route: never prerender or run in production.
+export const dynamic = 'force-dynamic';
 
 export async function POST(req) {
+    const blocked = debugGuard();
+    if (blocked) return blocked;
     try {
         const data = await req.json();
 
@@ -64,6 +70,8 @@ export async function POST(req) {
 
 // GET để kiểm tra endpoint còn sống
 export async function GET() {
+    const blocked = debugGuard();
+    if (blocked) return blocked;
     return NextResponse.json({
         info: 'Webhook Debug Inspector',
         usage: 'POST với payload JSON giống SePay webhook',

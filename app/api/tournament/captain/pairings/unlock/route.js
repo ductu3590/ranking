@@ -1,10 +1,12 @@
 import { supabaseServer as supabase } from '@/lib/supabaseServer';
 import { NextResponse } from 'next/server';
+import { getGroupIdForDatabase } from '@/lib/groupSession';
 
 // POST /api/tournament/captain/pairings/unlock
 // Unlock submitted pairings for editing
 export async function POST(request) {
     try {
+        const groupId = getGroupIdForDatabase();
         const body = await request.json();
         const { teamCode, round } = body;
 
@@ -20,6 +22,7 @@ export async function POST(request) {
             .from('tournament_teams')
             .select('id')
             .eq('team_code', teamCode)
+            .eq('group_id', groupId)
             .single();
 
         if (!team) {
@@ -37,6 +40,7 @@ export async function POST(request) {
                 submitted_at: null
             })
             .eq('team_id', team.id)
+            .eq('group_id', groupId)
             .eq('round_number', round)
             .select();
 

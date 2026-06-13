@@ -1,9 +1,13 @@
 import { supabaseServer } from '@/lib/supabaseServer';
 import { NextResponse } from 'next/server';
+import { getGroupIdForDatabase, requireGroupAdmin } from '@/lib/groupSession';
 
 // PUT - Reorder pairings (Admin only)
 export async function PUT(request) {
     try {
+        const adminCheck = requireGroupAdmin();
+        if (!adminCheck.ok) return adminCheck.response;
+        const groupId = getGroupIdForDatabase();
         const body = await request.json();
         const { round, teamCode, newOrder } = body;
 
@@ -17,6 +21,7 @@ export async function PUT(request) {
             .from('tournament_teams')
             .select('id')
             .eq('team_code', teamCode)
+            .eq('group_id', groupId)
             .single();
 
         if (teamError || !teamData) {
@@ -34,7 +39,8 @@ export async function PUT(request) {
             const { error } = await supabaseServer
                 .from('tournament_pairings')
                 .update({ pair_order: -1 * (index + 1) }) // -1, -2, -3...
-                .eq('id', item.id);
+                .eq('id', item.id)
+                .eq('group_id', groupId);
             if (error) throw error;
         });
         await Promise.all(tempUpdates);
@@ -44,7 +50,8 @@ export async function PUT(request) {
             const { error } = await supabaseServer
                 .from('tournament_pairings')
                 .update({ pair_order: index + 1 })
-                .eq('id', item.id);
+                .eq('id', item.id)
+                .eq('group_id', groupId);
             if (error) throw error;
         });
         await Promise.all(finalUpdates);

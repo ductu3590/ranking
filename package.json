@@ -9,11 +9,14 @@
     "lint": "next lint",
     "test:mobile-nav": "node tests/mobile-bottom-tabs.test.js",
     "test:tournament-dashboard": "node tests/tournament-dashboard.test.js",
-    "test:admin-center": "node tests/unified-admin-center.test.js"
+    "test:admin-center": "node tests/unified-admin-center.test.js",
+    "test:teamfund": "node tests/teamfund-phase1.test.js",
+    "test:debug-guard": "node tests/debug-routes-guard.test.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.3",
     "next": "14.1.0",
+    "qrcode": "^1.5.4",
     "react": "^18",
     "react-dom": "^18"
   },

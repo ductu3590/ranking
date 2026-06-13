@@ -1,9 +1,15 @@
 import { supabaseServer as supabase } from '@/lib/supabaseServer';
 import { NextResponse } from 'next/server';
+import { debugGuard } from '@/lib/debugGuard';
+
+// Debug-only route: never prerender or run in production.
+export const dynamic = 'force-dynamic';
 
 // GET /api/debug/pairings-status
 // Debug endpoint to check all pairings status
 export async function GET() {
+    const blocked = debugGuard();
+    if (blocked) return blocked;
     try {
         // Fetch all pairings with full details
         const { data: pairings, error } = await supabase

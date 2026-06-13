@@ -1,10 +1,12 @@
 import { supabaseServer as supabase } from '@/lib/supabaseServer';
+import { getGroupIdForDatabase, requireGroupAdmin } from '@/lib/groupSession';
 import { NextResponse } from 'next/server';
 
 // GET /api/tournament/live/matches
 // Fetch match schedule with pairings and scores
 export async function GET() {
     try {
+        const groupId = getGroupIdForDatabase();
         // Fetch all matches with pairing details
         const { data: matches, error } = await supabase
             .from('tournament_matches')
@@ -22,6 +24,7 @@ export async function GET() {
         )
       `)
             .eq('tournament_id', 1)
+            .eq('group_id', groupId)
             .order('match_number');
 
         if (error) throw error;
@@ -44,6 +47,9 @@ export async function GET() {
 // Update match score (admin only)
 export async function POST(request) {
     try {
+        const adminCheck = requireGroupAdmin();
+        if (!adminCheck.ok) return adminCheck.response;
+        const groupId = getGroupIdForDatabase();
         const body = await request.json();
         const { matchId, blueScore, redScore, status, isReset } = body;
 
@@ -90,6 +96,7 @@ export async function POST(request) {
             .from('tournament_matches')
             .update(updateData)
             .eq('id', matchId)
+            .eq('group_id', groupId)
             .select()
             .single();
 

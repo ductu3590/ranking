@@ -1,10 +1,16 @@
 import { supabaseServer as supabase } from '@/lib/supabaseServer';
 import { NextResponse } from 'next/server';
 import { calculateTeamScore } from '@/lib/tournamentHelpers';
+import { debugGuard } from '@/lib/debugGuard';
+
+// Debug-only route: never prerender or run in production.
+export const dynamic = 'force-dynamic';
 
 // GET /api/debug/scoreboard-test
 // Debug endpoint to test scoreboard calculation
 export async function GET() {
+    const blocked = debugGuard();
+    if (blocked) return blocked;
     try {
         // Fetch all matches
         const { data: matches, error } = await supabase

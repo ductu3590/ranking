@@ -1,4 +1,5 @@
 import { supabaseServer as supabase } from '@/lib/supabaseServer';
+import { getGroupIdForDatabase } from '@/lib/groupSession';
 import { NextResponse } from 'next/server';
 import { calculateTeamScore } from '@/lib/tournamentHelpers';
 
@@ -10,11 +11,13 @@ export const revalidate = 0;
 // Calculate and return team scores
 export async function GET() {
     try {
+        const groupId = getGroupIdForDatabase();
         // Fetch all matches - USE EXACT SAME QUERY AS /api/tournament/live/matches
         const { data: matches, error } = await supabase
             .from('tournament_matches')
             .select('*')
             .eq('tournament_id', 1)
+            .eq('group_id', groupId)
             .order('match_number'); // Add order to prevent caching issues
 
         if (error) {

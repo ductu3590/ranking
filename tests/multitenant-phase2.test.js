@@ -16,4 +16,12 @@ assert(
     'Migration 008 should create group_members linking auth.users to groups with a role and a unique membership.'
 );
 
+const membership = read('lib/membership.js');
+assert(
+    membership.includes('export async function getAdminGroupIds') &&
+    membership.includes('export async function isGroupAdmin') &&
+    membership.includes("from('group_members')"),
+    'lib/membership.js should resolve a user\'s admin group ids and check admin membership.'
+);
+
 console.log('multitenant phase 2 contract ok');

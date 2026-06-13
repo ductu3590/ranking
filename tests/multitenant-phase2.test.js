@@ -24,4 +24,17 @@ assert(
     'lib/membership.js should resolve a user\'s admin group ids and check admin membership.'
 );
 
+const createGroupRoute = read('app/api/groups/route.js');
+assert(
+    createGroupRoute.includes('auth.admin.createUser') &&
+    createGroupRoute.includes('addGroupMember') &&
+    createGroupRoute.includes('adminEmail'),
+    'Group creation should create a Supabase admin user and an owner membership.'
+);
+const homePage = read('app/page.js');
+assert(
+    homePage.includes('adminEmail'),
+    'Create-group form should collect the admin email.'
+);
+
 console.log('multitenant phase 2 contract ok');

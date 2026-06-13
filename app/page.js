@@ -7,6 +7,7 @@ import './page.css';
 const EMPTY_CREATE_FORM = {
     name: '',
     description: '',
+    adminEmail: '',
     adminPassword: '',
     memberPassword: '',
 };
@@ -273,6 +274,16 @@ export default function TeamFundHomePage() {
                         <form className="teamfund-form" onSubmit={handleCreateGroup}>
                             <FormError message={error} />
                             <label>
+                                Email quản trị
+                                <input
+                                    type="email"
+                                    value={createForm.adminEmail}
+                                    onChange={(event) => updateCreateForm('adminEmail', event.target.value)}
+                                    placeholder="admin@clb.com"
+                                    required
+                                />
+                            </label>
+                            <label>
                                 Tên nhóm
                                 <input
                                     value={createForm.name}
@@ -296,7 +307,7 @@ export default function TeamFundHomePage() {
                                     type="password"
                                     value={createForm.adminPassword}
                                     onChange={(event) => updateCreateForm('adminPassword', event.target.value)}
-                                    minLength="4"
+                                    minLength="6"
                                     required
                                 />
                             </label>

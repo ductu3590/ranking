@@ -111,4 +111,15 @@ assert(
     'RLS policies should scope access by the caller\'s group_members rows.'
 );
 
+const groupSessionSrc = read('lib/groupSession.js');
+assert(
+    !groupSessionSrc.includes('legacyFallback'),
+    'requireGroupAdmin should not silently allow no-session writes.'
+);
+const serverSrc = read('lib/supabaseServer.js');
+assert(
+    serverSrc.includes('NODE_ENV') && serverSrc.includes('SUPABASE_SERVICE_ROLE_KEY'),
+    'supabaseServer should hard-fail in production when the service key is missing.'
+);
+
 console.log('multitenant phase 2 contract ok');

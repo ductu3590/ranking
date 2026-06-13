@@ -171,61 +171,50 @@ export default function TeamFundHomePage() {
 
     return (
         <main className="teamfund-home">
-            <section className="teamfund-stage">
-                <div className="teamfund-hero-copy">
-                    <h1>Quản lý quỹ nhóm<br />Đơn giản minh bạch</h1>
-                    <p>Tạo nhóm, mời thành viên và quản lý CLB trong vài giây</p>
-                </div>
-
-                <section className="teamfund-phone" aria-label="TeamFund homepage preview">
-                    <div className="teamfund-status">
-                        <span>12:18</span>
-                        <span className="teamfund-status-icons">
-                            <span className="teamfund-signal" aria-hidden="true" />
-                            <span>WiFi</span>
-                            <span className="teamfund-battery" aria-hidden="true" />
-                        </span>
+            <div className="teamfund-app">
+                <header className="teamfund-appbar">
+                    <div className="teamfund-app-icon" aria-hidden="true">
+                        <PeopleWalletIcon />
                     </div>
+                    <div className="teamfund-appbar-text">
+                        <h1>TeamFund</h1>
+                        <p>Quản lý quỹ nhóm minh bạch, đơn giản</p>
+                    </div>
+                </header>
 
-                    <div className="teamfund-screen">
-                        <div className="teamfund-brand">
-                            <div className="teamfund-app-icon" aria-hidden="true">
-                                <PeopleWalletIcon />
-                            </div>
-                            <h2>TeamFund</h2>
-                            <p>Quản lý quỹ nhóm minh bạch, đơn giản</p>
-                        </div>
+                <div className="teamfund-content">
+                    {currentGroup && (
+                        <section className="teamfund-block">
+                            <h2 className="teamfund-section-title">
+                                <UsersIcon />
+                                Nhóm của tôi
+                            </h2>
 
-                        {currentGroup && (
-                            <>
-                                <h3 className="teamfund-section-title">
-                                    <UsersIcon />
-                                    Nhóm của tôi
-                                </h3>
-
-                                <article className="teamfund-group-card">
-                                    <div className="teamfund-row-main">
-                                        <div className="teamfund-tile teamfund-tile-orange">
-                                            <WalletIcon />
-                                        </div>
-                                        <div className="teamfund-item-text">
-                                            <strong>{currentGroup.name}</strong>
-                                            <span className="teamfund-role-pill">
-                                                {currentGroup.role === 'admin' ? 'Quản trị viên' : 'Thành viên'}
-                                            </span>
-                                        </div>
+                            <article className="teamfund-group-card">
+                                <div className="teamfund-row-main">
+                                    <div className="teamfund-tile teamfund-tile-orange">
+                                        <WalletIcon />
                                     </div>
-                                    <a
-                                        className="teamfund-more"
-                                        href={currentGroup.role === 'admin' ? '/admin' : '/quy'}
-                                        aria-label="Vào nhóm hiện tại"
-                                    >
-                                        +
-                                    </a>
-                                </article>
-                            </>
-                        )}
+                                    <div className="teamfund-item-text">
+                                        <strong>{currentGroup.name}</strong>
+                                        <span className="teamfund-role-pill">
+                                            {currentGroup.role === 'admin' ? 'Quản trị viên' : 'Thành viên'}
+                                        </span>
+                                    </div>
+                                </div>
+                                <a
+                                    className="teamfund-more"
+                                    href={currentGroup.role === 'admin' ? '/admin' : '/quy'}
+                                    aria-label="Vào nhóm hiện tại"
+                                >
+                                    <ChevronIcon />
+                                </a>
+                            </article>
+                        </section>
+                    )}
 
+                    <section className="teamfund-block">
+                        <h2 className="teamfund-section-title">Bắt đầu</h2>
                         <div className="teamfund-actions">
                             <button
                                 type="button"
@@ -250,7 +239,7 @@ export default function TeamFundHomePage() {
                                 onClick={() => setActiveModal('join')}
                             >
                                 <span className="teamfund-row-main">
-                                    <span className="teamfund-tile teamfund-tile-violet">
+                                    <span className="teamfund-tile teamfund-tile-blue">
                                         <KeyIcon />
                                     </span>
                                     <span className="teamfund-item-text">
@@ -261,11 +250,9 @@ export default function TeamFundHomePage() {
                                 <ChevronIcon />
                             </button>
                         </div>
-                    </div>
-
-                    <div className="teamfund-bottom-bar" />
-                </section>
-            </section>
+                    </section>
+                </div>
+            </div>
 
             {activeModal === 'create' && (
                 <Modal title="Tạo nhóm mới" onClose={closeModal}>

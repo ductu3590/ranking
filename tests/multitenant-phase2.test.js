@@ -37,4 +37,12 @@ assert(
     'Create-group form should collect the admin email.'
 );
 
+const adminSessionRoute = read('app/api/groups/session/admin/route.js');
+assert(
+    adminSessionRoute.includes('getAdminGroupIds') &&
+    adminSessionRoute.includes('signGroupSession') &&
+    adminSessionRoute.includes('setGroupSessionCookie'),
+    'Admin session route should mint a group_session cookie from the user\'s membership.'
+);
+
 console.log('multitenant phase 2 contract ok');

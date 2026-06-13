@@ -25,14 +25,27 @@ export default function LoginPage() {
 
             if (error) throw error;
 
-            // Check user role for redirect
-            const userRole = data.user?.user_metadata?.role;
+            // Multi-club admins: resolve their club and set the group_session cookie.
+            const res = await fetch('/api/groups/session/admin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ accessToken: data.session.access_token }),
+            });
+            if (res.ok) {
+                const payload = await res.json();
+                window.localStorage.setItem(
+                    'teamfund-current-group',
+                    JSON.stringify({ ...payload.group, role: 'admin' })
+                );
+                router.push(payload.redirectTo || '/admin');
+                return;
+            }
 
+            // Fallback: legacy Supabase-metadata roles (e.g. tournament captain).
+            const userRole = data.user?.user_metadata?.role;
             if (userRole === 'captain') {
-                // Redirect captains to tournament dashboard
                 router.push('/tournament/captain');
             } else {
-                // Redirect others to admin page
                 router.push('/admin');
             }
         } catch (error) {

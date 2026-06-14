@@ -215,3 +215,64 @@
     background: linear-gradient(145deg, #35d678, #0fa867);
     cursor: pointer;
 }
+
+.club-settings-sepay {
+    border: 1px solid #e9edf3;
+    border-radius: 16px;
+    padding: 18px;
+    background: #fff;
+}
+
+.club-settings-sepay-steps {
+    margin: 0 0 12px;
+    padding-left: 18px;
+    display: grid;
+    gap: 6px;
+    color: #343a45;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.club-settings-sepay-steps a {
+    color: #0f8c59;
+    font-weight: 700;
+}
+
+.club-settings-sepay-url {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.club-settings-sepay-url code {
+    flex: 1 1 200px;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 10px 12px;
+    border: 1px solid #dfe4ed;
+    border-radius: 10px;
+    background: #f8fafc;
+    font-size: 13px;
+    color: #20242c;
+}
+
+.club-settings-sepay-url button {
+    border: 0;
+    border-radius: 10px;
+    padding: 0 16px;
+    min-height: 40px;
+    font-weight: 800;
+    color: #fff;
+    background: linear-gradient(145deg, #35d678, #0fa867);
+    cursor: pointer;
+}
+
+.club-settings-sepay-doc {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 700;
+    color: #0f8c59;
+    text-decoration: none;
+}

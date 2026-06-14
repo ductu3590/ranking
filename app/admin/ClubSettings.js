@@ -13,8 +13,12 @@ export default function ClubSettings() {
     const [form, setForm] = useState({ name: '', description: '', memberPassword: '' });
     const [bankAccounts, setBankAccounts] = useState([]);
     const [bankForm, setBankForm] = useState({ accountNumber: '', bankName: '' });
+    const [webhookUrl, setWebhookUrl] = useState('');
 
     useEffect(() => {
+        if (typeof window !== 'undefined') {
+            setWebhookUrl(`${window.location.origin}/api/webhook`);
+        }
         loadSettings();
         loadBankAccounts();
     }, []);
@@ -99,6 +103,15 @@ export default function ClubSettings() {
         }
     }
 
+    async function copyWebhookUrl() {
+        try {
+            await navigator.clipboard.writeText(webhookUrl);
+            setNotice('Đã sao chép URL webhook.');
+        } catch {
+            setError('Không sao chép được — hãy copy thủ công.');
+        }
+    }
+
     async function handleDeleteBank(id) {
         if (!confirm('Xóa tài khoản ngân hàng này khỏi thu quỹ tự động?')) return;
         const res = await fetch(`/api/club/bank-accounts?id=${id}`, { method: 'DELETE' });
@@ -160,6 +173,38 @@ export default function ClubSettings() {
                 <button type="button" className="club-settings-regen" onClick={handleRegenerate} disabled={saving}>
                     Tạo lại mã
                 </button>
+            </div>
+
+            <div className="club-settings-sepay">
+                <p className="club-settings-bank-title">Thu quỹ tự động qua SePay</p>
+                <p className="club-settings-bank-hint">
+                    Kết nối SePay để mọi chuyển khoản vào tài khoản ngân hàng của CLB tự động được ghi nhận vào quỹ.
+                    Nếu không cấu hình SePay, trưởng nhóm cần tự tạo giao dịch thu/chi thủ công ở tab Quỹ.
+                </p>
+                <ol className="club-settings-sepay-steps">
+                    <li>
+                        Tạo tài khoản tại{' '}
+                        <a href="https://my.sepay.vn" target="_blank" rel="noreferrer">SePay</a>{' '}
+                        và liên kết tài khoản ngân hàng của CLB.
+                    </li>
+                    <li>
+                        Trong SePay: vào <strong>Webhooks → Thêm webhook</strong>, dán URL bên dưới, chọn loại giao dịch và
+                        tài khoản là <em>Tất cả</em>, xác thực để <em>Không</em> (lúc đầu), rồi bấm <strong>Gửi thử</strong> để kiểm tra.
+                    </li>
+                    <li>Khai đúng số tài khoản ngân hàng đó vào mục &quot;Tài khoản ngân hàng&quot; bên dưới.</li>
+                </ol>
+                <div className="club-settings-sepay-url">
+                    <code>{webhookUrl}</code>
+                    <button type="button" onClick={copyWebhookUrl}>Sao chép</button>
+                </div>
+                <a
+                    className="club-settings-sepay-doc"
+                    href="https://developer.sepay.vn/vi/sepay-webhooks/bat-dau-nhanh"
+                    target="_blank"
+                    rel="noreferrer"
+                >
+                    Xem hướng dẫn chi tiết của SePay ↗
+                </a>
             </div>
 
             <div className="club-settings-bank">

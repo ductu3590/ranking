@@ -42,4 +42,13 @@ assert(
     'ClubSettings should manage bank accounts for auto fund collection.'
 );
 
+const sepayUi = read('app/admin/ClubSettings.js');
+assert(
+    sepayUi.includes('/api/webhook') &&
+    sepayUi.includes('SePay') &&
+    sepayUi.includes('developer.sepay.vn') &&
+    sepayUi.includes('thủ công'),
+    'ClubSettings should show SePay webhook setup guidance (URL + docs link + manual fallback note).'
+);
+
 console.log('multitenant phase 5 contract ok');

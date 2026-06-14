@@ -15,20 +15,29 @@ async function buildJoin(request, code) {
     return { joinUrl, qrCodeDataUrl };
 }
 
+function safeGroupForClient(group) {
+    const { sepay_webhook_secret: sepayWebhookSecret, ...safeGroup } = group;
+    return {
+        ...safeGroup,
+        hasSepayWebhookSecret: Boolean(sepayWebhookSecret),
+    };
+}
+
 export async function GET(request) {
     const adminCheck = requireGroupAdmin();
     if (!adminCheck.ok) return adminCheck.response;
 
     const { data: group, error } = await supabaseAdmin
         .from('groups')
-        .select('id, code, name, description, logo_url')
+        .select('id, code, name, description, logo_url, sepay_webhook_secret')
         .eq('id', adminCheck.groupId)
         .single();
     if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
+
     const { joinUrl, qrCodeDataUrl } = await buildJoin(request, group.code);
-    return NextResponse.json({ group, joinUrl, qrCodeDataUrl });
+    return NextResponse.json({ group: safeGroupForClient(group), joinUrl, qrCodeDataUrl });
 }
 
 export async function PATCH(request) {
@@ -37,6 +46,7 @@ export async function PATCH(request) {
 
     const body = await request.json();
     const updates = {};
+
     if (typeof body?.name === 'string' && body.name.trim()) {
         updates.name = body.name.trim();
     }
@@ -61,11 +71,21 @@ export async function PATCH(request) {
             updates.logo_url = null;
         } else if (typeof logoUrl === 'string') {
             if (logoUrl.length > 100000) {
-                return NextResponse.json({ error: 'Logo quá lớn — hãy chọn ảnh nhỏ hơn.' }, { status: 400 });
+                return NextResponse.json({ error: 'Logo quá lớn, hãy chọn ảnh nhỏ hơn.' }, { status: 400 });
             }
             updates.logo_url = logoUrl;
         }
     }
+    if (body?.clearSepayWebhookSecret === true) {
+        updates.sepay_webhook_secret = null;
+    } else if (typeof body?.sepayWebhookSecret === 'string' && body.sepayWebhookSecret.trim()) {
+        const secret = body.sepayWebhookSecret.trim();
+        if (secret.length < 16) {
+            return NextResponse.json({ error: 'Secret webhook SePay cần ít nhất 16 ký tự.' }, { status: 400 });
+        }
+        updates.sepay_webhook_secret = secret;
+    }
+
     if (Object.keys(updates).length === 0) {
         return NextResponse.json({ error: 'Không có thay đổi.' }, { status: 400 });
     }
@@ -74,10 +94,11 @@ export async function PATCH(request) {
         .from('groups')
         .update(updates)
         .eq('id', adminCheck.groupId)
-        .select('id, code, name, description, logo_url')
+        .select('id, code, name, description, logo_url, sepay_webhook_secret')
         .single();
     if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
-    return NextResponse.json({ group });
+
+    return NextResponse.json({ group: safeGroupForClient(group) });
 }

@@ -16,6 +16,7 @@ export default function ClubSettings() {
     const [changingPassword, setChangingPassword] = useState(false);
     const [bankAccounts, setBankAccounts] = useState([]);
     const [bankForm, setBankForm] = useState({ accountNumber: '', bankName: '' });
+    const [sepayForm, setSepayForm] = useState({ sepayWebhookSecret: '' });
     const [webhookUrl, setWebhookUrl] = useState('');
 
     useEffect(() => {
@@ -35,6 +36,7 @@ export default function ClubSettings() {
             setQr({ joinUrl: data.joinUrl, qrCodeDataUrl: data.qrCodeDataUrl });
             setForm({ name: data.group.name || '', description: data.group.description || '', memberPassword: '' });
             setLogoUrl(data.group.logo_url || null);
+            setSepayForm({ sepayWebhookSecret: '' });
         } else {
             setError(data.error || 'Không tải được cài đặt.');
         }
@@ -112,7 +114,7 @@ export default function ClubSettings() {
             await navigator.clipboard.writeText(webhookUrl);
             setNotice('Đã sao chép URL webhook.');
         } catch {
-            setError('Không sao chép được — hãy copy thủ công.');
+            setError('Không sao chép được, hãy copy thủ công.');
         }
     }
 
@@ -122,6 +124,53 @@ export default function ClubSettings() {
         if (res.ok) {
             setBankAccounts((prev) => prev.filter((a) => a.id !== id));
         }
+    }
+
+    async function handleSaveSepaySecret(event) {
+        event.preventDefault();
+        const secret = sepayForm.sepayWebhookSecret.trim();
+        if (secret.length < 16) {
+            setError('Secret webhook SePay cần ít nhất 16 ký tự.');
+            return;
+        }
+        setSaving(true);
+        setError('');
+        setNotice('');
+        const res = await fetch('/api/club/settings', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sepayWebhookSecret: secret }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+            setGroup(data.group);
+            setSepayForm({ sepayWebhookSecret: '' });
+            setNotice('Đã lưu secret webhook SePay cho CLB.');
+        } else {
+            setError(data.error || 'Không lưu được secret webhook SePay.');
+        }
+        setSaving(false);
+    }
+
+    async function handleClearSepaySecret() {
+        if (!confirm('Tắt xác thực HMAC-SHA256 cho webhook SePay của CLB này?')) return;
+        setSaving(true);
+        setError('');
+        setNotice('');
+        const res = await fetch('/api/club/settings', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ clearSepayWebhookSecret: true }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+            setGroup(data.group);
+            setSepayForm({ sepayWebhookSecret: '' });
+            setNotice('Đã tắt xác thực webhook SePay cho CLB.');
+        } else {
+            setError(data.error || 'Không tắt được xác thực webhook SePay.');
+        }
+        setSaving(false);
     }
 
     function handleLogoFile(event) {
@@ -143,12 +192,12 @@ export default function ClubSettings() {
                     dataUrl = canvas.toDataURL('image/png');
                 }
                 if (dataUrl.length > 100000) {
-                    setError('Logo quá lớn sau khi nén — hãy chọn ảnh đơn giản hơn.');
+                    setError('Logo quá lớn sau khi nén, hãy chọn ảnh đơn giản hơn.');
                     return;
                 }
                 setError('');
                 setLogoUrl(dataUrl);
-                setNotice('Đã chọn logo — bấm "Lưu thay đổi" để áp dụng.');
+                setNotice('Đã chọn logo, bấm "Lưu thay đổi" để áp dụng.');
             };
             img.src = reader.result;
         };
@@ -184,7 +233,7 @@ export default function ClubSettings() {
     }
 
     if (loading) {
-        return <div className="club-settings-loading">⏳ Đang tải cài đặt...</div>;
+        return <div className="club-settings-loading">Đang tải cài đặt...</div>;
     }
     if (!group) {
         return <div className="club-settings-error">{error || 'Không có dữ liệu.'}</div>;
@@ -239,7 +288,7 @@ export default function ClubSettings() {
                                 <button
                                     type="button"
                                     className="club-settings-logo-remove"
-                                    onClick={() => { setLogoUrl(null); setNotice('Đã bỏ logo — bấm "Lưu thay đổi" để áp dụng.'); }}
+                                    onClick={() => { setLogoUrl(null); setNotice('Đã bỏ logo, bấm "Lưu thay đổi" để áp dụng.'); }}
                                 >
                                     Xóa logo
                                 </button>
@@ -304,8 +353,13 @@ export default function ClubSettings() {
                         và liên kết tài khoản ngân hàng của CLB.
                     </li>
                     <li>
-                        Trong SePay: vào <strong>Webhooks → Thêm webhook</strong>, dán URL bên dưới, chọn loại giao dịch và
-                        tài khoản là <em>Tất cả</em>, xác thực để <em>Không</em> (lúc đầu), rồi bấm <strong>Gửi thử</strong> để kiểm tra.
+                        Trong SePay: vào <strong>Webhooks → Thêm webhook</strong>, dán URL bên dưới,
+                        nếu muốn bảo mật thì chọn <strong>HMAC-SHA256</strong> và nhập cùng secret với
+                        <strong> Secret webhook riêng của CLB</strong> ở bên dưới. Nếu chọn không bảo mật,
+                        hãy để trống secret trong app.
+                    </li>
+                    <li>
+                        Chọn loại giao dịch và tài khoản là <em>Tất cả</em>, bấm <strong>Gửi thử</strong> để kiểm tra.
                     </li>
                     <li>Khai đúng số tài khoản ngân hàng đó vào mục &quot;Tài khoản ngân hàng&quot; bên dưới.</li>
                 </ol>
@@ -321,6 +375,19 @@ export default function ClubSettings() {
                 >
                     Xem hướng dẫn chi tiết của SePay ↗
                 </a>
+                <form className="club-settings-bank-form" onSubmit={handleSaveSepaySecret}>
+                    <input
+                        value={sepayForm.sepayWebhookSecret}
+                        onChange={(e) => setSepayForm({ sepayWebhookSecret: e.target.value })}
+                        placeholder={group.hasSepayWebhookSecret ? 'Đã có secret, nhập secret mới nếu muốn đổi' : 'Secret webhook riêng của CLB (tùy chọn)'}
+                    />
+                    <button type="submit" disabled={saving}>Lưu secret</button>
+                    {group.hasSepayWebhookSecret && (
+                        <button type="button" onClick={handleClearSepaySecret} disabled={saving}>
+                            Tắt bảo mật
+                        </button>
+                    )}
+                </form>
             </div>
 
             <div className="club-settings-bank">
@@ -341,7 +408,7 @@ export default function ClubSettings() {
                         ))}
                     </ul>
                 ) : (
-                    <p className="club-settings-bank-empty">Chưa có tài khoản nào — thu quỹ tự động đang tắt.</p>
+                    <p className="club-settings-bank-empty">Chưa có tài khoản nào, thu quỹ tự động đang tắt.</p>
                 )}
                 <form className="club-settings-bank-form" onSubmit={handleAddBank}>
                     <input

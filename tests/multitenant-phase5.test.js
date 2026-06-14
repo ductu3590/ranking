@@ -16,6 +16,15 @@ assert(
     'Migration 010 should create group_bank_accounts with a unique account_number, FK to groups, and RLS scoped by membership.'
 );
 
+const m011 = read('database/migrations/011_group_sepay_webhook_secret.sql');
+assert(
+    m011.includes('ALTER TABLE groups') &&
+    m011.includes('sepay_webhook_secret') &&
+    m011.includes('sepay_webhook_secret IS NULL') &&
+    m011.includes("btrim(sepay_webhook_secret) <> ''"),
+    'Migration 011 should add an optional per-group SePay webhook secret.'
+);
+
 const webhook = read('app/api/webhook/route.js');
 assert(
     webhook.includes('group_bank_accounts') &&
@@ -23,6 +32,22 @@ assert(
     webhook.includes('account_number') &&
     !webhook.includes('const groupId = DEFAULT_GROUP_ID;'),
     'Webhook should resolve group_id from group_bank_accounts by accountNumber (not hardcode the default).'
+);
+assert(
+    !webhook.includes("from '@/lib/groupConstants'") &&
+    webhook.includes('Unknown bank account') &&
+    webhook.includes('{ status: 422 }'),
+    'Webhook should reject unknown bank accounts instead of falling back to the default group.'
+);
+assert(
+    webhook.includes("import crypto from 'crypto'") &&
+    !webhook.includes('SEPAY_WEBHOOK_SECRET') &&
+    webhook.includes('sepay_webhook_secret') &&
+    webhook.includes('X-SePay-Signature') &&
+    webhook.includes('X-SePay-Timestamp') &&
+    webhook.includes('timingSafeEqual') &&
+    webhook.includes('rawBody'),
+    'Webhook should verify SePay HMAC-SHA256 signatures with the matched group secret.'
 );
 
 const bankApi = read('app/api/club/bank-accounts/route.js');
@@ -38,8 +63,10 @@ assert(
 const settingsUi = read('app/admin/ClubSettings.js');
 assert(
     settingsUi.includes('/api/club/bank-accounts') &&
-    settingsUi.includes('Tài khoản ngân hàng'),
-    'ClubSettings should manage bank accounts for auto fund collection.'
+    settingsUi.includes('Tài khoản ngân hàng') &&
+    settingsUi.includes('sepayWebhookSecret') &&
+    settingsUi.includes('clearSepayWebhookSecret'),
+    'ClubSettings should manage bank accounts and per-club SePay webhook secret for auto fund collection.'
 );
 
 const sepayUi = read('app/admin/ClubSettings.js');
@@ -47,8 +74,19 @@ assert(
     sepayUi.includes('/api/webhook') &&
     sepayUi.includes('SePay') &&
     sepayUi.includes('developer.sepay.vn') &&
+    sepayUi.includes('HMAC-SHA256') &&
+    sepayUi.includes('Secret webhook riêng của CLB') &&
     sepayUi.includes('thủ công'),
-    'ClubSettings should show SePay webhook setup guidance (URL + docs link + manual fallback note).'
+    'ClubSettings should show SePay setup guidance for optional per-club HMAC secret.'
+);
+
+const settingsRoute = read('app/api/club/settings/route.js');
+assert(
+    settingsRoute.includes('sepayWebhookSecret') &&
+    settingsRoute.includes('sepay_webhook_secret') &&
+    settingsRoute.includes('hasSepayWebhookSecret') &&
+    settingsRoute.includes('clearSepayWebhookSecret'),
+    'Settings API should let group admins set or clear their per-club SePay webhook secret.'
 );
 
 console.log('multitenant phase 5 contract ok');

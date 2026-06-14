@@ -10,6 +10,51 @@
     transition: all 0.2s;
 }
 
+.user-account-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.user-account-menu summary {
+    cursor: pointer;
+    list-style: none;
+}
+
+.user-account-menu summary::-webkit-details-marker {
+    display: none;
+}
+
+.user-account-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 50;
+    min-width: 150px;
+    padding: 6px;
+    border-radius: 8px;
+    background: #ffffff;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
+}
+
+.user-badge-logout {
+    width: 100%;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: #dc2626;
+    cursor: pointer;
+    font-weight: 800;
+    padding: 9px 10px;
+    text-align: left;
+}
+
+.user-badge-logout:hover,
+.user-badge-logout:focus-visible {
+    background: #fee2e2;
+    outline: none;
+}
+
 .user-badge.loading {
     background: rgba(156, 163, 175, 0.2);
     color: #6b7280;

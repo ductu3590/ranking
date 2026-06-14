@@ -50,11 +50,22 @@ assert(
     'Group session helper should expose clearGroupSessionCookie.'
 );
 
-// The status badge should reflect the current group + role, not just Supabase Auth.
+// The status badge should reflect the current group + role, not Supabase Auth.
 const badge = read('components/UserStatusBadge.js');
 assert(
     badge.includes('teamfund-current-group'),
     'UserStatusBadge should read the current group session from storage.'
+);
+assert(
+    !badge.includes('supabase.auth') && !badge.includes('@/lib/supabaseClient'),
+    'UserStatusBadge should not depend on Supabase Auth for admin account state.'
+);
+assert(
+    badge.includes('/api/groups/session') &&
+    badge.includes("method: 'DELETE'") &&
+    badge.includes("removeItem('teamfund-current-group')") &&
+    badge.includes('user-badge-logout'),
+    'UserStatusBadge account menu should expose group-session logout.'
 );
 assert(
     badge.includes('Thành viên') && badge.includes('Quản trị'),

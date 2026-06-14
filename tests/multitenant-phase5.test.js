@@ -25,4 +25,14 @@ assert(
     'Webhook should resolve group_id from group_bank_accounts by accountNumber (not hardcode the default).'
 );
 
+const bankApi = read('app/api/club/bank-accounts/route.js');
+assert(
+    bankApi.includes('export async function GET') &&
+    bankApi.includes('export async function POST') &&
+    bankApi.includes('export async function DELETE') &&
+    bankApi.includes('requireGroupAdmin') &&
+    bankApi.includes('group_bank_accounts'),
+    'Bank-accounts route should expose admin-guarded GET/POST/DELETE on group_bank_accounts.'
+);
+
 console.log('multitenant phase 5 contract ok');

@@ -15,4 +15,13 @@ assert(
     'Club transactions route should support admin-guarded manual create (Thu/Chi) and update/bulk.'
 );
 
+const mem = read('app/api/club/members/route.js');
+assert(
+    mem.includes('export async function POST') &&
+    mem.includes('export async function PATCH') &&
+    mem.includes('export async function DELETE') &&
+    mem.includes('requireGroupAdmin'),
+    'Club members route should support admin-guarded create/update/delete.'
+);
+
 console.log('multitenant phase 6 contract ok');

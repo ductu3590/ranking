@@ -50,4 +50,14 @@ assert(
     'Fund admin page should use the club server APIs.'
 );
 
+const tourAdmin = read('app/giai-dau/admin/page.js');
+assert(
+    !tourAdmin.includes('@/lib/supabaseClient') && !tourAdmin.includes('.from('),
+    'Tournament admin page should not query Supabase directly.'
+);
+assert(
+    tourAdmin.includes('/api/tournament/admin/overview') && tourAdmin.includes('/api/tournament/admin/reset'),
+    'Tournament admin page should use the overview and reset APIs.'
+);
+
 console.log('multitenant phase 6 contract ok');

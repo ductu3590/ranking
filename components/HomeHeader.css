@@ -30,6 +30,16 @@
 .header-logo a {
     text-decoration: none;
     color: #0F172A;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-logo-img {
+    height: 34px;
+    width: 34px;
+    object-fit: contain;
+    border-radius: 8px;
 }
 
 .header-logo h1 {

@@ -26,4 +26,12 @@ assert(
     'Settings PATCH should accept logoUrl and write logo_url.'
 );
 
+const header = read('components/HomeHeader.js');
+assert(
+    header.includes('/api/club/branding') &&
+    header.includes('useState') &&
+    header.includes('useEffect'),
+    'HomeHeader should fetch /api/club/branding and render club name + logo.'
+);
+
 console.log('multitenant phase 4 contract ok');

@@ -1,10 +1,25 @@
 'use client';
+import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import UserStatusBadge from './UserStatusBadge';
 import './HomeHeader.css';
 
 export default function HomeHeader({ showAdmin = true }) {
     const pathname = usePathname();
+    const [branding, setBranding] = useState({ name: 'Pickleball 246 Club', logoUrl: null });
+
+    useEffect(() => {
+        let active = true;
+        fetch('/api/club/branding')
+            .then((res) => (res.ok ? res.json() : null))
+            .then((data) => {
+                if (active && data && data.name) {
+                    setBranding({ name: data.name, logoUrl: data.logoUrl || null });
+                }
+            })
+            .catch(() => {});
+        return () => { active = false; };
+    }, []);
 
     const navLinks = [
         { href: '/quy', label: '💰 Quản lý quỹ' },
@@ -17,7 +32,10 @@ export default function HomeHeader({ showAdmin = true }) {
             <div className="header-container">
                 <div className="header-logo">
                     <a href="/quy">
-                        <h1>🏓 PICKLEBALL 246 CLUB</h1>
+                        {branding.logoUrl && (
+                            <img className="header-logo-img" src={branding.logoUrl} alt={branding.name} />
+                        )}
+                        <h1>{branding.name.toUpperCase()}</h1>
                     </a>
                 </div>
 
@@ -42,7 +60,6 @@ export default function HomeHeader({ showAdmin = true }) {
                     <UserStatusBadge />
                 </div>
             </div>
-
         </header>
     );
 }

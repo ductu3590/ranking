@@ -183,9 +183,9 @@ for (const route of [
 
 const tournamentAdminPage = read('app/giai-dau/admin/page.js');
 assert(
-    tournamentAdminPage.includes('getCurrentGroupIdClient') &&
-    tournamentAdminPage.includes(".eq('group_id', groupId)"),
-    'Tournament admin client page should scope direct Supabase reads and reset deletes to the current group_id.'
+    tournamentAdminPage.includes('/api/tournament/admin/overview') &&
+    !tournamentAdminPage.includes('.from('),
+    'Tournament admin page should read via the server overview API (group scoping moved server-side in Option B), not direct Supabase.'
 );
 
 console.log('teamfund phase 1 contract ok');

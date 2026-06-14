@@ -227,6 +227,23 @@
     border-color: var(--danger);
 }
 
+.btn-income {
+    background: rgba(16, 185, 129, 0.12);
+    color: #059669;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-income:hover {
+    background: rgba(16, 185, 129, 0.2);
+    border-color: #059669;
+}
+
 /* Bulk Toolbar */
 .bulk-edit-toolbar {
     background: var(--primary-light);

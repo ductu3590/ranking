@@ -39,6 +39,7 @@ export default function AdminPage({ embedded = false }) {
     // Manual expense states
     const [addingExpense, setAddingExpense] = useState(false);
     const [expenseForm, setExpenseForm] = useState({
+        direction: 'out', // 'in' = Thu (income), 'out' = Chi (expense)
         so_tien: '',
         loai_giao_dich: 'khac',
         noi_dung: '',
@@ -288,15 +289,17 @@ export default function AdminPage({ embedded = false }) {
             return;
         }
 
+        const isIncome = expenseForm.direction === 'in';
         const timestamp = Date.now();
+        const amount = Math.abs(parseFloat(expenseForm.so_tien));
         const transactionData = {
             group_id: getCurrentGroupIdClient(),
-            ma_giao_dich: `MANUAL_CHI_${timestamp}`,
-            so_tien: -Math.abs(parseFloat(expenseForm.so_tien)),
+            ma_giao_dich: `${isIncome ? 'MANUAL_THU' : 'MANUAL_CHI'}_${timestamp}`,
+            so_tien: isIncome ? amount : -amount,
             noi_dung_goc: expenseForm.noi_dung.trim(),
             nguoi_nop: 'THỦ QUỸ',
             loai_giao_dich: expenseForm.loai_giao_dich,
-            huong_giao_dich: 'out',
+            huong_giao_dich: isIncome ? 'in' : 'out',
             is_manually_categorized: true,
             admin_note: expenseForm.ghi_chu.trim() || null,
             confidence_score: 100,
@@ -311,9 +314,10 @@ export default function AdminPage({ embedded = false }) {
         if (error) {
             alert('Lỗi thêm giao dịch: ' + error.message);
         } else {
-            alert('Đã thêm giao dịch chi thành công!');
+            alert(isIncome ? 'Đã thêm giao dịch thu thành công!' : 'Đã thêm giao dịch chi thành công!');
             setAddingExpense(false);
             setExpenseForm({
+                direction: 'out',
                 so_tien: '',
                 loai_giao_dich: 'khac',
                 noi_dung: '',
@@ -441,7 +445,22 @@ export default function AdminPage({ embedded = false }) {
                                 </div>
                             </div>
                             <div className="action-bar" style={{ marginTop: '15px', paddingTop: '15px', borderTop: '1px solid #e5e7eb' }}>
-                                <button className="btn-expense" onClick={() => setAddingExpense(true)}>
+                                <button
+                                    className="btn-income"
+                                    onClick={() => {
+                                        setExpenseForm((p) => ({ ...p, direction: 'in', loai_giao_dich: 'nop_quy' }));
+                                        setAddingExpense(true);
+                                    }}
+                                >
+                                    💰 Thu
+                                </button>
+                                <button
+                                    className="btn-expense"
+                                    onClick={() => {
+                                        setExpenseForm((p) => ({ ...p, direction: 'out', loai_giao_dich: 'khac' }));
+                                        setAddingExpense(true);
+                                    }}
+                                >
                                     💸 Chi
                                 </button>
                             </div>
@@ -830,7 +849,7 @@ export default function AdminPage({ embedded = false }) {
             {addingExpense && (
                 <div className="modal-overlay" onClick={() => setAddingExpense(false)}>
                     <div className="modal" onClick={(e) => e.stopPropagation()}>
-                        <h2>💸 Thêm Giao Dịch Chi</h2>
+                        <h2>{expenseForm.direction === 'in' ? '💰 Thêm Giao Dịch Thu' : '💸 Thêm Giao Dịch Chi'}</h2>
 
                         <div className="form-group">
                             <label>Số tiền *</label>
@@ -843,7 +862,9 @@ export default function AdminPage({ embedded = false }) {
                                 step="1000"
                             />
                             <small style={{ color: '#6b7280', fontSize: '0.875rem', marginTop: '5px', display: 'block' }}>
-                                Nhập số tiền dương, hệ thống sẽ tự động chuyển thành tiền ra
+                                {expenseForm.direction === 'in'
+                                    ? 'Nhập số tiền dương, hệ thống sẽ ghi nhận là tiền vào quỹ'
+                                    : 'Nhập số tiền dương, hệ thống sẽ tự động chuyển thành tiền ra'}
                             </small>
                         </div>
 
@@ -897,6 +918,7 @@ export default function AdminPage({ embedded = false }) {
                                 onClick={() => {
                                     setAddingExpense(false);
                                     setExpenseForm({
+                                        direction: 'out',
                                         so_tien: '',
                                         loai_giao_dich: 'khac',
                                         noi_dung: '',

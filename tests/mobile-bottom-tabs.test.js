@@ -66,7 +66,7 @@ assert(
 );
 
 assert(
-    !homeHeaderJs.includes('useState') && !homeHeaderJs.includes('hamburger'),
+    !homeHeaderJs.includes('hamburger') && !homeHeaderJs.includes('menuOpen'),
     'HomeHeader should not keep mobile hamburger state or markup.'
 );
 

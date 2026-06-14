@@ -105,6 +105,24 @@ export default function AdminTournamentPanel({ embedded = false }) {
         checkAuth();
     }, [embedded, router]);
 
+    useEffect(() => {
+        if (!embedded || loading) return;
+
+        const searchParams = new URLSearchParams(window.location.search);
+        if (searchParams.get('action') === 'create') {
+            openCreateTournament();
+            return;
+        }
+
+        const editId = searchParams.get('edit');
+        if (editId) {
+            const target = tournaments.find((item) => String(item.id) === String(editId));
+            if (target) {
+                openEditTournament(target);
+            }
+        }
+    }, [embedded, loading, tournaments]);
+
     function checkAuth() {
         const group = getCurrentGroupClient();
         if (group.role !== 'admin') {

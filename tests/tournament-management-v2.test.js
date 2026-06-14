@@ -75,6 +75,9 @@ assert(
     adminPage.includes('fetchJson') &&
     adminPage.includes('AbortController') &&
     adminPage.includes('finally') &&
+    adminPage.includes('window.location.search') &&
+    adminPage.includes("searchParams.get('action') === 'create'") &&
+    adminPage.includes("searchParams.get('edit')") &&
     adminPage.includes('openCreateTournament') &&
     adminPage.includes('handleSaveTournament') &&
     adminPage.includes('handleDeleteTournament') &&

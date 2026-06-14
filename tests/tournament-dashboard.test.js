@@ -18,6 +18,9 @@ const detailPage = read('app/giai-dau/[id]/page.js');
 const moduleNav = read('components/TournamentModuleNav.js');
 const apiRoute = read('app/api/tournaments/route.js');
 const tournamentsHelper = read('lib/tournaments.js');
+const dashboardActionsPath = 'app/giai-dau/TournamentDashboardActions.js';
+assert(exists(dashboardActionsPath), 'Tournament dashboard should have a client actions component for admin create/edit/delete controls.');
+const dashboardActions = read(dashboardActionsPath);
 
 assert(
     dashboardPage.includes('TournamentDashboard') &&
@@ -29,6 +32,21 @@ assert(
 assert(
     dashboardPage.includes('/giai-dau/${tournament.id}') || dashboardPage.includes('`/giai-dau/${tournament.id}`'),
     'Dashboard cards should link to /giai-dau/[id].'
+);
+
+assert(
+    dashboardPage.includes('Tạo giải đấu') &&
+    dashboardPage.includes('TournamentDashboardActions') &&
+    !dashboardPage.includes('Quản trị giải'),
+    'Dashboard should put the create-tournament action outside the tournament list instead of showing a generic manage button.'
+);
+
+assert(
+    dashboardActions.includes('aria-label={`Sửa ${tournament.name}`') &&
+    dashboardActions.includes('aria-label={`Xóa ${tournament.name}`') &&
+    dashboardActions.includes('/api/tournaments?id=${tournament.id}') &&
+    dashboardActions.includes("method: 'DELETE'"),
+    'Dashboard cards should expose edit/delete icon actions that call the scoped tournaments API.'
 );
 
 assert(

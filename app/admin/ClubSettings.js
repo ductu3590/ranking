@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabaseClient';
 import './club-settings.css';
 
 export default function ClubSettings() {
@@ -11,6 +12,9 @@ export default function ClubSettings() {
     const [group, setGroup] = useState(null);
     const [qr, setQr] = useState({ joinUrl: '', qrCodeDataUrl: '' });
     const [form, setForm] = useState({ name: '', description: '', memberPassword: '' });
+    const [logoUrl, setLogoUrl] = useState(null);
+    const [passwordForm, setPasswordForm] = useState({ next: '', confirm: '' });
+    const [changingPassword, setChangingPassword] = useState(false);
     const [bankAccounts, setBankAccounts] = useState([]);
     const [bankForm, setBankForm] = useState({ accountNumber: '', bankName: '' });
     const [webhookUrl, setWebhookUrl] = useState('');
@@ -31,6 +35,7 @@ export default function ClubSettings() {
             setGroup(data.group);
             setQr({ joinUrl: data.joinUrl, qrCodeDataUrl: data.qrCodeDataUrl });
             setForm({ name: data.group.name || '', description: data.group.description || '', memberPassword: '' });
+            setLogoUrl(data.group.logo_url || null);
         } else {
             setError(data.error || 'Không tải được cài đặt.');
         }
@@ -42,7 +47,7 @@ export default function ClubSettings() {
         setSaving(true);
         setError('');
         setNotice('');
-        const payload = { name: form.name, description: form.description };
+        const payload = { name: form.name, description: form.description, logoUrl };
         if (form.memberPassword) payload.memberPassword = form.memberPassword;
         const res = await fetch('/api/club/settings', {
             method: 'PATCH',
@@ -120,6 +125,60 @@ export default function ClubSettings() {
         }
     }
 
+    function handleLogoFile(event) {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+            const img = new Image();
+            img.onload = () => {
+                const MAX = 256;
+                const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+                const canvas = document.createElement('canvas');
+                canvas.width = Math.round(img.width * scale);
+                canvas.height = Math.round(img.height * scale);
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                let dataUrl = canvas.toDataURL('image/webp', 0.8);
+                if (!dataUrl.startsWith('data:image/webp')) {
+                    dataUrl = canvas.toDataURL('image/png');
+                }
+                if (dataUrl.length > 100000) {
+                    setError('Logo quá lớn sau khi nén — hãy chọn ảnh đơn giản hơn.');
+                    return;
+                }
+                setError('');
+                setLogoUrl(dataUrl);
+                setNotice('Đã chọn logo — bấm "Lưu thay đổi" để áp dụng.');
+            };
+            img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    async function handleChangePassword(event) {
+        event.preventDefault();
+        setError('');
+        setNotice('');
+        if (passwordForm.next.length < 6) {
+            setError('Mật khẩu đăng nhập cần ít nhất 6 ký tự.');
+            return;
+        }
+        if (passwordForm.next !== passwordForm.confirm) {
+            setError('Mật khẩu xác nhận không khớp.');
+            return;
+        }
+        setChangingPassword(true);
+        const { error: authError } = await supabase.auth.updateUser({ password: passwordForm.next });
+        if (authError) {
+            setError(authError.message || 'Không đổi được mật khẩu.');
+        } else {
+            setPasswordForm({ next: '', confirm: '' });
+            setNotice('Đã đổi mật khẩu đăng nhập.');
+        }
+        setChangingPassword(false);
+    }
+
     if (loading) {
         return <div className="club-settings-loading">⏳ Đang tải cài đặt...</div>;
     }
@@ -159,6 +218,31 @@ export default function ClubSettings() {
                         placeholder="••••"
                     />
                 </label>
+                <div className="club-settings-logo">
+                    <span className="club-settings-logo-label">Logo CLB</span>
+                    <div className="club-settings-logo-row">
+                        {logoUrl ? (
+                            <img className="club-settings-logo-preview" src={logoUrl} alt="Logo CLB" />
+                        ) : (
+                            <span className="club-settings-logo-empty">Chưa có logo</span>
+                        )}
+                        <div className="club-settings-logo-actions">
+                            <label className="club-settings-logo-pick">
+                                Chọn ảnh
+                                <input type="file" accept="image/*" onChange={handleLogoFile} hidden />
+                            </label>
+                            {logoUrl && (
+                                <button
+                                    type="button"
+                                    className="club-settings-logo-remove"
+                                    onClick={() => { setLogoUrl(null); setNotice('Đã bỏ logo — bấm "Lưu thay đổi" để áp dụng.'); }}
+                                >
+                                    Xóa logo
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
                 <button type="submit" className="club-settings-save" disabled={saving}>
                     {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
                 </button>
@@ -174,6 +258,34 @@ export default function ClubSettings() {
                     Tạo lại mã
                 </button>
             </div>
+
+            <form className="club-settings-account" onSubmit={handleChangePassword}>
+                <p className="club-settings-account-title">Tài khoản đăng nhập</p>
+                <p className="club-settings-account-hint">Đổi mật khẩu đăng nhập admin của bạn.</p>
+                <label>
+                    Mật khẩu mới
+                    <input
+                        type="password"
+                        value={passwordForm.next}
+                        onChange={(e) => setPasswordForm((p) => ({ ...p, next: e.target.value }))}
+                        minLength="6"
+                        placeholder="••••••"
+                    />
+                </label>
+                <label>
+                    Xác nhận mật khẩu
+                    <input
+                        type="password"
+                        value={passwordForm.confirm}
+                        onChange={(e) => setPasswordForm((p) => ({ ...p, confirm: e.target.value }))}
+                        minLength="6"
+                        placeholder="••••••"
+                    />
+                </label>
+                <button type="submit" className="club-settings-save" disabled={changingPassword}>
+                    {changingPassword ? 'Đang đổi...' : 'Đổi mật khẩu'}
+                </button>
+            </form>
 
             <div className="club-settings-sepay">
                 <p className="club-settings-bank-title">Thu quỹ tự động qua SePay</p>

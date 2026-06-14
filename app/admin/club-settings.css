@@ -276,3 +276,113 @@
     color: #0f8c59;
     text-decoration: none;
 }
+
+.club-settings-logo {
+    display: grid;
+    gap: 8px;
+}
+
+.club-settings-logo-label {
+    color: #343a45;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.club-settings-logo-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.club-settings-logo-preview {
+    width: 56px;
+    height: 56px;
+    object-fit: contain;
+    border: 1px solid #e9edf3;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.club-settings-logo-empty {
+    color: #9aa1ad;
+    font-size: 13px;
+}
+
+.club-settings-logo-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.club-settings-logo-pick {
+    display: inline-flex;
+    align-items: center;
+    min-height: 38px;
+    padding: 0 14px;
+    border-radius: 10px;
+    background: #eef1f6;
+    border: 1px solid #dfe4ed;
+    color: #424b58;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.club-settings-logo-remove {
+    min-height: 38px;
+    padding: 0 14px;
+    border-radius: 10px;
+    border: 1px solid #f0d4cf;
+    background: #fff2ef;
+    color: #c43c2e;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.club-settings-account {
+    display: grid;
+    gap: 14px;
+    border: 1px solid #e9edf3;
+    border-radius: 16px;
+    padding: 18px;
+    background: #fff;
+}
+
+.club-settings-account-title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 800;
+    color: #20242c;
+}
+
+.club-settings-account-hint {
+    margin: -6px 0 0;
+    font-size: 13px;
+    color: #6a7180;
+}
+
+.club-settings-account label {
+    display: grid;
+    gap: 7px;
+    color: #343a45;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.club-settings-account input {
+    width: 100%;
+    border: 1px solid #dfe4ed;
+    border-radius: 12px;
+    padding: 12px 13px;
+    color: #20242c;
+    background: #f8fafc;
+    font: inherit;
+    font-size: 16px;
+    outline: none;
+}
+
+.club-settings-account input:focus {
+    border-color: #20ad72;
+    box-shadow: 0 0 0 3px rgba(32, 173, 114, .16);
+}

@@ -34,4 +34,13 @@ assert(
     'HomeHeader should fetch /api/club/branding and render club name + logo.'
 );
 
+const clubSettings = read('app/admin/ClubSettings.js');
+assert(
+    clubSettings.includes("from '@/lib/supabaseClient'") &&
+    clubSettings.includes('supabase.auth.updateUser') &&
+    clubSettings.includes('toDataURL') &&
+    clubSettings.includes('logoUrl'),
+    'ClubSettings should support logo upload (canvas resize) and admin password change.'
+);
+
 console.log('multitenant phase 4 contract ok');

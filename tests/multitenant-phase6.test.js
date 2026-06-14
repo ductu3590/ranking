@@ -24,4 +24,20 @@ assert(
     'Club members route should support admin-guarded create/update/delete.'
 );
 
+const overview = read('app/api/tournament/admin/overview/route.js');
+assert(
+    overview.includes('export async function GET') &&
+    overview.includes('getGroupIdForDatabase') &&
+    overview.includes('tournament_matches') &&
+    overview.includes('tournament_pairings'),
+    'Tournament overview route should return matches/pairings/stats scoped to the group.'
+);
+const reset = read('app/api/tournament/admin/reset/route.js');
+assert(
+    reset.includes('export async function POST') &&
+    reset.includes('requireGroupAdmin') &&
+    reset.includes('tournament_matches'),
+    'Tournament reset route should be admin-guarded and delete tournament data for the group.'
+);
+
 console.log('multitenant phase 6 contract ok');

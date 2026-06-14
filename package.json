@@ -18,7 +18,8 @@
     "test:phase3": "node tests/multitenant-phase3.test.js",
     "test:phase5": "node tests/multitenant-phase5.test.js",
     "test:phase6": "node tests/multitenant-phase6.test.js",
-    "test:phase4": "node tests/multitenant-phase4.test.js"
+    "test:phase4": "node tests/multitenant-phase4.test.js",
+    "test:tournament-management-v2": "node tests/tournament-management-v2.test.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.3",

@@ -21,8 +21,8 @@ export async function GET() {
             .from('tournament_pairings')
             .select(`
                 *,
-                player1:tournament_players!tournament_pairings_player1_id_fkey(full_name),
-                player2:tournament_players!tournament_pairings_player2_id_fkey(full_name)
+                player1:tournament_players!tournament_pairings_player1_id_fkey(player_name),
+                player2:tournament_players!tournament_pairings_player2_id_fkey(player_name)
             `)
             .eq('group_id', groupId)
             .order('round', { ascending: true })

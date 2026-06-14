@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { supabase } from '@/lib/supabaseClient';
+import { getCurrentGroupClient } from '@/lib/groupClient';
 import './MobileBottomNav.css';
 
 export default function MobileBottomNav() {
@@ -10,23 +10,8 @@ export default function MobileBottomNav() {
     const [userRole, setUserRole] = useState('guest');
 
     useEffect(() => {
-        let active = true;
-
-        async function checkRole() {
-            try {
-                const { data: { user } } = await supabase.auth.getUser();
-                if (!active || !user) return;
-                setUserRole(user.user_metadata?.role || 'member');
-            } catch (err) {
-                console.error('Mobile nav auth check error:', err);
-            }
-        }
-
-        checkRole();
-
-        return () => {
-            active = false;
-        };
+        const group = getCurrentGroupClient();
+        setUserRole(group.role || 'guest');
     }, []);
 
     const tabs = getGlobalTabs(userRole);

@@ -60,4 +60,12 @@ assert(
     'Tournament admin page should use the overview and reset APIs.'
 );
 
+for (const f of ['components/MobileBottomNav.js', 'components/TournamentModuleNav.js']) {
+    const src = read(f);
+    assert(
+        src.includes('getCurrentGroupClient') && !src.includes('supabase.auth'),
+        `${f} should derive role from the group session, not Supabase Auth.`
+    );
+}
+
 console.log('multitenant phase 6 contract ok');

@@ -11,9 +11,12 @@ export default function ClubSettings() {
     const [group, setGroup] = useState(null);
     const [qr, setQr] = useState({ joinUrl: '', qrCodeDataUrl: '' });
     const [form, setForm] = useState({ name: '', description: '', memberPassword: '' });
+    const [bankAccounts, setBankAccounts] = useState([]);
+    const [bankForm, setBankForm] = useState({ accountNumber: '', bankName: '' });
 
     useEffect(() => {
         loadSettings();
+        loadBankAccounts();
     }, []);
 
     async function loadSettings() {
@@ -70,6 +73,40 @@ export default function ClubSettings() {
         setSaving(false);
     }
 
+    async function loadBankAccounts() {
+        const res = await fetch('/api/club/bank-accounts');
+        const data = await res.json();
+        if (res.ok) setBankAccounts(data.accounts || []);
+    }
+
+    async function handleAddBank(event) {
+        event.preventDefault();
+        if (!bankForm.accountNumber.trim()) return;
+        setError('');
+        setNotice('');
+        const res = await fetch('/api/club/bank-accounts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ accountNumber: bankForm.accountNumber, bankName: bankForm.bankName }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+            setBankAccounts((prev) => [...prev, data.account]);
+            setBankForm({ accountNumber: '', bankName: '' });
+            setNotice('Đã thêm tài khoản ngân hàng.');
+        } else {
+            setError(data.error || 'Không thêm được tài khoản.');
+        }
+    }
+
+    async function handleDeleteBank(id) {
+        if (!confirm('Xóa tài khoản ngân hàng này khỏi thu quỹ tự động?')) return;
+        const res = await fetch(`/api/club/bank-accounts?id=${id}`, { method: 'DELETE' });
+        if (res.ok) {
+            setBankAccounts((prev) => prev.filter((a) => a.id !== id));
+        }
+    }
+
     if (loading) {
         return <div className="club-settings-loading">⏳ Đang tải cài đặt...</div>;
     }
@@ -123,6 +160,41 @@ export default function ClubSettings() {
                 <button type="button" className="club-settings-regen" onClick={handleRegenerate} disabled={saving}>
                     Tạo lại mã
                 </button>
+            </div>
+
+            <div className="club-settings-bank">
+                <p className="club-settings-bank-title">Tài khoản ngân hàng (thu quỹ tự động)</p>
+                <p className="club-settings-bank-hint">
+                    Khai số tài khoản nhận tiền của CLB. Chuyển khoản vào tài khoản này sẽ tự động ghi nhận vào quỹ CLB.
+                </p>
+                {bankAccounts.length > 0 ? (
+                    <ul className="club-settings-bank-list">
+                        {bankAccounts.map((a) => (
+                            <li key={a.id}>
+                                <span className="bank-acc-number">{a.account_number}</span>
+                                {a.bank_name && <span className="bank-acc-name">{a.bank_name}</span>}
+                                <button type="button" className="bank-acc-del" onClick={() => handleDeleteBank(a.id)}>
+                                    Xóa
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p className="club-settings-bank-empty">Chưa có tài khoản nào — thu quỹ tự động đang tắt.</p>
+                )}
+                <form className="club-settings-bank-form" onSubmit={handleAddBank}>
+                    <input
+                        value={bankForm.accountNumber}
+                        onChange={(e) => setBankForm((p) => ({ ...p, accountNumber: e.target.value }))}
+                        placeholder="Số tài khoản"
+                    />
+                    <input
+                        value={bankForm.bankName}
+                        onChange={(e) => setBankForm((p) => ({ ...p, bankName: e.target.value }))}
+                        placeholder="Tên ngân hàng (tùy chọn)"
+                    />
+                    <button type="submit">Thêm</button>
+                </form>
             </div>
         </div>
     );

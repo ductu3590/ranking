@@ -35,4 +35,11 @@ assert(
     'Bank-accounts route should expose admin-guarded GET/POST/DELETE on group_bank_accounts.'
 );
 
+const settingsUi = read('app/admin/ClubSettings.js');
+assert(
+    settingsUi.includes('/api/club/bank-accounts') &&
+    settingsUi.includes('Tài khoản ngân hàng'),
+    'ClubSettings should manage bank accounts for auto fund collection.'
+);
+
 console.log('multitenant phase 5 contract ok');

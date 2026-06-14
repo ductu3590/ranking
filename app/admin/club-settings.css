@@ -124,3 +124,94 @@
     color: #596170;
     border: 1px solid #dfe4ed;
 }
+
+.club-settings-bank {
+    border: 1px solid #e9edf3;
+    border-radius: 16px;
+    padding: 18px;
+    background: #fff;
+}
+
+.club-settings-bank-title {
+    margin: 0 0 4px;
+    font-weight: 800;
+    color: #20242c;
+}
+
+.club-settings-bank-hint {
+    margin: 0 0 12px;
+    font-size: 12px;
+    color: #6a7180;
+}
+
+.club-settings-bank-list {
+    list-style: none;
+    margin: 0 0 12px;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+}
+
+.club-settings-bank-list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid #edf0f5;
+    border-radius: 10px;
+    background: #f8fafc;
+}
+
+.bank-acc-number {
+    font-weight: 800;
+    color: #20242c;
+}
+
+.bank-acc-name {
+    font-size: 12px;
+    color: #6a7180;
+}
+
+.bank-acc-del {
+    margin-left: auto;
+    border: 0;
+    background: #fff2ef;
+    color: #c43c2e;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.club-settings-bank-empty {
+    margin: 0 0 12px;
+    font-size: 13px;
+    color: #858b98;
+}
+
+.club-settings-bank-form {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.club-settings-bank-form input {
+    flex: 1 1 140px;
+    border: 1px solid #dfe4ed;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font: inherit;
+    font-size: 16px;
+    background: #f8fafc;
+}
+
+.club-settings-bank-form button {
+    border: 0;
+    border-radius: 10px;
+    padding: 0 18px;
+    min-height: 42px;
+    font-weight: 800;
+    color: #fff;
+    background: linear-gradient(145deg, #35d678, #0fa867);
+    cursor: pointer;
+}

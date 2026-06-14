@@ -16,8 +16,10 @@ assert(
     branding.includes('export async function GET') &&
     branding.includes('getEffectiveGroupContext') &&
     branding.includes('supabaseAdmin') &&
-    branding.includes('logoUrl'),
-    'Branding route should expose a public GET resolving the active group and returning logoUrl.'
+    branding.includes('logoUrl') &&
+    branding.includes('PickHub') &&
+    branding.includes('context.is_default'),
+    'Branding route should expose PickHub by default and active club name/logo for a real group session.'
 );
 
 const settings = read('app/api/club/settings/route.js');
@@ -33,6 +35,13 @@ assert(
     header.includes('useEffect'),
     'HomeHeader should fetch /api/club/branding and render club name + logo.'
 );
+assert(
+    header.includes("name: 'PickHub'") &&
+    !header.includes('toUpperCase()') &&
+    header.includes('branding-updated') &&
+    header.includes('window.addEventListener'),
+    'HomeHeader should default to PickHub, preserve brand casing, and refresh when club branding changes.'
+);
 
 const clubSettings = read('app/admin/ClubSettings.js');
 assert(
@@ -41,6 +50,11 @@ assert(
     clubSettings.includes('toDataURL') &&
     clubSettings.includes('logoUrl'),
     'ClubSettings should support logo upload (canvas resize) and admin password change.'
+);
+assert(
+    clubSettings.includes('branding-updated') &&
+    clubSettings.includes('window.dispatchEvent'),
+    'ClubSettings should notify the app shell after saving a club logo/name change.'
 );
 
 console.log('multitenant phase 4 contract ok');

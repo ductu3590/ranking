@@ -6,19 +6,26 @@ import './HomeHeader.css';
 
 export default function HomeHeader({ showAdmin = true }) {
     const pathname = usePathname();
-    const [branding, setBranding] = useState({ name: 'Pickleball 246 Club', logoUrl: null });
+    const [branding, setBranding] = useState({ name: 'PickHub', logoUrl: null });
 
     useEffect(() => {
         let active = true;
-        fetch('/api/club/branding')
-            .then((res) => (res.ok ? res.json() : null))
-            .then((data) => {
-                if (active && data && data.name) {
-                    setBranding({ name: data.name, logoUrl: data.logoUrl || null });
-                }
-            })
-            .catch(() => {});
-        return () => { active = false; };
+        function loadBranding() {
+            fetch('/api/club/branding')
+                .then((res) => (res.ok ? res.json() : null))
+                .then((data) => {
+                    if (active && data && data.name) {
+                        setBranding({ name: data.name, logoUrl: data.logoUrl || null });
+                    }
+                })
+                .catch(() => {});
+        }
+        loadBranding();
+        window.addEventListener('branding-updated', loadBranding);
+        return () => {
+            active = false;
+            window.removeEventListener('branding-updated', loadBranding);
+        };
     }, []);
 
     const navLinks = [
@@ -35,7 +42,7 @@ export default function HomeHeader({ showAdmin = true }) {
                         {branding.logoUrl && (
                             <img className="header-logo-img" src={branding.logoUrl} alt={branding.name} />
                         )}
-                        <h1>{branding.name.toUpperCase()}</h1>
+                        <h1>{branding.name}</h1>
                     </a>
                 </div>
 

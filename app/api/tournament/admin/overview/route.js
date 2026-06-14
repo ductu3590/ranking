@@ -5,7 +5,12 @@ import { getGroupIdForDatabase } from '@/lib/groupSession';
 export async function GET() {
     const groupId = getGroupIdForDatabase();
 
-    const [matchesRes, pairingsRes, playersRes] = await Promise.all([
+    const [teamsRes, matchesRes, pairingsRes, playersRes] = await Promise.all([
+        supabaseAdmin
+            .from('tournament_teams')
+            .select('*')
+            .eq('group_id', groupId)
+            .order('team_code', { ascending: true }),
         supabaseAdmin
             .from('tournament_matches')
             .select('*')
@@ -25,18 +30,25 @@ export async function GET() {
             .order('pair_order', { ascending: true }),
         supabaseAdmin
             .from('tournament_players')
-            .select('id')
-            .eq('group_id', groupId),
+            .select('*')
+            .eq('group_id', groupId)
+            .eq('is_active', true)
+            .order('display_order', { ascending: true }),
     ]);
 
     const matches = matchesRes.data || [];
     const pairings = pairingsRes.data || [];
+    const players = playersRes.data || [];
+    const teams = (teamsRes.data || []).map((team) => ({
+        ...team,
+        players: players.filter((player) => player.team_id === team.id),
+    }));
     const stats = {
-        totalPlayers: (playersRes.data || []).length,
+        totalPlayers: players.length,
         totalMatches: matches.length,
         completedMatches: matches.filter((m) => m.match_status === 'completed').length,
         pendingSubmissions: pairings.filter((p) => p.submission_status === 'draft').length,
     };
 
-    return NextResponse.json({ matches, pairings, stats });
+    return NextResponse.json({ teams, matches, pairings, stats });
 }

@@ -6,6 +6,10 @@ import { getEffectiveGroupContext } from '@/lib/groupSession';
 // Only non-sensitive fields (name, logo) are exposed.
 export async function GET() {
     const context = getEffectiveGroupContext();
+    if (context.is_default) {
+        return NextResponse.json({ name: 'PickHub', logoUrl: null });
+    }
+
     const { data: group, error } = await supabaseAdmin
         .from('groups')
         .select('id, name, logo_url')

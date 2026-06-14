@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { getTournaments } from '@/lib/tournaments';
-import { getEffectiveGroupContext } from '@/lib/groupSession';
+import { requireGroupAdmin } from '@/lib/groupSession';
+
+const db = supabaseAdmin || supabaseServer;
 
 export async function GET() {
     const result = await getTournaments();
@@ -10,16 +13,18 @@ export async function GET() {
 
 export async function POST(request) {
     try {
+        const adminCheck = requireGroupAdmin();
+        if (!adminCheck.ok) return adminCheck.response;
+
         const body = await request.json();
         const name = body.name?.trim();
-        const { group_id: groupId } = getEffectiveGroupContext();
 
         if (!name) {
             return NextResponse.json({ error: 'Tournament name is required' }, { status: 400 });
         }
 
         const payload = {
-            group_id: groupId,
+            group_id: adminCheck.groupId,
             name,
             description: body.description?.trim() || null,
             event_date: body.event_date || null,
@@ -27,7 +32,7 @@ export async function POST(request) {
             location: body.location?.trim() || null,
         };
 
-        const { data, error } = await supabaseServer
+        const { data, error } = await db
             .from('tournaments')
             .insert(payload)
             .select()

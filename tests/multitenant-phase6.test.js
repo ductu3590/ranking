@@ -28,9 +28,10 @@ const overview = read('app/api/tournament/admin/overview/route.js');
 assert(
     overview.includes('export async function GET') &&
     overview.includes('getGroupIdForDatabase') &&
+    overview.includes('tournament_teams') &&
     overview.includes('tournament_matches') &&
     overview.includes('tournament_pairings'),
-    'Tournament overview route should return matches/pairings/stats scoped to the group.'
+    'Tournament overview route should return teams/matches/pairings/stats scoped to the group.'
 );
 const reset = read('app/api/tournament/admin/reset/route.js');
 assert(
@@ -58,6 +59,14 @@ assert(
 assert(
     tourAdmin.includes('/api/tournament/admin/overview') && tourAdmin.includes('/api/tournament/admin/reset'),
     'Tournament admin page should use the overview and reset APIs.'
+);
+
+const tournamentsRoute = read('app/api/tournaments/route.js');
+assert(
+    tournamentsRoute.includes('requireGroupAdmin') &&
+    tournamentsRoute.includes('adminCheck.groupId') &&
+    tournamentsRoute.includes('group_id'),
+    'Creating a tournament should require the current club admin session and assign that club group_id.'
 );
 
 for (const f of ['components/MobileBottomNav.js', 'components/TournamentModuleNav.js']) {

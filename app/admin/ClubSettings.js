@@ -59,6 +59,7 @@ export default function ClubSettings() {
         if (res.ok) {
             setGroup(data.group);
             setForm((prev) => ({ ...prev, memberPassword: '' }));
+            window.dispatchEvent(new Event('branding-updated'));
             setNotice('Đã lưu thay đổi.');
         } else {
             setError(data.error || 'Không lưu được.');

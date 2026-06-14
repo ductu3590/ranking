@@ -54,7 +54,6 @@ export default function AdminTournamentPanel({ embedded = false }) {
         setLoading(true);
         await Promise.all([
             loadSettings(),
-            loadTeams(),
             loadOverview()
         ]);
         setLoading(false);
@@ -79,18 +78,11 @@ export default function AdminTournamentPanel({ embedded = false }) {
         }
     }
 
-    async function loadTeams() {
-        const res = await fetch('/api/tournament/teams');
-        const data = await res.json();
-        if (data.teams) {
-            setTeams(data.teams);
-        }
-    }
-
     async function loadOverview() {
         const res = await fetch('/api/tournament/admin/overview');
         const data = await res.json();
         if (res.ok) {
+            setTeams(data.teams || []);
             setMatches(data.matches || []);
             setPairings(data.pairings || []);
             setStats(data.stats || { totalPlayers: 0, totalMatches: 0, completedMatches: 0, pendingSubmissions: 0 });

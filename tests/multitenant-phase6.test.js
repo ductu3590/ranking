@@ -40,4 +40,14 @@ assert(
     'Tournament reset route should be admin-guarded and delete tournament data for the group.'
 );
 
+const fundAdmin = read('app/quy/admin/page.js');
+assert(
+    !fundAdmin.includes('@/lib/supabaseClient') && !fundAdmin.includes('.from('),
+    'Fund admin page should not query Supabase directly.'
+);
+assert(
+    fundAdmin.includes('/api/club/transactions') && fundAdmin.includes('/api/club/members'),
+    'Fund admin page should use the club server APIs.'
+);
+
 console.log('multitenant phase 6 contract ok');

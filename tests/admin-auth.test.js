@@ -63,9 +63,7 @@ assert(
 
 const fundAdmin = read('app/quy/admin/page.js');
 assert(
-    fundAdmin.includes('MANUAL_THU') &&
-    fundAdmin.includes('💰 Thu') &&
-    fundAdmin.includes('direction'),
+    fundAdmin.includes('💰 Thu') && fundAdmin.includes('direction'),
     'Fund admin should support manual income (Thu) entry, not just expense.'
 );
 

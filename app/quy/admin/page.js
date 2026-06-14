@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabaseClient';
-import { getCurrentGroupClient, getCurrentGroupIdClient, isMissingGroupColumnError } from '@/lib/groupClient';
+import { getCurrentGroupClient } from '@/lib/groupClient';
 import { useRouter } from 'next/navigation';
 import './admin.css';
 import UserStatusBadge from '@/components/UserStatusBadge';
@@ -73,57 +72,15 @@ export default function AdminPage({ embedded = false }) {
     }
 
     async function loadTransactions() {
-        const groupId = getCurrentGroupIdClient();
-        const { data, error } = await supabase
-            .from('quy_pickleball')
-            .select('*')
-            .eq('group_id', groupId)
-            .order('created_at', { ascending: false });
-
-        if (error) {
-            if (isMissingGroupColumnError(error)) {
-                const { data: fallbackData, error: fallbackError } = await supabase
-                    .from('quy_pickleball')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-                if (fallbackError) {
-                    console.error('Error loading transactions:', fallbackError);
-                } else {
-                    setTransactions(fallbackData || []);
-                }
-            } else {
-                console.error('Error loading transactions:', error);
-            }
-        } else {
-            setTransactions(data || []);
-        }
+        const res = await fetch('/api/club/transactions');
+        const data = await res.json();
+        setTransactions(res.ok ? (data.transactions || []) : []);
     }
 
     async function loadMembers() {
-        const groupId = getCurrentGroupIdClient();
-        const { data, error } = await supabase
-            .from('club_members')
-            .select('*')
-            .eq('group_id', groupId)
-            .order('full_name', { ascending: true });
-
-        if (error) {
-            if (isMissingGroupColumnError(error)) {
-                const { data: fallbackData, error: fallbackError } = await supabase
-                    .from('club_members')
-                    .select('*')
-                    .order('full_name', { ascending: true });
-                if (fallbackError) {
-                    console.error('Error loading members:', fallbackError);
-                } else {
-                    setMembers(fallbackData || []);
-                }
-            } else {
-                console.error('Error loading members:', error);
-            }
-        } else {
-            setMembers(data || []);
-        }
+        const res = await fetch('/api/club/members');
+        const data = await res.json();
+        setMembers(res.ok ? (data.members || []) : []);
     }
 
     const filteredTransactions = transactions.filter(t => {
@@ -135,15 +92,14 @@ export default function AdminPage({ embedded = false }) {
     });
 
     async function updateTransaction(id, updates) {
-        const groupId = getCurrentGroupIdClient();
-        const { error } = await supabase
-            .from('quy_pickleball')
-            .update(updates)
-            .eq('id', id)
-            .eq('group_id', groupId);
-
-        if (error) {
-            alert('Lỗi cập nhật: ' + error.message);
+        const res = await fetch('/api/club/transactions', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ids: [id], updates }),
+        });
+        if (!res.ok) {
+            const data = await res.json();
+            alert('Lỗi cập nhật: ' + (data.error || ''));
         } else {
             loadTransactions();
             setEditingTransaction(null);
@@ -165,16 +121,14 @@ export default function AdminPage({ embedded = false }) {
                 .filter(line => line.length > 0);
         }
 
-        const { error } = await supabase
-            .from('club_members')
-            .insert([{
-                group_id: getCurrentGroupIdClient(),
-                full_name: newMember.full_name.toUpperCase().trim(),
-                aliases: aliasesArray.length > 0 ? aliasesArray : null
-            }]);
-
-        if (error) {
-            alert('Lỗi thêm thành viên: ' + error.message);
+        const res = await fetch('/api/club/members', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ full_name: newMember.full_name, aliases: aliasesArray }),
+        });
+        if (!res.ok) {
+            const data = await res.json();
+            alert('Lỗi thêm thành viên: ' + (data.error || ''));
         } else {
             loadMembers();
             setAddingMember(false);
@@ -184,15 +138,10 @@ export default function AdminPage({ embedded = false }) {
 
     async function deleteMember(id) {
         if (!confirm('Bạn có chắc muốn xóa thành viên này?')) return;
-
-        const { error } = await supabase
-            .from('club_members')
-            .delete()
-            .eq('id', id)
-            .eq('group_id', getCurrentGroupIdClient());
-
-        if (error) {
-            alert('Lỗi xóa: ' + error.message);
+        const res = await fetch(`/api/club/members?id=${id}`, { method: 'DELETE' });
+        if (!res.ok) {
+            const data = await res.json();
+            alert('Lỗi xóa: ' + (data.error || ''));
         } else {
             loadMembers();
         }
@@ -213,17 +162,14 @@ export default function AdminPage({ embedded = false }) {
                 .filter(line => line.length > 0);
         }
 
-        const { error } = await supabase
-            .from('club_members')
-            .update({
-                aliases: aliasesArray.length > 0 ? aliasesArray : null,
-                is_active: editMemberForm.is_active
-            })
-            .eq('id', editingMember.id)
-            .eq('group_id', getCurrentGroupIdClient());
-
-        if (error) {
-            alert('Lỗi cập nhật: ' + error.message);
+        const res = await fetch('/api/club/members', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: editingMember.id, aliases: aliasesArray, is_active: editMemberForm.is_active }),
+        });
+        if (!res.ok) {
+            const data = await res.json();
+            alert('Lỗi cập nhật: ' + (data.error || ''));
         } else {
             loadMembers();
             setEditingMember(null);
@@ -260,22 +206,22 @@ export default function AdminPage({ embedded = false }) {
             return;
         }
 
-        const { error } = await supabase
-            .from('quy_pickleball')
-            .update({
-                loai_giao_dich: bulkEditCategory,
-                is_manually_categorized: true
-            })
-            .in('id', selectedTransactions)
-            .eq('group_id', getCurrentGroupIdClient());
-
-        if (error) {
-            alert('Lỗi cập nhật: ' + error.message);
-        } else {
-            alert(`Đã cập nhật ${selectedTransactions.length} giao dịch thành công!`);
-            setSelectedTransactions([]);
-            loadTransactions();
+        const res = await fetch('/api/club/transactions', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                ids: selectedTransactions,
+                updates: { loai_giao_dich: bulkEditCategory, is_manually_categorized: true },
+            }),
+        });
+        if (!res.ok) {
+            const data = await res.json();
+            alert('Lỗi: ' + (data.error || ''));
+            return;
         }
+        alert(`Đã cập nhật ${selectedTransactions.length} giao dịch!`);
+        setSelectedTransactions([]);
+        loadTransactions();
     }
 
     async function addExpenseTransaction() {
@@ -289,41 +235,26 @@ export default function AdminPage({ embedded = false }) {
             return;
         }
 
-        const isIncome = expenseForm.direction === 'in';
-        const timestamp = Date.now();
-        const amount = Math.abs(parseFloat(expenseForm.so_tien));
-        const transactionData = {
-            group_id: getCurrentGroupIdClient(),
-            ma_giao_dich: `${isIncome ? 'MANUAL_THU' : 'MANUAL_CHI'}_${timestamp}`,
-            so_tien: isIncome ? amount : -amount,
-            noi_dung_goc: expenseForm.noi_dung.trim(),
-            nguoi_nop: 'THỦ QUỸ',
-            loai_giao_dich: expenseForm.loai_giao_dich,
-            huong_giao_dich: isIncome ? 'in' : 'out',
-            is_manually_categorized: true,
-            admin_note: expenseForm.ghi_chu.trim() || null,
-            confidence_score: 100,
-            parsing_method: 'manual',
-            created_at: new Date(expenseForm.ngay_giao_dich).toISOString()
-        };
-
-        const { error } = await supabase
-            .from('quy_pickleball')
-            .insert([transactionData]);
-
-        if (error) {
-            alert('Lỗi thêm giao dịch: ' + error.message);
+        const res = await fetch('/api/club/transactions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                direction: expenseForm.direction,
+                so_tien: expenseForm.so_tien,
+                loai_giao_dich: expenseForm.loai_giao_dich,
+                noi_dung: expenseForm.noi_dung,
+                ngay_giao_dich: expenseForm.ngay_giao_dich,
+                ghi_chu: expenseForm.ghi_chu,
+            }),
+        });
+        if (!res.ok) {
+            const data = await res.json();
+            alert('Lỗi thêm giao dịch: ' + (data.error || ''));
         } else {
+            const isIncome = expenseForm.direction === 'in';
             alert(isIncome ? 'Đã thêm giao dịch thu thành công!' : 'Đã thêm giao dịch chi thành công!');
             setAddingExpense(false);
-            setExpenseForm({
-                direction: 'out',
-                so_tien: '',
-                loai_giao_dich: 'khac',
-                noi_dung: '',
-                ngay_giao_dich: new Date().toISOString().split('T')[0],
-                ghi_chu: ''
-            });
+            setExpenseForm({ direction: 'out', so_tien: '', loai_giao_dich: 'khac', noi_dung: '', ngay_giao_dich: new Date().toISOString().split('T')[0], ghi_chu: '' });
             loadTransactions();
         }
     }

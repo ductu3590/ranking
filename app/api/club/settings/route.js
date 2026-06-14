@@ -21,7 +21,7 @@ export async function GET(request) {
 
     const { data: group, error } = await supabaseAdmin
         .from('groups')
-        .select('id, code, name, description')
+        .select('id, code, name, description, logo_url')
         .eq('id', adminCheck.groupId)
         .single();
     if (error) {
@@ -49,6 +49,17 @@ export async function PATCH(request) {
         }
         updates.member_password_hash = hashPassword(body.memberPassword);
     }
+    if ('logoUrl' in (body || {})) {
+        const logoUrl = body.logoUrl;
+        if (logoUrl === null || logoUrl === '') {
+            updates.logo_url = null;
+        } else if (typeof logoUrl === 'string') {
+            if (logoUrl.length > 100000) {
+                return NextResponse.json({ error: 'Logo quá lớn — hãy chọn ảnh nhỏ hơn.' }, { status: 400 });
+            }
+            updates.logo_url = logoUrl;
+        }
+    }
     if (Object.keys(updates).length === 0) {
         return NextResponse.json({ error: 'Không có thay đổi.' }, { status: 400 });
     }
@@ -57,7 +68,7 @@ export async function PATCH(request) {
         .from('groups')
         .update(updates)
         .eq('id', adminCheck.groupId)
-        .select('id, code, name, description')
+        .select('id, code, name, description, logo_url')
         .single();
     if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });

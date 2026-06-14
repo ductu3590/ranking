@@ -11,7 +11,6 @@ assert(exists('app/api/tournaments/route.js'), 'A tournaments list API route sho
 assert(exists('app/giai-dau/[id]/page.js'), 'Tournament detail route /giai-dau/[id] should exist.');
 assert(exists('app/giai-dau/[id]/live/page.js'), 'Tournament scoped live route should exist.');
 assert(exists('app/giai-dau/[id]/admin/page.js'), 'Tournament scoped admin route should exist.');
-assert(exists('app/giai-dau/[id]/captain/page.js'), 'Tournament scoped captain route should exist.');
 
 const dashboardPage = read('app/giai-dau/page.js');
 const detailPage = read('app/giai-dau/[id]/page.js');

@@ -16,33 +16,28 @@ assert(
     'Migration 008 should create group_members linking auth.users to groups with a role and a unique membership.'
 );
 
-const membership = read('lib/membership.js');
-assert(
-    membership.includes('export async function getAdminGroupIds') &&
-    membership.includes('export async function isGroupAdmin') &&
-    membership.includes("from('group_members')"),
-    'lib/membership.js should resolve a user\'s admin group ids and check admin membership.'
-);
-
+// Auth is unified on group code + password. Group creation no longer provisions a
+// Supabase Auth user or an owner membership, and the admin-email field is gone.
 const createGroupRoute = read('app/api/groups/route.js');
 assert(
-    createGroupRoute.includes('auth.admin.createUser') &&
-    createGroupRoute.includes('addGroupMember') &&
-    createGroupRoute.includes('adminEmail'),
-    'Group creation should create a Supabase admin user and an owner membership.'
+    !createGroupRoute.includes('auth.admin.createUser') &&
+    !createGroupRoute.includes('addGroupMember') &&
+    !createGroupRoute.includes('adminEmail') &&
+    createGroupRoute.includes('admin_password_hash') &&
+    createGroupRoute.includes('member_password_hash') &&
+    createGroupRoute.includes('setGroupSessionCookie'),
+    'Group creation should use code + password hashes only and mint a group_session cookie.'
 );
 const homePage = read('app/page.js');
 assert(
-    homePage.includes('adminEmail'),
-    'Create-group form should collect the admin email.'
+    !homePage.includes('adminEmail'),
+    'Create-group form should not collect an admin email.'
 );
 
-const adminSessionRoute = read('app/api/groups/session/admin/route.js');
+// The Supabase-Auth admin session route has been removed.
 assert(
-    adminSessionRoute.includes('getAdminGroupIds') &&
-    adminSessionRoute.includes('signGroupSession') &&
-    adminSessionRoute.includes('setGroupSessionCookie'),
-    'Admin session route should mint a group_session cookie from the user\'s membership.'
+    !fs.existsSync(path.join(root, 'app/api/groups/session/admin/route.js')),
+    'The legacy Supabase admin session route should be removed.'
 );
 
 for (const route of [
@@ -124,9 +119,22 @@ assert(
 
 const homePageAuth = read('app/page.js');
 assert(
-    homePageAuth.includes('signInWithPassword') &&
-    homePageAuth.includes("from '@/lib/supabaseClient'"),
-    'Home page should sign the new admin into Supabase Auth after creating a club.'
+    !homePageAuth.includes('signInWithPassword') &&
+    !homePageAuth.includes("from '@/lib/supabaseClient'"),
+    'Home page should not depend on Supabase Auth; identity comes from the group_session cookie.'
 );
+
+// Supabase Auth login + the captain feature are fully removed.
+for (const gone of [
+    'app/login/page.js',
+    'app/api/groups/session/admin/route.js',
+    'lib/membership.js',
+    'app/giai-dau/captain/page.js',
+    'app/giai-dau/[id]/captain/page.js',
+    'app/api/tournament/captain/pairings/route.js',
+    'app/api/tournament/captain/pairings/unlock/route.js',
+]) {
+    assert(!fs.existsSync(path.join(root, gone)), `${gone} should be removed.`);
+}
 
 console.log('multitenant phase 2 contract ok');

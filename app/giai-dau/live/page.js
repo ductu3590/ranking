@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import './live.css';
 import { supabase } from '@/lib/supabaseClient';
+import { getCurrentGroupClient } from '@/lib/groupClient';
 import UserStatusBadge from '@/components/UserStatusBadge';
 
 export default function LiveTournament() {
@@ -12,7 +13,7 @@ export default function LiveTournament() {
     const [scoreboard, setScoreboard] = useState(null);
     const [canRevealRound1, setCanRevealRound1] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [userRole, setUserRole] = useState('guest'); // guest, captain, admin
+    const [userRole, setUserRole] = useState('guest'); // guest, admin
     const [editingScore, setEditingScore] = useState(null); // {matchId, blueScore, redScore}
     const [draggedPairing, setDraggedPairing] = useState(null);
     const [realtimeChannel, setRealtimeChannel] = useState(null);
@@ -53,13 +54,11 @@ export default function LiveTournament() {
         checkAuth();
     }, []);
 
-    async function checkAuth() {
+    function checkAuth() {
         try {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user?.user_metadata?.role === 'admin') {
+            const group = getCurrentGroupClient();
+            if (group.role === 'admin') {
                 setUserRole('admin');
-            } else if (user?.user_metadata?.role === 'captain') {
-                setUserRole('captain');
             }
         } catch (err) {
             console.error('Auth check error:', err);
@@ -588,11 +587,6 @@ export default function LiveTournament() {
                     <div className="live-footer">
                         <p>⚡ Cập nhật tự động mỗi 10 giây</p>
                         <p>Giải đấu diễn ra: 17:00 - 20:05</p>
-                        <p style={{ marginTop: '10px' }}>
-                            <a href="/giai-dau/captain" style={{ color: '#4f46e5', textDecoration: 'none', fontSize: '0.8rem' }}>
-                                Admin/Captain Login
-                            </a>
-                        </p>
                     </div>
                 </div>
         </div>

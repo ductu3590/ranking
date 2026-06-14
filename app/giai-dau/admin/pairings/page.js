@@ -175,8 +175,8 @@ export default function AdminPairingsPage({ embedded = false }) {
                             <strong>Pairings Lock:</strong>
                             <div className="lock-description">
                                 {locked
-                                    ? 'Captains CANNOT edit pairings'
-                                    : 'Captains CAN edit pairings'}
+                                    ? 'Pairings đã khoá (không cho chỉnh sửa)'
+                                    : 'Pairings đang mở (có thể chỉnh sửa)'}
                             </div>
                         </div>
                     </div>

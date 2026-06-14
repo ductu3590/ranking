@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabaseClient';
 import './club-settings.css';
 
 export default function ClubSettings() {
@@ -169,12 +168,17 @@ export default function ClubSettings() {
             return;
         }
         setChangingPassword(true);
-        const { error: authError } = await supabase.auth.updateUser({ password: passwordForm.next });
-        if (authError) {
-            setError(authError.message || 'Không đổi được mật khẩu.');
+        const res = await fetch('/api/club/settings', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ adminPassword: passwordForm.next }),
+        });
+        if (!res.ok) {
+            const data = await res.json();
+            setError(data.error || 'Không đổi được mật khẩu.');
         } else {
             setPasswordForm({ next: '', confirm: '' });
-            setNotice('Đã đổi mật khẩu đăng nhập.');
+            setNotice('Đã đổi mật khẩu đăng nhập admin.');
         }
         setChangingPassword(false);
     }

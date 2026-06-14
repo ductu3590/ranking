@@ -49,6 +49,12 @@ export async function PATCH(request) {
         }
         updates.member_password_hash = hashPassword(body.memberPassword);
     }
+    if (typeof body?.adminPassword === 'string' && body.adminPassword) {
+        if (body.adminPassword.length < 6) {
+            return NextResponse.json({ error: 'Mật khẩu admin cần ít nhất 6 ký tự.' }, { status: 400 });
+        }
+        updates.admin_password_hash = hashPassword(body.adminPassword);
+    }
     if ('logoUrl' in (body || {})) {
         const logoUrl = body.logoUrl;
         if (logoUrl === null || logoUrl === '') {

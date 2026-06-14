@@ -36,8 +36,8 @@ assert(
 
 const clubSettings = read('app/admin/ClubSettings.js');
 assert(
-    clubSettings.includes("from '@/lib/supabaseClient'") &&
-    clubSettings.includes('supabase.auth.updateUser') &&
+    clubSettings.includes('adminPassword') &&
+    clubSettings.includes('/api/club/settings') &&
     clubSettings.includes('toDataURL') &&
     clubSettings.includes('logoUrl'),
     'ClubSettings should support logo upload (canvas resize) and admin password change.'

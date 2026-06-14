@@ -68,4 +68,15 @@ for (const f of ['components/MobileBottomNav.js', 'components/TournamentModuleNa
     );
 }
 
+const settingsRoute = read('app/api/club/settings/route.js');
+assert(
+    settingsRoute.includes('adminPassword') && settingsRoute.includes('admin_password_hash'),
+    'Settings PATCH should let an admin change the group admin password (hashed).'
+);
+const settingsUi = read('app/admin/ClubSettings.js');
+assert(
+    !settingsUi.includes('supabase.auth') && settingsUi.includes('adminPassword'),
+    'ClubSettings should change the admin password via the server route, not Supabase Auth.'
+);
+
 console.log('multitenant phase 6 contract ok');

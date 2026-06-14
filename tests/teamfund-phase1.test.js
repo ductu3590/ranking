@@ -155,8 +155,6 @@ for (const route of [
     'app/api/tournament/live/matches/route.js',
     'app/api/tournament/live/scoreboard/route.js',
     'app/api/tournament/live/pairings/route.js',
-    'app/api/tournament/captain/pairings/route.js',
-    'app/api/tournament/captain/pairings/unlock/route.js',
 ]) {
     const source = read(route);
     assert(

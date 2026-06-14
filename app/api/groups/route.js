@@ -9,7 +9,6 @@ import {
     publicGroupPayload,
 } from '@/lib/groupAuth';
 import { setGroupSessionCookie, signGroupSession } from '@/lib/groupSession';
-import { addGroupMember } from '@/lib/membership';
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -35,7 +34,6 @@ export async function POST(request) {
         const description = String(body?.description || '').trim();
         const adminPassword = String(body?.adminPassword || '');
         const memberPassword = String(body?.memberPassword || '');
-        const adminEmail = String(body?.adminEmail || '').trim().toLowerCase();
 
         if (!name) {
             return NextResponse.json({ error: 'Tên nhóm là bắt buộc.' }, { status: 400 });
@@ -45,9 +43,6 @@ export async function POST(request) {
         }
         if (memberPassword.length < 4) {
             return NextResponse.json({ error: 'Mật khẩu thành viên cần ít nhất 4 ký tự.' }, { status: 400 });
-        }
-        if (!adminEmail || !adminEmail.includes('@')) {
-            return NextResponse.json({ error: 'Email quản trị không hợp lệ.' }, { status: 400 });
         }
         if (adminPassword === memberPassword) {
             return NextResponse.json({ error: 'Mật khẩu admin và thành viên phải khác nhau.' }, { status: 400 });
@@ -67,19 +62,6 @@ export async function POST(request) {
             .single();
 
         if (error) throw error;
-
-        const { data: created, error: authError } = await supabaseAdmin.auth.admin.createUser({
-            email: adminEmail,
-            password: adminPassword,
-            email_confirm: true,
-            user_metadata: { default_group_id: group.id },
-        });
-        if (authError) {
-            // Roll back the group so a failed signup doesn't leave an orphan club.
-            await db.from('groups').delete().eq('id', group.id);
-            return NextResponse.json({ error: 'Email đã tồn tại hoặc không hợp lệ.' }, { status: 400 });
-        }
-        await addGroupMember(created.user.id, group.id, 'owner');
 
         const origin = request.headers.get('origin') || new URL(request.url).origin;
         const joinUrl = `${origin}/join?group=${group.code}`;

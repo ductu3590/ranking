@@ -2,13 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabaseClient';
 import './page.css';
 
 const EMPTY_CREATE_FORM = {
     name: '',
     description: '',
-    adminEmail: '',
     adminPassword: '',
     memberPassword: '',
 };
@@ -69,13 +67,6 @@ export default function TeamFundHomePage() {
             });
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Không thể tạo nhóm.');
-
-            // Establish a Supabase Auth browser session so the admin's client
-            // carries a JWT (required by RLS on the admin pages).
-            await supabase.auth.signInWithPassword({
-                email: createForm.adminEmail,
-                password: createForm.adminPassword,
-            });
 
             rememberGroup(data.group, data.role);
             setCreatedGroup(data);
@@ -281,16 +272,6 @@ export default function TeamFundHomePage() {
                     ) : (
                         <form className="teamfund-form" onSubmit={handleCreateGroup}>
                             <FormError message={error} />
-                            <label>
-                                Email quản trị
-                                <input
-                                    type="email"
-                                    value={createForm.adminEmail}
-                                    onChange={(event) => updateCreateForm('adminEmail', event.target.value)}
-                                    placeholder="admin@clb.com"
-                                    required
-                                />
-                            </label>
                             <label>
                                 Tên nhóm
                                 <input

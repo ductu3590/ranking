@@ -52,4 +52,14 @@ assert(adminCenter.includes("searchParams.get('t')") &&
 assert(!adminCenter.includes('admin-center-subtabs'),
     'Admin center should drop the hardcoded overview/pairings subtabs.');
 
+assert(exists('app/giai-dau/admin/components/TournamentList.js'),
+    'TournamentList component should exist.');
+const panel = read('app/giai-dau/admin/page.js');
+assert(panel.includes('tournamentId') && panel.includes('TournamentConsole') &&
+    panel.includes('TournamentList'),
+    'Panel should switch between TournamentList and TournamentConsole.');
+const listView = read('app/giai-dau/admin/components/TournamentList.js');
+assert(listView.includes('section=tournament&t=') && listView.includes('Tạo'),
+    'TournamentList should link into a console and offer create.');
+
 console.log('tournament admin redesign contract ok');

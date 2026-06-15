@@ -72,4 +72,16 @@ for (const label of ['MLP Team Match', 'Đánh đôi vòng tròn', 'Vòng bảng
     assert(form.includes(label), `TournamentForm should include "${label}".`);
 }
 
+assert(exists('app/giai-dau/admin/components/TournamentConsole.js'),
+    'TournamentConsole component should exist.');
+const consoleSrc = read('app/giai-dau/admin/components/TournamentConsole.js');
+for (const t of ['Tổng quan', 'Cài đặt', 'Đội', 'Pairings', 'Trận đấu']) {
+    assert(consoleSrc.includes(t), `Console tab bar should include "${t}".`);
+}
+assert(consoleSrc.includes('OverviewTab') && consoleSrc.includes('SettingsTab') &&
+    consoleSrc.includes('TeamsTab') && consoleSrc.includes('PairingsTab') && consoleSrc.includes('MatchesTab'),
+    'Console should render all five tab components.');
+assert(consoleSrc.includes('/api/tournament/admin/reset') && consoleSrc.includes('tournamentId'),
+    'Console overflow should reset scoped to this tournament.');
+
 console.log('tournament admin redesign contract ok');

@@ -17,4 +17,6 @@ assert(/schedule_format[\s\S]*?'round_robin'[\s\S]*?'knockout'/i.test(sql), 'sta
 assert(/match_format[\s\S]*?'simple'[\s\S]*?'mlp'/i.test(sql), 'stage.match_format check');
 assert((sql.match(/group_id/gi) || []).length >= 7, 'mọi bảng có group_id');
 assert(/DISABLE ROW LEVEL SECURITY/i.test(sql), 'RLS disable backstop');
+assert(/group_id\s+bigint NOT NULL REFERENCES groups\(id\) ON DELETE CASCADE/i.test(sql), 'group_id phải là bigint FK -> groups(id) ON DELETE CASCADE');
+assert((sql.match(/REFERENCES groups\(id\) ON DELETE CASCADE/gi) || []).length >= 7, 'cả 7 bảng đều FK group_id -> groups');
 console.log('migration-015 contract ok');

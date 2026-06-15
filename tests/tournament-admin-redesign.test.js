@@ -45,4 +45,11 @@ const teamsRoute = read('app/api/tournament/teams/route.js');
 assert(!teamsRoute.includes(".eq('tournament_id', 1)"),
     'teams route should not hardcode tournament_id = 1.');
 
+const adminCenter = read('app/admin/page.js');
+assert(adminCenter.includes("searchParams.get('t')") &&
+    adminCenter.includes("searchParams.get('tab')"),
+    'Admin center should read tournament id (t) and tab from the URL.');
+assert(!adminCenter.includes('admin-center-subtabs'),
+    'Admin center should drop the hardcoded overview/pairings subtabs.');
+
 console.log('tournament admin redesign contract ok');

@@ -1,0 +1,11 @@
+const fs = require('fs'); const path = require('path');
+const root = path.join(__dirname, '..', '..');
+const read = (f) => fs.readFileSync(path.join(root, f), 'utf8');
+const exists = (f) => fs.existsSync(path.join(root, f));
+const assert = (c, m) => { if (!c) { console.error(`FAIL: ${m}`); process.exit(1); } };
+const f = 'app/giai-dau/v2/console/TournamentConsoleV2.js';
+assert(exists(f), 'console tồn tại');
+const s = read(f);
+for (const t of ['Tổng quan', 'Kết quả', 'Bảng xếp hạng', 'Sơ đồ', 'Đội', 'Cài đặt']) assert(s.includes(t), `tab "${t}"`);
+for (const c of ['OverviewTab', 'ResultsTab', 'StandingsTab', 'BracketTab', 'TeamsTab', 'SettingsTab']) assert(s.includes(c), `render ${c}`);
+console.log('ui-console contract ok');

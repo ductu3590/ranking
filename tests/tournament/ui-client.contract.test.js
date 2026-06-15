@@ -6,8 +6,9 @@ const assert = (c, m) => { if (!c) { console.error(`FAIL: ${m}`); process.exit(1
 const f = 'lib/tournamentV2Client.js';
 assert(exists(f), 'client tồn tại');
 const s = read(f);
-for (const ep of ['/api/tournament-v2/tournaments', '/api/tournament-v2/stages', '/api/tournament-v2/entrants', '/api/tournament-v2/generate', '/api/tournament-v2/games', '/api/tournament-v2/standings', '/api/tournament-v2/advance', '/api/tournament-v2/public']) {
-  assert(s.includes(ep), `gọi endpoint ${ep}`);
+assert(s.includes('/api/tournament-v2'), 'có prefix API v2');
+for (const seg of ['/tournaments', '/stages', '/entrants', '/generate', '/games', '/standings', '/advance', '/public']) {
+  assert(s.includes(`'${seg}'`), `gọi segment ${seg} (path thật trong code, không phải comment)`);
 }
 for (const fn of ['listTournaments', 'createTournament', 'saveStage', 'saveEntrant', 'generateSchedule', 'saveGames', 'getStandings', 'advanceStage', 'getPublic']) {
   assert(s.includes(fn), `export ${fn}`);

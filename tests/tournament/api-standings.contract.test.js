@@ -1,0 +1,12 @@
+const fs = require('fs'); const path = require('path');
+const root = path.join(__dirname, '..', '..');
+const read = (f) => fs.readFileSync(path.join(root, f), 'utf8');
+const exists = (f) => fs.existsSync(path.join(root, f));
+const assert = (c, m) => { if (!c) { console.error(`FAIL: ${m}`); process.exit(1); } };
+const f = 'app/api/tournament-v2/standings/route.js';
+assert(exists(f), 'route tồn tại');
+const s = read(f);
+assert(s.includes('getScheduleEngine') && s.includes('computeStandings'), 'gọi computeStandings');
+assert(s.includes('buildResolvedMatches') && s.includes('getMatchEngine'), 'gom resolved matches từ games');
+assert(s.includes('tournament_games') && s.includes(".eq('group_id'") && s.includes('stage_id'), 'đọc games + scope');
+console.log('api-standings contract ok');

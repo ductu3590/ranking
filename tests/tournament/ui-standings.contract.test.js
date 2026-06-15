@@ -1,0 +1,13 @@
+const fs = require('fs'); const path = require('path');
+const root = path.join(__dirname, '..', '..');
+const read = (f) => fs.readFileSync(path.join(root, f), 'utf8');
+const exists = (f) => fs.existsSync(path.join(root, f));
+const assert = (c, m) => { if (!c) { console.error(`FAIL: ${m}`); process.exit(1); } };
+const ss = 'app/giai-dau/v2/console/tabs/StandingsTab.js';
+assert(exists(ss), 'StandingsTab tồn tại');
+const s = read(ss);
+assert(s.includes('getStandings'), 'gọi getStandings');
+assert(s.includes('schedule_format'), 'nhánh theo schedule_format');
+assert(/round_robin|match_points|exit_round|knockout/.test(s), 'render 2 shape BXH');
+assert(exists('app/giai-dau/v2/console/tabs/BracketTab.js'), 'BracketTab tồn tại');
+console.log('ui-standings contract ok');

@@ -1,0 +1,15 @@
+const fs = require('fs'); const path = require('path');
+const root = path.join(__dirname, '..', '..');
+const read = (f) => fs.readFileSync(path.join(root, f), 'utf8');
+const exists = (f) => fs.existsSync(path.join(root, f));
+const assert = (c, m) => { if (!c) { console.error(`FAIL: ${m}`); process.exit(1); } };
+const rt = 'app/giai-dau/v2/console/tabs/ResultsTab.js';
+assert(exists(rt), 'ResultsTab tồn tại');
+const s = read(rt);
+assert(s.includes('saveGames'), 'lưu tỉ số qua saveGames');
+assert(/score_a|score_b/.test(s), 'nhập điểm từng ván');
+assert(s.includes('womens') || s.includes('mlp') || s.includes('lineup'), 'hỗ trợ lineup/ván con MLP');
+assert(exists('app/giai-dau/v2/console/tabs/SettingsTab.js'), 'SettingsTab tồn tại');
+const st = read('app/giai-dau/v2/console/tabs/SettingsTab.js');
+assert(st.includes('public') || st.includes('slug') || st.includes('QR') || st.includes('qrcode'), 'Settings có link/QR công khai');
+console.log('ui-results contract ok');

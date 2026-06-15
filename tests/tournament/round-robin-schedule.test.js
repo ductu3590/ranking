@@ -1,0 +1,14 @@
+const { generateSchedule } = require('../../lib/tournament/engines/roundRobin');
+const assert = (c, m) => { if (!c) { console.error(`FAIL: ${m}`); process.exit(1); } };
+const entrants = [1, 2, 3, 4].map((id) => ({ id, name: 'E' + id, seed: id }));
+const matches = generateSchedule({ config: {} }, entrants, 42);
+assert(matches.length === 6, `4 đội -> 6 trận, got ${matches.length}`);
+const rounds = new Set(matches.map((m) => m.round));
+assert(rounds.size === 3, '3 vòng');
+const pairs = matches.map((m) => [m.entrant_a_id, m.entrant_b_id].sort((a, b) => a - b).join('-'));
+assert(new Set(pairs).size === 6, 'không cặp trùng');
+assert(matches.every((m) => m.entrant_a_id && m.entrant_b_id && m.entrant_a_id !== m.entrant_b_id), 'cặp hợp lệ');
+const odd = [1, 2, 3, 4, 5].map((id) => ({ id, name: 'E' + id, seed: id }));
+const m5 = generateSchedule({ config: {} }, odd, 1);
+assert(m5.length === 10, `5 đội -> 10 trận, got ${m5.length}`);
+console.log('round-robin-schedule ok');

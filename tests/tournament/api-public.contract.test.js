@@ -1,0 +1,13 @@
+const fs = require('fs'); const path = require('path');
+const root = path.join(__dirname, '..', '..');
+const read = (f) => fs.readFileSync(path.join(root, f), 'utf8');
+const exists = (f) => fs.existsSync(path.join(root, f));
+const assert = (c, m) => { if (!c) { console.error(`FAIL: ${m}`); process.exit(1); } };
+const f = 'app/api/tournament-v2/public/route.js';
+assert(exists(f), 'route tồn tại');
+const s = read(f);
+assert(s.includes('getEffectiveGroupContext'), 'đọc theo group context (không cần admin)');
+assert(!s.includes('requireGroupAdmin'), 'public không chặn admin');
+assert(s.includes('public_slug') && s.includes(".eq('group_id'"), 'tra theo slug + scope group');
+assert(s.includes('tournament_stages') && s.includes('tournament_matches'), 'trả stage + match');
+console.log('api-public contract ok');

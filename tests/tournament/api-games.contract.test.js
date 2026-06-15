@@ -1,0 +1,14 @@
+const fs = require('fs'); const path = require('path');
+const root = path.join(__dirname, '..', '..');
+const read = (f) => fs.readFileSync(path.join(root, f), 'utf8');
+const exists = (f) => fs.existsSync(path.join(root, f));
+const assert = (c, m) => { if (!c) { console.error(`FAIL: ${m}`); process.exit(1); } };
+const f = 'app/api/tournament-v2/games/route.js';
+assert(exists(f), 'route tồn tại');
+const s = read(f);
+assert(s.includes('requireGroupAdmin'), 'admin guard');
+assert(s.includes('getMatchEngine') && s.includes('resolveMatch'), 'gọi match engine');
+assert(s.includes('advanceWinner'), 'đẩy winner lên bracket cha');
+assert(s.includes('tournament_games') && s.includes('tournament_matches'), 'thao tác games + matches');
+assert(s.includes('winner_entrant_id') && s.includes("'done'"), 'set winner + status done');
+console.log('api-games contract ok');

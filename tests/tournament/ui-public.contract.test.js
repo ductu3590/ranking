@@ -1,0 +1,12 @@
+const fs = require('fs'); const path = require('path');
+const root = path.join(__dirname, '..', '..');
+const read = (f) => fs.readFileSync(path.join(root, f), 'utf8');
+const exists = (f) => fs.existsSync(path.join(root, f));
+const assert = (c, m) => { if (!c) { console.error(`FAIL: ${m}`); process.exit(1); } };
+const f = 'app/giai-dau/v2/[slug]/page.js';
+assert(exists(f), 'trang công khai tồn tại');
+const s = read(f);
+assert(s.includes('getPublic') || s.includes('/api/tournament-v2/public'), 'load dữ liệu công khai');
+assert(s.includes('supabaseClient') || s.includes('.channel(') || s.includes('postgres_changes'), 'realtime subscribe');
+assert(s.includes('getStandings') || s.includes('standings'), 'hiện BXH');
+console.log('ui-public contract ok');

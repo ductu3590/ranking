@@ -42,7 +42,8 @@ import { requireGroupAdmin, getEffectiveGroupContext, getGroupIdForDatabase } fr
 
 ## Migration SQL (database/migrations/NNN_tên.sql)
 - Đánh số tăng dần (hiện cao nhất: 014). Idempotent: `CREATE TABLE IF NOT EXISTS`, `ADD COLUMN IF NOT EXISTS`, `CREATE INDEX IF NOT EXISTS`.
-- Mọi bảng CLB có `group_id`. RLS để `DISABLE` (backstop, app tự scope ở server). Comment mô tả bằng tiếng Việt (`COMMENT ON ...`).
+- Mọi bảng CLB có `group_id bigint NOT NULL REFERENCES groups(id) ON DELETE CASCADE` (convention chuẩn — xem migration 008/010; `groups.id` là bigint, KHÔNG dùng `integer`). RLS để `DISABLE` (backstop, app tự scope ở server). Comment mô tả bằng tiếng Việt (`COMMENT ON ...`).
+- Index các cột FK nóng (vd `(group_id, tournament_id)`, `(group_id, stage_id)`) để tránh seq-scan khi dữ liệu lớn.
 - **Lưu ý vận hành**: user tự apply migration + tự deploy Vercel. KHÔNG bao giờ áp migration phá vỡ (RLS bật) lên prod trước khi code tương ứng deploy. Clean-slate giải đấu: được phép drop bảng giải cũ (user đã đồng ý).
 
 ## Node test (tests/*.test.js) — contract test

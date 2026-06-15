@@ -20,7 +20,12 @@
     "test:phase6": "node tests/multitenant-phase6.test.js",
     "test:phase4": "node tests/multitenant-phase4.test.js",
     "test:tournament-management-v2": "node tests/tournament-management-v2.test.js",
-    "test:tournament-admin-redesign": "node tests/tournament-admin-redesign.test.js"
+    "test:tournament-admin-redesign": "node tests/tournament-admin-redesign.test.js",
+    "test:t-migration": "node tests/tournament/migration-015.test.js",
+    "test:t-engines": "node tests/tournament/seeding.test.js && node tests/tournament/match-simple.test.js && node tests/tournament/match-mlp.test.js && node tests/tournament/round-robin-schedule.test.js && node tests/tournament/round-robin-groups.test.js && node tests/tournament/round-robin-standings.test.js && node tests/tournament/knockout-schedule.test.js && node tests/tournament/knockout-standings.test.js && node tests/tournament/registry.test.js && node tests/tournament/orchestrator.test.js && node tests/tournament/mix-integration.test.js",
+    "test:t-api": "node tests/tournament/persistence.test.js && node tests/tournament/results.test.js && node tests/tournament/api-tournaments.contract.test.js && node tests/tournament/api-stages.contract.test.js && node tests/tournament/api-entrants.contract.test.js && node tests/tournament/api-generate.contract.test.js && node tests/tournament/api-games.contract.test.js && node tests/tournament/api-standings.contract.test.js && node tests/tournament/api-advance.contract.test.js && node tests/tournament/api-public.contract.test.js && node tests/tournament/api-matches.contract.test.js",
+    "test:t-ui": "node tests/tournament/ui-client.contract.test.js && node tests/tournament/ui-list.contract.test.js && node tests/tournament/ui-wizard.contract.test.js && node tests/tournament/ui-console.contract.test.js && node tests/tournament/ui-results.contract.test.js && node tests/tournament/ui-standings.contract.test.js && node tests/tournament/ui-public.contract.test.js",
+    "test:tournament": "npm run test:t-migration && npm run test:t-engines && npm run test:t-api && npm run test:t-ui"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.3",

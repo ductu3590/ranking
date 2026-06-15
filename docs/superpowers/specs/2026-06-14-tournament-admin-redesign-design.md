@@ -131,3 +131,35 @@ Các route cần sửa:
 - Trang mobile phân cấp rõ List → Console, không còn cuộn dài 6 khối.
 - Không còn form tên/ngày trùng lặp.
 - Link/route cũ không vỡ (`view=pairings`, live mặc định giải active).
+
+## 10. Cập nhật sau khi kiểm tra DB thực tế (2026-06-14)
+
+Đã đối chiếu code với schema/dữ liệu thật trên Supabase project `Ranking 246` (`uhhlelemewilgsdijwja`). Phát hiện một số phần **đang hỏng vì lệch schema**, không chỉ là lộn xộn giao diện. Các quyết định dưới đây **ghi đè** giả định ở mục 3.3/6 khi mâu thuẫn.
+
+### 10.1 Hiện trạng đã xác minh
+- `tournament_settings` thực tế là **key-value** (`setting_key`, `setting_value` jsonb), KHÔNG có cột phẳng. Keys đang dùng: `round1_reveal_time`, `round1_revealed`, `pairings_locked`, `current_phase`, `round1_winner`, `round2_winner`.
+- Route `settings` đọc/ghi cột phẳng (`tournament_name`, `start_time`, `total_courts`, `match_duration_minutes`...) + `order('created_at')` → **không tồn tại** → form Cài đặt hiện **hỏng**, các field sân/giờ/thời lượng **không có nơi lưu và không nơi nào tiêu thụ**.
+- `tournament_pairings` dùng FK (`team_id`, `player1_id`, `player2_id`). Route `pairings` admin đọc/ghi `team`, `player1_name`, `player2_name` → **không tồn tại** → editor pairings **hỏng** (GET gom hết vào 'unknown', PUT ghi cột ảo). Overview đọc pairings ĐÚNG qua FK join.
+- Unique index của `tournament_settings` là `unique_setting (tournament_id, setting_key)` — **thiếu `group_id`**. Nhưng `toggle-round1` & `toggle-pairings-lock` upsert với `onConflict: 'group_id,tournament_id,setting_key'` → Postgres báo lỗi vì không có unique index khớp → **2 toggle này cũng đang hỏng**, đồng thời là **lỗi multi-tenant** (2 CLB cùng `tournament_id=1` sẽ đụng nhau).
+- Phần CHẠY ĐÚNG: `overview` (read), `tournaments` CRUD, `auto-assign` (đã nhận `tournamentId` và scope đầy đủ — dùng làm **mẫu tham chiếu** cho per-tournament).
+- Nhiều route hardcode `tournament_id = 1`: `toggle-round1`, `toggle-pairings-lock`, `teams`; còn `overview`, `reorder`, `reset` chỉ lọc theo `group_id`. `reset` còn dùng UUID sentinel trên id kiểu integer (sai), và xóa theo group (không theo giải).
+
+### 10.2 Quyết định đã chốt với người dùng
+- **Tab Cài đặt — giữ field + thêm lưu trữ thật.** Lưu các field lịch (start_time, end_time, total_courts, match_duration_minutes, break_duration_minutes, round1_reveal_time) dạng **key-value theo (group_id, tournament_id)** trong `tournament_settings` (đồng nhất với pattern reveal/lock đang chạy). `is_active` bỏ khỏi tab Cài đặt — dùng `tournaments.status` (sửa ở form thông tin giải). Viết lại route `settings` để GET trả 1 object lắp từ các key, POST upsert nhiều key.
+- **Tab Pairings — read-only đợt này.** Render từ dữ liệu overview (đã có tên cầu thủ qua FK). KHÔNG bọc editor pairings cũ (đang hỏng). Editor sắp cặp viết lại đúng FK = **đợt sau** (ngoài phạm vi).
+
+### 10.3 Migration cần làm (mục 6.1 thay bằng phần này)
+- Migration `013_tournament_settings_group_unique.sql`: `DROP` unique cũ `unique_setting`, tạo `CREATE UNIQUE INDEX ... ON tournament_settings(group_id, tournament_id, setting_key)`. Sửa cả lỗi upsert lẫn đụng độ multi-tenant.
+- KHÔNG cần thêm cột mới (settings dùng key-value; các bảng vận hành đã có `tournament_id`).
+
+### 10.4 Phạm vi backend chính xác (thay danh sách ở mục 6)
+Mỗi route nhận `tournamentId` (query cho GET, body cho POST/PUT), validate giải thuộc group, lọc `.eq('tournament_id', tournamentId)` cạnh `group_id`:
+- Viết lại `GET|POST /api/tournament/admin/settings` → object key-value theo giải.
+- `GET /api/tournament/admin/overview` → thêm lọc `tournament_id`.
+- `POST /api/tournament/admin/toggle-round1` → nhận `tournamentId` thay cho hardcode `1`.
+- `GET|POST /api/tournament/admin/toggle-pairings-lock` → nhận `tournamentId`.
+- `POST /api/tournament/admin/reset` → scope `(group_id, tournament_id)`, bỏ UUID sentinel.
+- `GET /api/tournament/teams` → nhận `tournamentId` thay cho hardcode `1`.
+- `PUT /api/tournament/admin/reorder` → thêm lọc `tournament_id`.
+- `auto-assign`, `tournaments` CRUD: đã đúng, chỉ thêm test xác nhận.
+- Live routes: ngoài phạm vi đợt này (giữ nguyên; sẽ xử lý khi làm editor pairings).

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { listTournaments } from '@/lib/tournamentV2Client';
 import { getCurrentGroupClient } from '@/lib/groupClient';
@@ -24,7 +24,7 @@ function formatDate(d) {
     return d;
 }
 
-export default function TournamentV2Page() {
+function TournamentV2PageInner() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const activeId = searchParams.get('t');
@@ -152,5 +152,14 @@ export default function TournamentV2Page() {
                 </ul>
             )}
         </div>
+    );
+}
+
+// useSearchParams cần Suspense boundary khi prerender (Next 14 App Router).
+export default function TournamentV2Page() {
+    return (
+        <Suspense fallback={<div className="v2-page"><div className="v2-state v2-loading"><span className="v2-spinner" aria-hidden="true" /><p>Đang tải...</p></div></div>}>
+            <TournamentV2PageInner />
+        </Suspense>
     );
 }

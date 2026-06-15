@@ -48,7 +48,7 @@ export default function TournamentForm({ fetchJson, editing, onDone, onCancel })
         });
         setSaving(false);
         if (!res.ok) { setNotice(data.error || 'Không lưu được giải đấu.'); return; }
-        onDone();
+        onDone(data.tournament);
     }
 
     return (

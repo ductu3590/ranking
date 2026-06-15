@@ -59,7 +59,13 @@ export default function AdminTournamentPanel({ embedded = false, tournamentId = 
                 <TournamentForm
                     fetchJson={fetchJson}
                     editing={action === 'edit' ? current : null}
-                    onDone={async () => { await loadTournaments(); router.push('/admin?section=tournament'); }}
+                    onDone={async (saved) => {
+                        await loadTournaments();
+                        const savedId = saved?.id ?? (action === 'edit' ? current?.id : null);
+                        router.push(savedId
+                            ? `/admin?section=tournament&t=${savedId}`
+                            : '/admin?section=tournament');
+                    }}
                     onCancel={() => router.push('/admin?section=tournament')}
                 />
             </div>

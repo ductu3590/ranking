@@ -61,6 +61,8 @@ assert(panel.includes('tournamentId') && panel.includes('TournamentConsole') &&
 const listView = read('app/giai-dau/admin/components/TournamentList.js');
 assert(listView.includes('section=tournament&t=') && listView.includes('Tạo'),
     'TournamentList should link into a console and offer create.');
+assert(panel.includes('section=tournament&t=${savedId}'),
+    'After saving, the orchestrator should open the saved tournament console.');
 
 assert(exists('app/giai-dau/admin/components/TournamentForm.js'),
     'TournamentForm component should exist.');

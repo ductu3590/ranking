@@ -1,0 +1,13 @@
+const fs = require('fs'); const path = require('path');
+const root = path.join(__dirname, '..', '..');
+const read = (f) => fs.readFileSync(path.join(root, f), 'utf8');
+const exists = (f) => fs.existsSync(path.join(root, f));
+const assert = (c, m) => { if (!c) { console.error(`FAIL: ${m}`); process.exit(1); } };
+const f = 'app/api/tournament-v2/entrants/route.js';
+assert(exists(f), 'route tồn tại');
+const s = read(f);
+assert(s.includes('requireGroupAdmin'), 'admin guard');
+assert(s.includes('tournament_entrants') && s.includes('tournament_entrant_members'), 'thao tác cả entrant + members');
+assert(s.includes(".eq('group_id'") && s.includes('tournament_id'), 'scope');
+assert(s.includes('member_id') && s.includes('display_name') && s.includes('gender'), 'member có member_id/tên/giới tính');
+console.log('api-entrants contract ok');

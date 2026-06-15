@@ -1,0 +1,14 @@
+const fs = require('fs'); const path = require('path');
+const root = path.join(__dirname, '..', '..');
+const read = (f) => fs.readFileSync(path.join(root, f), 'utf8');
+const exists = (f) => fs.existsSync(path.join(root, f));
+const assert = (c, m) => { if (!c) { console.error(`FAIL: ${m}`); process.exit(1); } };
+const f = 'app/api/tournament-v2/generate/route.js';
+assert(exists(f), 'route tồn tại');
+const s = read(f);
+assert(s.includes('requireGroupAdmin'), 'admin guard');
+assert(s.includes('getScheduleEngine') && s.includes('generateSchedule'), 'gọi schedule engine');
+assert(s.includes('scheduleToInsertRows') && s.includes('resolveParentLinks'), 'dùng persistence helper');
+assert(s.includes('parent_match_id'), 'set parent_match_id sau insert');
+assert(s.includes('tournament_matches') && s.includes(".eq('group_id'") && s.includes('stage_id'), 'bảng + scope');
+console.log('api-generate contract ok');

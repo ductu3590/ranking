@@ -57,7 +57,7 @@ Số đội lẻ -> circle method tự thêm BYE ảo (không sinh match cho BYE
 }
 ```
 
-**`computeStandings` row (14 trường):**
+**`computeStandings` row (13 trường):**
 ```js
 {
   entrant_id,
@@ -140,8 +140,23 @@ Cùng return shape cho cả simple và mlp:
 const { isStageComplete, seedNextStage } = require('../../lib/tournament/orchestrator');
 
 isStageComplete(matches) -> boolean   // true khi matches.length > 0 && mọi m.status === 'done'
-seedNextStage(stage, standings) -> Advanced[]   // = getScheduleEngine(stage.schedule_format).advance(stage, standings)
+seedNextStage(stage, standings) -> Seeded[]   // gọi advance() rồi CHUẨN HÓA thêm id + seed
 ```
+`seedNextStage` trả về object **ĐÃ chuẩn hóa**: mỗi phần tử mang cả `entrant_id`/`seed_in_stage` LẪN `id`/`seed`
+(mirror của nhau). Nhờ vậy output truyền **thẳng** vào `generateSchedule` của stage sau (engine đọc `.id`/`.seed`)
+mà KHÔNG cần remap.
+
+```js
+[{ entrant_id, seed_in_stage, from_group?, from_rank?, id, seed }]  // id === entrant_id, seed === seed_in_stage
+```
+
+Lưu ý: nếu gọi **trực tiếp** `engine.advance(stage, standings)` (bỏ qua orchestrator) thì output CHỈ có
+`entrant_id`/`seed_in_stage` (knockout: `entrant_id`/`seed_in_stage` từ nhà vô địch) — phải tự remap sang `id`/`seed`
+trước khi đưa vào `generateSchedule`.
+
+API persist `entrant_id` + `seed_in_stage` vào bảng `tournament_stage_entrants` (các field `id`/`seed` chỉ là cầu nối
+cho engine stage sau, không cần lưu).
+
 Mix nhiều stage: standings stage trước → `seedNextStage` → seeding (`seed_in_stage`) cho `generateSchedule` của stage sau.
 
 ---

@@ -45,6 +45,15 @@ export default function TournamentConsole({ tournament, tab, fetchJson, onTourna
         setMenuOpen(false);
     }
 
+    async function handleDeleteTournament() {
+        if (!confirm(`Xóa giải "${tournament.name}"?`)) return;
+        if (!confirm('Xác nhận lần cuối: toàn bộ team, VĐV, lịch và cài đặt của giải này sẽ bị xóa.')) return;
+        const { res, data } = await fetchJson(`/api/tournaments?id=${id}`, { method: 'DELETE' });
+        if (!res.ok) { alert('Lỗi xóa: ' + (data.error || '')); return; }
+        if (onTournamentsChanged) await onTournamentsChanged();
+        router.push('/admin?section=tournament');
+    }
+
     const tabProps = { tournament, fetchJson, overview, reloadOverview: loadOverview };
 
     return (
@@ -63,6 +72,7 @@ export default function TournamentConsole({ tournament, tab, fetchJson, onTourna
                     <button type="button" onClick={() => router.push(`/admin?section=tournament&t=${id}&action=edit`)}>Sửa thông tin</button>
                     <button type="button" onClick={() => router.push(`/giai-dau/${id}/live`)}>Xem Live</button>
                     <button type="button" className="danger" onClick={handleReset}>Reset giải</button>
+                    <button type="button" className="danger" onClick={handleDeleteTournament}>Xóa giải</button>
                 </div>
             ) : null}
 

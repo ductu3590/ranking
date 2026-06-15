@@ -179,10 +179,12 @@ for (const route of [
     );
 }
 
+// Redesign (2026-06-14): overview read lives in the console component.
 const tournamentAdminPage = read('app/giai-dau/admin/page.js');
+const tournamentConsole = read('app/giai-dau/admin/components/TournamentConsole.js');
 assert(
-    tournamentAdminPage.includes('/api/tournament/admin/overview') &&
-    !tournamentAdminPage.includes('.from('),
+    tournamentConsole.includes('/api/tournament/admin/overview') &&
+    !tournamentAdminPage.includes('.from(') && !tournamentConsole.includes('.from('),
     'Tournament admin page should read via the server overview API (group scoping moved server-side in Option B), not direct Supabase.'
 );
 

@@ -1,0 +1,10 @@
+const { generateSchedule, splitGroups } = require('../../lib/tournament/engines/roundRobin');
+const assert = (c, m) => { if (!c) { console.error(`FAIL: ${m}`); process.exit(1); } };
+const entrants = [1, 2, 3, 4, 5, 6, 7, 8].map((id) => ({ id, name: 'E' + id, seed: id }));
+const groups = splitGroups(entrants, 2);
+assert(groups.A.map((e) => e.id).join(',') === '1,4,5,8', `bảng A snake, got ${groups.A.map((e) => e.id)}`);
+assert(groups.B.map((e) => e.id).join(',') === '2,3,6,7', `bảng B snake, got ${groups.B.map((e) => e.id)}`);
+const matches = generateSchedule({ config: { groupCount: 2 } }, entrants, 7);
+assert(matches.length === 12, `2 bảng x 6 = 12 trận, got ${matches.length}`);
+assert(matches.some((m) => m.group_label === 'A') && matches.some((m) => m.group_label === 'B'), 'có nhãn 2 bảng');
+console.log('round-robin-groups ok');

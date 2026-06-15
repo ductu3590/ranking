@@ -1,0 +1,17 @@
+const { generateSchedule } = require('../../lib/tournament/engines/knockout');
+const assert = (c, m) => { if (!c) { console.error(`FAIL: ${m}`); process.exit(1); } };
+const e8 = [1, 2, 3, 4, 5, 6, 7, 8].map((id) => ({ id, name: 'E' + id, seed: id }));
+const m8 = generateSchedule({ config: {} }, e8, 1);
+assert(m8.length === 7, `8 đội -> 7 trận, got ${m8.length}`);
+const r1 = m8.filter((m) => m.round === 1);
+assert(r1.length === 4, '4 trận vòng 1');
+const top = r1.find((m) => m.entrant_a_id === 1 || m.entrant_b_id === 1);
+assert([top.entrant_a_id, top.entrant_b_id].includes(8), 'seed1 vs seed8');
+const r2 = m8.filter((m) => m.round === 2);
+assert(r2.every((m) => m.parent_slot == null) === false, 'vòng>1 có liên kết slot');
+const e6 = [1, 2, 3, 4, 5, 6].map((id) => ({ id, name: 'E' + id, seed: id }));
+const m6 = generateSchedule({ config: {} }, e6, 1);
+const r1b = m6.filter((m) => m.round === 1);
+assert(r1b.every((m) => m.entrant_a_id && m.entrant_b_id), 'vòng 1 không chứa bye rỗng');
+assert(m6.filter((m) => m.round === 1).length === 2, '6 đội -> 2 trận vòng 1');
+console.log('knockout-schedule ok');

@@ -54,7 +54,7 @@ assert(
 
 assert(
     tournamentAdminPage.includes('embedded = false') &&
-    tournamentAdminPage.includes('/admin?section=tournament&view=pairings') &&
+    tournamentAdminPage.includes('/admin?section=tournament') &&
     !tournamentAdminPage.includes('href="/quy/admin"'),
     'Tournament admin page should be embeddable and link within the unified admin center.'
 );

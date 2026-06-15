@@ -6,7 +6,6 @@ import HomeHeader from '@/components/HomeHeader';
 import MobileBottomNav from '@/components/MobileBottomNav';
 import FundAdminPage from '@/app/quy/admin/page';
 import AdminTournamentPanel from '@/app/giai-dau/admin/page';
-import AdminPairingsPage from '@/app/giai-dau/admin/pairings/page';
 import ClubSettings from '@/app/admin/ClubSettings';
 import './admin-center.css';
 
@@ -22,14 +21,11 @@ function UnifiedAdminCenterContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const section = searchParams.get('section') || 'fund';
-    const view = searchParams.get('view') || 'overview';
+    const tournamentId = searchParams.get('t') || '';
+    const tab = searchParams.get('tab') || (searchParams.get('view') === 'pairings' ? 'pairings' : 'overview');
 
     function setSection(nextSection) {
         router.push(`/admin?section=${nextSection}`);
-    }
-
-    function setTournamentView(nextView) {
-        router.push(`/admin?section=tournament${nextView === 'pairings' ? '&view=pairings' : ''}`);
     }
 
     return (
@@ -77,23 +73,7 @@ function UnifiedAdminCenterContent() {
                 )}
                 {section === 'tournament' && (
                     <section className="admin-center-panel">
-                        <div className="admin-center-subtabs">
-                            <button
-                                type="button"
-                                className={view !== 'pairings' ? 'active' : ''}
-                                onClick={() => setTournamentView('overview')}
-                            >
-                                Tổng quan
-                            </button>
-                            <button
-                                type="button"
-                                className={view === 'pairings' ? 'active' : ''}
-                                onClick={() => setTournamentView('pairings')}
-                            >
-                                Pairings
-                            </button>
-                        </div>
-                        {view === 'pairings' ? <AdminPairingsPage embedded /> : <AdminTournamentPanel embedded />}
+                        <AdminTournamentPanel embedded tournamentId={tournamentId} tab={tab} />
                     </section>
                 )}
             </main>

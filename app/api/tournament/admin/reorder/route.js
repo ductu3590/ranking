@@ -16,12 +16,18 @@ export async function PUT(request) {
             return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
         }
 
+        const tournamentId = Number(body?.tournamentId);
+        if (!Number.isFinite(tournamentId) || tournamentId <= 0) {
+            return NextResponse.json({ error: 'tournamentId is required' }, { status: 400 });
+        }
+
         // 1. Get Team ID first
         const { data: teamData, error: teamError } = await supabaseServer
             .from('tournament_teams')
             .select('id')
             .eq('team_code', teamCode)
             .eq('group_id', groupId)
+            .eq('tournament_id', tournamentId)
             .single();
 
         if (teamError || !teamData) {
@@ -40,7 +46,8 @@ export async function PUT(request) {
                 .from('tournament_pairings')
                 .update({ pair_order: -1 * (index + 1) }) // -1, -2, -3...
                 .eq('id', item.id)
-                .eq('group_id', groupId);
+                .eq('group_id', groupId)
+                .eq('tournament_id', tournamentId);
             if (error) throw error;
         });
         await Promise.all(tempUpdates);
@@ -51,7 +58,8 @@ export async function PUT(request) {
                 .from('tournament_pairings')
                 .update({ pair_order: index + 1 })
                 .eq('id', item.id)
-                .eq('group_id', groupId);
+                .eq('group_id', groupId)
+                .eq('tournament_id', tournamentId);
             if (error) throw error;
         });
         await Promise.all(finalUpdates);

@@ -69,25 +69,37 @@ assert(
     'Tournament overview should select tournament player_name fields, not missing full_name fields.'
 );
 
-const adminPage = read('app/giai-dau/admin/page.js');
+// Redesign (2026-06-14): the monolithic admin page is split into a
+// list/console orchestrator plus focused components.
+const orchestrator = read('app/giai-dau/admin/page.js');
 assert(
-    adminPage.includes('loadTournaments') &&
-    adminPage.includes('fetchJson') &&
-    adminPage.includes('AbortController') &&
-    adminPage.includes('finally') &&
-    adminPage.includes('window.location.search') &&
-    adminPage.includes("searchParams.get('action') === 'create'") &&
-    adminPage.includes("searchParams.get('edit')") &&
-    adminPage.includes('openCreateTournament') &&
-    adminPage.includes('handleSaveTournament') &&
-    adminPage.includes('handleDeleteTournament') &&
-    adminPage.includes('handleAutoAssign') &&
-    adminPage.includes('/api/tournaments/auto-assign'),
-    'Tournament admin page should manage tournament CRUD and auto assignment.'
+    orchestrator.includes('loadTournaments') &&
+    orchestrator.includes('fetchJson') &&
+    orchestrator.includes('AbortController') &&
+    orchestrator.includes('finally') &&
+    orchestrator.includes('window.location.search') &&
+    orchestrator.includes("action === 'create'"),
+    'Tournament orchestrator should load tournaments and route to the create form.'
 );
+const formComp = read('app/giai-dau/admin/components/TournamentForm.js');
 assert(
-    adminPage.includes('m.round_number === round') && !adminPage.includes('m.round === round'),
-    'Tournament admin round summaries should use tournament_matches.round_number.'
+    formComp.includes("'/api/tournaments'") && formComp.includes('PATCH') && formComp.includes('POST'),
+    'TournamentForm should create/update tournaments.'
+);
+const consoleComp = read('app/giai-dau/admin/components/TournamentConsole.js');
+assert(
+    consoleComp.includes('handleDeleteTournament') && consoleComp.includes('handleReset'),
+    'TournamentConsole should support deleting and resetting a tournament.'
+);
+const teamsTabComp = read('app/giai-dau/admin/components/tabs/TeamsTab.js');
+assert(
+    teamsTabComp.includes('handleAutoAssign') && teamsTabComp.includes('/api/tournaments/auto-assign'),
+    'TeamsTab should auto-assign teams/pairs.'
+);
+const overviewTabComp = read('app/giai-dau/admin/components/tabs/OverviewTab.js');
+assert(
+    overviewTabComp.includes('m.round_number === round') && !overviewTabComp.includes('m.round === round'),
+    'Overview round summaries should use tournament_matches.round_number.'
 );
 
 for (const label of [
@@ -98,7 +110,7 @@ for (const label of [
     'Chia ngẫu nhiên',
     'Chia cặp ngẫu nhiên',
 ]) {
-    assert(adminPage.includes(label), `Tournament admin UI should include "${label}".`);
+    assert(formComp.includes(label), `TournamentForm should include "${label}".`);
 }
 
 const pkg = read('package.json');

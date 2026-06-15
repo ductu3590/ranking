@@ -51,13 +51,16 @@ assert(
     'Fund admin page should use the club server APIs.'
 );
 
+// Redesign (2026-06-14): overview/reset calls live in the console component.
 const tourAdmin = read('app/giai-dau/admin/page.js');
+const tourConsole = read('app/giai-dau/admin/components/TournamentConsole.js');
 assert(
-    !tourAdmin.includes('@/lib/supabaseClient') && !tourAdmin.includes('.from('),
+    !tourAdmin.includes('@/lib/supabaseClient') && !tourAdmin.includes('.from(') &&
+    !tourConsole.includes('@/lib/supabaseClient') && !tourConsole.includes('.from('),
     'Tournament admin page should not query Supabase directly.'
 );
 assert(
-    tourAdmin.includes('/api/tournament/admin/overview') && tourAdmin.includes('/api/tournament/admin/reset'),
+    tourConsole.includes('/api/tournament/admin/overview') && tourConsole.includes('/api/tournament/admin/reset'),
     'Tournament admin page should use the overview and reset APIs.'
 );
 

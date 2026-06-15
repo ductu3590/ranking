@@ -9,13 +9,17 @@ export async function POST(request) {
         const adminCheck = requireGroupAdmin();
         if (!adminCheck.ok) return adminCheck.response;
         const groupId = getGroupIdForDatabase();
-        const { reveal } = await request.json();
+        const { reveal, tournamentId } = await request.json();
+        const tid = Number(tournamentId);
+        if (!Number.isFinite(tid) || tid <= 0) {
+            return NextResponse.json({ success: false, error: 'tournamentId is required' }, { status: 400 });
+        }
 
         // Update setting - use simple boolean instead of timestamp
         const { error } = await supabase
             .from('tournament_settings')
             .upsert({
-                tournament_id: 1,
+                tournament_id: tid,
                 group_id: groupId,
                 setting_key: 'round1_revealed',
                 setting_value: reveal, // true or false
@@ -42,14 +46,16 @@ export async function POST(request) {
 }
 
 // GET - Check current state
-export async function GET() {
+export async function GET(request) {
     try {
         const groupId = getGroupIdForDatabase();
+        const tournamentId = Number(new URL(request.url).searchParams.get('tournamentId')) || 1;
         const { data } = await supabase
             .from('tournament_settings')
             .select('setting_value')
             .eq('setting_key', 'round1_revealed')
             .eq('group_id', groupId)
+            .eq('tournament_id', tournamentId)
             .single();
 
         return NextResponse.json({

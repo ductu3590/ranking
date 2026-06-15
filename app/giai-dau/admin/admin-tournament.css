@@ -474,3 +474,34 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* === Redesign: list + console (mobile-first) === */
+.tournament-filter-chips { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+.tournament-filter-chips .chip { padding: 6px 12px; border-radius: 999px; border: 1px solid #d0d5dd; background: #fff; font-size: 13px; }
+.tournament-filter-chips .chip.active { background: #111827; color: #fff; border-color: #111827; }
+
+.tournament-row { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 14px; border: 1px solid #e5e7eb; border-radius: 12px; background: #fff; margin-bottom: 10px; cursor: pointer; }
+.tournament-row-main { flex: 1; min-width: 0; }
+.tournament-row-main h3 { margin: 4px 0 2px; font-size: 16px; }
+.tournament-row-main p { margin: 0; font-size: 13px; color: #6b7280; }
+.tournament-row-chevron { font-size: 22px; color: #9ca3af; }
+
+.console-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.console-back, .console-menu-btn { font-size: 20px; background: none; border: none; padding: 4px 8px; cursor: pointer; }
+.console-title { flex: 1; min-width: 0; font-size: 17px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.console-menu { display: flex; flex-direction: column; align-items: stretch; gap: 2px; border: 1px solid #e5e7eb; border-radius: 10px; padding: 6px; margin-bottom: 12px; background: #fff; }
+.console-menu button { text-align: left; padding: 10px 12px; background: none; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; }
+.console-menu button:hover { background: #f3f4f6; }
+.console-menu button.danger { color: #b91c1c; }
+
+.next-step-strip { display: flex; align-items: center; gap: 10px; background: #eff6ff; border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; }
+.next-step-strip > div { flex: 1; display: flex; flex-direction: column; }
+.next-step-label { font-size: 11px; color: #1d4ed8; }
+
+.console-tabs { display: flex; gap: 16px; overflow-x: auto; border-bottom: 1px solid #e5e7eb; margin-bottom: 14px; }
+.console-tabs button { white-space: nowrap; padding: 10px 0; background: none; border: none; border-bottom: 2px solid transparent; font-size: 14px; color: #6b7280; cursor: pointer; }
+.console-tabs button.active { color: #111827; border-bottom-color: #111827; font-weight: 600; }
+
+.team-player-list { list-style: none; padding: 0; margin: 8px 0 0; font-size: 13px; }
+.pairings-list, .matches-list { list-style: none; padding: 0; margin: 0; }
+.pairings-list li, .matches-list li { display: flex; gap: 10px; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 14px; }

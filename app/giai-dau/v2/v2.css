@@ -1,0 +1,392 @@
+/* Tournament v2 — mobile-first (~380px), tái dùng palette tím #667eea/#764ba2/#8b5cf6 */
+
+.v2-page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 16px;
+    color: #1f2937;
+    min-height: 100vh;
+}
+
+.v2-back {
+    background: none;
+    border: none;
+    color: #667eea;
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 8px 0;
+    cursor: pointer;
+}
+
+/* --- Header danh sách --- */
+.v2-list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 8px 0 20px;
+}
+
+.v2-list-header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #4c2c92;
+}
+
+/* --- Nút --- */
+.v2-btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.v2-btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.v2-btn-secondary {
+    background: #fff;
+    color: #667eea;
+    border: 1.5px solid #c7d2fe;
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.v2-btn-secondary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* --- Trạng thái loading/error/empty --- */
+.v2-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 48px 16px;
+    text-align: center;
+    color: #6b7280;
+}
+
+.v2-error {
+    color: #b91c1c;
+}
+
+.v2-spinner {
+    width: 36px;
+    height: 36px;
+    border: 4px solid #e0e7ff;
+    border-top-color: #8b5cf6;
+    border-radius: 50%;
+    animation: v2-spin 1s linear infinite;
+}
+
+@keyframes v2-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* --- Danh sách thẻ --- */
+.v2-card-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.v2-card {
+    position: relative;
+    width: 100%;
+    text-align: left;
+    background: #fff;
+    border: 1px solid #ede9fe;
+    border-radius: 14px;
+    padding: 14px 36px 14px 16px;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.08);
+    cursor: pointer;
+}
+
+.v2-card:active {
+    transform: scale(0.99);
+}
+
+.v2-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.v2-card-date {
+    font-size: 0.8rem;
+    color: #9ca3af;
+}
+
+.v2-card-name {
+    margin: 0 0 4px;
+    font-size: 1.05rem;
+    color: #1f2937;
+}
+
+.v2-card-meta {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+.v2-card-chevron {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.4rem;
+    color: #c4b5fd;
+}
+
+/* --- Chip trạng thái --- */
+.v2-chip {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+    text-transform: none;
+}
+
+.v2-chip-draft {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.v2-chip-active {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.v2-chip-completed {
+    background: #ede9fe;
+    color: #6d28d9;
+}
+
+/* --- Console stub --- */
+.v2-console-stub {
+    background: #fff;
+    border: 1px dashed #c4b5fd;
+    border-radius: 14px;
+    padding: 24px 16px;
+    text-align: center;
+    color: #6b7280;
+}
+
+.v2-console-stub h2 {
+    margin: 0 0 8px;
+    color: #4c2c92;
+}
+
+.v2-console-stub-id {
+    font-size: 0.8rem;
+    color: #9ca3af;
+    word-break: break-all;
+}
+
+/* ==================== WIZARD (dùng chung file css) ==================== */
+
+.v2-wizard {
+    background: #fff;
+    border: 1px solid #ede9fe;
+    border-radius: 16px;
+    padding: 18px 16px;
+    box-shadow: 0 2px 10px rgba(102, 126, 234, 0.08);
+}
+
+.v2-wizard-title {
+    margin: 0 0 14px;
+    font-size: 1.25rem;
+    color: #4c2c92;
+}
+
+/* Thanh bước */
+.v2-steps {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 18px;
+}
+
+.v2-step-dot {
+    flex: 1;
+    text-align: center;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #9ca3af;
+    padding-bottom: 8px;
+    border-bottom: 3px solid #ede9fe;
+}
+
+.v2-step-dot.active {
+    color: #667eea;
+    border-bottom-color: #8b5cf6;
+}
+
+.v2-step-dot.done {
+    color: #15803d;
+    border-bottom-color: #86efac;
+}
+
+/* Form chung */
+.v2-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 14px;
+}
+
+.v2-field label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.v2-field input,
+.v2-field select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 12px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    background: #fff;
+}
+
+.v2-field input:focus,
+.v2-field select:focus {
+    outline: none;
+    border-color: #8b5cf6;
+}
+
+.v2-radio-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.v2-radio {
+    flex: 1;
+    min-width: 120px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.v2-radio.active {
+    border-color: #8b5cf6;
+    background: #f5f3ff;
+    color: #6d28d9;
+    font-weight: 600;
+}
+
+/* Mảng phụ (config 2 cột) */
+.v2-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+/* Danh sách item (stage/entrant) đã thêm */
+.v2-item-list {
+    list-style: none;
+    margin: 0 0 14px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.v2-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background: #faf5ff;
+    border: 1px solid #ede9fe;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 0.9rem;
+}
+
+.v2-item-sub {
+    font-size: 0.78rem;
+    color: #8b5cf6;
+}
+
+.v2-add-box {
+    background: #f9fafb;
+    border: 1px dashed #c4b5fd;
+    border-radius: 12px;
+    padding: 14px 12px;
+    margin-bottom: 14px;
+}
+
+.v2-add-box h3 {
+    margin: 0 0 10px;
+    font-size: 0.95rem;
+    color: #4c2c92;
+}
+
+.v2-notice {
+    background: #fef2f2;
+    color: #b91c1c;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 0.85rem;
+    margin: 0 0 14px;
+}
+
+.v2-result {
+    background: #f0fdf4;
+    color: #15803d;
+    border-radius: 10px;
+    padding: 14px 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 14px;
+}
+
+/* Điều hướng bước */
+.v2-wizard-nav {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+}
+
+.v2-wizard-nav .v2-btn-primary,
+.v2-wizard-nav .v2-btn-secondary {
+    flex: 1;
+}
+
+/* Desktop nới rộng */
+@media (min-width: 640px) {
+    .v2-page {
+        padding: 24px;
+    }
+    .v2-list-header h1 {
+        font-size: 1.8rem;
+    }
+}

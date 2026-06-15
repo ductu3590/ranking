@@ -1,0 +1,14 @@
+const fs = require('fs'); const path = require('path');
+const root = path.join(__dirname, '..', '..');
+const read = (f) => fs.readFileSync(path.join(root, f), 'utf8');
+const exists = (f) => fs.existsSync(path.join(root, f));
+const assert = (c, m) => { if (!c) { console.error(`FAIL: ${m}`); process.exit(1); } };
+const f = 'app/giai-dau/v2/page.js';
+assert(exists(f), 'trang list tồn tại');
+const s = read(f);
+assert(s.includes("'use client'") || s.includes('"use client"'), 'client component');
+assert(s.includes('listTournaments') && s.includes('tournamentV2Client'), 'dùng client wrapper');
+assert(s.includes('getCurrentGroupClient'), 'lấy role');
+assert(/Tạo|Thêm/.test(s), 'có nút tạo (tiếng Việt)');
+assert(exists('app/giai-dau/v2/v2.css'), 'css kèm');
+console.log('ui-list contract ok');

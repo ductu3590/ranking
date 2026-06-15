@@ -1,6 +1,8 @@
 .tournament-module-nav-wrap {
-    background: var(--bg-primary);
+    background: var(--surface-court-soft);
     border-bottom: 1px solid var(--border-color);
+    color: var(--court-midnight);
+    box-shadow: var(--shadow-sm);
     padding: 12px 16px 0;
 }
 
@@ -26,9 +28,9 @@
     gap: 7px;
     padding: 0 14px;
     border-radius: 8px;
-    border: 1px solid #E2E8F0;
-    background: #FFFFFF;
-    color: #475569;
+    border: 1px solid var(--border-color);
+    background: var(--surface-court-soft);
+    color: var(--court-midnight);
     text-decoration: none;
     font-size: 14px;
     font-weight: 700;
@@ -37,15 +39,15 @@
 }
 
 .tournament-module-link:hover {
-    border-color: rgba(37, 99, 235, 0.3);
-    color: #2563EB;
-    background: #EFF6FF;
+    border-color: var(--border-color);
+    color: var(--court-midnight);
+    background: var(--surface-court-soft);
 }
 
 .tournament-module-link.active {
-    border-color: rgba(37, 99, 235, 0.32);
-    background: #EFF6FF;
-    color: #2563EB;
+    background: var(--court-midnight);
+    color: var(--pickle-lime);
+    border-color: rgba(202, 255, 40, 0.28);
 }
 
 @media (max-width: 768px) {

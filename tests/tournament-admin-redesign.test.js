@@ -62,4 +62,14 @@ const listView = read('app/giai-dau/admin/components/TournamentList.js');
 assert(listView.includes('section=tournament&t=') && listView.includes('Tạo'),
     'TournamentList should link into a console and offer create.');
 
+assert(exists('app/giai-dau/admin/components/TournamentForm.js'),
+    'TournamentForm component should exist.');
+const form = read('app/giai-dau/admin/components/TournamentForm.js');
+assert(form.includes("'/api/tournaments'") && form.includes('PATCH') && form.includes('POST') &&
+    form.includes('tournament_format') && form.includes('assignment_mode'),
+    'TournamentForm should create/update tournaments with format + assignment mode.');
+for (const label of ['MLP Team Match', 'Đánh đôi vòng tròn', 'Vòng bảng + Playoff', 'Loại trực tiếp']) {
+    assert(form.includes(label), `TournamentForm should include "${label}".`);
+}
+
 console.log('tournament admin redesign contract ok');

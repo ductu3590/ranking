@@ -92,6 +92,11 @@
 .stat-value.positive { color: var(--court-green); }
 .stat-value.negative { color: var(--rally-coral); }
 
+.balance-card .stat-value.positive,
+.balance-card .stat-value.negative {
+    color: white;
+}
+
 /* ─── Tabs ─── */
 .tab-bar {
     display: flex;

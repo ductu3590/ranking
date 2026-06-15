@@ -84,4 +84,19 @@ assert(consoleSrc.includes('OverviewTab') && consoleSrc.includes('SettingsTab') 
 assert(consoleSrc.includes('/api/tournament/admin/reset') && consoleSrc.includes('tournamentId'),
     'Console overflow should reset scoped to this tournament.');
 
+for (const f of ['OverviewTab', 'SettingsTab', 'TeamsTab', 'PairingsTab', 'MatchesTab']) {
+    assert(exists(`app/giai-dau/admin/components/tabs/${f}.js`), `${f} should exist.`);
+}
+const settingsTab = read('app/giai-dau/admin/components/tabs/SettingsTab.js');
+assert(settingsTab.includes('/api/tournament/admin/settings') &&
+    settingsTab.includes('round1_reveal_time') && settingsTab.includes('total_courts') &&
+    settingsTab.includes('tournamentId'),
+    'SettingsTab should save per-tournament key-value settings.');
+const teamsTab = read('app/giai-dau/admin/components/tabs/TeamsTab.js');
+assert(teamsTab.includes('/api/tournaments/auto-assign') && teamsTab.includes('tournamentId'),
+    'TeamsTab should auto-assign scoped to this tournament.');
+const pairingsTab = read('app/giai-dau/admin/components/tabs/PairingsTab.js');
+assert(pairingsTab.includes('read-only') || pairingsTab.includes('chỉ xem'),
+    'PairingsTab should be read-only this round.');
+
 console.log('tournament admin redesign contract ok');

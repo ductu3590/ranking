@@ -99,4 +99,9 @@ const pairingsTab = read('app/giai-dau/admin/components/tabs/PairingsTab.js');
 assert(pairingsTab.includes('read-only') || pairingsTab.includes('chỉ xem'),
     'PairingsTab should be read-only this round.');
 
+const css = read('app/giai-dau/admin/admin-tournament.css');
+for (const cls of ['.console-tabs', '.next-step-strip', '.tournament-row', '.tournament-filter-chips', '.console-header']) {
+    assert(css.includes(cls), `admin-tournament.css should style ${cls}.`);
+}
+
 console.log('tournament admin redesign contract ok');

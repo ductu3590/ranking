@@ -100,6 +100,9 @@ export async function POST(request) {
         if (!tournamentId) {
             return NextResponse.json({ error: 'tournament_id is required' }, { status: 400 });
         }
+        if (!String(body.name || '').trim()) {
+            return NextResponse.json({ error: 'Tên đội/cặp là bắt buộc' }, { status: 400 });
+        }
 
         const payload = buildEntrantPayload(body, adminCheck.groupId);
 

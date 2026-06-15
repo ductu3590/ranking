@@ -49,7 +49,7 @@ function buildStagePayload(body, groupId) {
     if (groupId) {
         payload.group_id = groupId;
     }
-    payload.updated_at = new Date().toISOString();
+    // tournament_stages không có cột updated_at (migration 015) — không ghi.
     return payload;
 }
 

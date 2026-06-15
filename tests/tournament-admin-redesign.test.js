@@ -26,4 +26,23 @@ assert(settingsRoute.includes("onConflict: 'group_id,tournament_id,setting_key'"
 assert(!settingsRoute.includes('tournament_name') && !settingsRoute.includes("order('created_at'"),
     'Settings route should drop dead flat-column logic.');
 
+for (const f of [
+    'app/api/tournament/admin/overview/route.js',
+    'app/api/tournament/teams/route.js',
+    'app/api/tournament/admin/toggle-round1/route.js',
+    'app/api/tournament/admin/toggle-pairings-lock/route.js',
+    'app/api/tournament/admin/reorder/route.js',
+    'app/api/tournament/admin/reset/route.js',
+]) {
+    const c = read(f);
+    assert(c.includes('tournamentId') && c.includes(".eq('tournament_id'"),
+        `${f} should be scoped by tournamentId.`);
+}
+const reset = read('app/api/tournament/admin/reset/route.js');
+assert(!reset.includes('00000000-0000-0000-0000-000000000000'),
+    'reset route should not use the UUID sentinel against integer ids.');
+const teamsRoute = read('app/api/tournament/teams/route.js');
+assert(!teamsRoute.includes(".eq('tournament_id', 1)"),
+    'teams route should not hardcode tournament_id = 1.');
+
 console.log('tournament admin redesign contract ok');

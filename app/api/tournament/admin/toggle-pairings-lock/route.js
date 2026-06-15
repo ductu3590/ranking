@@ -7,6 +7,11 @@ export async function POST(request) {
         const adminCheck = requireGroupAdmin();
         if (!adminCheck.ok) return adminCheck.response;
         const groupId = getGroupIdForDatabase();
+        const { tournamentId } = await request.json().catch(() => ({}));
+        const tid = Number(tournamentId);
+        if (!Number.isFinite(tid) || tid <= 0) {
+            return NextResponse.json({ error: 'tournamentId is required' }, { status: 400 });
+        }
 
         // Get current lock status
         const { data: currentSetting, error: fetchError } = await supabaseAdmin
@@ -14,7 +19,8 @@ export async function POST(request) {
             .select('setting_value')
             .eq('setting_key', 'pairings_locked')
             .eq('group_id', groupId)
-            .single();
+            .eq('tournament_id', tid)
+            .maybeSingle();
 
         if (fetchError) {
             console.error('Error fetching lock status:', fetchError);
@@ -56,15 +62,17 @@ export async function POST(request) {
 }
 
 // GET endpoint to check lock status
-export async function GET() {
+export async function GET(request) {
     try {
         const groupId = getGroupIdForDatabase();
+        const tournamentId = Number(new URL(request.url).searchParams.get('tournamentId')) || 1;
         const { data, error } = await supabaseAdmin
             .from('tournament_settings')
             .select('setting_value')
             .eq('setting_key', 'pairings_locked')
             .eq('group_id', groupId)
-            .single();
+            .eq('tournament_id', tournamentId)
+            .maybeSingle();
 
         if (error) {
             console.error('Error fetching lock status:', error);

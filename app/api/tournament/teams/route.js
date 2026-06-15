@@ -4,15 +4,16 @@ import { getEffectiveGroupContext, isMissingGroupColumnError } from '@/lib/group
 
 // GET /api/tournament/teams
 // Fetch all teams and their players
-export async function GET() {
+export async function GET(request) {
     try {
         const { group_id: groupId } = getEffectiveGroupContext();
+        const tournamentId = Number(new URL(request.url).searchParams.get('tournamentId')) || 1;
         // Fetch teams
         const { data: teams, error: teamsError } = await supabase
             .from('tournament_teams')
             .select('*')
             .eq('group_id', groupId)
-            .eq('tournament_id', 1)
+            .eq('tournament_id', tournamentId)
             .order('team_code');
 
         if (teamsError) throw teamsError;
@@ -22,7 +23,7 @@ export async function GET() {
             .from('tournament_players')
             .select('*')
             .eq('group_id', groupId)
-            .eq('tournament_id', 1)
+            .eq('tournament_id', tournamentId)
             .eq('is_active', true)
             .order('display_order');
 
@@ -42,10 +43,11 @@ export async function GET() {
     } catch (error) {
         if (isMissingGroupColumnError(error)) {
             try {
+                const fallbackTournamentId = Number(new URL(request.url).searchParams.get('tournamentId')) || 1;
                 const { data: teams, error: teamsError } = await supabase
                     .from('tournament_teams')
                     .select('*')
-                    .eq('tournament_id', 1)
+                    .eq('tournament_id', fallbackTournamentId)
                     .order('team_code');
 
                 if (teamsError) throw teamsError;
@@ -53,7 +55,7 @@ export async function GET() {
                 const { data: players, error: playersError } = await supabase
                     .from('tournament_players')
                     .select('*')
-                    .eq('tournament_id', 1)
+                    .eq('tournament_id', fallbackTournamentId)
                     .eq('is_active', true)
                     .order('display_order');
 

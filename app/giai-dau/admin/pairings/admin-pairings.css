@@ -6,7 +6,7 @@
     max-width: 1400px;
     margin: 0 auto;
     padding: 30px 20px;
-    background: var(--bg-primary);
+    background: var(--surface-court);
     min-height: 100vh;
     font-family: var(--font-family);
     color: var(--text-primary);
@@ -86,7 +86,7 @@
 }
 
 .toggle-label.active {
-    color: var(--success);
+    color: var(--court-green);
 }
 
 .toggle-switch {
@@ -133,11 +133,11 @@
 }
 
 input:checked+.slider {
-    background-color: var(--success);
+    background-color: var(--live-cyan);
 }
 
 input:focus+.slider {
-    box-shadow: 0 0 1px var(--success);
+    box-shadow: 0 0 1px var(--live-cyan);
 }
 
 input:checked+.slider:before {
@@ -206,13 +206,13 @@ input:checked+.slider .text-off {
 }
 
 .round-tab.active {
-    background: var(--primary);
-    color: white;
-    border-color: var(--primary);
+    background: var(--court-midnight);
+    color: var(--pickle-lime);
+    border-color: var(--court-midnight);
 }
 
 .round-tab:hover:not(.active) {
-    background: var(--bg-secondary);
+    background: var(--surface-court);
 }
 
 /* Teams Container */
@@ -279,7 +279,7 @@ input:checked+.slider .text-off {
 }
 
 .player-input:focus {
-    border-color: var(--primary);
+    border-color: var(--live-cyan);
 }
 
 .vs {
@@ -290,8 +290,8 @@ input:checked+.slider .text-off {
 .btn-save {
     margin-top: 10px;
     padding: 12px 20px;
-    background: var(--gradient-primary);
-    color: white;
+    background: var(--gradient-court-action);
+    color: var(--court-midnight);
     border: none;
     border-radius: 8px;
     font-weight: 700;

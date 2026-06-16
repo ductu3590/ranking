@@ -21,7 +21,7 @@
 
 .pair-box.draggable:hover,
 .order-item.draggable:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 4px 12px rgba(44, 220, 255, 0.4);
     transform: translateY(-2px);
 }
 
@@ -34,8 +34,25 @@
     top: 50%;
     transform: translateY(-50%);
     font-size: 20px;
-    color: #10b981;
+    color: var(--live-cyan);
     animation: bounce 1s infinite;
+}
+
+.pair-box.draggable:active::after,
+.order-item.draggable:active::after {
+    color: var(--pickle-lime);
+}
+
+.pair-box.drag-over,
+.order-item.drag-over {
+    border-color: var(--pickle-lime);
+    box-shadow: 0 0 0 3px rgba(202, 255, 40, 0.2);
+}
+
+.pair-box.drag-invalid,
+.order-item.drag-invalid {
+    border-color: var(--rally-coral);
+    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.2);
 }
 
 @keyframes bounce {

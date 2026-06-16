@@ -18,9 +18,9 @@
 
 .tournament-badge {
     display: inline-block;
-    background: var(--gradient-badge);
+    background: var(--gradient-court-hero);
     border: 2px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+    box-shadow: 0 4px 15px rgba(7, 27, 24, 0.28);
     color: white;
     padding: 5px 15px;
     border-radius: var(--border-radius-lg);
@@ -160,7 +160,7 @@
 }
 
 .phase-header {
-    background: var(--gradient-badge) !important;
+    background: var(--gradient-court-hero) !important;
     color: #fff;
     font-weight: bold;
     text-align: left !important;

@@ -119,8 +119,9 @@
 }
 
 .tournament-icon-action.danger {
-    border-color: rgba(220, 38, 38, 0.22);
-    color: #DC2626;
+    background: var(--rally-coral-soft);
+    border-color: rgba(255, 107, 53, 0.24);
+    color: var(--rally-coral);
 }
 
 .tournament-icon-action:hover {

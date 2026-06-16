@@ -1,61 +1,65 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');
 
 :root {
-  /* ── Palette sáng, hiện đại ── */
-  --bg-primary: #F8FAFC;
-  --bg-secondary: #F1F5F9;
+  --court-midnight: #071B18;
+  --court-green: #0D7565;
+  --court-green-strong: #064F45;
+  --court-green-soft: #E6F8F0;
+  --pickle-lime: #CAFF28;
+  --pickle-lime-soft: #F1FFC6;
+  --live-cyan: #2CDCFF;
+  --live-cyan-soft: #E6FBFF;
+  --rally-coral: #FF6B35;
+  --rally-coral-soft: #FFF0EA;
+  --surface-court: #F4FBF6;
+  --surface-court-soft: #EEF7F3;
+  --bg-primary: var(--surface-court);
+  --bg-secondary: var(--surface-court-soft);
   --bg-card: #FFFFFF;
-  --bg-card-hover: #F8FAFC;
-  --border-color: #E2E8F0;
-
-  /* Text */
-  --text-primary: #0F172A;
-  --text-secondary: #475569;
-  --text-muted: #94A3B8;
-
-  /* Brand colors */
-  --primary: #2563EB;
-  --primary-hover: #1D4ED8;
-  --primary-dim: rgba(37, 99, 235, 0.08);
-  --primary-light: #EFF6FF;
-
-  /* Status */
-  --success: #10B981;
-  --success-dim: rgba(16, 185, 129, 0.10);
-  --success-light: #ECFDF5;
-  --danger: #EF4444;
-  --danger-dim: rgba(239, 68, 68, 0.10);
-  --danger-light: #FEF2F2;
-  --warning: #F59E0B;
-  --warning-dim: rgba(245, 158, 11, 0.10);
-
-  /* Gradients */
-  --gradient-primary: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
-  --gradient-success: linear-gradient(135deg, #10B981 0%, #059669 100%);
-  --gradient-team-blue: linear-gradient(135deg, #1D4ED8 0%, #2563EB 100%);
-  --gradient-team-red: linear-gradient(135deg, #DC2626 0%, #EF4444 100%);
-
-  /* Typography */
+  --bg-card-hover: #F8FCF9;
+  --border-color: #DBECE4;
+  --border-strong: #BBD8CB;
+  --text-primary: #071B18;
+  --text-secondary: #536A64;
+  --text-muted: #7A8D85;
+  --primary: var(--court-green);
+  --primary-hover: var(--court-green-strong);
+  --primary-dim: rgba(13, 117, 101, 0.10);
+  --primary-light: var(--court-green-soft);
+  --success: #14A979;
+  --success-dim: rgba(20, 169, 121, 0.12);
+  --success-light: #E8F8F1;
+  --danger: var(--rally-coral);
+  --danger-dim: rgba(255, 107, 53, 0.12);
+  --danger-light: var(--rally-coral-soft);
+  --warning: #F5B700;
+  --warning-dim: rgba(245, 183, 0, 0.14);
+  --gradient-court-hero:
+    radial-gradient(circle at 92% 8%, rgba(44, 220, 255, 0.36), transparent 25%),
+    linear-gradient(135deg, #071B18 0%, #0D7565 58%, #14A979 100%);
+  --gradient-court-action: linear-gradient(135deg, #CAFF28 0%, #9DF20B 100%);
+  --gradient-court-green: linear-gradient(135deg, #0D7565 0%, #14A979 100%);
+  --gradient-live: linear-gradient(135deg, #2CDCFF 0%, #14A979 100%);
+  --gradient-danger: linear-gradient(135deg, #FF6B35 0%, #E64A2E 100%);
   --font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-
-  /* Spacing & Shape */
-  --mobile-bottom-nav-height: 72px;
-  --border-radius-sm: 8px;
-  --border-radius-md: 12px;
-  --border-radius-lg: 16px;
-  --border-radius-xl: 20px;
-
-  /* Shadows — nhẹ, hiện đại */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.10), 0 4px 8px rgba(0, 0, 0, 0.04);
-
-  /* Legacy compat */
-  --dark: #0F172A;
+  --mobile-bottom-nav-height: 78px;
+  --border-radius-sm: 10px;
+  --border-radius-md: 14px;
+  --border-radius-lg: 18px;
+  --border-radius-xl: 22px;
+  --shadow-sm: 0 8px 24px rgba(7, 27, 24, 0.06);
+  --shadow-md: 0 14px 36px rgba(7, 27, 24, 0.10);
+  --shadow-lg: 0 24px 70px rgba(7, 27, 24, 0.18);
+  --focus-ring: 0 0 0 3px rgba(202, 255, 40, 0.36);
+  --dark: var(--court-midnight);
   --light: #FFFFFF;
-  --secondary: #1D4ED8;
-  --accent: #F59E0B;
-  --gradient-badge: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  --secondary: var(--court-green);
+  --accent: var(--pickle-lime);
+  --gradient-primary: var(--gradient-court-green);
+  --gradient-success: var(--gradient-court-green);
+  --gradient-team-blue: linear-gradient(135deg, #0D7565 0%, #2CDCFF 100%);
+  --gradient-team-red: linear-gradient(135deg, #FF6B35 0%, #E64A2E 100%);
+  --gradient-badge: var(--gradient-court-action);
 }
 
 html {
@@ -68,7 +72,7 @@ body {
   padding: 0;
   box-sizing: border-box;
   font-family: var(--font-family);
-  background: var(--bg-primary);
+  background: var(--surface-court);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -78,10 +82,11 @@ body {
   box-sizing: border-box;
 }
 
-/* ── Shared Layout ── */
 .app-background {
   min-height: 100vh;
-  background: var(--bg-primary);
+  background:
+    radial-gradient(circle at top right, rgba(202, 255, 40, 0.12), transparent 28rem),
+    var(--surface-court);
   padding: 20px;
 }
 
@@ -96,13 +101,12 @@ body {
 }
 
 .card-header {
-  background: var(--gradient-primary);
-  border-bottom: 1px solid var(--border-color);
+  background: var(--gradient-court-hero);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   padding: 30px 20px;
   text-align: center;
 }
 
-/* ── Responsive ── */
 @media (max-width: 768px) {
   body {
     padding-bottom: calc(var(--mobile-bottom-nav-height) + env(safe-area-inset-bottom));

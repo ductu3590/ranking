@@ -6,7 +6,10 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    background: var(--surface-court-soft);
+    border: 1px solid var(--border-color);
+    color: var(--court-midnight);
+    box-shadow: var(--shadow-sm);
     transition: all 0.2s;
 }
 
@@ -32,9 +35,9 @@
     min-width: 150px;
     padding: 6px;
     border-radius: 8px;
-    background: #ffffff;
-    border: 1px solid rgba(15, 23, 42, 0.12);
-    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
+    background: var(--surface-court-soft);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
 }
 
 .user-badge-logout {
@@ -56,28 +59,28 @@
 }
 
 .user-badge.loading {
-    background: rgba(156, 163, 175, 0.2);
-    color: #6b7280;
+    background: var(--surface-court-soft);
+    color: var(--court-midnight);
 }
 
 .admin-badge {
-    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-    color: white;
+    background: var(--surface-court-soft);
+    color: var(--court-midnight);
 }
 
 .admin-badge:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+    box-shadow: var(--shadow-sm);
 }
 
 .member-badge {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: white;
+    background: var(--surface-court-soft);
+    color: var(--court-midnight);
 }
 
 .member-badge:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+    box-shadow: var(--shadow-sm);
 }
 
 /* Two-line layout: group name on top, role below */
@@ -106,15 +109,15 @@
 }
 
 .captain-badge {
-    color: white;
+    color: var(--court-midnight);
 }
 
 .captain-badge.captain-blue {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    background: var(--surface-court-soft);
 }
 
 .captain-badge.captain-red {
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    background: var(--surface-court-soft);
 }
 
 .captain-badge:hover {
@@ -122,9 +125,9 @@
 }
 
 .guest-badge {
-    background: rgba(156, 163, 175, 0.2);
-    color: #4b5563;
-    border: 2px solid rgba(156, 163, 175, 0.3);
+    background: var(--surface-court-soft);
+    color: var(--court-midnight);
+    border: 1px solid var(--border-color);
 }
 
 /* Mobile Responsive */

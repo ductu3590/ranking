@@ -4,7 +4,9 @@
 
 .members-page {
     min-height: 100vh;
-    background: var(--bg-primary);
+    background:
+        radial-gradient(circle at top right, rgba(202, 255, 40, 0.12), transparent 28rem),
+        var(--surface-court);
     color: var(--text-primary);
     font-family: var(--font-family);
 }
@@ -17,9 +19,9 @@
 
 /* ─── Header ─── */
 .members-header {
-    background: var(--bg-card);
+    background: #fff;
     border: 1px solid var(--border-color);
-    border-radius: 14px;
+    border-radius: var(--border-radius-md);
     padding: 24px 28px;
     margin-bottom: 20px;
     display: flex;
@@ -57,13 +59,13 @@
 }
 
 .active-badge {
-    background: var(--success-dim);
-    color: var(--success);
-    border: 1px solid rgba(16, 185, 129, 0.25);
+    background: var(--pickle-lime-soft);
+    color: var(--court-midnight);
+    border: 1px solid rgba(202, 255, 40, 0.44);
 }
 
 .inactive-badge {
-    background: var(--bg-secondary);
+    background: var(--surface-court-soft);
     color: var(--text-secondary);
     border: 1px solid var(--border-color);
 }
@@ -72,7 +74,7 @@
 .members-filter {
     display: flex;
     gap: 8px;
-    background: var(--bg-card);
+    background: #fff;
     border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 8px;
@@ -96,23 +98,23 @@
 }
 
 .filter-btn:hover {
-    border-color: var(--primary);
+    border-color: var(--court-green);
     color: var(--text-primary);
-    background: var(--bg-secondary);
+    background: var(--surface-court-soft);
 }
 
 .filter-btn.active {
-    background: var(--gradient-primary);
-    color: white;
-    border-color: var(--primary);
+    background: var(--court-midnight);
+    color: var(--pickle-lime);
+    border-color: var(--court-midnight);
     box-shadow: var(--shadow-md);
 }
 
 /* ─── Table ─── */
 .members-table-wrap {
-    background: var(--bg-card);
+    background: #fff;
     border: 1px solid var(--border-color);
-    border-radius: 14px;
+    border-radius: var(--border-radius-md);
     overflow: hidden;
     box-shadow: var(--shadow-sm);
 }
@@ -123,7 +125,7 @@
 }
 
 .members-table thead tr {
-    background: var(--bg-secondary);
+    background: var(--surface-court-soft);
     border-bottom: 2px solid var(--border-color);
 }
 
@@ -150,7 +152,7 @@
 }
 
 .members-table tbody tr:hover {
-    background: var(--bg-secondary);
+    background: var(--surface-court-soft);
 }
 
 .inactive-row {
@@ -173,7 +175,7 @@
     justify-content: center;
     width: 30px;
     height: 30px;
-    background: var(--bg-secondary);
+    background: var(--surface-court-soft);
     border-radius: 50%;
     font-size: 13px;
     font-weight: 700;
@@ -192,7 +194,7 @@
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: var(--gradient-primary);
+    background: var(--gradient-court-hero);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -204,7 +206,8 @@
 }
 
 .inactive-row .member-avatar {
-    background: var(--text-muted);
+    background: var(--border-strong);
+    color: var(--court-midnight);
 }
 
 .member-fullname {
@@ -227,13 +230,13 @@
 }
 
 .status-active {
-    background: var(--success-dim);
-    color: var(--success);
-    border: 1px solid rgba(16, 185, 129, 0.25);
+    background: var(--pickle-lime-soft);
+    color: var(--court-midnight);
+    border: 1px solid rgba(202, 255, 40, 0.44);
 }
 
 .status-inactive {
-    background: var(--bg-secondary);
+    background: var(--surface-court-soft);
     color: var(--text-secondary);
     border: 1px solid var(--border-color);
 }
@@ -244,7 +247,7 @@
     padding: 60px;
     font-size: 16px;
     color: var(--text-secondary);
-    background: var(--bg-card);
+    background: #fff;
     border: 1px solid var(--border-color);
     border-radius: 14px;
 }

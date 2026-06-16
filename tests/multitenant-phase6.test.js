@@ -24,22 +24,7 @@ assert(
     'Club members route should support admin-guarded create/update/delete.'
 );
 
-const overview = read('app/api/tournament/admin/overview/route.js');
-assert(
-    overview.includes('export async function GET') &&
-    overview.includes('getGroupIdForDatabase') &&
-    overview.includes('tournament_teams') &&
-    overview.includes('tournament_matches') &&
-    overview.includes('tournament_pairings'),
-    'Tournament overview route should return teams/matches/pairings/stats scoped to the group.'
-);
-const reset = read('app/api/tournament/admin/reset/route.js');
-assert(
-    reset.includes('export async function POST') &&
-    reset.includes('requireGroupAdmin') &&
-    reset.includes('tournament_matches'),
-    'Tournament reset route should be admin-guarded and delete tournament data for the group.'
-);
+// NOTE: Tournament admin (overview/reset) chuyển sang module v2 (app/api/tournament-v2/*) — test ở tests/tournament/*.
 
 const fundAdmin = read('app/quy/admin/page.js');
 assert(
@@ -51,34 +36,11 @@ assert(
     'Fund admin page should use the club server APIs.'
 );
 
-// Redesign (2026-06-14): overview/reset calls live in the console component.
-const tourAdmin = read('app/giai-dau/admin/page.js');
-const tourConsole = read('app/giai-dau/admin/components/TournamentConsole.js');
+const navSrc = read('components/MobileBottomNav.js');
 assert(
-    !tourAdmin.includes('@/lib/supabaseClient') && !tourAdmin.includes('.from(') &&
-    !tourConsole.includes('@/lib/supabaseClient') && !tourConsole.includes('.from('),
-    'Tournament admin page should not query Supabase directly.'
+    navSrc.includes('getCurrentGroupClient') && !navSrc.includes('supabase.auth'),
+    'MobileBottomNav should derive role from the group session, not Supabase Auth.'
 );
-assert(
-    tourConsole.includes('/api/tournament/admin/overview') && tourConsole.includes('/api/tournament/admin/reset'),
-    'Tournament admin page should use the overview and reset APIs.'
-);
-
-const tournamentsRoute = read('app/api/tournaments/route.js');
-assert(
-    tournamentsRoute.includes('requireGroupAdmin') &&
-    tournamentsRoute.includes('adminCheck.groupId') &&
-    tournamentsRoute.includes('group_id'),
-    'Creating a tournament should require the current club admin session and assign that club group_id.'
-);
-
-for (const f of ['components/MobileBottomNav.js', 'components/TournamentModuleNav.js']) {
-    const src = read(f);
-    assert(
-        src.includes('getCurrentGroupClient') && !src.includes('supabase.auth'),
-        `${f} should derive role from the group session, not Supabase Auth.`
-    );
-}
 
 const settingsRoute = read('app/api/club/settings/route.js');
 assert(

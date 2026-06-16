@@ -5,7 +5,6 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import HomeHeader from '@/components/HomeHeader';
 import MobileBottomNav from '@/components/MobileBottomNav';
 import FundAdminPage from '@/app/quy/admin/page';
-import AdminTournamentPanel from '@/app/giai-dau/admin/page';
 import ClubSettings from '@/app/admin/ClubSettings';
 import './admin-center.css';
 
@@ -21,8 +20,6 @@ function UnifiedAdminCenterContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const section = searchParams.get('section') || 'fund';
-    const tournamentId = searchParams.get('t') || '';
-    const tab = searchParams.get('tab') || (searchParams.get('view') === 'pairings' ? 'pairings' : 'overview');
 
     function setSection(nextSection) {
         router.push(`/admin?section=${nextSection}`);
@@ -37,7 +34,7 @@ function UnifiedAdminCenterContent() {
                     <div>
                         <p className="admin-center-eyebrow">Quản trị</p>
                         <h1>Trung tâm quản trị CLB</h1>
-                        <p>Quản lý quỹ, thành viên và giải đấu trong cùng một module.</p>
+                        <p>Quản lý quỹ và thành viên CLB. Giải đấu quản lý ở mục riêng trên thanh menu.</p>
                     </div>
                 </section>
 
@@ -48,13 +45,6 @@ function UnifiedAdminCenterContent() {
                         onClick={() => setSection('fund')}
                     >
                         Quỹ
-                    </button>
-                    <button
-                        type="button"
-                        className={section === 'tournament' ? 'active' : ''}
-                        onClick={() => setSection('tournament')}
-                    >
-                        Giải đấu
                     </button>
                     <button
                         type="button"
@@ -69,11 +59,6 @@ function UnifiedAdminCenterContent() {
                 {section === 'settings' && (
                     <section className="admin-center-panel">
                         <ClubSettings />
-                    </section>
-                )}
-                {section === 'tournament' && (
-                    <section className="admin-center-panel">
-                        <AdminTournamentPanel embedded tournamentId={tournamentId} tab={tab} />
                     </section>
                 )}
             </main>

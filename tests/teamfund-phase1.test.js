@@ -138,54 +138,7 @@ assert(
     'Migration should create groups, seed default group, and backfill existing club data.'
 );
 
-assert(
-    migration.includes('idx_tournament_settings_group_tournament_key') &&
-    migration.includes('group_id, tournament_id, setting_key') &&
-    read('app/api/tournament/admin/toggle-round1/route.js').includes("onConflict: 'group_id,tournament_id,setting_key'") &&
-    read('app/api/tournament/admin/toggle-pairings-lock/route.js').includes("onConflict: 'group_id,tournament_id,setting_key'"),
-    'Tournament settings upserts should use a group-aware unique key.'
-);
-
-for (const route of [
-    'app/api/tournament/admin/settings/route.js',
-    'app/api/tournament/admin/toggle-round1/route.js',
-    'app/api/tournament/admin/toggle-pairings-lock/route.js',
-    'app/api/tournament/admin/reorder/route.js',
-    'app/api/tournament/admin/pairings/route.js',
-    'app/api/tournament/live/matches/route.js',
-    'app/api/tournament/live/scoreboard/route.js',
-    'app/api/tournament/live/pairings/route.js',
-]) {
-    const source = read(route);
-    assert(
-        source.includes('getGroupIdForDatabase') &&
-        source.includes(".eq('group_id', groupId)"),
-        `${route} should scope tournament data to the current group_id.`
-    );
-}
-
-for (const route of [
-    'app/api/tournament/admin/settings/route.js',
-    'app/api/tournament/admin/toggle-round1/route.js',
-    'app/api/tournament/admin/toggle-pairings-lock/route.js',
-    'app/api/tournament/admin/reorder/route.js',
-    'app/api/tournament/admin/pairings/route.js',
-]) {
-    const source = read(route);
-    assert(
-        source.includes('requireGroupAdmin') &&
-        source.includes('adminCheck.response'),
-        `${route} should reject write access unless the current group session is admin.`
-    );
-}
-
-// Redesign (2026-06-14): overview read lives in the console component.
-const tournamentAdminPage = read('app/giai-dau/admin/page.js');
-const tournamentConsole = read('app/giai-dau/admin/components/TournamentConsole.js');
-assert(
-    tournamentConsole.includes('/api/tournament/admin/overview') &&
-    !tournamentAdminPage.includes('.from(') && !tournamentConsole.includes('.from('),
-    'Tournament admin page should read via the server overview API (group scoping moved server-side in Option B), not direct Supabase.'
-);
+// NOTE: group-scoping cho giải đấu đã chuyển sang module v2 (app/api/tournament-v2/*,
+// RLS migration 016). Các route giải đấu cũ đã bị xóa (clean-slate) — kiểm tra ở tests/tournament/*.
 
 console.log('teamfund phase 1 contract ok');

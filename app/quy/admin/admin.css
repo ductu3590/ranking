@@ -8,7 +8,7 @@
 
 .admin-container {
     min-height: 100vh;
-    background: var(--bg-primary);
+    background: var(--surface-court);
     padding: 24px 20px;
     font-family: var(--font-family);
     color: var(--text-primary);
@@ -45,7 +45,7 @@
 .admin-header {
     background: var(--bg-card);
     padding: 24px 30px;
-    border-radius: 16px;
+    border-radius: var(--border-radius-lg);
     margin-bottom: 24px;
     border: 1px solid var(--border-color);
     box-shadow: var(--shadow-sm);
@@ -61,7 +61,7 @@
 .admin-header h1 {
     margin: 0 0 6px 0;
     font-size: 28px;
-    color: var(--text-primary);
+    color: var(--court-midnight);
     font-weight: 800;
 }
 
@@ -99,29 +99,29 @@
 }
 
 .btn-home:hover {
-    background: var(--bg-secondary);
+    background: var(--surface-court-soft);
 }
 
 .btn-tournament {
-    background: var(--primary-dim);
-    color: var(--primary);
-    border: 1px solid rgba(37, 99, 235, 0.2);
+    background: var(--gradient-court-action);
+    color: var(--court-midnight);
+    border: 1px solid rgba(202, 255, 40, 0.34);
 }
 
 .btn-tournament:hover {
-    background: rgba(37, 99, 235, 0.15);
-    border-color: var(--primary);
+    border-color: var(--court-green);
+    box-shadow: 0 10px 22px rgba(7, 27, 24, 0.16);
 }
 
 .btn-logout {
-    background: var(--danger-dim);
-    color: var(--danger);
-    border: 1px solid rgba(239, 68, 68, 0.2);
+    background: var(--rally-coral-soft);
+    color: var(--rally-coral);
+    border: 1px solid rgba(255, 107, 53, 0.24);
 }
 
 .btn-logout:hover {
-    background: rgba(239, 68, 68, 0.15);
-    border-color: var(--danger);
+    background: rgba(255, 107, 53, 0.18);
+    border-color: var(--rally-coral);
 }
 
 /* Tabs */
@@ -147,12 +147,12 @@
 }
 
 .tab:hover {
-    color: var(--text-primary);
+    color: var(--court-midnight);
 }
 
 .tab.active {
-    color: var(--primary);
-    border-bottom-color: var(--primary);
+    color: var(--court-green);
+    border-bottom-color: var(--court-green);
 }
 
 /* Cards & Layout */
@@ -160,7 +160,7 @@
 .table-card {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
-    border-radius: 12px;
+    border-radius: var(--border-radius-lg);
     padding: 20px;
     margin-bottom: 24px;
     box-shadow: var(--shadow-sm);
@@ -190,17 +190,18 @@
     padding: 10px 14px;
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 16px;
     font-family: inherit;
     outline: none;
-    background: var(--bg-primary);
+    background: var(--surface-court-soft);
     color: var(--text-primary);
     transition: all 0.2s;
 }
 
 .filter-item select:focus,
 .filter-item input:focus {
-    border-color: var(--primary);
+    border-color: var(--court-green);
+    box-shadow: var(--focus-ring);
 }
 
 .action-bar {
@@ -211,9 +212,9 @@
 }
 
 .btn-expense {
-    background: var(--danger-dim);
-    color: var(--danger);
-    border: 1px solid rgba(239, 68, 68, 0.2);
+    background: var(--rally-coral-soft);
+    color: var(--rally-coral);
+    border: 1px solid rgba(255, 107, 53, 0.24);
     padding: 10px 20px;
     border-radius: 8px;
     font-size: 14px;
@@ -223,14 +224,14 @@
 }
 
 .btn-expense:hover {
-    background: rgba(239, 68, 68, 0.15);
-    border-color: var(--danger);
+    background: rgba(255, 107, 53, 0.18);
+    border-color: var(--rally-coral);
 }
 
 .btn-income {
-    background: rgba(16, 185, 129, 0.12);
-    color: #059669;
-    border: 1px solid rgba(16, 185, 129, 0.25);
+    background: var(--gradient-court-action);
+    color: var(--court-midnight);
+    border: 1px solid rgba(202, 255, 40, 0.34);
     padding: 10px 20px;
     border-radius: 8px;
     font-size: 14px;
@@ -240,14 +241,14 @@
 }
 
 .btn-income:hover {
-    background: rgba(16, 185, 129, 0.2);
-    border-color: #059669;
+    border-color: var(--court-green);
+    box-shadow: 0 10px 22px rgba(7, 27, 24, 0.16);
 }
 
 /* Bulk Toolbar */
 .bulk-edit-toolbar {
-    background: var(--primary-light);
-    border: 1px solid rgba(37, 99, 235, 0.2);
+    background: var(--court-green-soft);
+    border: 1px solid rgba(13, 117, 101, 0.2);
     border-radius: 12px;
     padding: 12px 20px;
     margin-bottom: 20px;
@@ -261,20 +262,21 @@
 .toolbar-label {
     font-size: 14px;
     font-weight: 600;
-    color: var(--primary);
+    color: var(--court-green);
 }
 
 .bulk-edit-toolbar select {
     padding: 8px 12px;
     border: 1px solid var(--border-color);
     border-radius: 6px;
-    font-size: 14px;
+    font-size: 16px;
     background: var(--bg-card);
+    color: var(--text-primary);
 }
 
 .btn-apply {
-    background: var(--primary);
-    color: white;
+    background: var(--gradient-court-action);
+    color: var(--court-midnight);
     border: none;
     padding: 8px 16px;
     border-radius: 6px;
@@ -283,7 +285,7 @@
 }
 
 .btn-apply:hover {
-    background: var(--primary-hover);
+    box-shadow: 0 8px 18px rgba(7, 27, 24, 0.14);
 }
 
 /* Tables */
@@ -299,7 +301,7 @@ table {
 }
 
 th {
-    background: var(--bg-secondary);
+    background: var(--surface-court-soft);
     color: var(--text-secondary);
     font-weight: 700;
     padding: 14px 16px;
@@ -313,11 +315,11 @@ td {
 }
 
 tr:hover {
-    background: var(--bg-secondary);
+    background: var(--surface-court-soft);
 }
 
 tr.selected {
-    background: var(--primary-light);
+    background: var(--pickle-lime-soft);
 }
 
 .checkbox-cell {
@@ -328,7 +330,7 @@ tr.selected {
 .checkbox-cell input {
     width: 16px;
     height: 16px;
-    accent-color: var(--primary);
+    accent-color: var(--court-green);
 }
 
 .font-medium {
@@ -340,8 +342,8 @@ tr.selected {
     font-size: 15px;
 }
 
-.amount.in { color: var(--success); }
-.amount.out { color: var(--danger); }
+.amount.in { color: var(--court-green); }
+.amount.out { color: var(--rally-coral); }
 
 .confidence.low {
     color: var(--warning);
@@ -356,7 +358,7 @@ tr.selected {
 }
 
 .manually-edited {
-    border-left: 3px solid var(--primary);
+    border-left: 3px solid var(--court-green);
 }
 
 /* Badges */
@@ -369,45 +371,45 @@ tr.selected {
 }
 
 .badge-nop_phat {
-    background: var(--danger-dim);
-    color: var(--danger);
+    background: var(--rally-coral-soft);
+    color: var(--rally-coral);
 }
 
 .badge-nop_quy {
-    background: var(--success-dim);
-    color: var(--success);
+    background: var(--court-green-soft);
+    color: var(--court-green);
 }
 
 .badge-khac {
-    background: var(--bg-secondary);
+    background: var(--surface-court-soft);
     color: var(--text-secondary);
 }
 
 .badge-direction-in {
-    background: var(--success-light);
-    color: var(--success);
+    background: var(--court-green-soft);
+    color: var(--court-green);
 }
 
 .badge-direction-out {
-    background: var(--danger-light);
-    color: var(--danger);
+    background: var(--rally-coral-soft);
+    color: var(--rally-coral);
 }
 
 .badge-active {
-    background: var(--success-light);
-    color: var(--success);
+    background: var(--court-green-soft);
+    color: var(--court-green);
 }
 
 .badge-inactive {
-    background: var(--bg-secondary);
+    background: var(--surface-court-soft);
     color: var(--text-muted);
 }
 
 /* Buttons inside table */
 .btn-edit {
-    background: var(--primary-dim);
-    color: var(--primary);
-    border: 1px solid rgba(37, 99, 235, 0.2);
+    background: var(--gradient-court-action);
+    color: var(--court-midnight);
+    border: 1px solid rgba(202, 255, 40, 0.34);
     padding: 6px 12px;
     border-radius: 6px;
     cursor: pointer;
@@ -415,13 +417,13 @@ tr.selected {
 }
 
 .btn-edit:hover {
-    background: rgba(37, 99, 235, 0.15);
+    border-color: var(--court-green);
 }
 
 .btn-delete {
-    background: var(--danger-dim);
-    color: var(--danger);
-    border: 1px solid rgba(239, 68, 68, 0.2);
+    background: var(--rally-coral-soft);
+    color: var(--rally-coral);
+    border: 1px solid rgba(255, 107, 53, 0.24);
     padding: 6px 12px;
     border-radius: 6px;
     cursor: pointer;
@@ -429,7 +431,7 @@ tr.selected {
 }
 
 .btn-delete:hover {
-    background: rgba(239, 68, 68, 0.15);
+    background: rgba(255, 107, 53, 0.18);
 }
 
 /* Stats Cards */
@@ -442,7 +444,7 @@ tr.selected {
 .stat-card {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
-    border-radius: 12px;
+    border-radius: var(--border-radius-lg);
     padding: 24px;
     box-shadow: var(--shadow-sm);
     display: flex;
@@ -451,17 +453,17 @@ tr.selected {
 }
 
 .stat-card.balance {
-    background: var(--gradient-primary);
-    border-color: var(--primary);
-    color: white;
+    background: var(--court-midnight);
+    border-color: var(--court-midnight);
+    color: var(--pickle-lime);
 }
 
 .stat-card.balance .stat-label {
-    color: rgba(255, 255, 255, 0.85);
+    color: rgba(202, 255, 40, 0.72);
 }
 
 .stat-card.balance .stat-value {
-    color: white;
+    color: var(--pickle-lime);
 }
 
 /* Modals */
@@ -479,7 +481,7 @@ tr.selected {
 .modal {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
-    border-radius: 16px;
+    border-radius: var(--border-radius-lg);
     padding: 30px;
     width: 90%;
     max-width: 500px;
@@ -488,7 +490,7 @@ tr.selected {
 
 .modal h2 {
     margin: 0 0 20px 0;
-    color: var(--text-primary);
+    color: var(--court-midnight);
     font-size: 20px;
     font-weight: 800;
 }
@@ -512,8 +514,8 @@ tr.selected {
     padding: 10px 14px;
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    font-size: 14px;
-    background: var(--bg-primary);
+    font-size: 16px;
+    background: var(--surface-court-soft);
     color: var(--text-primary);
     outline: none;
     font-family: inherit;
@@ -523,8 +525,8 @@ tr.selected {
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    border-color: var(--court-green);
+    box-shadow: var(--focus-ring);
 }
 
 .modal-actions {
@@ -534,8 +536,8 @@ tr.selected {
 }
 
 .btn-primary {
-    background: var(--gradient-primary);
-    color: white;
+    background: var(--gradient-court-action);
+    color: var(--court-midnight);
     border: none;
     padding: 10px 20px;
     border-radius: 8px;
@@ -547,11 +549,11 @@ tr.selected {
 
 .btn-primary:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    box-shadow: 0 10px 22px rgba(7, 27, 24, 0.16);
 }
 
 .btn-secondary {
-    background: var(--bg-secondary);
+    background: var(--surface-court-soft);
     border: 1px solid var(--border-color);
     color: var(--text-secondary);
     padding: 10px 20px;

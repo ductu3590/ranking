@@ -9,7 +9,7 @@
 .club-settings-error {
     padding: 24px;
     text-align: center;
-    color: #6b7280;
+    color: var(--text-secondary);
 }
 
 .club-settings-msg {
@@ -21,15 +21,15 @@
 }
 
 .club-settings-msg.error {
-    background: #fff2ef;
-    color: #c43c2e;
-    border: 1px solid rgba(231, 76, 60, .22);
+    background: var(--rally-coral-soft);
+    color: var(--rally-coral);
+    border: 1px solid rgba(255, 107, 53, .22);
 }
 
 .club-settings-msg.ok {
-    background: #eef8f2;
-    color: #0f8c59;
-    border: 1px solid rgba(15, 168, 103, .25);
+    background: var(--court-green-soft);
+    color: var(--court-green);
+    border: 1px solid rgba(13, 117, 101, .25);
 }
 
 .club-settings-form {
@@ -40,7 +40,7 @@
 .club-settings-form label {
     display: grid;
     gap: 7px;
-    color: #343a45;
+    color: var(--text-primary);
     font-size: 13px;
     font-weight: 700;
 }
@@ -48,11 +48,11 @@
 .club-settings-form input,
 .club-settings-form textarea {
     width: 100%;
-    border: 1px solid #dfe4ed;
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 12px 13px;
-    color: #20242c;
-    background: #f8fafc;
+    color: var(--text-primary);
+    background: var(--surface-court-soft);
     font: inherit;
     font-size: 16px;
     outline: none;
@@ -60,8 +60,8 @@
 
 .club-settings-form input:focus,
 .club-settings-form textarea:focus {
-    border-color: #20ad72;
-    box-shadow: 0 0 0 3px rgba(32, 173, 114, .16);
+    border-color: var(--court-green);
+    box-shadow: var(--focus-ring);
 }
 
 .club-settings-save,
@@ -76,8 +76,8 @@
 }
 
 .club-settings-save {
-    background: linear-gradient(145deg, #35d678, #0fa867);
-    color: #fff;
+    background: var(--gradient-court-action);
+    color: var(--court-midnight);
 }
 
 .club-settings-save:disabled {
@@ -86,11 +86,12 @@
 }
 
 .club-settings-code {
-    border: 1px solid #e9edf3;
-    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
     padding: 18px;
     text-align: center;
-    background: #fff;
+    background: var(--bg-card);
+    box-shadow: var(--shadow-sm);
 }
 
 .club-settings-code-label {
@@ -99,7 +100,7 @@
     letter-spacing: .08em;
     font-size: 12px;
     font-weight: 800;
-    color: #6a7180;
+    color: var(--text-secondary);
 }
 
 .club-settings-code-value {
@@ -107,7 +108,7 @@
     margin-top: 4px;
     font-size: 26px;
     letter-spacing: .08em;
-    color: #20242c;
+    color: var(--court-midnight);
 }
 
 .club-settings-code img {
@@ -115,33 +116,34 @@
     height: 180px;
     display: block;
     margin: 14px auto;
-    border: 1px solid #edf0f5;
+    border: 1px solid var(--border-color);
     border-radius: 14px;
 }
 
 .club-settings-regen {
-    background: #eef1f6;
-    color: #596170;
-    border: 1px solid #dfe4ed;
+    background: var(--surface-court-soft);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
 }
 
 .club-settings-bank {
-    border: 1px solid #e9edf3;
-    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
     padding: 18px;
-    background: #fff;
+    background: var(--bg-card);
+    box-shadow: var(--shadow-sm);
 }
 
 .club-settings-bank-title {
     margin: 0 0 4px;
     font-weight: 800;
-    color: #20242c;
+    color: var(--court-midnight);
 }
 
 .club-settings-bank-hint {
     margin: 0 0 12px;
     font-size: 12px;
-    color: #6a7180;
+    color: var(--text-secondary);
 }
 
 .club-settings-bank-list {
@@ -157,26 +159,26 @@
     align-items: center;
     gap: 10px;
     padding: 10px 12px;
-    border: 1px solid #edf0f5;
+    border: 1px solid var(--border-color);
     border-radius: 10px;
-    background: #f8fafc;
+    background: var(--surface-court-soft);
 }
 
 .bank-acc-number {
     font-weight: 800;
-    color: #20242c;
+    color: var(--court-midnight);
 }
 
 .bank-acc-name {
     font-size: 12px;
-    color: #6a7180;
+    color: var(--text-secondary);
 }
 
 .bank-acc-del {
     margin-left: auto;
     border: 0;
-    background: #fff2ef;
-    color: #c43c2e;
+    background: var(--rally-coral-soft);
+    color: var(--rally-coral);
     border-radius: 8px;
     padding: 6px 10px;
     font-weight: 700;
@@ -186,7 +188,7 @@
 .club-settings-bank-empty {
     margin: 0 0 12px;
     font-size: 13px;
-    color: #858b98;
+    color: var(--text-muted);
 }
 
 .club-settings-bank-form {
@@ -197,12 +199,13 @@
 
 .club-settings-bank-form input {
     flex: 1 1 140px;
-    border: 1px solid #dfe4ed;
+    border: 1px solid var(--border-color);
     border-radius: 10px;
     padding: 10px 12px;
     font: inherit;
     font-size: 16px;
-    background: #f8fafc;
+    background: var(--surface-court-soft);
+    color: var(--text-primary);
 }
 
 .club-settings-bank-form button {
@@ -211,16 +214,17 @@
     padding: 0 18px;
     min-height: 42px;
     font-weight: 800;
-    color: #fff;
-    background: linear-gradient(145deg, #35d678, #0fa867);
+    color: var(--court-midnight);
+    background: var(--gradient-court-action);
     cursor: pointer;
 }
 
 .club-settings-sepay {
-    border: 1px solid #e9edf3;
-    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
     padding: 18px;
-    background: #fff;
+    background: var(--bg-card);
+    box-shadow: var(--shadow-sm);
 }
 
 .club-settings-sepay-steps {
@@ -228,13 +232,13 @@
     padding-left: 18px;
     display: grid;
     gap: 6px;
-    color: #343a45;
+    color: var(--text-primary);
     font-size: 13px;
     line-height: 1.45;
 }
 
 .club-settings-sepay-steps a {
-    color: #0f8c59;
+    color: var(--court-green);
     font-weight: 700;
 }
 
@@ -251,11 +255,11 @@
     overflow-x: auto;
     white-space: nowrap;
     padding: 10px 12px;
-    border: 1px solid #dfe4ed;
+    border: 1px solid var(--border-color);
     border-radius: 10px;
-    background: #f8fafc;
+    background: var(--surface-court-soft);
     font-size: 13px;
-    color: #20242c;
+    color: var(--text-primary);
 }
 
 .club-settings-sepay-url button {
@@ -264,8 +268,8 @@
     padding: 0 16px;
     min-height: 40px;
     font-weight: 800;
-    color: #fff;
-    background: linear-gradient(145deg, #35d678, #0fa867);
+    color: var(--court-midnight);
+    background: var(--gradient-court-action);
     cursor: pointer;
 }
 
@@ -273,7 +277,7 @@
     display: inline-block;
     font-size: 13px;
     font-weight: 700;
-    color: #0f8c59;
+    color: var(--court-green);
     text-decoration: none;
 }
 
@@ -283,7 +287,7 @@
 }
 
 .club-settings-logo-label {
-    color: #343a45;
+    color: var(--text-primary);
     font-size: 13px;
     font-weight: 700;
 }
@@ -298,13 +302,13 @@
     width: 56px;
     height: 56px;
     object-fit: contain;
-    border: 1px solid #e9edf3;
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     background: #fff;
 }
 
 .club-settings-logo-empty {
-    color: #9aa1ad;
+    color: var(--text-muted);
     font-size: 13px;
 }
 
@@ -320,9 +324,9 @@
     min-height: 38px;
     padding: 0 14px;
     border-radius: 10px;
-    background: #eef1f6;
-    border: 1px solid #dfe4ed;
-    color: #424b58;
+    background: var(--surface-court-soft);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
     font-size: 13px;
     font-weight: 700;
     cursor: pointer;
@@ -332,9 +336,9 @@
     min-height: 38px;
     padding: 0 14px;
     border-radius: 10px;
-    border: 1px solid #f0d4cf;
-    background: #fff2ef;
-    color: #c43c2e;
+    border: 1px solid rgba(255, 107, 53, .24);
+    background: var(--rally-coral-soft);
+    color: var(--rally-coral);
     font-size: 13px;
     font-weight: 700;
     cursor: pointer;
@@ -343,46 +347,47 @@
 .club-settings-account {
     display: grid;
     gap: 14px;
-    border: 1px solid #e9edf3;
-    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
     padding: 18px;
-    background: #fff;
+    background: var(--bg-card);
+    box-shadow: var(--shadow-sm);
 }
 
 .club-settings-account-title {
     margin: 0;
     font-size: 15px;
     font-weight: 800;
-    color: #20242c;
+    color: var(--court-midnight);
 }
 
 .club-settings-account-hint {
     margin: -6px 0 0;
     font-size: 13px;
-    color: #6a7180;
+    color: var(--text-secondary);
 }
 
 .club-settings-account label {
     display: grid;
     gap: 7px;
-    color: #343a45;
+    color: var(--text-primary);
     font-size: 13px;
     font-weight: 700;
 }
 
 .club-settings-account input {
     width: 100%;
-    border: 1px solid #dfe4ed;
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 12px 13px;
-    color: #20242c;
-    background: #f8fafc;
+    color: var(--text-primary);
+    background: var(--surface-court-soft);
     font: inherit;
     font-size: 16px;
     outline: none;
 }
 
 .club-settings-account input:focus {
-    border-color: #20ad72;
-    box-shadow: 0 0 0 3px rgba(32, 173, 114, .16);
+    border-color: var(--court-green);
+    box-shadow: var(--focus-ring);
 }

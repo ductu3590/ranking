@@ -66,7 +66,8 @@ export async function GET(request) {
             .from('tournament_entrant_members')
             .select('*')
             .eq('group_id', groupId)
-            .in('entrant_id', entrantIds);
+            .in('entrant_id', entrantIds)
+            .order('id', { ascending: true });
 
         if (membersErr) {
             return NextResponse.json({ error: membersErr.message }, { status: 500 });

@@ -7,6 +7,7 @@ import {
     saveStage,
     saveEntrant,
     generateSchedule,
+    generatePairs,
 } from '@/lib/tournamentV2Client';
 import './v2.css';
 
@@ -16,6 +17,17 @@ const STEPS_REGULAR = [
     { n: 3, label: 'Đội/Cặp' },
     { n: 4, label: 'Sinh lịch' },
 ];
+
+const SUB_KIND_LABELS = {
+    womens: 'Đôi nữ',
+    mens: 'Đôi nam',
+    mixed1: 'Đôi nam nữ 1',
+    mixed2: 'Đôi nam nữ 2',
+};
+
+function subKindLabel(kind) {
+    return SUB_KIND_LABELS[kind] || kind;
+}
 
 const STEPS_MLP = [
     { n: 1, label: 'Thông tin' },
@@ -60,6 +72,9 @@ export default function TournamentWizard({ onDone }) {
 
     /* ---- Step 4 ---- */
     const [matchCount, setMatchCount] = useState(null);
+    const [pairSchedule, setPairSchedule] = useState(null);
+    const [pairBusy, setPairBusy] = useState(false);
+    const [pairError, setPairError] = useState('');
 
     const STEPS = tournamentFormat === 'mlp' ? STEPS_MLP : STEPS_REGULAR;
     const setInfoField = (k, v) => setInfo(c => ({ ...c, [k]: v }));
@@ -294,15 +309,43 @@ export default function TournamentWizard({ onDone }) {
 
     async function runGenerate() {
         setNotice('');
+        setPairError('');
         if (!stages.length) { setNotice('Chưa có giai đoạn.'); return; }
         setBusy(true);
         try {
+            // 1. Sinh matchups (round_robin).
             const r = await generateSchedule(stages[0].id);
             setMatchCount(r.matchCount ?? 0);
+
+            // 2. Với MLP: tự động sinh lịch ghép đôi nội bộ mỗi đội.
+            if (tournamentFormat === 'mlp') {
+                setPairBusy(true);
+                try {
+                    const ps = await generatePairs(stages[0].id);
+                    setPairSchedule(ps.pairSchedule || null);
+                } catch (err) {
+                    setPairError(err.message || 'Không sinh được cặp đôi.');
+                } finally {
+                    setPairBusy(false);
+                }
+            }
         } catch (err) {
             setNotice(err.message || 'Không sinh được lịch.');
         } finally {
             setBusy(false);
+        }
+    }
+
+    async function regeneratePairs() {
+        setPairError('');
+        setPairBusy(true);
+        try {
+            const ps = await generatePairs(stages[0].id, Math.floor(Math.random() * 100000) + 1);
+            setPairSchedule(ps.pairSchedule || null);
+        } catch (err) {
+            setPairError(err.message || 'Không sinh lại được cặp đôi.');
+        } finally {
+            setPairBusy(false);
         }
     }
 
@@ -704,7 +747,41 @@ export default function TournamentWizard({ onDone }) {
                         </button>
                     ) : (
                         <>
-                            <p className="v2-result">✓ Đã sinh {matchCount} trận đấu.</p>
+                            <p className="v2-result">
+                                ✓ Đã sinh {matchCount} trận đấu
+                                {tournamentFormat === 'mlp' && pairSchedule
+                                    ? ` · ${pairSchedule.rounds} vòng ghép đôi`
+                                    : ''}.
+                            </p>
+
+                            {tournamentFormat === 'mlp' && (
+                                <>
+                                    {pairBusy && (
+                                        <p className="v2-item-sub">Đang sinh cặp đôi...</p>
+                                    )}
+                                    {pairError && (
+                                        <p className="v2-notice">{pairError}</p>
+                                    )}
+                                    {pairSchedule && (
+                                        <PairsPreview
+                                            pairSchedule={pairSchedule}
+                                            entrants={entrants}
+                                        />
+                                    )}
+                                    {pairSchedule && (
+                                        <button
+                                            type="button"
+                                            className="v2-btn-secondary"
+                                            onClick={regeneratePairs}
+                                            disabled={pairBusy}
+                                            style={{ width: '100%', marginBottom: 12 }}
+                                        >
+                                            {pairBusy ? 'Đang sinh lại...' : '🔀 Sinh lại cặp đôi'}
+                                        </button>
+                                    )}
+                                </>
+                            )}
+
                             <button type="button" className="v2-btn-primary" onClick={finish} style={{ width: '100%' }}>
                                 Mở console giải
                             </button>
@@ -718,6 +795,47 @@ export default function TournamentWizard({ onDone }) {
                     </div>
                 </div>
             )}
+        </div>
+    );
+}
+
+/* Xem trước lịch ghép đôi MLP (chỉ xem, không sửa).
+   pairSchedule.teams keyed theo entrantId; mỗi vòng r liệt kê các đôi của từng đội. */
+function PairsPreview({ pairSchedule, entrants }) {
+    if (!pairSchedule || !pairSchedule.teams) return null;
+    const nameById = {};
+    for (const e of entrants || []) nameById[String(e.id)] = e.name;
+
+    const teamIds = Object.keys(pairSchedule.teams);
+    const rounds = pairSchedule.rounds || 0;
+    const subKinds = pairSchedule.subKinds || [];
+
+    const pairText = (pair) =>
+        (pair || []).map(p => p?.name || '?').join(' + ');
+
+    return (
+        <div className="v2-pairs-preview">
+            {Array.from({ length: rounds }).map((_, r) => (
+                <div key={r} className="v2-pairs-round">
+                    <div className="v2-pairs-round-label">
+                        Vòng {r + 1}{subKinds[r] ? ` · ${subKindLabel(subKinds[r])}` : ''}
+                    </div>
+                    {teamIds.map((tid) => {
+                        const team = pairSchedule.teams[tid];
+                        const roundPairs = (team?.rounds || [])[r] || [];
+                        return (
+                            <div key={tid} className="v2-pair-row">
+                                <span className="v2-pair-tag">{nameById[tid] || `#${tid}`}</span>
+                                <span>
+                                    {roundPairs.length
+                                        ? roundPairs.map(pairText).join('  |  ')
+                                        : '—'}
+                                </span>
+                            </div>
+                        );
+                    })}
+                </div>
+            ))}
         </div>
     );
 }

@@ -109,6 +109,30 @@ Xóa matches cũ của stage → gọi schedule engine → insert matches → re
 
 ---
 
+## GET /api/tournament-v2/pairs — lịch ghép đôi MLP của stage (public)
+
+Đọc `stage.config.pairSchedule` (lịch ghép đôi nội bộ mỗi đội, chỉ có với stage MLP).
+
+- **Query**: `?stageId=<id>` (bắt buộc).
+- **200**: `{ "pairSchedule": PairSchedule | null }` — `null` nếu stage chưa sinh (hoặc không phải MLP).
+- `PairSchedule`: `{ seed, generatedAt, rounds, subKinds: string[], teams: { "<entrantId>": { pairsPerRound, rounds: Pair[][] } } }`.
+  - `rounds` = `config.gamesPerMatchup` (số vòng shuffle). `subKinds[r]` = `kind` của ván con vòng `r` (khớp enum `tournament_games.kind`): 2 vòng → `['womens','mens']`, 4 vòng → `['womens','mens','mixed1','mixed2']`.
+  - `teams[entrantId].rounds[r]` = mảng các đôi của đội đó ở vòng `r`. Mỗi `Pair` = `[{ mi, name }, { mi, name }]` (`mi` = member index theo thứ tự GET entrants). VĐV lẻ bị bench (rotate theo vòng), KHÔNG tạo đôi 1 người.
+  - **Ghép cross-team** (đôi i đội A vs đôi i đội B) KHÔNG lưu — UI suy ra lúc render matchup: `teams[A].rounds[r][i]` vs `teams[B].rounds[r][i]`, rồi snapshot vào `game.lineup` khi `PUT /games`.
+- **Lỗi**: 400 `stageId is required`. 404 `Stage không tồn tại`.
+
+## POST /api/tournament-v2/pairs — sinh/sinh lại lịch ghép đôi MLP (admin)
+
+Sinh (hoặc regenerate, ghi đè) `pairSchedule` cho stage MLP. Trục dữ liệu riêng với `/generate` (matchups) — regenerate pairs KHÔNG đụng matches/games đã lưu.
+
+- **Body**: `{ stageId*, seed?=1 }` (`seed` = hạt giống deterministic; cùng seed → cùng lịch).
+- **Hành vi**: requireGroupAdmin → load stage (scope group) → load entrants + members (entrants theo `seed` asc, members theo `id` asc để `mi` ổn định) → gọi engine `generatePairSchedule(teams, gamesPerMatchup, seed)` → merge `pairSchedule` (kèm `generatedAt`) vào `config`, giữ nguyên key khác → PATCH `tournament_stages.config`.
+- **200**: `{ "success": true, "pairSchedule": PairSchedule }`.
+- **Lỗi**: 403 không admin. 400 `stageId is required` / `Pair schedule chỉ áp dụng cho stage MLP` / `Giải chưa có đội nào` / `Đội "<name>" cần ít nhất 2 VĐV`. 404 `Stage không tồn tại`. 500 Supabase.
+- **Idempotent**: POST lại = ghi đè (regenerate), không tạo bản ghi mới.
+
+---
+
 ## PUT /api/tournament-v2/games — nhập/sửa tỉ số 1 match (admin)
 
 `POST` cũng map cùng handler. Replace toàn bộ games của match → gọi match engine → cập nhật `winner_entrant_id` + `status`; nếu knockout có `parent_match_id` thì đẩy winner lên match cha.

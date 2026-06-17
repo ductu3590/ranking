@@ -523,6 +523,7 @@ export default function ResultsTab({ tournamentId, stageId, stage, isAdmin }) {
     const [showPairEditor, setShowPairEditor] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [activeRound, setActiveRound] = useState(null);
 
     const isMlp = stage?.match_format === 'mlp';
 
@@ -570,6 +571,11 @@ export default function ResultsTab({ tournamentId, stageId, stage, isAdmin }) {
         load();
     }, [load]);
 
+    // Reset vòng active khi đổi stage
+    useEffect(() => {
+        setActiveRound(null);
+    }, [stageId]);
+
     if (loading) {
         return (
             <div className="v2-state v2-loading">
@@ -595,6 +601,13 @@ export default function ResultsTab({ tournamentId, stageId, stage, isAdmin }) {
             </div>
         );
     }
+
+    // Nhóm trận theo vòng
+    const rounds = [...new Set(matches.map((m) => m.round))].sort((a, b) => a - b);
+    const currentRound = activeRound !== null && rounds.includes(activeRound)
+        ? activeRound
+        : rounds[0];
+    const visibleMatches = matches.filter((m) => m.round === currentRound);
 
     return (
         <div className="v2-results">
@@ -636,7 +649,30 @@ export default function ResultsTab({ tournamentId, stageId, stage, isAdmin }) {
                 />
             ) : null}
 
-            {matches.map((m) => (
+            {/* Tab bar theo vòng */}
+            {rounds.length > 1 ? (
+                <nav className="v2-round-tabbar" aria-label="Vòng đấu">
+                    {rounds.map((r) => {
+                        const roundMatches = matches.filter((m) => m.round === r);
+                        const doneCount = roundMatches.filter((m) => m.status === 'done').length;
+                        const allDone = doneCount === roundMatches.length;
+                        const hasLive = roundMatches.some((m) => m.status === 'live');
+                        return (
+                            <button
+                                key={r}
+                                type="button"
+                                className={`v2-round-tab ${currentRound === r ? 'active' : ''} ${allDone ? 'done' : ''} ${hasLive ? 'live' : ''}`}
+                                onClick={() => setActiveRound(r)}
+                            >
+                                <span className="v2-round-tab-name">Vòng {r}</span>
+                                <span className="v2-round-tab-count">{doneCount}/{roundMatches.length}</span>
+                            </button>
+                        );
+                    })}
+                </nav>
+            ) : null}
+
+            {visibleMatches.map((m) => (
                 <MatchCard
                     key={m.id}
                     match={m}

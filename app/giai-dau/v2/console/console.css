@@ -632,3 +632,57 @@
     cursor: pointer;
     max-width: 110px;
 }
+
+/* ===== TeamsTab — danh sách thành viên trong form sửa ===== */
+.v2-member-list {
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.v2-member-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f5f3ff;
+    border: 1px solid #ede9fe;
+    border-radius: 8px;
+    padding: 7px 10px;
+    font-size: 0.88rem;
+}
+.v2-member-name {
+    color: #1f2937;
+    font-weight: 500;
+    flex: 1;
+}
+.v2-member-remove {
+    background: none;
+    border: none;
+    color: #9ca3af;
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 2px;
+    flex-shrink: 0;
+}
+.v2-member-remove:hover { color: #dc2626; }
+
+/* Hàng thêm thành viên thủ công */
+.v2-member-add-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+.v2-member-add-row input {
+    flex: 1;
+    border: 1.5px solid #c7d2fe;
+    border-radius: 10px;
+    padding: 9px 12px;
+    font-size: 0.9rem;
+    color: #1f2937;
+    background: #fff;
+    outline: none;
+}
+.v2-member-add-row input:focus { border-color: #8b5cf6; }

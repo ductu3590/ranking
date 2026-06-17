@@ -7,22 +7,44 @@ import {
     saveGames,
     getPairs,
     generatePairs,
+    patchPairs,
 } from '@/lib/tournamentV2Client';
 
-const MLP_SUB_LABELS = {
+// --- SubKind helpers (hỗ trợ cả format mới round_X_pair_Y lẫn legacy womens/mens/...) ---
+
+const LEGACY_LABELS = {
     womens: 'Đôi nữ',
     mens: 'Đôi nam',
     mixed1: 'Đôi nam nữ 1',
     mixed2: 'Đôi nam nữ 2',
 };
-const MLP_SUB_FALLBACK = ['womens', 'mens', 'mixed1', 'mixed2'];
 
-// subKinds authoritative = pairSchedule.subKinds; fallback từ gamesPerMatchup (2 hoặc 4 ván).
+function parseSubKind(kind) {
+    if (!kind) return null;
+    const pairMatch = kind.match(/^round_(\d+)_pair_(\d+)$/);
+    if (pairMatch) return { round: Number(pairMatch[1]) - 1, pairIndex: Number(pairMatch[2]) - 1 };
+    const roundMatch = kind.match(/^round_(\d+)$/);
+    if (roundMatch) return { round: Number(roundMatch[1]) - 1, pairIndex: 0 };
+    return null;
+}
+
+function subKindDisplayLabel(kind) {
+    if (!kind) return '';
+    const pairMatch = kind.match(/^round_(\d+)_pair_(\d+)$/);
+    if (pairMatch) return `Vòng ${pairMatch[1]} · Đôi ${pairMatch[2]}`;
+    const roundMatch = kind.match(/^round_(\d+)$/);
+    if (roundMatch) return `Vòng ${roundMatch[1]}`;
+    return LEGACY_LABELS[kind] || kind;
+}
+
+// subKinds authoritative = pairSchedule.subKinds; fallback derive từ gamesPerMatchup.
 function getSubKinds(pairSchedule, gamesPerMatchup) {
     if (pairSchedule?.subKinds?.length) return pairSchedule.subKinds;
-    const n = gamesPerMatchup === 2 ? 2 : 4;
-    return MLP_SUB_FALLBACK.slice(0, n);
+    const n = Number(gamesPerMatchup) || 4;
+    return Array.from({ length: n }, (_, i) => `round_${i + 1}`);
 }
+
+// ---
 
 const MATCH_STATUS_LABELS = {
     pending: 'Chưa đấu',
@@ -36,13 +58,11 @@ function entrantName(entrantsById, id, fallback) {
     return e ? e.name : `#${id}`;
 }
 
-// Tên các VĐV trong 1 đôi: [{mi,name}, {mi,name}] -> "Lan + Mai".
 function pairLabel(pair) {
     if (!Array.isArray(pair) || !pair.length) return null;
     return pair.map((p) => p?.name || '?').join(' + ');
 }
 
-// Suy ra đôi đề xuất của 1 đội ở vòng r (mặc định pairIndex 0 — mỗi ván con dùng đôi đầu).
 function proposedPair(pairSchedule, entrantId, round, pairIndex = 0) {
     if (!pairSchedule || !pairSchedule.teams || entrantId == null) return null;
     const team = pairSchedule.teams[String(entrantId)];
@@ -52,10 +72,8 @@ function proposedPair(pairSchedule, entrantId, round, pairIndex = 0) {
     return roundPairs[pairIndex] || null;
 }
 
-// Khởi tạo các ván cho 1 match từ games đã lưu, tùy theo thể thức.
 function initGames(match, savedGames, isMlp, subKinds) {
     if (isMlp) {
-        // Mỗi sub là 1 ván cố định; map từ games đã lưu theo kind.
         const byKind = {};
         for (const g of savedGames || []) byKind[g.kind] = g;
         const rows = subKinds.map((kind, i) => {
@@ -78,7 +96,6 @@ function initGames(match, savedGames, isMlp, subKinds) {
         });
         return rows;
     }
-    // Thể thức thường: 1 hàng/ván, mặc định 1 ván nếu chưa có.
     if (savedGames && savedGames.length) {
         return savedGames.map((g, i) => ({
             kind: 'game',
@@ -101,7 +118,6 @@ function MatchCard({ match, savedGames, isMlp, entrantsById, isAdmin, onSaved, p
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [match.id, savedGames, isMlp, pairSchedule, gamesPerMatchup]);
 
-    // VĐV được chọn cho DreamBreaker (mảng {mi,name}) mỗi đội.
     const [dbPickA, setDbPickA] = useState([]);
     const [dbPickB, setDbPickB] = useState([]);
 
@@ -111,7 +127,6 @@ function MatchCard({ match, savedGames, isMlp, entrantsById, isAdmin, onSaved, p
     const entrantA = entrantsById[String(match.entrant_a_id)];
     const entrantB = entrantsById[String(match.entrant_b_id)];
 
-    // Khôi phục lựa chọn DreamBreaker từ snapshot đã lưu (nếu có).
     useEffect(() => {
         const dbRow = rows.find((r) => r.kind === 'dreambreaker');
         if (dbRow?.lineup) {
@@ -146,7 +161,6 @@ function MatchCard({ match, savedGames, isMlp, entrantsById, isAdmin, onSaved, p
         setBusy(true);
         setMsg('');
         try {
-            // Bỏ ván chưa nhập điểm (cả 2 trống). Dreambreaker chỉ gửi nếu có điểm.
             const games = rows
                 .filter((r) => r.score_a !== '' || r.score_b !== '')
                 .map((r) => {
@@ -158,19 +172,19 @@ function MatchCard({ match, savedGames, isMlp, entrantsById, isAdmin, onSaved, p
                     };
                     if (isMlp) {
                         if (r.kind === 'dreambreaker') {
-                            // Snapshot VĐV được chọn luân phiên.
                             if (dbPickA.length || dbPickB.length) {
                                 game.lineup = { dreamBreaker: true, a: dbPickA, b: dbPickB };
                             } else if (r.lineup) {
                                 game.lineup = r.lineup;
                             }
                         } else {
-                            const round = r.game_no - 1;
-                            // Ưu tiên snapshot đã lưu; nếu chưa có thì lấy từ đề xuất pairSchedule.
-                            const a = r.lineup?.a || proposedPair(pairSchedule, match.entrant_a_id, round, 0);
-                            const b = r.lineup?.b || proposedPair(pairSchedule, match.entrant_b_id, round, 0);
+                            const parsed = parseSubKind(r.kind);
+                            const round = parsed?.round ?? (r.game_no - 1);
+                            const pairIndex = parsed?.pairIndex ?? 0;
+                            const a = r.lineup?.a || proposedPair(pairSchedule, match.entrant_a_id, round, pairIndex);
+                            const b = r.lineup?.b || proposedPair(pairSchedule, match.entrant_b_id, round, pairIndex);
                             if (a || b) {
-                                game.lineup = { round, pairIndex: 0, a: a || null, b: b || null };
+                                game.lineup = { round, pairIndex, a: a || null, b: b || null };
                             }
                         }
                     }
@@ -193,7 +207,6 @@ function MatchCard({ match, savedGames, isMlp, entrantsById, isAdmin, onSaved, p
 
     const winnerId = match.winner_entrant_id;
 
-    // Đếm số ván con đã thắng mỗi đội (bỏ dreambreaker) — để biết có hòa cần DreamBreaker.
     let subWinsA = 0;
     let subWinsB = 0;
     let subsScored = 0;
@@ -208,7 +221,6 @@ function MatchCard({ match, savedGames, isMlp, entrantsById, isAdmin, onSaved, p
     }
     const dbRow = rows.find((r) => r.kind === 'dreambreaker');
     const dbHasScore = dbRow && (dbRow.score_a !== '' || dbRow.score_b !== '');
-    // Hiện khối DreamBreaker khi đã chấm đủ ván con mà hòa, hoặc đã có điểm DreamBreaker.
     const showDreamBreaker =
         isMlp &&
         ((subsScored >= subKinds.length && subWinsA === subWinsB) || dbHasScore);
@@ -220,7 +232,6 @@ function MatchCard({ match, savedGames, isMlp, entrantsById, isAdmin, onSaved, p
         setter(exists ? cur.filter((p) => p.mi !== member.mi) : [...cur, member]);
     }
 
-    // Danh sách VĐV của 1 đội (từ entrant.members) -> [{mi,name}].
     function teamMembers(entrant) {
         if (!entrant || !Array.isArray(entrant.members)) return [];
         return entrant.members.map((m, idx) => ({ mi: idx, name: m.display_name || `VĐV ${idx + 1}` }));
@@ -243,56 +254,58 @@ function MatchCard({ match, savedGames, isMlp, entrantsById, isAdmin, onSaved, p
                 {rows.map((r, i) => {
                     const subKind = isMlp ? subKinds[i] : null;
                     const isDb = r.kind === 'dreambreaker';
-                    // MLP: dreambreaker được nhập ở khối riêng bên dưới, bỏ khỏi danh sách ván con.
                     if (isMlp && isDb) return null;
-                    // Đôi đề xuất/đã chốt cho ván con MLP.
                     let lineA = null;
                     let lineB = null;
-                    if (isMlp) {
-                        const round = r.game_no - 1;
-                        lineA = pairLabel(r.lineup?.a) || pairLabel(proposedPair(pairSchedule, match.entrant_a_id, round, 0));
-                        lineB = pairLabel(r.lineup?.b) || pairLabel(proposedPair(pairSchedule, match.entrant_b_id, round, 0));
+                    if (isMlp && subKind) {
+                        const parsed = parseSubKind(subKind);
+                        const round = parsed?.round ?? (r.game_no - 1);
+                        const pairIndex = parsed?.pairIndex ?? 0;
+                        lineA = pairLabel(r.lineup?.a) || pairLabel(proposedPair(pairSchedule, match.entrant_a_id, round, pairIndex));
+                        lineB = pairLabel(r.lineup?.b) || pairLabel(proposedPair(pairSchedule, match.entrant_b_id, round, pairIndex));
                     }
                     return (
                         <div key={`${r.kind}-${i}`} className="v2-game-row-wrap">
-                        {isMlp && (lineA || lineB) ? (
-                            <p className="v2-lineup-display">
-                                <strong>{lineA || '?'}</strong>
-                                <span className="v2-pair-vs"> vs </span>
-                                <strong>{lineB || '?'}</strong>
-                            </p>
-                        ) : null}
-                        <div className={`v2-game-row ${isDb ? 'v2-game-db' : ''}`}>
-                            <span className="v2-game-label">
-                                {isMlp ? (subKind ? (MLP_SUB_LABELS[subKind] || subKind) : 'DreamBreaker') : `Ván ${r.game_no}`}
-                            </span>
-                            <input
-                                type="number"
-                                min="0"
-                                inputMode="numeric"
-                                className="v2-score-input"
-                                value={r.score_a}
-                                onChange={(e) => setScore(i, 'score_a', e.target.value)}
-                                disabled={!isAdmin}
-                                aria-label={`Điểm ${nameA}`}
-                            />
-                            <span className="v2-score-sep">–</span>
-                            <input
-                                type="number"
-                                min="0"
-                                inputMode="numeric"
-                                className="v2-score-input"
-                                value={r.score_b}
-                                onChange={(e) => setScore(i, 'score_b', e.target.value)}
-                                disabled={!isAdmin}
-                                aria-label={`Điểm ${nameB}`}
-                            />
-                            {!isMlp && isAdmin && rows.length > 1 ? (
-                                <button type="button" className="v2-game-del" onClick={() => removeGame(i)} aria-label="Xóa ván">
-                                    ×
-                                </button>
+                            {isMlp && (lineA || lineB) ? (
+                                <p className="v2-lineup-display">
+                                    <strong>{lineA || '?'}</strong>
+                                    <span className="v2-pair-vs"> vs </span>
+                                    <strong>{lineB || '?'}</strong>
+                                </p>
                             ) : null}
-                        </div>
+                            <div className={`v2-game-row ${isDb ? 'v2-game-db' : ''}`}>
+                                <span className="v2-game-label">
+                                    {isMlp
+                                        ? (subKind ? subKindDisplayLabel(subKind) : 'DreamBreaker')
+                                        : `Ván ${r.game_no}`}
+                                </span>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    inputMode="numeric"
+                                    className="v2-score-input"
+                                    value={r.score_a}
+                                    onChange={(e) => setScore(i, 'score_a', e.target.value)}
+                                    disabled={!isAdmin}
+                                    aria-label={`Điểm ${nameA}`}
+                                />
+                                <span className="v2-score-sep">–</span>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    inputMode="numeric"
+                                    className="v2-score-input"
+                                    value={r.score_b}
+                                    onChange={(e) => setScore(i, 'score_b', e.target.value)}
+                                    disabled={!isAdmin}
+                                    aria-label={`Điểm ${nameB}`}
+                                />
+                                {!isMlp && isAdmin && rows.length > 1 ? (
+                                    <button type="button" className="v2-game-del" onClick={() => removeGame(i)} aria-label="Xóa ván">
+                                        ×
+                                    </button>
+                                ) : null}
+                            </div>
                         </div>
                     );
                 })}
@@ -379,6 +392,120 @@ function MatchCard({ match, savedGames, isMlp, entrantsById, isAdmin, onSaved, p
     );
 }
 
+// --- PairScheduleEditor: cho admin chỉnh sửa thủ công lịch ghép đôi ---
+
+function PairScheduleEditor({ pairSchedule, entrantsById, stageId, onSaved }) {
+    const [local, setLocal] = useState(() => JSON.parse(JSON.stringify(pairSchedule)));
+    const [busy, setBusy] = useState(false);
+    const [msg, setMsg] = useState('');
+
+    useEffect(() => {
+        setLocal(JSON.parse(JSON.stringify(pairSchedule)));
+    }, [pairSchedule]);
+
+    function allMembers(teamId) {
+        const e = entrantsById[String(teamId)];
+        return (e?.members || []).map((m, idx) => ({ mi: idx, name: m.display_name || `VĐV ${idx + 1}` }));
+    }
+
+    function setMemberInPair(teamId, roundIdx, pairIdx, slotIdx, newMi) {
+        setLocal((prev) => {
+            const next = JSON.parse(JSON.stringify(prev));
+            const members = allMembers(teamId);
+            const member = members.find((m) => m.mi === Number(newMi));
+            if (!member) return prev;
+            next.teams[teamId].rounds[roundIdx][pairIdx][slotIdx] = member;
+            return next;
+        });
+    }
+
+    function validate() {
+        for (const [teamId, team] of Object.entries(local.teams || {})) {
+            for (let r = 0; r < (team.rounds || []).length; r++) {
+                const usedMis = new Set();
+                for (const pair of team.rounds[r]) {
+                    for (const ref of pair) {
+                        if (usedMis.has(ref.mi)) {
+                            const teamName = entrantsById[teamId]?.name || `Đội #${teamId}`;
+                            return `${teamName} — Vòng ${r + 1}: VĐV "${ref.name}" xuất hiện 2 lần trong cùng vòng.`;
+                        }
+                        usedMis.add(ref.mi);
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    async function save() {
+        const err = validate();
+        if (err) { setMsg(err); return; }
+        setBusy(true);
+        setMsg('');
+        try {
+            const r = await patchPairs(stageId, local);
+            setMsg('Đã lưu lịch ghép đôi.');
+            if (onSaved) onSaved(r.pairSchedule);
+        } catch (e) {
+            setMsg(e.message || 'Không lưu được.');
+        } finally {
+            setBusy(false);
+        }
+    }
+
+    const rounds = local.rounds || 0;
+    const teamIds = Object.keys(local.teams || {});
+
+    return (
+        <div className="v2-pair-editor">
+            <div className="v2-pair-editor-head">
+                <span className="v2-section-label">Sửa thủ công lịch ghép đôi</span>
+                <button type="button" className="v2-btn-primary v2-btn-sm" onClick={save} disabled={busy}>
+                    {busy ? 'Đang lưu...' : 'Lưu lịch'}
+                </button>
+            </div>
+            {msg ? <p className="v2-match-msg" style={{ marginTop: 8 }}>{msg}</p> : null}
+            {Array.from({ length: rounds }).map((_, r) => (
+                <div key={r} className="v2-pairs-round">
+                    <div className="v2-pairs-round-label">Vòng {r + 1}</div>
+                    {teamIds.map((teamId) => {
+                        const team = local.teams[teamId];
+                        const teamName = entrantsById[teamId]?.name || `Đội #${teamId}`;
+                        const pairs = (team?.rounds || [])[r] || [];
+                        const members = allMembers(teamId);
+                        return (
+                            <div key={teamId} className="v2-pair-team-row">
+                                <span className="v2-pair-tag">{teamName}</span>
+                                <div className="v2-pair-slots">
+                                    {pairs.map((pair, pi) => (
+                                        <span key={pi} className="v2-pair-slot">
+                                            <span className="v2-pair-slot-label">Đôi {pi + 1}:</span>
+                                            {pair.map((ref, si) => (
+                                                <select
+                                                    key={si}
+                                                    value={ref.mi}
+                                                    onChange={(e) => setMemberInPair(teamId, r, pi, si, e.target.value)}
+                                                    className="v2-pair-select"
+                                                >
+                                                    {members.map((m) => (
+                                                        <option key={m.mi} value={m.mi}>{m.name}</option>
+                                                    ))}
+                                                </select>
+                                            ))}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            ))}
+        </div>
+    );
+}
+
+// --- Main ResultsTab ---
+
 export default function ResultsTab({ tournamentId, stageId, stage, isAdmin }) {
     const [matches, setMatches] = useState([]);
     const [gamesByMatchId, setGamesByMatchId] = useState({});
@@ -386,6 +513,7 @@ export default function ResultsTab({ tournamentId, stageId, stage, isAdmin }) {
     const [pairSchedule, setPairSchedule] = useState(null);
     const [pairBusy, setPairBusy] = useState(false);
     const [pairMsg, setPairMsg] = useState('');
+    const [showPairEditor, setShowPairEditor] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
@@ -401,7 +529,6 @@ export default function ResultsTab({ tournamentId, stageId, stage, isAdmin }) {
         setError('');
         try {
             const tasks = [listMatches(stageId), listEntrants(tournamentId)];
-            // Với MLP: tải thêm lịch ghép đôi để hiển thị đôi mỗi ván con.
             if (isMlp) tasks.push(getPairs(stageId).catch(() => ({ pairSchedule: null })));
             const [matchData, entrants, pairsData] = await Promise.all(tasks);
             setMatches(matchData.matches || []);
@@ -423,6 +550,7 @@ export default function ResultsTab({ tournamentId, stageId, stage, isAdmin }) {
         try {
             const r = await generatePairs(stageId, Math.floor(Math.random() * 100000) + 1);
             setPairSchedule(r.pairSchedule || null);
+            setShowPairEditor(false);
             setPairMsg('Đã sinh lại cặp đôi. Các game đã lưu giữ nguyên đôi gốc.');
         } catch (err) {
             setPairMsg(err.message || 'Không sinh lại được cặp đôi.');
@@ -473,12 +601,33 @@ export default function ResultsTab({ tournamentId, stageId, stage, isAdmin }) {
                     >
                         {pairBusy ? 'Đang sinh lại...' : '🔀 Sinh lại cặp đôi'}
                     </button>
+                    {pairSchedule ? (
+                        <button
+                            type="button"
+                            className="v2-btn-secondary v2-btn-sm"
+                            onClick={() => setShowPairEditor((v) => !v)}
+                        >
+                            {showPairEditor ? 'Ẩn bảng sửa' : '✏️ Sửa lịch ghép đôi'}
+                        </button>
+                    ) : null}
                     <span className="v2-pairs-bar-hint">
                         Chỉ đổi ĐỀ XUẤT — các game đã lưu giữ nguyên đôi gốc.
                     </span>
                 </div>
             ) : null}
             {pairMsg ? <p className="v2-match-msg">{pairMsg}</p> : null}
+
+            {isMlp && isAdmin && showPairEditor && pairSchedule ? (
+                <PairScheduleEditor
+                    pairSchedule={pairSchedule}
+                    entrantsById={entrantsById}
+                    stageId={stageId}
+                    onSaved={(updated) => {
+                        setPairSchedule(updated);
+                        setPairMsg('Đã cập nhật lịch ghép đôi.');
+                    }}
+                />
+            ) : null}
 
             {matches.map((m) => (
                 <MatchCard

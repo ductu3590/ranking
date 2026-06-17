@@ -154,3 +154,49 @@ export async function POST(request) {
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }
+
+// PATCH /api/tournament-v2/pairs (admin)
+// Ghi đè toàn bộ pairSchedule (dùng khi admin sửa thủ công lịch ghép đôi).
+export async function PATCH(request) {
+    try {
+        const adminCheck = requireGroupAdmin();
+        if (!adminCheck.ok) return adminCheck.response;
+        const groupId = adminCheck.groupId;
+
+        const body = await request.json();
+        const stageId = body?.stageId;
+        const pairSchedule = body?.pairSchedule;
+        if (!stageId) {
+            return NextResponse.json({ error: 'stageId is required' }, { status: 400 });
+        }
+        if (!pairSchedule || typeof pairSchedule !== 'object') {
+            return NextResponse.json({ error: 'pairSchedule is required' }, { status: 400 });
+        }
+
+        const { data: stage, error: stageErr } = await db
+            .from('tournament_stages')
+            .select('id, match_format, config')
+            .eq('group_id', groupId)
+            .eq('id', stageId)
+            .maybeSingle();
+
+        if (stageErr) return NextResponse.json({ error: stageErr.message }, { status: 500 });
+        if (!stage) return NextResponse.json({ error: 'Stage không tồn tại' }, { status: 404 });
+        if (stage.match_format !== 'mlp') {
+            return NextResponse.json({ error: 'Pair schedule chỉ áp dụng cho stage MLP' }, { status: 400 });
+        }
+
+        const newConfig = { ...(stage.config || {}), pairSchedule: { ...pairSchedule, updatedAt: new Date().toISOString() } };
+        const { error: updateErr } = await db
+            .from('tournament_stages')
+            .update({ config: newConfig })
+            .eq('id', stageId)
+            .eq('group_id', groupId);
+
+        if (updateErr) return NextResponse.json({ error: updateErr.message }, { status: 500 });
+        return NextResponse.json({ success: true, pairSchedule: newConfig.pairSchedule });
+    } catch (err) {
+        console.error('Pairs v2 PATCH error:', err);
+        return NextResponse.json({ error: err.message }, { status: 500 });
+    }
+}

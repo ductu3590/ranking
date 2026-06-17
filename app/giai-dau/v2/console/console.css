@@ -524,3 +524,111 @@
     flex-shrink: 0;
     cursor: pointer;
 }
+
+/* ===== Settings — block header với nút Sửa ===== */
+.v2-settings-block-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+.v2-settings-block-head h3 { margin: 0; }
+
+/* Info list trong Settings (key: value) */
+.v2-info-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.v2-info-list li {
+    font-size: 0.88rem;
+    color: #374151;
+}
+.v2-info-list li span {
+    font-weight: 600;
+    color: #6b7280;
+    margin-right: 6px;
+}
+
+/* Hint nhỏ dưới field */
+.v2-field-hint {
+    margin: 4px 0 0;
+    font-size: 0.75rem;
+    color: #9ca3af;
+    line-height: 1.4;
+}
+
+/* Checkbox label dạng inline */
+.v2-checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: 6px 0;
+}
+
+/* ===== Pair Schedule Editor ===== */
+.v2-pair-editor {
+    background: #faf5ff;
+    border: 1.5px solid #ede9fe;
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 14px;
+}
+.v2-pair-editor-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+.v2-section-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #5b21b6;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.v2-pair-team-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid #ede9fe;
+    flex-wrap: wrap;
+}
+.v2-pair-team-row:last-child { border-bottom: none; }
+.v2-pair-slots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    flex: 1;
+}
+.v2-pair-slot {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: #fff;
+    border: 1px solid #e0e7ff;
+    border-radius: 8px;
+    padding: 4px 8px;
+    font-size: 0.82rem;
+}
+.v2-pair-slot-label {
+    color: #6b7280;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.v2-pair-select {
+    border: 1px solid #c7d2fe;
+    border-radius: 6px;
+    padding: 3px 6px;
+    font-size: 0.8rem;
+    color: #1f2937;
+    background: #f5f3ff;
+    cursor: pointer;
+    max-width: 110px;
+}

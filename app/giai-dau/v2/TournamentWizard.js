@@ -18,15 +18,12 @@ const STEPS_REGULAR = [
     { n: 4, label: 'Sinh lịch' },
 ];
 
-const SUB_KIND_LABELS = {
-    womens: 'Đôi nữ',
-    mens: 'Đôi nam',
-    mixed1: 'Đôi nam nữ 1',
-    mixed2: 'Đôi nam nữ 2',
-};
-
 function subKindLabel(kind) {
-    return SUB_KIND_LABELS[kind] || kind;
+    const pairMatch = kind?.match(/^round_(\d+)_pair_(\d+)$/);
+    if (pairMatch) return `Vòng ${pairMatch[1]} · Đôi ${pairMatch[2]}`;
+    const roundMatch = kind?.match(/^round_(\d+)$/);
+    if (roundMatch) return `Vòng ${roundMatch[1]}`;
+    return kind || '';
 }
 
 const STEPS_MLP = [
@@ -526,18 +523,18 @@ export default function TournamentWizard({ onDone }) {
                 <div>
                     {stages.length > 0 ? (
                         <p className="v2-item-sub" style={{ marginBottom: 14 }}>
-                            Cấu hình MLP đã lưu: {mlpCfg.gamesPerMatchup} ván/lượt đấu
+                            Cấu hình MLP đã lưu: {mlpCfg.gamesPerMatchup} vòng/lượt đấu
                             {mlpCfg.dreamBreaker ? ', có DreamBreaker' : ''}.
                             Nhấn Tiếp tục để thêm đội.
                         </p>
                     ) : (
                         <>
                             <div className="v2-field">
-                                <label>Số ván khi 2 đội gặp nhau</label>
+                                <label>Số vòng đấu mỗi khi 2 đội gặp nhau</label>
                                 <div className="v2-radio-row">
                                     {[
-                                        { value: 2, label: '2 ván', hint: 'Đôi nam + Đôi nữ' },
-                                        { value: 4, label: '4 ván', hint: 'Men\'s · Women\'s · Mixed 1 · Mixed 2' },
+                                        { value: 2, label: '2 vòng', hint: 'Vòng 1 · Vòng 2' },
+                                        { value: 4, label: '4 vòng', hint: 'Vòng 1 · Vòng 2 · Vòng 3 · Vòng 4' },
                                     ].map(o => (
                                         <label key={o.value} className={`v2-radio ${mlpCfg.gamesPerMatchup === o.value ? 'active' : ''}`}>
                                             <input type="radio" name="gpm" value={o.value}
@@ -550,6 +547,9 @@ export default function TournamentWizard({ onDone }) {
                                         </label>
                                     ))}
                                 </div>
+                                <p style={{ fontSize: '0.75rem', color: '#9ca3af', marginTop: 6 }}>
+                                    Mỗi vòng tất cả VĐV ghép đôi ngẫu nhiên ra sân. Thắng vòng +1 điểm cho đội.
+                                </p>
                             </div>
 
                             <div className="v2-field">
@@ -804,9 +804,7 @@ function PairsPreview({ pairSchedule, entrants }) {
         <div className="v2-pairs-preview">
             {Array.from({ length: rounds }).map((_, r) => (
                 <div key={r} className="v2-pairs-round">
-                    <div className="v2-pairs-round-label">
-                        Vòng {r + 1}{subKinds[r] ? ` · ${subKindLabel(subKinds[r])}` : ''}
-                    </div>
+                    <div className="v2-pairs-round-label">Vòng {r + 1}</div>
                     {teamIds.map((tid) => {
                         const team = pairSchedule.teams[tid];
                         const roundPairs = (team?.rounds || [])[r] || [];

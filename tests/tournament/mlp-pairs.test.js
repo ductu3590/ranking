@@ -29,7 +29,12 @@ function noDup(roundPairs) {
   const out = generatePairSchedule(teams, 4, 42);
   assert(out.seed === 42, 'T1 seed lưu lại');
   assert(out.rounds === 4, 'T1 rounds=4');
-  assert(JSON.stringify(out.subKinds) === JSON.stringify(['womens', 'mens', 'mixed1', 'mixed2']), 'T1 subKinds 4');
+  assert(JSON.stringify(out.subKinds) === JSON.stringify([
+    'round_1_pair_1', 'round_1_pair_2', 'round_1_pair_3', 'round_1_pair_4',
+    'round_2_pair_1', 'round_2_pair_2', 'round_2_pair_3', 'round_2_pair_4',
+    'round_3_pair_1', 'round_3_pair_2', 'round_3_pair_3', 'round_3_pair_4',
+    'round_4_pair_1', 'round_4_pair_2', 'round_4_pair_3', 'round_4_pair_4',
+  ]), 'T1 subKinds round-based');
   const t = out.teams['10'];
   assert(t.pairsPerRound === 4, 'T1 pairsPerRound=4');
   assert(t.rounds.length === 4, 'T1 có 4 vòng');
@@ -42,14 +47,15 @@ function noDup(roundPairs) {
   console.log('T1 8 members/4 rounds ok');
 }
 
-// ── Test 2: 8 members / 2 rounds → subKinds = ['womens','mens'] ──────────
+// ── Test 2: 4 members / 4 rounds → subKinds length 8, biên 2 đầu ─────────
 {
-  const teams = [mk('10', ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'])];
-  const out = generatePairSchedule(teams, 2, 7);
-  assert(JSON.stringify(out.subKinds) === JSON.stringify(['womens', 'mens']), 'T2 subKinds 2');
-  assert(out.teams['10'].rounds.length === 2, 'T2 có 2 vòng');
-  assert(out.teams['10'].pairsPerRound === 4, 'T2 pairsPerRound=4');
-  console.log('T2 8 members/2 rounds subKinds ok');
+  const teams = [mk('10', ['A', 'B', 'C', 'D'])];
+  const out = generatePairSchedule(teams, 4, 7);
+  assert(out.subKinds.length === 8, 'T2 subKinds length=8');
+  assert(out.subKinds[0] === 'round_1_pair_1', 'T2 subKinds[0]=round_1_pair_1');
+  assert(out.subKinds[7] === 'round_4_pair_2', 'T2 subKinds[7]=round_4_pair_2');
+  assert(out.teams['10'].pairsPerRound === 2, 'T2 pairsPerRound=2');
+  console.log('T2 4 members/4 rounds subKinds ok');
 }
 
 // ── Test 3: Determinism — cùng seed → byte-identical ────────────────────
@@ -105,6 +111,26 @@ function noDup(roundPairs) {
   catch (e) { threw0 = true; }
   assert(threw0, 'T5 0 VĐV phải throw');
   console.log('T5 <2 VĐV throw ok');
+}
+
+// ── Test 6: 2 members / 2 rounds → subKinds = ['round_1','round_2'] ──────
+{
+  const teams = [mk('40', ['X', 'Y'])];
+  const out = generatePairSchedule(teams, 2, 3);
+  assert(JSON.stringify(out.subKinds) === JSON.stringify(['round_1', 'round_2']), 'T6 subKinds no _pair suffix');
+  assert(out.teams['40'].pairsPerRound === 1, 'T6 pairsPerRound=1');
+  console.log('T6 2 members/2 rounds subKinds ok');
+}
+
+// ── Test 7: 4 members / 2 rounds → 4 subKinds với _pair suffix ───────────
+{
+  const teams = [mk('50', ['A', 'B', 'C', 'D'])];
+  const out = generatePairSchedule(teams, 2, 9);
+  assert(JSON.stringify(out.subKinds) === JSON.stringify([
+    'round_1_pair_1', 'round_1_pair_2', 'round_2_pair_1', 'round_2_pair_2',
+  ]), 'T7 subKinds round_pair');
+  assert(out.teams['50'].pairsPerRound === 2, 'T7 pairsPerRound=2');
+  console.log('T7 4 members/2 rounds subKinds ok');
 }
 
 console.log('mlp-pairs ok');

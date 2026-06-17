@@ -227,20 +227,31 @@ export default function TournamentWizard({ onDone }) {
     }
 
     function getPS(localId) {
-        return pickerState[localId] || { clubPick: '', manualName: '' };
+        return pickerState[localId] || { selectedIds: [], manualName: '' };
     }
 
     function setPS(localId, field, val) {
         setPickerState(c => ({ ...c, [localId]: { ...getPS(localId), [field]: val } }));
     }
 
-    function addFromClub(localId) {
-        const ps = getPS(localId);
-        if (!ps.clubPick) return;
-        const cm = clubMembers.find(m => m.id === ps.clubPick);
-        if (!cm) return;
-        addTeamMember(localId, { display_name: cm.full_name, member_id: cm.id });
-        setPS(localId, 'clubPick', '');
+    function toggleClubMember(localId, memberId) {
+        setPickerState(c => {
+            const ps = c[localId] || { selectedIds: [], manualName: '' };
+            const ids = ps.selectedIds;
+            const newIds = ids.includes(memberId)
+                ? ids.filter(id => id !== memberId)
+                : [...ids, memberId];
+            return { ...c, [localId]: { ...ps, selectedIds: newIds } };
+        });
+    }
+
+    function addSelectedClubMembers(localId) {
+        const { selectedIds } = getPS(localId);
+        for (const memberId of selectedIds) {
+            const cm = clubMembers.find(m => m.id === memberId);
+            if (cm) addTeamMember(localId, { display_name: cm.full_name, member_id: cm.id });
+        }
+        setPS(localId, 'selectedIds', []);
     }
 
     function addManual(localId) {
@@ -584,6 +595,9 @@ export default function TournamentWizard({ onDone }) {
             {/* ===== STEP 3 MLP: Quản lý đội ===== */}
             {step === 3 && tournamentFormat === 'mlp' && (
                 <div>
+                    <p className="v2-step-desc">
+                        Thêm VĐV vào từng đội — chọn từ danh sách thành viên CLB hoặc nhập tên thủ công.
+                    </p>
                     <ul className="v2-item-list" style={{ marginBottom: 12 }}>
                         {mlpTeams.map((team, tIdx) => {
                             const ps = getPS(team.localId);
@@ -616,22 +630,31 @@ export default function TournamentWizard({ onDone }) {
                                     )}
 
                                     {availableClub.length > 0 && (
-                                        <div className="v2-member-add-row">
-                                            <select
-                                                className="v2-member-select"
-                                                value={ps.clubPick}
-                                                onChange={e => setPS(team.localId, 'clubPick', e.target.value)}
-                                            >
-                                                <option value="">Chọn thành viên CLB...</option>
+                                        <>
+                                            <p className="v2-member-list-label">Thành viên CLB</p>
+                                            <div className="v2-member-checklist">
                                                 {availableClub.map(m => (
-                                                    <option key={m.id} value={m.id}>{m.full_name}</option>
+                                                    <label
+                                                        key={m.id}
+                                                        className={`v2-member-check-item ${ps.selectedIds.includes(m.id) ? 'selected' : ''}`}
+                                                    >
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={ps.selectedIds.includes(m.id)}
+                                                            onChange={() => toggleClubMember(team.localId, m.id)}
+                                                        />
+                                                        {m.full_name}
+                                                    </label>
                                                 ))}
-                                            </select>
-                                            <button type="button" className="v2-btn-secondary v2-btn-sm"
-                                                onClick={() => addFromClub(team.localId)} disabled={!ps.clubPick}>
-                                                + Thêm
-                                            </button>
-                                        </div>
+                                            </div>
+                                            {ps.selectedIds.length > 0 && (
+                                                <button type="button" className="v2-btn-secondary"
+                                                    style={{ width: '100%' }}
+                                                    onClick={() => addSelectedClubMembers(team.localId)}>
+                                                    + Thêm {ps.selectedIds.length} VĐV đã chọn
+                                                </button>
+                                            )}
+                                        </>
                                     )}
 
                                     <div className="v2-member-add-row">

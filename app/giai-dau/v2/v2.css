@@ -556,6 +556,67 @@
     border-color: #8b5cf6;
 }
 
+/* Step description text */
+.v2-step-desc {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin: 0 0 14px;
+    line-height: 1.5;
+}
+
+/* Member checklist (multi-select) */
+.v2-member-list-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #8b5cf6;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0 0 6px;
+}
+
+.v2-member-checklist {
+    max-height: 160px;
+    overflow-y: auto;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 8px;
+    background: #fff;
+    margin-bottom: 8px;
+}
+
+.v2-member-check-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 12px;
+    font-size: 0.88rem;
+    cursor: pointer;
+    border-bottom: 1px solid #f3f4f6;
+    transition: background 0.1s;
+    color: #374151;
+}
+
+.v2-member-check-item:last-child {
+    border-bottom: none;
+}
+
+.v2-member-check-item:hover {
+    background: #faf5ff;
+}
+
+.v2-member-check-item.selected {
+    background: #f5f3ff;
+    color: #5b21b6;
+    font-weight: 600;
+}
+
+.v2-member-check-item input[type="checkbox"] {
+    accent-color: #8b5cf6;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
 /* Remove button */
 .v2-btn-remove {
     background: none;

@@ -250,23 +250,16 @@ export default function TournamentWizard({ onDone }) {
     }
 
     function toggleClubMember(localId, memberId) {
-        setPickerState(c => {
-            const ps = c[localId] || { selectedIds: [], manualName: '' };
-            const ids = ps.selectedIds;
-            const newIds = ids.includes(memberId)
-                ? ids.filter(id => id !== memberId)
-                : [...ids, memberId];
-            return { ...c, [localId]: { ...ps, selectedIds: newIds } };
-        });
-    }
-
-    function addSelectedClubMembers(localId) {
-        const { selectedIds } = getPS(localId);
-        for (const memberId of selectedIds) {
-            const cm = clubMembers.find(m => m.id === memberId);
-            if (cm) addTeamMember(localId, { display_name: cm.full_name, member_id: cm.id });
-        }
-        setPS(localId, 'selectedIds', []);
+        const cm = clubMembers.find(m => m.id === memberId);
+        if (!cm) return;
+        setMlpTeams(c => c.map(t => {
+            if (t.localId !== localId) return t;
+            const alreadyIn = t.members.some(m => m.member_id === memberId);
+            if (alreadyIn) {
+                return { ...t, members: t.members.filter(m => m.member_id !== memberId) };
+            }
+            return { ...t, members: [...t.members, { display_name: cm.full_name, member_id: cm.id }] };
+        }));
     }
 
     function addManual(localId) {
@@ -644,8 +637,6 @@ export default function TournamentWizard({ onDone }) {
                     <ul className="v2-item-list" style={{ marginBottom: 12 }}>
                         {mlpTeams.map((team, tIdx) => {
                             const ps = getPS(team.localId);
-                            const usedIds = new Set(team.members.map(m => m.member_id).filter(Boolean));
-                            const availableClub = clubMembers.filter(m => !usedIds.has(m.id));
                             return (
                                 <li key={team.localId} className="v2-team-card">
                                     <div className="v2-team-header">
@@ -672,31 +663,27 @@ export default function TournamentWizard({ onDone }) {
                                         </div>
                                     )}
 
-                                    {availableClub.length > 0 && (
+                                    {clubMembers.length > 0 && (
                                         <>
                                             <p className="v2-member-list-label">Thành viên CLB</p>
                                             <div className="v2-member-checklist">
-                                                {availableClub.map(m => (
-                                                    <label
-                                                        key={m.id}
-                                                        className={`v2-member-check-item ${ps.selectedIds.includes(m.id) ? 'selected' : ''}`}
-                                                    >
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={ps.selectedIds.includes(m.id)}
-                                                            onChange={() => toggleClubMember(team.localId, m.id)}
-                                                        />
-                                                        {m.full_name}
-                                                    </label>
-                                                ))}
+                                                {clubMembers.map(m => {
+                                                    const checked = team.members.some(tm => tm.member_id === m.id);
+                                                    return (
+                                                        <label
+                                                            key={m.id}
+                                                            className={`v2-member-check-item ${checked ? 'selected' : ''}`}
+                                                        >
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={checked}
+                                                                onChange={() => toggleClubMember(team.localId, m.id)}
+                                                            />
+                                                            {m.full_name}
+                                                        </label>
+                                                    );
+                                                })}
                                             </div>
-                                            {ps.selectedIds.length > 0 && (
-                                                <button type="button" className="v2-btn-secondary"
-                                                    style={{ width: '100%' }}
-                                                    onClick={() => addSelectedClubMembers(team.localId)}>
-                                                    + Thêm {ps.selectedIds.length} VĐV đã chọn
-                                                </button>
-                                            )}
                                         </>
                                     )}
 

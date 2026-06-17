@@ -141,7 +141,7 @@ export default function OverviewTab({ tournamentId, tournament, stage, stageId, 
 
             {notice ? <p className="v2-notice v2-notice-info">{notice}</p> : null}
 
-            {isAdmin && stage ? (
+            {isAdmin && stage && stages.length > 1 ? (
                 <button
                     type="button"
                     className="v2-btn-primary v2-block"

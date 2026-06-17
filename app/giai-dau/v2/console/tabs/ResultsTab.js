@@ -58,9 +58,16 @@ function entrantName(entrantsById, id, fallback) {
     return e ? e.name : `#${id}`;
 }
 
+// Tên rút gọn: lấy từ cuối cùng trong họ tên (tên riêng tiếng Việt)
+function shortName(fullName) {
+    if (!fullName) return '?';
+    const parts = fullName.trim().split(/\s+/);
+    return parts[parts.length - 1];
+}
+
 function pairLabel(pair) {
     if (!Array.isArray(pair) || !pair.length) return null;
-    return pair.map((p) => p?.name || '?').join(' + ');
+    return pair.map((p) => shortName(p?.name)).join(' + ');
 }
 
 function proposedPair(pairSchedule, entrantId, round, pairIndex = 0) {

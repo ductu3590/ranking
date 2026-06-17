@@ -9,13 +9,20 @@ import {
     generatePairs,
 } from '@/lib/tournamentV2Client';
 
-// Các ván con MLP cố định + dreambreaker (ván phụ khi hòa).
-const MLP_SUBS = [
-    { kind: 'womens', label: 'Đôi nữ' },
-    { kind: 'mens', label: 'Đôi nam' },
-    { kind: 'mixed1', label: 'Đôi nam nữ 1' },
-    { kind: 'mixed2', label: 'Đôi nam nữ 2' },
-];
+const MLP_SUB_LABELS = {
+    womens: 'Đôi nữ',
+    mens: 'Đôi nam',
+    mixed1: 'Đôi nam nữ 1',
+    mixed2: 'Đôi nam nữ 2',
+};
+const MLP_SUB_FALLBACK = ['womens', 'mens', 'mixed1', 'mixed2'];
+
+// subKinds authoritative = pairSchedule.subKinds; fallback từ gamesPerMatchup (2 hoặc 4 ván).
+function getSubKinds(pairSchedule, gamesPerMatchup) {
+    if (pairSchedule?.subKinds?.length) return pairSchedule.subKinds;
+    const n = gamesPerMatchup === 2 ? 2 : 4;
+    return MLP_SUB_FALLBACK.slice(0, n);
+}
 
 const MATCH_STATUS_LABELS = {
     pending: 'Chưa đấu',
@@ -46,25 +53,25 @@ function proposedPair(pairSchedule, entrantId, round, pairIndex = 0) {
 }
 
 // Khởi tạo các ván cho 1 match từ games đã lưu, tùy theo thể thức.
-function initGames(match, savedGames, isMlp) {
+function initGames(match, savedGames, isMlp, subKinds) {
     if (isMlp) {
         // Mỗi sub là 1 ván cố định; map từ games đã lưu theo kind.
         const byKind = {};
         for (const g of savedGames || []) byKind[g.kind] = g;
-        const rows = MLP_SUBS.map((s, i) => {
-            const g = byKind[s.kind];
+        const rows = subKinds.map((kind, i) => {
+            const g = byKind[kind];
             return {
-                kind: s.kind,
+                kind,
                 game_no: i + 1,
                 score_a: g ? String(g.score_a ?? '') : '',
                 score_b: g ? String(g.score_b ?? '') : '',
-                lineup: g?.lineup || null, // snapshot đôi thực đã đá (nếu có)
+                lineup: g?.lineup || null,
             };
         });
         const db = byKind.dreambreaker;
         rows.push({
             kind: 'dreambreaker',
-            game_no: MLP_SUBS.length + 1,
+            game_no: subKinds.length + 1,
             score_a: db ? String(db.score_a ?? '') : '',
             score_b: db ? String(db.score_b ?? '') : '',
             lineup: db?.lineup || null,
@@ -83,14 +90,16 @@ function initGames(match, savedGames, isMlp) {
     return [{ kind: 'game', game_no: 1, score_a: '', score_b: '' }];
 }
 
-function MatchCard({ match, savedGames, isMlp, entrantsById, isAdmin, onSaved, pairSchedule }) {
-    const [rows, setRows] = useState(() => initGames(match, savedGames, isMlp));
+function MatchCard({ match, savedGames, isMlp, entrantsById, isAdmin, onSaved, pairSchedule, gamesPerMatchup }) {
+    const subKinds = isMlp ? getSubKinds(pairSchedule, gamesPerMatchup) : [];
+    const [rows, setRows] = useState(() => initGames(match, savedGames, isMlp, subKinds));
     const [busy, setBusy] = useState(false);
     const [msg, setMsg] = useState('');
 
     useEffect(() => {
-        setRows(initGames(match, savedGames, isMlp));
-    }, [match.id, savedGames, isMlp]);
+        setRows(initGames(match, savedGames, isMlp, subKinds));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [match.id, savedGames, isMlp, pairSchedule, gamesPerMatchup]);
 
     // VĐV được chọn cho DreamBreaker (mảng {mi,name}) mỗi đội.
     const [dbPickA, setDbPickA] = useState([]);
@@ -202,7 +211,7 @@ function MatchCard({ match, savedGames, isMlp, entrantsById, isAdmin, onSaved, p
     // Hiện khối DreamBreaker khi đã chấm đủ ván con mà hòa, hoặc đã có điểm DreamBreaker.
     const showDreamBreaker =
         isMlp &&
-        ((subsScored >= MLP_SUBS.length && subWinsA === subWinsB) || dbHasScore);
+        ((subsScored >= subKinds.length && subWinsA === subWinsB) || dbHasScore);
 
     function toggleDbPick(side, member) {
         const cur = side === 'a' ? dbPickA : dbPickB;
@@ -232,7 +241,7 @@ function MatchCard({ match, savedGames, isMlp, entrantsById, isAdmin, onSaved, p
 
             <div className="v2-game-rows">
                 {rows.map((r, i) => {
-                    const sub = isMlp ? MLP_SUBS[i] : null;
+                    const subKind = isMlp ? subKinds[i] : null;
                     const isDb = r.kind === 'dreambreaker';
                     // MLP: dreambreaker được nhập ở khối riêng bên dưới, bỏ khỏi danh sách ván con.
                     if (isMlp && isDb) return null;
@@ -255,7 +264,7 @@ function MatchCard({ match, savedGames, isMlp, entrantsById, isAdmin, onSaved, p
                         ) : null}
                         <div className={`v2-game-row ${isDb ? 'v2-game-db' : ''}`}>
                             <span className="v2-game-label">
-                                {isMlp ? (sub ? sub.label : 'DreamBreaker') : `Ván ${r.game_no}`}
+                                {isMlp ? (subKind ? (MLP_SUB_LABELS[subKind] || subKind) : 'DreamBreaker') : `Ván ${r.game_no}`}
                             </span>
                             <input
                                 type="number"
@@ -481,6 +490,7 @@ export default function ResultsTab({ tournamentId, stageId, stage, isAdmin }) {
                     isAdmin={isAdmin}
                     onSaved={load}
                     pairSchedule={pairSchedule}
+                    gamesPerMatchup={stage?.config?.gamesPerMatchup}
                 />
             ))}
         </div>

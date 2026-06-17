@@ -381,6 +381,205 @@
     flex: 1;
 }
 
+/* Format selection cards (Step 1 & Step 2 Regular) */
+.v2-format-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.v2-format-card {
+    width: 100%;
+    text-align: left;
+    background: #fff;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.v2-format-card:hover {
+    border-color: #c4b5fd;
+}
+
+.v2-format-card.active {
+    border-color: #8b5cf6;
+    background: #f5f3ff;
+}
+
+.v2-format-card-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.v2-format-card.active .v2-format-card-title {
+    color: #6d28d9;
+}
+
+.v2-format-card-sub {
+    font-size: 0.8rem;
+    color: #6b7280;
+    line-height: 1.4;
+}
+
+/* Toggle switch (DreamBreaker) */
+.v2-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.v2-toggle input[type="checkbox"] {
+    display: none;
+}
+
+.v2-toggle-track {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    background: #d1d5db;
+    border-radius: 12px;
+    flex-shrink: 0;
+    transition: background 0.2s;
+}
+
+.v2-toggle input:checked + .v2-toggle-track {
+    background: #8b5cf6;
+}
+
+.v2-toggle-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    background: #fff;
+    border-radius: 50%;
+    transition: left 0.2s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.v2-toggle input:checked + .v2-toggle-track .v2-toggle-thumb {
+    left: 23px;
+}
+
+/* MLP Team cards */
+.v2-team-card {
+    background: #fff;
+    border: 1.5px solid #ede9fe;
+    border-radius: 14px;
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.v2-team-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.v2-team-name-input {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #4c2c92;
+    background: #fff;
+}
+
+.v2-team-name-input:focus {
+    outline: none;
+    border-color: #8b5cf6;
+}
+
+/* Member chips */
+.v2-member-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.v2-member-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    background: #ede9fe;
+    color: #5b21b6;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.v2-member-chip button {
+    background: none;
+    border: none;
+    color: #8b5cf6;
+    font-size: 0.75rem;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+/* Member picker row */
+.v2-member-add-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.v2-member-select,
+.v2-member-manual-input {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    background: #fff;
+    min-width: 0;
+}
+
+.v2-member-select:focus,
+.v2-member-manual-input:focus {
+    outline: none;
+    border-color: #8b5cf6;
+}
+
+/* Remove button */
+.v2-btn-remove {
+    background: none;
+    border: 1.5px solid #fca5a5;
+    color: #dc2626;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.v2-btn-remove:hover {
+    background: #fef2f2;
+}
+
+/* Small button variant */
+.v2-btn-sm {
+    padding: 8px 12px !important;
+    font-size: 0.82rem !important;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
 /* Desktop nới rộng */
 @media (min-width: 640px) {
     .v2-page {

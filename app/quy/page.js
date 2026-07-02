@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { getCurrentGroupClient } from '@/lib/groupClient';
 import './page.css';
 
+
 export default function HomePage() {
     const [isAdmin, setIsAdmin] = useState(false);
     const [activeTab, setActiveTab] = useState('events');
@@ -34,6 +35,9 @@ export default function HomePage() {
 
     // Delete event
     const [deletingEvent, setDeletingEvent] = useState(null);
+
+    // Share event
+    const [copiedEventId, setCopiedEventId] = useState(null);
 
     useEffect(() => {
         const group = getCurrentGroupClient();
@@ -159,6 +163,23 @@ export default function HomePage() {
             if (expandedEvent === eventId) setExpandedEvent(null);
         }
         setDeletingEvent(null);
+    }
+
+    async function handleShareEvent(e, eventId) {
+        e.stopPropagation();
+        const url = `${window.location.origin}/quy/su-kien/${eventId}`;
+        try {
+            await navigator.clipboard.writeText(url);
+        } catch {
+            const input = document.createElement('input');
+            input.value = url;
+            document.body.appendChild(input);
+            input.select();
+            document.execCommand('copy');
+            document.body.removeChild(input);
+        }
+        setCopiedEventId(eventId);
+        setTimeout(() => setCopiedEventId(null), 2000);
     }
 
     function toggleMemberInForm(memberId) {
@@ -302,6 +323,13 @@ export default function HomePage() {
                                                     </div>
                                                     <div className="progress-pct">{pct}%</div>
                                                     <span className="expand-icon">{isExpanded ? '▲' : '▼'}</span>
+                                                    <button
+                                                        className={`btn-share-event ${copiedEventId === event.id ? 'copied' : ''}`}
+                                                        onClick={(e) => handleShareEvent(e, event.id)}
+                                                        title="Chia sẻ link sự kiện"
+                                                    >
+                                                        {copiedEventId === event.id ? '✅ Đã sao chép!' : '🔗 Chia sẻ'}
+                                                    </button>
                                                 </div>
                                             </div>
 

@@ -1,0 +1,459 @@
+/* =====================================================
+   SHARE EVENT PAGE - Public View
+   ===================================================== */
+
+.share-page {
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at top right, rgba(202, 255, 40, 0.10), transparent 28rem),
+        radial-gradient(circle at bottom left, rgba(13, 117, 101, 0.06), transparent 24rem),
+        var(--surface-court);
+    color: var(--text-primary);
+    font-family: var(--font-family);
+    padding: 0 0 40px;
+}
+
+.share-container {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 16px;
+}
+
+/* ─── Loading ─── */
+.share-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    gap: 16px;
+    color: var(--text-muted);
+    font-size: 15px;
+}
+
+.share-spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid var(--border-color);
+    border-top-color: var(--court-green);
+    border-radius: 50%;
+    animation: share-spin 0.7s linear infinite;
+}
+
+@keyframes share-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ─── Error ─── */
+.share-error {
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.share-error-icon {
+    font-size: 56px;
+    margin-bottom: 16px;
+}
+
+.share-error h2 {
+    font-size: 20px;
+    color: var(--text-primary);
+    margin: 0 0 8px;
+}
+
+.share-error p {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin: 0 0 24px;
+}
+
+.share-back-link {
+    color: var(--court-green);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.share-back-link:hover {
+    text-decoration: underline;
+}
+
+/* ─── Header ─── */
+.share-header {
+    padding-top: 16px;
+    margin-bottom: 20px;
+}
+
+.share-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.share-back-btn {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 8px;
+    background: #fff;
+    border: 1px solid var(--border-color);
+    transition: all 0.2s;
+    display: inline-block;
+}
+
+.share-back-btn:hover {
+    border-color: var(--court-green);
+    color: var(--text-primary);
+}
+
+.share-copy-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border-color);
+    background: #fff;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+}
+
+.share-copy-btn:hover {
+    border-color: var(--court-green);
+    color: var(--court-green);
+    background: var(--court-green-soft);
+}
+
+.share-copy-btn.copied {
+    background: var(--court-green-soft);
+    border-color: var(--court-green);
+    color: var(--court-green);
+}
+
+.share-hero {
+    background: var(--gradient-court-hero);
+    border-radius: 16px;
+    padding: 28px 24px;
+    color: white;
+    box-shadow: var(--shadow-lg);
+}
+
+.share-badge {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(6px);
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    letter-spacing: 0.3px;
+}
+
+.share-title {
+    font-size: 24px;
+    font-weight: 800;
+    margin: 0 0 10px;
+    line-height: 1.3;
+}
+
+.share-desc {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0 0 16px;
+    line-height: 1.5;
+}
+
+.share-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+.share-meta-item {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 500;
+}
+
+.share-meta-amount {
+    color: var(--pickle-lime);
+    font-weight: 700;
+}
+
+/* ─── Progress Card ─── */
+.share-progress-card {
+    background: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-sm);
+}
+
+.share-progress-stats {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.share-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.share-stat-number {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--court-green);
+}
+
+.share-stat-total {
+    color: var(--text-primary);
+}
+
+.share-stat-money {
+    font-size: 20px;
+    color: var(--court-green);
+}
+
+.share-stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.share-stat-divider {
+    width: 1px;
+    height: 36px;
+    background: var(--border-color);
+}
+
+.share-progress-bar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.share-progress-bar {
+    flex: 1;
+    height: 10px;
+    background: var(--surface-court-soft);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.share-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--court-green), var(--pickle-lime));
+    border-radius: 5px;
+    transition: width 0.6s ease;
+    min-width: 2px;
+}
+
+.share-progress-pct {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--court-green);
+    min-width: 40px;
+    text-align: right;
+}
+
+/* ─── Members Grid ─── */
+.share-members {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.share-column {
+    background: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.share-col-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.share-col-header.unpaid {
+    background: var(--rally-coral-soft);
+    color: var(--rally-coral);
+    border-bottom: 1px solid rgba(255, 107, 53, 0.16);
+}
+
+.share-col-header.paid {
+    background: var(--court-green-soft);
+    color: var(--court-green);
+    border-bottom: 1px solid rgba(13, 117, 101, 0.14);
+}
+
+.share-col-icon {
+    font-size: 15px;
+}
+
+.share-col-count {
+    margin-left: auto;
+    background: rgba(255, 255, 255, 0.6);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+}
+
+.share-col-body {
+    padding: 4px 0;
+}
+
+.share-col-empty {
+    padding: 24px 16px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.share-member-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border-color);
+    transition: background 0.15s;
+}
+
+.share-member-row:last-child {
+    border-bottom: none;
+}
+
+.share-member-row:hover {
+    background: var(--surface-court-soft);
+}
+
+.share-member-row.unpaid {
+    background: rgba(255, 107, 53, 0.03);
+}
+
+.share-member-row.paid {
+    background: rgba(13, 117, 101, 0.02);
+}
+
+.share-member-index {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--surface-court-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+.share-member-name {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.share-member-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.share-paid-date {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.share-member-amount {
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.share-member-amount.unpaid {
+    color: var(--rally-coral);
+}
+
+.share-member-amount.paid {
+    color: var(--court-green);
+}
+
+/* ─── Footer ─── */
+.share-footer {
+    text-align: center;
+    padding: 16px 0;
+    border-top: 1px solid var(--border-color);
+}
+
+.share-footer p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 640px) {
+    .share-members {
+        grid-template-columns: 1fr;
+    }
+
+    .share-title {
+        font-size: 20px;
+    }
+
+    .share-hero {
+        padding: 22px 18px;
+    }
+
+    .share-progress-stats {
+        gap: 14px;
+    }
+
+    .share-stat-number {
+        font-size: 22px;
+    }
+
+    .share-stat-money {
+        font-size: 16px;
+    }
+
+    .share-meta {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .share-header-top {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+    }
+
+    .share-copy-btn {
+        text-align: center;
+    }
+}

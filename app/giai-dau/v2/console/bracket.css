@@ -1,4 +1,5 @@
-/* Sơ đồ cây loại trực tiếp + Bảng xếp hạng — mobile-first, cuộn ngang. */
+/* Sơ đồ cây loại trực tiếp + Bảng xếp hạng — mobile-first, cuộn ngang.
+   Dùng chung design system với globals.css */
 
 /* ==================== BRACKET ==================== */
 .v2-bracket-scroll {
@@ -26,7 +27,7 @@
 .v2-br-col-head {
     font-size: 0.78rem;
     font-weight: 700;
-    color: #6d28d9;
+    color: var(--primary);
     text-align: center;
     text-transform: uppercase;
     letter-spacing: 0.03em;
@@ -34,11 +35,11 @@
 }
 
 .v2-br-match {
-    background: #fff;
-    border: 1px solid #ede9fe;
-    border-radius: 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.06);
+    box-shadow: var(--shadow-sm);
 }
 
 .v2-br-side {
@@ -48,11 +49,12 @@
     gap: 8px;
     padding: 8px 10px;
     font-size: 0.85rem;
-    color: #374151;
+    color: var(--text-primary);
+    font-family: var(--font-family);
 }
 
 .v2-br-side + .v2-br-side {
-    border-top: 1px solid #f3f4f6;
+    border-top: 1px solid var(--border-color);
 }
 
 .v2-br-name {
@@ -64,22 +66,22 @@
 .v2-br-score {
     flex: 0 0 auto;
     font-weight: 700;
-    color: #4c2c92;
+    color: var(--text-secondary);
     min-width: 18px;
     text-align: right;
 }
 
 .v2-br-win .v2-br-name {
     font-weight: 700;
-    color: #15803d;
+    color: var(--success);
 }
 
 .v2-br-win .v2-br-score {
-    color: #15803d;
+    color: var(--success);
 }
 
 .v2-br-bye .v2-br-name {
-    color: #9ca3af;
+    color: var(--text-muted);
     font-style: italic;
 }
 
@@ -93,21 +95,23 @@
 .v2-standings-heading {
     margin: 0 0 8px;
     font-size: 0.95rem;
-    color: #4c2c92;
+    color: var(--text-primary);
+    font-weight: 700;
 }
 
 .v2-standings-scroll {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    border: 1px solid #ede9fe;
-    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
 }
 
 .v2-standings-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 0.82rem;
-    background: #fff;
+    background: var(--bg-card);
+    font-family: var(--font-family);
 }
 
 .v2-standings-table th,
@@ -115,12 +119,12 @@
     padding: 8px 6px;
     text-align: center;
     white-space: nowrap;
-    border-bottom: 1px solid #f3f4f6;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .v2-standings-table th {
-    background: #faf5ff;
-    color: #6b7280;
+    background: var(--bg-secondary);
+    color: var(--text-muted);
     font-weight: 700;
     font-size: 0.76rem;
 }
@@ -129,12 +133,12 @@
     text-align: left;
     min-width: 110px;
     font-weight: 600;
-    color: #1f2937;
+    color: var(--text-primary);
 }
 
 .v2-standings-table .v2-st-pts {
     font-weight: 700;
-    color: #4c2c92;
+    color: var(--primary);
 }
 
 .v2-standings-table tbody tr:last-child td {
@@ -155,11 +159,12 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    background: #fff;
-    border: 1px solid #ede9fe;
-    border-radius: 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
     padding: 10px 12px;
-    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.06);
+    box-shadow: var(--shadow-sm);
+    font-family: var(--font-family);
 }
 
 .v2-placement-rank {
@@ -170,8 +175,8 @@
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background: #f5f3ff;
-    color: #6d28d9;
+    background: var(--primary-light);
+    color: var(--primary);
     font-weight: 700;
     font-size: 0.82rem;
 }
@@ -179,7 +184,7 @@
 .v2-placement-name {
     flex: 1;
     font-weight: 600;
-    color: #1f2937;
+    color: var(--text-primary);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -189,5 +194,5 @@
     flex: 0 0 auto;
     font-size: 0.78rem;
     font-weight: 700;
-    color: #b45309;
+    color: var(--warning);
 }

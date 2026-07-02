@@ -1,21 +1,23 @@
-/* Tournament v2 — mobile-first (~380px), tái dùng palette tím #667eea/#764ba2/#8b5cf6 */
+/* Tournament v2 — mobile-first (~380px), dùng chung design system với globals.css */
 
 .v2-page {
     max-width: 720px;
     margin: 0 auto;
     padding: 16px;
-    color: #1f2937;
+    color: var(--text-primary);
     min-height: 100vh;
+    font-family: var(--font-family);
 }
 
 .v2-back {
     background: none;
     border: none;
-    color: #667eea;
+    color: var(--primary);
     font-size: 0.95rem;
     font-weight: 600;
     padding: 8px 0;
     cursor: pointer;
+    font-family: var(--font-family);
 }
 
 /* --- Header danh sách --- */
@@ -30,36 +32,51 @@
 .v2-list-header h1 {
     margin: 0;
     font-size: 1.5rem;
-    color: #4c2c92;
+    color: var(--text-primary);
 }
 
 /* --- Nút --- */
 .v2-btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--gradient-court-green);
     color: #fff;
     border: none;
-    border-radius: 10px;
+    border-radius: var(--border-radius-sm);
     padding: 10px 16px;
     font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;
     white-space: nowrap;
+    font-family: var(--font-family);
+    transition: opacity 0.15s, transform 0.1s;
+}
+
+.v2-btn-primary:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
 }
 
 .v2-btn-primary:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+    transform: none;
 }
 
 .v2-btn-secondary {
     background: #fff;
-    color: #667eea;
-    border: 1.5px solid #c7d2fe;
-    border-radius: 10px;
+    color: var(--primary);
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--border-radius-sm);
     padding: 10px 16px;
     font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;
+    font-family: var(--font-family);
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.v2-btn-secondary:hover {
+    background: var(--primary-light);
+    border-color: var(--primary);
 }
 
 .v2-btn-secondary:disabled {
@@ -75,18 +92,18 @@
     gap: 14px;
     padding: 48px 16px;
     text-align: center;
-    color: #6b7280;
+    color: var(--text-muted);
 }
 
 .v2-error {
-    color: #b91c1c;
+    color: var(--danger);
 }
 
 .v2-spinner {
     width: 36px;
     height: 36px;
-    border: 4px solid #e0e7ff;
-    border-top-color: #8b5cf6;
+    border: 4px solid var(--border-color);
+    border-top-color: var(--primary);
     border-radius: 50%;
     animation: v2-spin 1s linear infinite;
 }
@@ -109,12 +126,20 @@
     position: relative;
     width: 100%;
     text-align: left;
-    background: #fff;
-    border: 1px solid #ede9fe;
-    border-radius: 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
     padding: 14px 36px 14px 16px;
-    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.08);
+    box-shadow: var(--shadow-sm);
     cursor: pointer;
+    transition: box-shadow 0.15s, border-color 0.15s, transform 0.1s;
+    font-family: var(--font-family);
+}
+
+.v2-card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--border-strong);
+    transform: translateY(-1px);
 }
 
 .v2-card:active {
@@ -131,19 +156,19 @@
 
 .v2-card-date {
     font-size: 0.8rem;
-    color: #9ca3af;
+    color: var(--text-muted);
 }
 
 .v2-card-name {
     margin: 0 0 4px;
     font-size: 1.05rem;
-    color: #1f2937;
+    color: var(--text-primary);
 }
 
 .v2-card-meta {
     margin: 0;
     font-size: 0.85rem;
-    color: #6b7280;
+    color: var(--text-secondary);
 }
 
 .v2-card-chevron {
@@ -152,7 +177,7 @@
     top: 50%;
     transform: translateY(-50%);
     font-size: 1.4rem;
-    color: #c4b5fd;
+    color: var(--border-strong);
 }
 
 /* --- Chip trạng thái --- */
@@ -166,55 +191,55 @@
 }
 
 .v2-chip-draft {
-    background: #f3f4f6;
-    color: #6b7280;
+    background: var(--bg-secondary);
+    color: var(--text-muted);
 }
 
 .v2-chip-active {
-    background: #dcfce7;
-    color: #15803d;
+    background: var(--success-light);
+    color: var(--success);
 }
 
 .v2-chip-completed {
-    background: #ede9fe;
-    color: #6d28d9;
+    background: var(--primary-light);
+    color: var(--primary);
 }
 
 /* --- Console stub --- */
 .v2-console-stub {
-    background: #fff;
-    border: 1px dashed #c4b5fd;
-    border-radius: 14px;
+    background: var(--bg-card);
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--border-radius-md);
     padding: 24px 16px;
     text-align: center;
-    color: #6b7280;
+    color: var(--text-muted);
 }
 
 .v2-console-stub h2 {
     margin: 0 0 8px;
-    color: #4c2c92;
+    color: var(--text-primary);
 }
 
 .v2-console-stub-id {
     font-size: 0.8rem;
-    color: #9ca3af;
+    color: var(--text-muted);
     word-break: break-all;
 }
 
 /* ==================== WIZARD (dùng chung file css) ==================== */
 
 .v2-wizard {
-    background: #fff;
-    border: 1px solid #ede9fe;
-    border-radius: 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
     padding: 18px 16px;
-    box-shadow: 0 2px 10px rgba(102, 126, 234, 0.08);
+    box-shadow: var(--shadow-sm);
 }
 
 .v2-wizard-title {
     margin: 0 0 14px;
     font-size: 1.25rem;
-    color: #4c2c92;
+    color: var(--text-primary);
 }
 
 /* Thanh bước */
@@ -229,19 +254,19 @@
     text-align: center;
     font-size: 0.72rem;
     font-weight: 600;
-    color: #9ca3af;
+    color: var(--text-muted);
     padding-bottom: 8px;
-    border-bottom: 3px solid #ede9fe;
+    border-bottom: 3px solid var(--border-color);
 }
 
 .v2-step-dot.active {
-    color: #667eea;
-    border-bottom-color: #8b5cf6;
+    color: var(--primary);
+    border-bottom-color: var(--primary);
 }
 
 .v2-step-dot.done {
-    color: #15803d;
-    border-bottom-color: #86efac;
+    color: var(--success);
+    border-bottom-color: var(--success);
 }
 
 /* Form chung */
@@ -255,7 +280,7 @@
 .v2-field label {
     font-size: 0.85rem;
     font-weight: 600;
-    color: #374151;
+    color: var(--text-secondary);
 }
 
 .v2-field input,
@@ -263,16 +288,20 @@
     width: 100%;
     box-sizing: border-box;
     padding: 10px 12px;
-    border: 1.5px solid #e5e7eb;
-    border-radius: 10px;
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
     font-size: 0.95rem;
-    background: #fff;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-family: var(--font-family);
+    transition: border-color 0.15s;
 }
 
 .v2-field input:focus,
 .v2-field select:focus {
     outline: none;
-    border-color: #8b5cf6;
+    border-color: var(--primary);
+    box-shadow: var(--focus-ring);
 }
 
 .v2-radio-row {
@@ -288,16 +317,19 @@
     align-items: center;
     gap: 8px;
     padding: 10px 12px;
-    border: 1.5px solid #e5e7eb;
-    border-radius: 10px;
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
     font-size: 0.9rem;
     cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    color: var(--text-primary);
+    font-family: var(--font-family);
 }
 
 .v2-radio.active {
-    border-color: #8b5cf6;
-    background: #f5f3ff;
-    color: #6d28d9;
+    border-color: var(--primary);
+    background: var(--primary-light);
+    color: var(--primary);
     font-weight: 600;
 }
 
@@ -323,22 +355,23 @@
     align-items: center;
     justify-content: space-between;
     gap: 8px;
-    background: #faf5ff;
-    border: 1px solid #ede9fe;
-    border-radius: 10px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
     padding: 10px 12px;
     font-size: 0.9rem;
+    color: var(--text-primary);
 }
 
 .v2-item-sub {
     font-size: 0.78rem;
-    color: #8b5cf6;
+    color: var(--primary);
 }
 
 .v2-add-box {
-    background: #f9fafb;
-    border: 1px dashed #c4b5fd;
-    border-radius: 12px;
+    background: var(--bg-secondary);
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--border-radius-md);
     padding: 14px 12px;
     margin-bottom: 14px;
 }
@@ -346,22 +379,23 @@
 .v2-add-box h3 {
     margin: 0 0 10px;
     font-size: 0.95rem;
-    color: #4c2c92;
+    color: var(--text-primary);
 }
 
 .v2-notice {
-    background: #fef2f2;
-    color: #b91c1c;
-    border-radius: 10px;
+    background: var(--danger-light);
+    color: var(--danger);
+    border-radius: var(--border-radius-sm);
     padding: 10px 12px;
     font-size: 0.85rem;
     margin: 0 0 14px;
+    border: 1px solid rgba(255, 107, 53, 0.2);
 }
 
 .v2-result {
-    background: #f0fdf4;
-    color: #15803d;
-    border-radius: 10px;
+    background: var(--success-light);
+    color: var(--success);
+    border-radius: var(--border-radius-sm);
     padding: 14px 12px;
     font-size: 0.95rem;
     font-weight: 600;
@@ -381,6 +415,424 @@
     flex: 1;
 }
 
+/* Format selection cards (Step 1 & Step 2 Regular) */
+.v2-format-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.v2-format-card {
+    width: 100%;
+    text-align: left;
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    padding: 14px 16px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: border-color 0.15s, background 0.15s;
+    font-family: var(--font-family);
+}
+
+.v2-format-card:hover {
+    border-color: var(--border-strong);
+}
+
+.v2-format-card.active {
+    border-color: var(--primary);
+    background: var(--primary-light);
+}
+
+.v2-format-card-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.v2-format-card.active .v2-format-card-title {
+    color: var(--primary);
+}
+
+.v2-format-card-sub {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+/* Toggle switch (DreamBreaker) */
+.v2-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.v2-toggle input[type="checkbox"] {
+    display: none;
+}
+
+.v2-toggle-track {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    background: var(--border-strong);
+    border-radius: 12px;
+    flex-shrink: 0;
+    transition: background 0.2s;
+}
+
+.v2-toggle input:checked + .v2-toggle-track {
+    background: var(--primary);
+}
+
+.v2-toggle-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    background: #fff;
+    border-radius: 50%;
+    transition: left 0.2s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.v2-toggle input:checked + .v2-toggle-track .v2-toggle-thumb {
+    left: 23px;
+}
+
+/* MLP Team cards */
+.v2-team-card {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.v2-team-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.v2-team-name-input {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1.5px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    background: var(--bg-card);
+    font-family: var(--font-family);
+    transition: border-color 0.15s;
+}
+
+.v2-team-name-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: var(--focus-ring);
+}
+
+/* Member chips */
+.v2-member-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.v2-member-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    background: var(--primary-light);
+    color: var(--primary);
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.v2-member-chip button {
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-size: 0.75rem;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+/* Member picker row */
+.v2-member-add-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.v2-member-select,
+.v2-member-manual-input {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1.5px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 0.88rem;
+    background: var(--bg-card);
+    min-width: 0;
+    color: var(--text-primary);
+    font-family: var(--font-family);
+    transition: border-color 0.15s;
+}
+
+.v2-member-select:focus,
+.v2-member-manual-input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+/* Step description text */
+.v2-step-desc {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin: 0 0 14px;
+    line-height: 1.5;
+}
+
+/* Member checklist (multi-select) */
+.v2-member-list-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0 0 6px;
+}
+
+.v2-member-checklist {
+    max-height: 160px;
+    overflow-y: auto;
+    border: 1.5px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-card);
+    margin-bottom: 8px;
+}
+
+.v2-member-check-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 12px;
+    font-size: 0.88rem;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-color);
+    transition: background 0.1s;
+    color: var(--text-primary);
+}
+
+.v2-member-check-item:last-child {
+    border-bottom: none;
+}
+
+.v2-member-check-item:hover {
+    background: var(--bg-secondary);
+}
+
+.v2-member-check-item.selected {
+    background: var(--primary-light);
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.v2-member-check-item input[type="checkbox"] {
+    accent-color: var(--primary);
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+/* Remove button */
+.v2-btn-remove {
+    background: none;
+    border: 1.5px solid rgba(255, 107, 53, 0.4);
+    color: var(--danger);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.15s;
+    font-family: var(--font-family);
+}
+
+.v2-btn-remove:hover {
+    background: var(--danger-light);
+}
+
+/* Small button variant */
+.v2-btn-sm {
+    padding: 8px 12px !important;
+    font-size: 0.82rem !important;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* Card wrapper: groups card button + admin actions */
+.v2-card-wrap {
+    display: flex;
+    flex-direction: column;
+}
+
+.v2-card-wrap .v2-card {
+    border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.v2-card-wrap:has(.v2-card-actions) .v2-card {
+    border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
+}
+
+/* When no actions, restore full border-radius */
+.v2-card-wrap:not(:has(.v2-card-actions)) .v2-card {
+    border-radius: var(--border-radius-md);
+}
+
+.v2-card-actions {
+    display: flex;
+    gap: 0;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-top: none;
+    border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
+    overflow: hidden;
+}
+
+.v2-card-action-btn {
+    flex: 1;
+    background: none;
+    border: none;
+    border-right: 1px solid var(--border-color);
+    padding: 9px 12px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    font-family: var(--font-family);
+}
+
+.v2-card-action-btn:last-child {
+    border-right: none;
+}
+
+.v2-card-action-btn:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.v2-card-action-delete {
+    color: var(--danger);
+}
+
+.v2-card-action-delete:hover {
+    background: var(--danger-light);
+    color: var(--danger);
+}
+
+/* Danger button */
+.v2-btn-danger {
+    background: var(--gradient-danger);
+    color: #fff;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    padding: 10px 16px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    flex: 1;
+    font-family: var(--font-family);
+    transition: opacity 0.15s;
+}
+
+.v2-btn-danger:hover {
+    opacity: 0.9;
+}
+
+.v2-btn-danger:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Overlay + dialog for delete confirm */
+.v2-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(7, 27, 24, 0.55);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 1200;
+    padding: 0 0 env(safe-area-inset-bottom, 0);
+}
+
+@media (min-width: 480px) {
+    .v2-overlay {
+        align-items: center;
+    }
+}
+
+.v2-dialog {
+    background: var(--bg-card);
+    border-radius: 20px 20px 0 0;
+    padding: 24px 20px 28px;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-color);
+}
+
+@media (min-width: 480px) {
+    .v2-dialog {
+        border-radius: var(--border-radius-lg);
+        padding: 24px 24px 24px;
+    }
+}
+
+.v2-dialog-title {
+    margin: 0 0 8px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.v2-dialog-body {
+    margin: 0 0 20px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.v2-dialog-body strong {
+    color: var(--text-primary);
+}
+
+.v2-dialog-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.v2-dialog-actions .v2-btn-secondary {
+    flex: 1;
+}
+
 /* Desktop nới rộng */
 @media (min-width: 640px) {
     .v2-page {
@@ -390,3 +842,32 @@
         font-size: 1.8rem;
     }
 }
+
+/* ===== MLP Pairs — xem trước trong wizard (step 4) ===== */
+.v2-pairs-preview { margin: 12px 0; }
+.v2-pairs-round { margin-bottom: 10px; }
+.v2-pairs-round-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+}
+.v2-pair-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.85rem;
+}
+.v2-pair-tag {
+    background: var(--primary-light);
+    color: var(--primary);
+    border-radius: 6px;
+    padding: 2px 8px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+.v2-pair-vs { color: var(--text-muted); font-size: 0.75rem; }

@@ -16,6 +16,14 @@
     "completion_commit": null,
     "merge_commit": null
   },
+  "ui_preview": {
+    "status": "awaiting_approval",
+    "branch": "codex/pickhub-ui-brand-preview",
+    "evidence": "docs/pickhub-core/evidence/ui-preview-review.md",
+    "approved_at": null,
+    "completion_commit": null,
+    "merge_commit": null
+  },
   "phases": [
     {
       "id": 1,

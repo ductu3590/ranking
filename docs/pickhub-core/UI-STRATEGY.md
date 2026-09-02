@@ -12,6 +12,8 @@ Hướng thực hiện:
 4. Sau khi Phase 3 hoàn thành, bắt đầu chương trình visual redesign trên nhánh riêng. Lúc đó workflow và API chính đã được kiểm chứng.
 5. Phase 4 trở đi dùng design system mới khi nó đã ổn định; không tạo hai hệ thống UI song song kéo dài.
 
+Prototype duyệt hướng hình ảnh trước khi production redesign nằm ở [`UI-BRAND-SYSTEM.md`](./UI-BRAND-SYSTEM.md), [`UI-PREVIEW-SPEC.md`](./UI-PREVIEW-SPEC.md) và [`ui-preview/`](./ui-preview/). Prototype không thay đổi route hay dữ liệu thật.
+
 ## Vì sao không làm UI cuối cùng ngay
 
 - Auth, role và mô hình tournament sẽ thay đổi cấu trúc điều hướng.
@@ -65,6 +67,7 @@ Authenticated
 ### Design system foundation
 
 - Semantic tokens cho màu, spacing, typography, radius, elevation và state.
+- Bộ token và quy tắc nhận diện bản nháp được ghi trong [`UI-BRAND-SYSTEM.md`](./UI-BRAND-SYSTEM.md); chỉ đưa vào production sau review visual.
 - Component primitives không biết business domain.
 - Domain components nhận view model, không nhận Supabase rows.
 - Mobile-first; score entry và check-in ưu tiên thao tác một tay.
@@ -94,3 +97,7 @@ Nhánh redesign không thay đổi schema, auth rule, tournament calculation ho�
 - Route map và workflow chính không còn thay đổi lớn.
 - API view model có contract test.
 - Có danh sách pain point UX từ người tổ chức, trưởng CLB và người xem.
+
+## Review gate cho visual redesign
+
+Prototype phải được xem trên desktop và mobile trước khi chọn hướng final. Các màn hình review đại diện là thành viên, trưởng nhóm và trang giải công khai. Chỉ sau khi người dùng xác nhận hướng thương hiệu và hierarchy chính mới tách component production vào nhánh `codex/ui-redesign-foundation`.

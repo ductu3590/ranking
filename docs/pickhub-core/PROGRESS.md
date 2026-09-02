@@ -7,6 +7,7 @@ File này là bản đọc cho con người. Trạng thái chuẩn cho máy nằ
 | Hạng mục | Trạng thái | Nhánh | Điều kiện tiếp theo |
 |---|---|---|---|
 | Core blueprint | `awaiting_approval` | `codex/pickhub-core-blueprint` | Người phụ trách sản phẩm duyệt và merge vào `main` |
+| UI Brand & Preview track | `awaiting_approval` | `codex/pickhub-ui-brand-preview` | Người phụ trách sản phẩm xem prototype và chốt hướng visual |
 | Phase 1 — Ổn định nền tảng | `not_started` | Chưa tạo | Blueprint đã merge vào `main` |
 | Phase 2 — Danh tính VĐV và CLB | `not_started` | Chưa tạo | Phase 1 completed và merge |
 | Phase 3 — MVP giải liên CLB | `not_started` | Chưa tạo | Phase 2 completed và merge |
@@ -17,6 +18,8 @@ File này là bản đọc cho con người. Trạng thái chuẩn cho máy nằ
 ## Completion ledger
 
 Chưa có phase triển khai nào hoàn thành.
+
+UI Brand & Preview cũng chưa được xem là hoàn thành cho đến khi có xác nhận visual; evidence hiện tại nằm tại [`evidence/ui-preview-review.md`](./evidence/ui-preview-review.md).
 
 Mỗi completion record sau này phải chứa: phase, thời gian, branch, completion commit, merge commit, người xác nhận, test evidence và ghi chú migration/release.
 

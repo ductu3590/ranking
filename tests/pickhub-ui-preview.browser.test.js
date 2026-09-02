@@ -20,6 +20,7 @@ const assert = (condition, message) => {
   assert(await page.locator('h1').textContent() === 'Bảng xếp hạng đóng góp', 'member ranking heading missing');
   assert(await page.locator('.mobile-nav__item').count() === 5, 'member mobile nav must have five items');
   assert((await page.locator('.mobile-nav__item').nth(2).textContent()).includes('BXH'), 'BXH must be the center mobile tab');
+  assert((await page.locator('.mobile-nav__item').nth(4).textContent()).includes('Thông tin'), 'member fifth tab must be Thông tin');
 
   await page.setViewportSize({ width: 390, height: 844 });
   const memberLayout = await page.evaluate(() => {
@@ -33,6 +34,18 @@ const assert = (condition, message) => {
   assert(memberLayout.overflow === 0, `member horizontal overflow is ${memberLayout.overflow}px`);
   assert(memberLayout.allInside, 'member mobile nav item is outside the nav bounds');
 
+  await page.locator('.mobile-nav [data-member-route="info"]').click();
+  assert(await page.locator('h1').textContent() === 'Thông tin cá nhân', 'member information view heading missing');
+  assert(await page.locator('.profile-score strong').textContent() === '3,2', 'member PHR score is missing');
+  await page.locator('.mobile-nav [data-member-route="ranking"]').click();
+  assert(await page.locator('h1').textContent() === 'Bảng xếp hạng đóng góp', 'member ranking route did not return to ranking');
+  const memberSurfaces = await page.evaluate(() => [
+    getComputedStyle(document.querySelector('.preview-toolbar')).backgroundColor,
+    getComputedStyle(document.querySelector('.ranking-toggle__item.is-active')).backgroundColor,
+    getComputedStyle(document.querySelector('.mobile-nav__item--center'), '::before').backgroundColor,
+  ]);
+  assert(memberSurfaces.every((color) => !['rgb(18, 19, 38)', 'rgb(7, 26, 58)'].includes(color)), `member still uses a dark surface: ${memberSurfaces.join(', ')}`);
+
   await page.locator('[data-view="public"]').click();
   await page.waitForSelector('.public-shell');
   await page.locator('[data-tab="Bảng đấu"]').click();
@@ -43,8 +56,12 @@ const assert = (condition, message) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto(`${baseUrl}?view=leader`, { waitUntil: 'networkidle' });
   assert((await page.locator('h1').textContent()).includes('Chào anh Minh'), 'leader heading missing');
+  const leaderSurface = await page.evaluate(() => getComputedStyle(document.querySelector('.leader-summary')).backgroundColor);
+  assert(!['rgb(18, 19, 38)', 'rgb(7, 26, 58)'].includes(leaderSurface), `leader summary still uses a dark surface: ${leaderSurface}`);
   await page.goto(`${baseUrl}?view=public`, { waitUntil: 'networkidle' });
   assert((await page.locator('h1').textContent()).includes('PickHub'), 'public event heading missing');
+  const publicSurface = await page.evaluate(() => getComputedStyle(document.querySelector('.hero-overlay')).backgroundColor);
+  assert(!['rgb(18, 19, 38)', 'rgb(7, 26, 58)'].includes(publicSurface), `public hero still uses a dark surface: ${publicSurface}`);
 
   assert(errors.length === 0, `browser console errors: ${errors.join(' | ')}`);
   const unexpectedMissing = missing.filter((entry) => !entry.endsWith('/favicon.ico'));

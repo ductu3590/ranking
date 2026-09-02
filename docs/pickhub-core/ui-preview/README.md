@@ -16,6 +16,8 @@ Mở `http://127.0.0.1:4173/` rồi dùng thanh “Xem trước” để chuyể
 - `?view=leader` — dashboard trưởng nhóm.
 - `?view=public` — trang giải công khai.
 
+Trong ngữ cảnh `member`, tab `Thông tin` mở hồ sơ cá nhân, PHR và lịch sử cập nhật; tab `BXH` đưa về bảng xếp hạng đóng góp.
+
 Dữ liệu đều là minh họa. Prototype không cần Supabase, không ghi dữ liệu và không yêu cầu tài khoản.
 
 ## Tài sản

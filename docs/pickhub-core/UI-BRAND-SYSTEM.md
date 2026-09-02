@@ -20,17 +20,18 @@ PickHub là không gian giúp các CLB pickleball vận hành minh bạch, kết
 
 | Token | Giá trị | Vai trò |
 |---|---|---|
-| `--ph-ink` | `#121326` | Mực tím than, chữ mạnh và nền vận hành |
+| `--ph-ink` | `#28243D` | Mực tím than cho chữ và icon; không dùng làm nền đặc |
 | `--ph-indigo` | `#6F48C9` | Hành động chính, liên kết, trạng thái đang chọn |
-| `--ph-lime` | `#B8EB37` | Điểm nhấn thể thao và trạng thái tích cực |
-| `--ph-cyan` | `#56C7D6` | Dữ liệu tích cực và biểu đồ |
-| `--ph-coral` | `#F48772` | Cảnh báo nhẹ, trạng thái cần chú ý |
-| `--ph-surface` | `#F4F6FA` | Nền ứng dụng |
+| `--ph-lavender` | `#EEE9FF` | Accent nhẹ cho tab, hồ sơ và trạng thái nổi bật |
+| `--ph-gold` | `#FFC95E` | Accent ấm cho huy hiệu, thành tích và dữ liệu nổi bật |
+| `--ph-cyan` | `#A8DFE9` | Dữ liệu tích cực và biểu đồ |
+| `--ph-coral` | `#FF8B83` | Cảnh báo nhẹ, trạng thái cần chú ý |
+| `--ph-surface` | `#F5F6FB` | Nền ứng dụng |
 | `--ph-card` | `#FFFFFF` | Bề mặt card |
 | `--ph-line` | `#E4E9F2` | Viền và phân tách |
 | `--ph-muted` | `#667085` | Chữ phụ |
 
-Màu CLB và màu giải được map vào các token accent, không được thay thế màu chữ, màu cảnh báo hoặc màu focus. Hệ thống kiểm tra tương phản trước khi lưu theme.
+Màu CLB và màu giải được map vào các token accent, không được thay thế màu chữ, màu cảnh báo hoặc màu focus. Hệ thống kiểm tra tương phản trước khi lưu theme. Không dùng nền đen hoặc navy đặc trong các màn hình vận hành; `--ph-ink` chỉ dành cho chữ/icon cần độ tương phản.
 
 ### Typography
 
@@ -68,7 +69,7 @@ Logo prototype dùng chữ **P** cách điệu bằng một quỹ đạo cong v�
 
 ## 6. UI content rules
 
-- Thành viên: “Quỹ”, “Thành viên”, “BXH” ở vị trí trung tâm, “Giải”, “Cấu hình”; nội dung chính ưu tiên “BXH đóng quỹ”, “Tổng quan quỹ”, “Phân bổ trình độ”.
+- Thành viên: “Quỹ”, “Thành viên”, “BXH” ở vị trí trung tâm, “Giải”, “Thông tin”; nội dung chính ưu tiên “BXH đóng quỹ”, “Tổng quan quỹ”, “Phân bổ trình độ” và PHR cá nhân.
 - Trưởng nhóm: “Thu–chi”, “Thành viên”, “Cần xử lý”.
 - Ban tổ chức: “Đăng ký”, “Bốc thăm”, “Lịch thi đấu”, “Kết quả”.
 - Public tournament: ưu tiên biệt danh đã cấu hình; nếu chưa có thì dùng tên trong CLB chủ quản.

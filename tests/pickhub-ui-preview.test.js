@@ -15,11 +15,21 @@ for (const view of ['member', 'leader', 'public']) {
   if (!html.includes(`data-view="${view}"`)) throw new Error(`missing ${view} switcher`);
 }
 
+if (!js.includes("['Quỹ', icons.wallet], ['Thành viên', icons.users], ['BXH', icons.chart], ['Giải', icons.calendar], ['Thông tin', icons.user]")) {
+  throw new Error('member navigation must contain five tabs with Thông tin in the fifth position');
+}
 if (!js.includes("['Quỹ', icons.wallet], ['Thành viên', icons.users], ['BXH', icons.chart], ['Giải', icons.calendar], ['Cấu hình', icons.shield]")) {
-  throw new Error('member navigation must contain five tabs with BXH in the center');
+  throw new Error('leader navigation must retain Cấu hình in the fifth position');
+}
+if (!js.includes('function memberInfoView')) {
+  throw new Error('member information view is missing');
 }
 
-for (const token of ['--ph-ink', '--ph-indigo', '--ph-lime', '--ph-cyan', '--ph-coral']) {
+if (css.includes('--ph-lime:')) {
+  throw new Error('UI preview must not define the retired lime brand token');
+}
+
+for (const token of ['--ph-ink', '--ph-indigo', '--ph-lavender', '--ph-gold', '--ph-cyan', '--ph-coral']) {
   if (!css.includes(token) || !brand.includes(token.replace('--ph-', '`--ph-'))) throw new Error(`missing brand token ${token}`);
 }
 

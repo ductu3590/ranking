@@ -16,6 +16,8 @@
 - [Desktop leader screenshot](../../../output/playwright/pickhub-ui-leader-1440.png)
 - [Desktop public tournament screenshot](../../../output/playwright/pickhub-ui-public-1440.png)
 - [Mobile member screenshot](../../../output/playwright/pickhub-ui-member-390.png)
+- [Desktop member information screenshot](../../../output/playwright/pickhub-ui-member-info-1440.png)
+- [Mobile member information screenshot](../../../output/playwright/pickhub-ui-member-info-390.png)
 - [Mobile public tournament screenshot](../../../output/playwright/pickhub-ui-public-390.png)
 
 ## Verification
@@ -25,14 +27,16 @@
 - `npm run test:tournament` — pass: migration, engines, API contracts và UI contracts hiện có.
 - `git diff --check` — pass.
 - Bundled Playwright + installed Chrome: member, leader và public đều render được heading; mobile member kiểm tra `scrollWidth - clientWidth = 0`; chuyển context sang trang giải và chọn tab “Bảng đấu” trả `aria-selected=true`.
-- Chrome headless đã chụp 5 ảnh review ở desktop `1440px` và mobile `390px`.
+- Chrome headless đã chụp 7 ảnh review ở desktop `1440px` và mobile `390px`, gồm cả luồng `Thông tin` cá nhân.
 
 ## Review notes
 
-- Hero public dùng ảnh nền trừu tượng sân pickleball, giữ vùng tối cho copy.
+- Hero public dùng ảnh nền trừu tượng sân pickleball với overlay sáng, giữ copy dễ đọc mà không tạo bề mặt đen.
 - Member dashboard đã chuyển thành màn hình ranking-first: BXH nộp phạt/đóng quỹ là nội dung chính, có bộ chuyển loại bảng, podium và danh sách xếp hạng.
-- Mobile member giữ đúng 5 tab `Quỹ | Thành viên | BXH | Giải | Cấu hình`; `BXH` nằm ở vị trí trung tâm và có trạng thái nổi bật.
+- Mobile member giữ đúng 5 tab `Quỹ | Thành viên | BXH | Giải | Thông tin`; `BXH` nằm ở vị trí trung tâm và có trạng thái nổi bật.
+- Mobile member đã đổi tab thứ năm thành `Thông tin`; màn hình này có hồ sơ cá nhân, PHR cá nhân, lịch sử cập nhật và tùy chọn tên hiển thị. Trưởng nhóm vẫn giữ `Cấu hình`.
 - Visual direction lấy cấu trúc tham chiếu từ ảnh fitness app được cung cấp: nền sáng, card gọn, phân cấp rõ, màu tím làm accent; không sao chép layout hay nội dung.
+- Bản màu mới dùng tím/lavender, vàng pastel, coral và cyan nhạt; các surface nền đen/navy đã được thay bằng nền sáng.
 - Leader dashboard đưa thu–chi, thành viên và việc cần xử lý lên trung tâm.
 - Bracket public là bản minh họa double elimination với scroll ngang ở mobile.
 - Cần người phụ trách sản phẩm duyệt màu, mức độ thể thao, wording và ưu tiên thông tin trước khi tách component production.

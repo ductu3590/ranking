@@ -4,6 +4,7 @@ const icons = {
   arrow: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>',
   plus: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
   users: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 19c0-3 2.7-5 6-5s6 2 6 5M16 5.5a3 3 0 0 1 0 5.8M18 14c2 .5 3 2 3 4"/></svg>',
+  user: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c.6-3.8 3.1-5.8 7.5-5.8s6.9 2 7.5 5.8"/></svg>',
   wallet: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h15a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h14M16 13h4"/><circle cx="16" cy="13" r=".7"/></svg>',
   chart: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h17M8 16v-4M12 16V8M16 16v-6M20 16v-9"/></svg>',
   calendar: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>',
@@ -43,11 +44,16 @@ const header = (mode, title, subline) => `
   </header>
 `;
 
-const mobileNav = (active = 'BXH') => `
+const mobileNav = (active = 'BXH', role = 'member') => {
+  const items = role === 'leader'
+    ? [['Quỹ', icons.wallet], ['Thành viên', icons.users], ['BXH', icons.chart], ['Giải', icons.calendar], ['Cấu hình', icons.shield]]
+    : [['Quỹ', icons.wallet], ['Thành viên', icons.users], ['BXH', icons.chart], ['Giải', icons.calendar], ['Thông tin', icons.user]];
+  return `
   <nav class="mobile-nav" aria-label="Điều hướng chính">
-    ${[['Quỹ', icons.wallet], ['Thành viên', icons.users], ['BXH', icons.chart], ['Giải', icons.calendar], ['Cấu hình', icons.shield]].map(([label, icon]) => `<button class="mobile-nav__item ${label === active ? 'is-active' : ''} ${label === 'BXH' ? 'mobile-nav__item--center' : ''}" type="button">${icon}<span>${label}</span></button>`).join('')}
+    ${items.map(([label, icon]) => { const route = role === 'member' && label === 'Thông tin' ? 'info' : role === 'member' && label === 'BXH' ? 'ranking' : ''; return `<button class="mobile-nav__item ${label === active ? 'is-active' : ''} ${label === 'BXH' ? 'mobile-nav__item--center' : ''}" ${route ? `data-member-route="${route}"` : ''} type="button">${icon}<span>${label}</span></button>`; }).join('')}
   </nav>
 `;
+};
 
 const metric = ({ tone, icon, eyebrow, value, detail, trend }) => `
   <article class="metric-card metric-card--${tone}">
@@ -65,9 +71,9 @@ function memberView() {
         <div class="side-rail__label">CLB của tôi</div>
         <button class="side-link" type="button">${icons.wallet}<span>Quỹ CLB</span></button>
         <button class="side-link" type="button">${icons.users}<span>Thành viên</span></button>
-        <button class="side-link is-active" type="button">${icons.chart}<span>BXH đóng góp</span></button>
+        <button class="side-link is-active" data-member-route="ranking" type="button">${icons.chart}<span>BXH đóng góp</span></button>
         <button class="side-link" type="button">${icons.calendar}<span>Giải</span></button>
-        <button class="side-link" type="button">${icons.shield}<span>Cấu hình</span></button>
+        <button class="side-link" data-member-route="info" type="button">${icons.user}<span>Thông tin</span></button>
         <div class="side-rail__spacer"></div>
         <div class="side-help"><span class="help-orb">?</span><strong>Cần hỗ trợ?</strong><small>Gửi câu hỏi cho trưởng nhóm</small></div>
       </aside>
@@ -97,7 +103,16 @@ function memberView() {
         </section>
       </main>
     </div>
-    ${mobileNav('BXH')}
+    ${mobileNav('BXH', 'member')}
+  </div>`;
+}
+
+function memberInfoView() {
+  return `<div class="member-info-view">
+    <div class="page-heading page-heading--split page-heading--compact"><div><span class="eyebrow">Skyline Pickleball · Hồ sơ cá nhân</span><h1>Thông tin cá nhân</h1><p>Thông tin dùng để nhận diện bạn trong CLB và cân bằng trình độ khi đăng ký giải.</p></div><button class="outline-button" type="button">Mã truy cập CLB <span class="access-code">SKY-482</span></button></div>
+    <section class="profile-card"><div class="profile-card__identity"><span class="profile-avatar">MT</span><div><span class="eyebrow">Thành viên đang hoạt động</span><h2>Minh Trần</h2><p>Biệt danh hiển thị: <strong>Minh M</strong></p></div><button class="soft-button" type="button">Chỉnh sửa</button></div><div class="profile-meta"><div><span>CLB mặc định</span><strong>Skyline Pickleball</strong><small>Yên Bái · tham gia từ 03/2025</small></div><div><span>Các CLB đang sinh hoạt</span><strong>2 CLB</strong><small>Skyline Pickleball · River Smash</small></div><div><span>Trạng thái</span><strong class="profile-status"><i></i> Đang hoạt động</strong><small>Cập nhật lần cuối hôm nay</small></div></div></section>
+    <section class="profile-grid"><article class="panel profile-score-card"><div class="panel-heading"><div><span class="eyebrow">Điểm trình cá nhân</span><h3>PHR hiện tại</h3></div><span class="score-trend">+0,2</span></div><div class="profile-score"><strong>3,2</strong><span>Khá</span></div><div class="score-meter"><i style="width:64%"></i></div><div class="score-scale"><span>Mới bắt đầu</span><span>Trung bình</span><span>Khá</span><span>Nâng cao</span></div><p class="profile-note">Trưởng nhóm cập nhật ngày 06/09/2026. Điểm này được dùng để ghép cặp cân bằng ở các giải tiếp theo.</p></article><article class="panel"><div class="panel-heading"><div><span class="eyebrow">Lịch sử cập nhật</span><h3>Các mốc trình độ</h3></div><button class="text-button" type="button">Xem đầy đủ ${icons.arrow}</button></div><div class="profile-timeline"><div><i></i><p><strong>Khá · 3,2</strong><small>06/09/2026 · Trưởng nhóm Minh</small></p></div><div><i></i><p><strong>Trung bình · 3,0</strong><small>15/07/2026 · Trưởng nhóm Minh</small></p></div><div><i></i><p><strong>Trung bình · 2,8</strong><small>03/04/2026 · Trưởng nhóm Minh</small></p></div></div></article></section>
+    <section class="panel profile-privacy"><div><span class="eyebrow">Hiển thị trong PickHub</span><h3>Quyền riêng tư và tên hiển thị</h3><p>Biệt danh được ưu tiên trên bảng xếp hạng và trang giải khi bạn đã liên kết tài khoản.</p></div><div class="profile-switch"><span>Cho phép hiển thị biệt danh</span><button class="switch is-on" type="button" aria-label="Cho phép hiển thị biệt danh"><i></i></button></div></section>
   </div>`;
 }
 
@@ -134,7 +149,7 @@ function leaderView() {
         </section>
       </main>
     </div>
-    ${mobileNav('Quỹ')}
+    ${mobileNav('Quỹ', 'leader')}
   </div>`;
 }
 
@@ -176,6 +191,19 @@ document.addEventListener('click', (event) => {
   if (contextButton) {
     setView(contextButton.dataset.view);
     document.querySelector('#preview-root').focus({ preventScroll: true });
+    return;
+  }
+
+  const memberRoute = event.target.closest('[data-member-route]');
+  if (memberRoute && currentView === 'member') {
+    const route = memberRoute.dataset.memberRoute;
+    if (route === 'info') {
+      document.querySelector('#member-content').innerHTML = memberInfoView();
+      document.querySelectorAll('.mobile-nav__item').forEach((item) => item.classList.toggle('is-active', item.dataset.memberRoute === 'info'));
+      document.querySelectorAll('.side-link').forEach((item) => item.classList.toggle('is-active', item.dataset.memberRoute === 'info'));
+    } else if (route === 'ranking') {
+      setView('member');
+    }
     return;
   }
 

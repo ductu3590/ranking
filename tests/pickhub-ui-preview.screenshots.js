@@ -19,6 +19,13 @@ fs.mkdirSync(outputDir, { recursive: true });
     await page.goto(`${baseUrl}?view=${view}`, { waitUntil: 'networkidle' });
     await page.screenshot({ path: path.join(outputDir, `pickhub-ui-${view}-390.png`), fullPage: true });
   }
+  await page.goto(`${baseUrl}?view=member`, { waitUntil: 'networkidle' });
+  await page.locator('.mobile-nav [data-member-route="info"]').click();
+  await page.screenshot({ path: path.join(outputDir, 'pickhub-ui-member-info-390.png'), fullPage: true });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto(`${baseUrl}?view=member`, { waitUntil: 'networkidle' });
+  await page.locator('.side-rail [data-member-route="info"]').click();
+  await page.screenshot({ path: path.join(outputDir, 'pickhub-ui-member-info-1440.png'), fullPage: true });
   await browser.close();
   console.log(`SCREENSHOTS WRITTEN: ${outputDir}`);
 })().catch((error) => {

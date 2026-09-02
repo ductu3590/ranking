@@ -77,4 +77,4 @@
 
 - [x] Regenerate the migration ledger so migration 018 is recorded with its checksum.
 - [x] Run `git diff --check`, `npm run test:regression`, and `npm run test:ci` with the known dependency/build warnings recorded.
-- [ ] Commit the slice without changing Phase 1 status to completed.
+- [x] Commit the slice without changing Phase 1 status to completed.

@@ -104,6 +104,16 @@
       "version": 20,
       "filename": "020_phase1_tenant_constraints.sql",
       "checksum": "a7deb9852b614fb590c20ce7a6077662ebe1f5ddaa8c3bf4ad2a9b6e4b517420"
+    },
+    {
+      "version": 21,
+      "filename": "021_phase1_rls_hardening.sql",
+      "checksum": "166eda7790d7cf0f295516054410fe04e52ccc3073cb6f72bc4fe9e9a349c7b5"
+    },
+    {
+      "version": 22,
+      "filename": "022_fund_participant_tenancy.sql",
+      "checksum": "508887e12f436bd6e95fc6fb0ae0629c65b89bd6f14e81ea266556082e98e9a0"
     }
   ],
   "duplicateVersions": [

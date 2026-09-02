@@ -14,7 +14,7 @@ WITH expected(table_name, data_scope, tenant_column_required) AS (
         ('quy_pickleball', 'club', true),
         ('ranking_snapshots', 'club', true),
         ('fund_events', 'club', true),
-        ('fund_event_participants', 'parent_scoped', false),
+        ('fund_event_participants', 'club', true),
         ('tournaments', 'club', true),
         ('tournament_stages', 'club', true),
         ('tournament_entrants', 'club', true),
@@ -60,6 +60,20 @@ UNION ALL
 SELECT 'fund_events', count(*), count(*) FILTER (WHERE group_id IS NULL)
 FROM public.fund_events
 UNION ALL
+SELECT 'fund_event_participants', count(*),
+       CASE
+           WHEN EXISTS (
+               SELECT 1
+               FROM information_schema.columns
+               WHERE table_schema = 'public'
+                 AND table_name = 'fund_event_participants'
+                 AND column_name = 'group_id'
+           )
+           THEN count(*) FILTER (WHERE to_jsonb(fund_event_participants)->>'group_id' IS NULL)
+           ELSE NULL
+       END
+FROM public.fund_event_participants
+UNION ALL
 SELECT 'group_members', count(*), count(*) FILTER (WHERE group_id IS NULL)
 FROM public.group_members
 UNION ALL
@@ -97,7 +111,19 @@ SELECT
         WHERE table_schema = 'public'
           AND table_name = 'ranking_snapshots'
           AND column_name = 'group_id'
-    ) AS has_group_id;
+    ) AS has_group_id,
+    CASE
+        WHEN EXISTS (
+            SELECT 1
+            FROM information_schema.columns
+            WHERE table_schema = 'public'
+              AND table_name = 'ranking_snapshots'
+              AND column_name = 'group_id'
+        )
+        THEN count(*) FILTER (WHERE to_jsonb(ranking_snapshots)->>'group_id' IS NULL)
+        ELSE NULL
+    END AS null_group_id
+FROM public.ranking_snapshots;
 
 -- 5. Duplicate tên trong cùng CLB. Tên không phải identity, nhưng policy hiện
 -- tại vẫn cần xác định rõ trước khi thay global unique constraint.
@@ -117,6 +143,14 @@ WITH violations AS (
     FROM public.fund_event_participants AS child
     LEFT JOIN public.fund_events AS parent ON parent.id = child.event_id
     WHERE parent.id IS NULL
+
+    UNION ALL
+    SELECT 'fund_event_participants.member_id', count(*)
+    FROM public.fund_event_participants AS child
+    JOIN public.fund_events AS event ON event.id = child.event_id
+    LEFT JOIN public.club_members AS member ON member.id = child.member_id
+    WHERE child.member_id IS NOT NULL
+      AND (member.id IS NULL OR member.group_id IS DISTINCT FROM event.group_id)
 
     UNION ALL
     SELECT 'tournament_stages.tournament_id', count(*)

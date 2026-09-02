@@ -99,6 +99,11 @@
       "version": 19,
       "filename": "019_tournament_atomic_mutations.sql",
       "checksum": "9484fe2fb0cd258e5aa0bc5fb5d2f7f24235cd5d5c54f479d1d02eb9fce296b9"
+    },
+    {
+      "version": 20,
+      "filename": "020_phase1_tenant_constraints.sql",
+      "checksum": "a7deb9852b614fb590c20ce7a6077662ebe1f5ddaa8c3bf4ad2a9b6e4b517420"
     }
   ],
   "duplicateVersions": [

@@ -15,6 +15,10 @@ for (const view of ['member', 'leader', 'public']) {
   if (!html.includes(`data-view="${view}"`)) throw new Error(`missing ${view} switcher`);
 }
 
+if (!js.includes("['Quỹ', icons.wallet], ['Thành viên', icons.users], ['BXH', icons.chart], ['Giải', icons.calendar], ['Cấu hình', icons.shield]")) {
+  throw new Error('member navigation must contain five tabs with BXH in the center');
+}
+
 for (const token of ['--ph-ink', '--ph-indigo', '--ph-lime', '--ph-cyan', '--ph-coral']) {
   if (!css.includes(token) || !brand.includes(token.replace('--ph-', '`--ph-'))) throw new Error(`missing brand token ${token}`);
 }

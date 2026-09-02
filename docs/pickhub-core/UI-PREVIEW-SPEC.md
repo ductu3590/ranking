@@ -11,6 +11,7 @@ Prototype này giúp xem trước một hệ thống giao diện thống nhất 
 - Mở vào CLB mặc định.
 - Hiển thị mã truy cập ở trạng thái read-only.
 - Ba ưu tiên trên màn hình đầu: BXH đóng quỹ, tổng quan quỹ, tổng số thành viên và phân bổ PHR.
+- Điều hướng mobile của thành viên có đúng 5 tab `Quỹ / Thành viên / BXH / Giải / Cấu hình`; `BXH` là tab trung tâm và có điểm nhấn riêng.
 - Có danh sách thông báo chỉ trong PickHub.
 - Có thể xem lịch/kết quả giải ở điều hướng phụ.
 
@@ -60,4 +61,3 @@ Prototype này giúp xem trước một hệ thống giao diện thống nhất 
 - Thành viên có nhìn thấy đúng ba nội dung minh bạch ưu tiên không?
 - Dashboard trưởng nhóm có làm nổi bật việc cần xử lý không?
 - Trang giải có phù hợp vừa xem công khai vừa trình chiếu tại sân không?
-

@@ -43,9 +43,9 @@ const header = (mode, title, subline) => `
   </header>
 `;
 
-const mobileNav = (active = 'Tổng quan') => `
+const mobileNav = (active = 'BXH') => `
   <nav class="mobile-nav" aria-label="Điều hướng chính">
-    ${[['Tổng quan', icons.chart], ['Quỹ', icons.wallet], ['Thành viên', icons.users], ['Giải đấu', icons.calendar]].map(([label, icon]) => `<button class="mobile-nav__item ${label === active ? 'is-active' : ''}" type="button">${icon}<span>${label}</span></button>`).join('')}
+    ${[['Quỹ', icons.wallet], ['Thành viên', icons.users], ['BXH', icons.chart], ['Giải', icons.calendar], ['Cấu hình', icons.shield]].map(([label, icon]) => `<button class="mobile-nav__item ${label === active ? 'is-active' : ''} ${label === 'BXH' ? 'mobile-nav__item--center' : ''}" type="button">${icon}<span>${label}</span></button>`).join('')}
   </nav>
 `;
 
@@ -63,49 +63,41 @@ function memberView() {
     <div class="app-body">
       <aside class="side-rail">
         <div class="side-rail__label">CLB của tôi</div>
-        <button class="side-link is-active" type="button">${icons.chart}<span>Tổng quan</span></button>
         <button class="side-link" type="button">${icons.wallet}<span>Quỹ CLB</span></button>
         <button class="side-link" type="button">${icons.users}<span>Thành viên</span></button>
-        <button class="side-link" type="button">${icons.calendar}<span>Giải đấu</span></button>
+        <button class="side-link is-active" type="button">${icons.chart}<span>BXH đóng góp</span></button>
+        <button class="side-link" type="button">${icons.calendar}<span>Giải</span></button>
+        <button class="side-link" type="button">${icons.shield}<span>Cấu hình</span></button>
         <div class="side-rail__spacer"></div>
         <div class="side-help"><span class="help-orb">?</span><strong>Cần hỗ trợ?</strong><small>Gửi câu hỏi cho trưởng nhóm</small></div>
       </aside>
       <main class="content-area" id="member-content">
-        <div class="page-heading page-heading--split">
-          <div><span class="eyebrow">Không gian thành viên</span><h1>Minh bạch để cùng tiến bộ.</h1><p>Theo dõi sức khỏe CLB, đóng góp của bạn và mặt bằng trình độ hiện tại.</p></div>
+        <div class="page-heading page-heading--split page-heading--compact">
+          <div><span class="eyebrow">Skyline Pickleball · Thành viên</span><h1>Bảng xếp hạng đóng góp</h1><p>Minh bạch khoản quỹ, ghi nhận tinh thần và cùng nhau giữ nhịp CLB.</p></div>
           <button class="outline-button" type="button">Mã truy cập CLB <span class="access-code">SKY-482</span></button>
         </div>
-        <section class="member-hero card-surface">
-          <div class="member-hero__club">${mark('S')}<div><span class="eyebrow eyebrow--light">CLB mặc định</span><h2>Skyline Pickleball</h2><p>32 thành viên đang hoạt động · Yên Bái</p></div></div>
-          <div class="member-hero__pulse"><span class="pulse-label">Tinh thần CLB</span><strong>Ổn định</strong><span class="pulse-bar"><i style="width:78%"></i></span><small>+8% so với tháng trước</small></div>
+        <section class="ranking-hero">
+          <div class="ranking-hero__copy"><span class="ranking-kicker">BẢNG VÀNG ĐÓNG GÓP</span><div class="ranking-title-row"><span class="ranking-medal">01</span><h2>BXH nộp phạt<br><em>đóng quỹ</em></h2></div><p>Vinh danh những thành viên đóng góp nhiều nhất cho hoạt động chung của CLB.</p></div>
+          <div class="ranking-period"><span>KỲ ĐANG XEM</span><strong>01/09/2026 — nay</strong><small>Được cập nhật tự động từ sổ quỹ</small></div>
         </section>
-        <div class="section-heading"><div><span class="eyebrow">Ba điều quan trọng</span><h2>CLB đang vận hành ra sao?</h2></div><button class="text-button" type="button">Xem chi tiết ${icons.arrow}</button></div>
-        <section class="metric-grid">
-          ${metric({ tone: 'lime', icon: icons.chart, eyebrow: 'BXH đóng quỹ', value: '#08', detail: 'trong 32 thành viên', trend: '↑ 2 bậc' })}
-          ${metric({ tone: 'cyan', icon: icons.wallet, eyebrow: 'Tổng quan quỹ', value: '18,4 tr', detail: 'số dư hiện tại', trend: '+2,6 tr tháng này' })}
-          ${metric({ tone: 'indigo', icon: icons.users, eyebrow: 'Thành viên đang hoạt động', value: '32', detail: '8 Khá · 14 Trung bình', trend: '10 đang phát triển' })}
+        <div class="ranking-toggle" role="tablist" aria-label="Chọn bảng xếp hạng"><button class="ranking-toggle__item is-active" type="button" role="tab" aria-selected="true">Nộp phạt</button><button class="ranking-toggle__item" type="button" role="tab" aria-selected="false">Đóng quỹ</button></div>
+        <section class="summary-grid">
+          <article class="summary-card"><span class="summary-card__icon summary-card__icon--coral">${icons.wallet}</span><div><small>Tổng tiền phạt</small><strong>70.000đ</strong></div></article>
+          <article class="summary-card"><span class="summary-card__icon summary-card__icon--purple">${icons.users}</span><div><small>Thành viên góp quỹ</small><strong>3 người</strong></div></article>
+          <article class="summary-card"><span class="summary-card__icon summary-card__icon--lime">${icons.chart}</span><div><small>Số lượt nộp phạt</small><strong>4 lượt</strong></div></article>
         </section>
-        <section class="dashboard-grid dashboard-grid--member">
-          <article class="panel panel--distribution">
-            <div class="panel-heading"><div><span class="eyebrow">PHR snapshot</span><h3>Phân bổ trình độ</h3></div><span class="tiny-label">Cập nhật 08/09</span></div>
-            <div class="distribution-list">
-              ${[['Mới bắt đầu', '1,0–1,4', 6, 'neutral'], ['Cơ bản', '1,5–1,9', 10, 'cyan'], ['Trung bình', '2,0–2,9', 14, 'indigo'], ['Khá trở lên', '3,0–5,0', 8, 'lime']].map(([label, range, count, tone]) => `<div class="distribution-row"><div><span>${label}</span><small>${range}</small></div><div class="distribution-meter"><i class="meter-${tone}" style="width:${Math.round(count / 14 * 100)}%"></i></div><strong>${count}</strong></div>`).join('')}
-            </div>
-            <div class="panel-footnote"><span class="info-dot">i</span> Điểm PHR do trưởng nhóm cập nhật, có thể xem lịch sử thay đổi.</div>
-          </article>
-          <article class="panel panel--notices">
-            <div class="panel-heading"><div><span class="eyebrow">Trong PickHub</span><h3>Thông báo mới</h3></div><span class="notice-count">3</span></div>
-            <div class="notice-list">
-              <div class="notice-item"><span class="notice-icon notice-icon--lime">${icons.calendar}</span><div><strong>Giải Skyline Open đã mở đăng ký</strong><p>Hạn đăng ký còn 6 ngày · 12 phút trước</p></div><span class="unread-dot"></span></div>
-              <div class="notice-item"><span class="notice-icon notice-icon--coral">${icons.wallet}</span><div><strong>Quỹ tháng 9 đã được cập nhật</strong><p>Trưởng nhóm vừa ghi nhận một khoản thu · 2 giờ trước</p></div><span class="unread-dot"></span></div>
-              <div class="notice-item"><span class="notice-icon notice-icon--cyan">${icons.chart}</span><div><strong>Điểm PHR của bạn đã thay đổi</strong><p>Khá · 3,2 — cập nhật ngày 06/09</p></div></div>
-            </div>
-            <button class="panel-link" type="button">Xem tất cả thông báo ${icons.arrow}</button>
-          </article>
+        <section class="panel ranking-panel">
+          <div class="panel-heading"><div><span class="eyebrow">Nộp phạt trong CLB</span><h3>Ai đang dẫn đầu?</h3></div><span class="tiny-label">Cập nhật 10 phút trước</span></div>
+          <div class="ranking-podium"><div class="podium-card podium-card--second"><span class="podium-place">02</span><span class="podium-avatar">HN</span><strong>Hà Nguyên</strong><small>20.000đ</small></div><div class="podium-card podium-card--first"><span class="podium-crown">TOP 01</span><span class="podium-avatar">LP</span><strong>Lan Phương</strong><small>35.000đ</small></div><div class="podium-card podium-card--third"><span class="podium-place">03</span><span class="podium-avatar">TD</span><strong>Tuấn Dũng</strong><small>15.000đ</small></div></div>
+          <div class="ranking-list"><div class="ranking-list__head"><span>HẠNG</span><span>THÀNH VIÊN</span><span>ĐÓNG GÓP</span></div>${[['04','Minh Trần','—'],['05','Ngọc Anh','—'],['06','Quang Vũ','—']].map(([rank, name, amount]) => `<div class="ranking-list__row"><span>${rank}</span><span><i class="ranking-list__avatar">${name.split(' ').map((part) => part[0]).slice(-2).join('')}</i><b>${name}</b></span><strong>${amount}</strong></div>`).join('')}</div>
+        </section>
+        <section class="dashboard-grid dashboard-grid--member member-secondary-grid">
+          <article class="panel"><div class="panel-heading"><div><span class="eyebrow">Tổng quan CLB</span><h3>Quỹ đang vận hành</h3></div><button class="text-button" type="button">Mở sổ quỹ ${icons.arrow}</button></div><div class="fund-balance"><strong>18,4 tr</strong><span>Số dư hiện tại</span></div><div class="fund-progress"><i style="width:72%"></i></div><div class="fund-breakdown"><span><i class="legend-dot legend-dot--lime"></i> Thu tháng này <b>+2,6 tr</b></span><span><i class="legend-dot legend-dot--coral"></i> Chi tháng này <b>1,1 tr</b></span></div></article>
+          <article class="panel"><div class="panel-heading"><div><span class="eyebrow">32 thành viên</span><h3>Phân bổ trình độ</h3></div><span class="tiny-label">PHR snapshot</span></div><div class="compact-distribution">${[['Mới bắt đầu', 6, 'neutral'], ['Cơ bản', 10, 'cyan'], ['Trung bình', 14, 'indigo'], ['Khá trở lên', 8, 'lime']].map(([label, count, tone]) => `<div><span>${label}</span><i><b class="meter-${tone}" style="width:${Math.round(count / 14 * 100)}%"></b></i><strong>${count}</strong></div>`).join('')}</div></article>
         </section>
       </main>
     </div>
-    ${mobileNav()}
+    ${mobileNav('BXH')}
   </div>`;
 }
 
@@ -142,7 +134,7 @@ function leaderView() {
         </section>
       </main>
     </div>
-    ${mobileNav('Tổng quan')}
+    ${mobileNav('Quỹ')}
   </div>`;
 }
 

@@ -20,12 +20,12 @@ PickHub là không gian giúp các CLB pickleball vận hành minh bạch, kết
 
 | Token | Giá trị | Vai trò |
 |---|---|---|
-| `--ph-ink` | `#071A3A` | Midnight navy, chữ mạnh và nền hero |
-| `--ph-indigo` | `#3152D9` | Hành động chính, liên kết, trạng thái đang chọn |
-| `--ph-lime` | `#C8F34A` | Điểm nhấn thể thao, CTA nổi bật |
-| `--ph-cyan` | `#50D5FF` | Dữ liệu tích cực và biểu đồ |
-| `--ph-coral` | `#FF7B65` | Cảnh báo nhẹ, trạng thái cần chú ý |
-| `--ph-surface` | `#F5F7FB` | Nền ứng dụng |
+| `--ph-ink` | `#121326` | Mực tím than, chữ mạnh và nền vận hành |
+| `--ph-indigo` | `#6F48C9` | Hành động chính, liên kết, trạng thái đang chọn |
+| `--ph-lime` | `#B8EB37` | Điểm nhấn thể thao và trạng thái tích cực |
+| `--ph-cyan` | `#56C7D6` | Dữ liệu tích cực và biểu đồ |
+| `--ph-coral` | `#F48772` | Cảnh báo nhẹ, trạng thái cần chú ý |
+| `--ph-surface` | `#F4F6FA` | Nền ứng dụng |
 | `--ph-card` | `#FFFFFF` | Bề mặt card |
 | `--ph-line` | `#E4E9F2` | Viền và phân tách |
 | `--ph-muted` | `#667085` | Chữ phụ |
@@ -68,7 +68,7 @@ Logo prototype dùng chữ **P** cách điệu bằng một quỹ đạo cong v�
 
 ## 6. UI content rules
 
-- Thành viên: “Tổng quan CLB”, “BXH đóng quỹ”, “Phân bổ trình độ”.
+- Thành viên: “Quỹ”, “Thành viên”, “BXH” ở vị trí trung tâm, “Giải”, “Cấu hình”; nội dung chính ưu tiên “BXH đóng quỹ”, “Tổng quan quỹ”, “Phân bổ trình độ”.
 - Trưởng nhóm: “Thu–chi”, “Thành viên”, “Cần xử lý”.
 - Ban tổ chức: “Đăng ký”, “Bốc thăm”, “Lịch thi đấu”, “Kết quả”.
 - Public tournament: ưu tiên biệt danh đã cấu hình; nếu chưa có thì dùng tên trong CLB chủ quản.
@@ -85,4 +85,3 @@ Logo prototype dùng chữ **P** cách điệu bằng một quỹ đạo cong v�
 ## 8. Review status
 
 Đây là định hướng thương hiệu và UI draft. Prototype trong cùng thư mục là vật liệu để duyệt hướng hình ảnh trước khi đưa token vào production components. Chưa đánh dấu là bộ nhận diện cuối cùng.
-

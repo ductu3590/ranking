@@ -30,7 +30,9 @@
 ## Review notes
 
 - Hero public dùng ảnh nền trừu tượng sân pickleball, giữ vùng tối cho copy.
-- Member dashboard đưa BXH quỹ, tổng quan quỹ và phân bổ PHR lên trung tâm.
+- Member dashboard đã chuyển thành màn hình ranking-first: BXH nộp phạt/đóng quỹ là nội dung chính, có bộ chuyển loại bảng, podium và danh sách xếp hạng.
+- Mobile member giữ đúng 5 tab `Quỹ | Thành viên | BXH | Giải | Cấu hình`; `BXH` nằm ở vị trí trung tâm và có trạng thái nổi bật.
+- Visual direction lấy cấu trúc tham chiếu từ ảnh fitness app được cung cấp: nền sáng, card gọn, phân cấp rõ, màu tím làm accent; không sao chép layout hay nội dung.
 - Leader dashboard đưa thu–chi, thành viên và việc cần xử lý lên trung tâm.
 - Bracket public là bản minh họa double elimination với scroll ngang ở mobile.
 - Cần người phụ trách sản phẩm duyệt màu, mức độ thể thao, wording và ưu tiên thông tin trước khi tách component production.

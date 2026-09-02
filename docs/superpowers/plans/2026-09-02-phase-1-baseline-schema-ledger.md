@@ -187,7 +187,7 @@ git commit -m "test: establish phase 1 regression baseline"
 
 - [ ] **Step 1: Write the failing ledger test**
 
-Use a temporary directory containing `001_first.sql`, `002_second.sql`, and `002_duplicate.sql`. Assert normalized LF hashing, lexicographic order, the literal SHA-256 `b4e0497804e46e0a0b0b8c31975b062152d551bac49c3c2e80932567b4085dcd` for `SELECT 1;\n`, duplicate version reporting for `002`, SQL literal escaping, and non-migration file exclusion.
+Use a temporary directory containing `001_first.sql`, `002_second.sql`, and `002_duplicate.sql`. Assert normalized LF hashing, lexicographic order, the literal SHA-256 `b4e0497804e46e0a0b0b8c31975b062152d551bac49c3c2e80932567b4085dcd` for `SELECT 1;\n`, duplicate version reporting for `002`, SQL literal escaping, immutable `ON CONFLICT DO NOTHING` behavior, and non-migration file exclusion.
 
 - [ ] **Step 2: Run the test and confirm RED**
 
@@ -250,4 +250,3 @@ Expected: tests and production build exit 0; warnings are recorded for the depen
 git add database/audits/phase-1-schema-preflight.sql database/audits/README.md
 git commit -m "chore: add phase 1 schema preflight"
 ```
-

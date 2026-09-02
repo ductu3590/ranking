@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "architecture_version": "1.0.0",
-  "active_phase": null,
+  "active_phase": 1,
   "allowed_statuses": [
     "not_started",
     "in_progress",
@@ -20,7 +20,7 @@
     {
       "id": 1,
       "name": "foundation-hardening",
-      "status": "not_started",
+      "status": "in_progress",
       "branch": "codex/phase-1-foundation-hardening",
       "depends_on": ["core-blueprint"],
       "evidence": null,

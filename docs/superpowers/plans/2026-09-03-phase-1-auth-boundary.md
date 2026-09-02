@@ -43,4 +43,4 @@
 ### Task 4: Verify and commit
 
 - [x] Run `git diff --check`, `npm run test:regression`, and `npm run test:ci` with known baseline warnings recorded.
-- [ ] Commit without changing Phase 1 to completed.
+- [x] Commit without changing Phase 1 to completed.

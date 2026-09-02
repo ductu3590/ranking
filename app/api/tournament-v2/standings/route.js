@@ -1,15 +1,16 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
-import { getEffectiveGroupContext } from '@/lib/groupSession';
+import { getClubScope } from '@/lib/groupSession';
 import { computeStageStandings } from '@/lib/tournament/standingsService';
 
 const db = supabaseAdmin || supabaseServer;
 
 export async function GET(request) {
     try {
-        const ctx = getEffectiveGroupContext();
-        const groupId = ctx.group_id;
+        const scope = getClubScope();
+        if (!scope.ok) return scope.response;
+        const groupId = scope.groupId;
 
         const { searchParams } = new URL(request.url);
         const stageId = searchParams.get('stageId');

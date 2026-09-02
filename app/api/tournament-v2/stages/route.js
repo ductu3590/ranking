@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
-import { requireGroupAdmin, getEffectiveGroupContext } from '@/lib/groupSession';
+import { requireGroupAdmin, getClubScope } from '@/lib/groupSession';
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -55,7 +55,9 @@ function buildStagePayload(body, groupId) {
 
 export async function GET(request) {
     try {
-        const { group_id: groupId } = getEffectiveGroupContext();
+        const scope = getClubScope();
+        if (!scope.ok) return scope.response;
+        const groupId = scope.groupId;
         const { searchParams } = new URL(request.url);
         const tournamentId = searchParams.get('tournamentId');
         if (!tournamentId) {

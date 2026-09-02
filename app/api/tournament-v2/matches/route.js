@@ -1,17 +1,18 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
-import { getEffectiveGroupContext } from '@/lib/groupSession';
+import { getClubScope } from '@/lib/groupSession';
 
 const db = supabaseAdmin || supabaseServer;
 
 // GET /api/tournament-v2/matches?stageId=<id>
 // Danh sách trận của 1 stage + games gom theo match_id (cho console nhập tỉ số).
-// Đọc public (getEffectiveGroupContext) — không chặn admin; scope group_id + stage_id.
+// Đọc nội bộ console: cần signed group session; public link dùng /public snapshot.
 export async function GET(request) {
     try {
-        const ctx = getEffectiveGroupContext();
-        const groupId = ctx.group_id;
+        const scope = getClubScope();
+        if (!scope.ok) return scope.response;
+        const groupId = scope.groupId;
 
         const { searchParams } = new URL(request.url);
         const stageId = searchParams.get('stageId');

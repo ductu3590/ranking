@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { randomBytes } from 'crypto';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
-import { requireGroupAdmin, getEffectiveGroupContext } from '@/lib/groupSession';
+import { requireGroupAdmin, getClubScope } from '@/lib/groupSession';
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -78,7 +78,9 @@ async function insertWithSlugRetry(payload) {
 
 export async function GET() {
     try {
-        const { group_id: groupId } = getEffectiveGroupContext();
+        const scope = getClubScope();
+        if (!scope.ok) return scope.response;
+        const groupId = scope.groupId;
 
         const { data, error } = await db
             .from('tournaments')

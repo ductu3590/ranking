@@ -6,6 +6,7 @@ const assert = (c, m) => { if (!c) { console.error(`FAIL: ${m}`); process.exit(1
 const f = 'app/api/tournament-v2/standings/route.js';
 assert(exists(f), 'route tồn tại');
 const s = read(f);
+assert(s.includes('getClubScope'), 'đọc nội bộ yêu cầu club scope từ signed session');
 const service = read('lib/tournament/standingsService.js');
 assert(s.includes('computeStageStandings'), 'gọi standings service dùng chung');
 assert(service.includes('getScheduleEngine') && service.includes('computeStandings'), 'service gọi computeStandings');

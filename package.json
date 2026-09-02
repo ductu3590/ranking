@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test:phase1": "node tests/phase1/progress.test.js && node tests/phase1/navigation-role.test.js && node tests/phase1/migration-ledger.test.js && node tests/phase1/public-snapshot.test.js && node tests/phase1/polling-backoff.test.js && node tests/phase1/public-identity-migration.test.js",
+    "test:phase1": "node tests/phase1/progress.test.js && node tests/phase1/navigation-role.test.js && node tests/phase1/migration-ledger.test.js && node tests/phase1/public-snapshot.test.js && node tests/phase1/polling-backoff.test.js && node tests/phase1/public-identity-migration.test.js && node tests/phase1/auth-boundary.test.js",
     "migration:ledger": "node scripts/migration-ledger.js --directory database/migrations",
     "test:court-energy-css": "node tests/court-energy-css.test.js",
     "test:mobile-nav": "node tests/mobile-bottom-tabs.test.js",

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "architecture_version": "1.0.0-draft",
-  "active_phase": "core-blueprint",
+  "active_phase": null,
   "allowed_statuses": [
     "not_started",
     "in_progress",
@@ -10,10 +10,10 @@
     "completed"
   ],
   "blueprint": {
-    "status": "awaiting_approval",
+    "status": "completed",
     "branch": "codex/pickhub-core-blueprint",
-    "approved_at": null,
-    "completion_commit": null,
+    "approved_at": "2026-09-02",
+    "completion_commit": "60048bf41e10462e8053b26fb242bfb2b3eef56b",
     "merge_commit": null
   },
   "phases": [

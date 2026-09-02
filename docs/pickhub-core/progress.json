@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "architecture_version": "1.0.0-draft",
+  "active_phase": null,
+  "allowed_statuses": [
+    "not_started",
+    "in_progress",
+    "blocked",
+    "awaiting_approval",
+    "completed"
+  ],
+  "blueprint": {
+    "status": "completed",
+    "branch": "codex/pickhub-core-blueprint",
+    "approved_at": "2026-09-02",
+    "completion_commit": "60048bf41e10462e8053b26fb242bfb2b3eef56b",
+    "merge_commit": null
+  },
+  "phases": [
+    {
+      "id": 1,
+      "name": "foundation-hardening",
+      "status": "not_started",
+      "branch": "codex/phase-1-foundation-hardening",
+      "depends_on": ["core-blueprint"],
+      "evidence": null,
+      "approved_by": null,
+      "completed_at": null,
+      "completion_commit": null,
+      "merge_commit": null
+    },
+    {
+      "id": 2,
+      "name": "identity-clubs",
+      "status": "not_started",
+      "branch": "codex/phase-2-identity-clubs",
+      "depends_on": [1],
+      "evidence": null,
+      "approved_by": null,
+      "completed_at": null,
+      "completion_commit": null,
+      "merge_commit": null
+    },
+    {
+      "id": 3,
+      "name": "interclub-tournament-mvp",
+      "status": "not_started",
+      "branch": "codex/phase-3-interclub-tournament-mvp",
+      "depends_on": [2],
+      "evidence": null,
+      "approved_by": null,
+      "completed_at": null,
+      "completion_commit": null,
+      "merge_commit": null
+    },
+    {
+      "id": 4,
+      "name": "tournament-operations",
+      "status": "not_started",
+      "branch": "codex/phase-4-tournament-operations",
+      "depends_on": [3],
+      "evidence": null,
+      "approved_by": null,
+      "completed_at": null,
+      "completion_commit": null,
+      "merge_commit": null
+    },
+    {
+      "id": 5,
+      "name": "player-rating",
+      "status": "not_started",
+      "branch": "codex/phase-5-player-rating",
+      "depends_on": [4],
+      "evidence": null,
+      "approved_by": null,
+      "completed_at": null,
+      "completion_commit": null,
+      "merge_commit": null
+    },
+    {
+      "id": 6,
+      "name": "national-scale",
+      "status": "not_started",
+      "branch": "codex/phase-6-national-scale",
+      "depends_on": [5],
+      "evidence": null,
+      "approved_by": null,
+      "completed_at": null,
+      "completion_commit": null,
+      "merge_commit": null
+    }
+  ],
+  "completion_history": []
+}

@@ -89,6 +89,11 @@
       "version": 17,
       "filename": "017_phase1_migration_ledger.sql",
       "checksum": "4e0330023c044328cf4e5120cbe7e25c88cb609209486215aaaba2513128b4e9"
+    },
+    {
+      "version": 18,
+      "filename": "018_tournament_public_identity.sql",
+      "checksum": "d56076485e3cb1e897f05d62bd4ff11bd3a1fc16b657aa6bdf76126e684fa406"
     }
   ],
   "duplicateVersions": [

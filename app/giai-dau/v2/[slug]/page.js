@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { getPublic, getStandings } from '@/lib/tournamentV2Client';
-import { supabase } from '@/lib/supabaseClient';
+import { getPublic } from '@/lib/tournamentV2Client';
+import { nextPollingDelay } from '@/lib/pollingBackoff';
 import { StandingsView } from '../console/standingsRender';
 import { BracketView } from '../console/bracketRender';
 import '../console/bracket.css';
@@ -56,7 +56,7 @@ function ScheduleList({ matches, entrantsById }) {
 }
 
 // 1 giai đoạn: lịch + BXH (+ sơ đồ nếu knockout).
-function StageSection({ stage, matches, entrantsById, standings }) {
+function StageSection({ stage, matches, gamesByMatchId, entrantsById, standings }) {
     const isKnockout = stage.schedule_format === 'knockout';
     return (
         <section className="v2pub-stage">
@@ -65,7 +65,7 @@ function StageSection({ stage, matches, entrantsById, standings }) {
             {isKnockout ? (
                 <div className="v2pub-block">
                     <h3 className="v2pub-block-title">Sơ đồ thi đấu</h3>
-                    <BracketView matches={matches} gamesByMatchId={{}} entrantsById={entrantsById} />
+                    <BracketView matches={matches} gamesByMatchId={gamesByMatchId} entrantsById={entrantsById} />
                 </div>
             ) : null}
 
@@ -93,21 +93,22 @@ function StageSection({ stage, matches, entrantsById, standings }) {
 export default function PublicTournamentPage({ params }) {
     const slug = params?.slug;
 
-    const [data, setData] = useState(null); // { tournament, stages, entrants, matches }
+    const [data, setData] = useState(null); // public snapshot
     const [standingsByStage, setStandingsByStage] = useState({});
     const [activeStageId, setActiveStageId] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
-    const refetchTimer = useRef(null);
+    const pollTimer = useRef(null);
+    const pollDelay = useRef(null);
 
-    const load = useCallback(async () => {
+    const load = useCallback(async ({ background = false } = {}) => {
         if (!slug) {
             setError('Thiếu mã giải đấu.');
             setLoading(false);
-            return;
+            return false;
         }
-        setError('');
+        if (!background) setError('');
         try {
             const snapshot = await getPublic(slug);
             setData(snapshot);
@@ -116,50 +117,53 @@ export default function PublicTournamentPage({ params }) {
                 if (prev && stages.some((s) => String(s.id) === String(prev))) return prev;
                 return stages.length ? stages[0].id : null;
             });
-            // BXH tính riêng từng stage (on-read).
-            const stages = snapshot.stages || [];
-            const results = await Promise.all(
-                stages.map((s) => getStandings(s.id).catch(() => null)),
-            );
-            const map = {};
-            stages.forEach((s, i) => {
-                if (results[i]) map[String(s.id)] = results[i];
-            });
-            setStandingsByStage(map);
+            setStandingsByStage(snapshot.standingsByStage || {});
+            return true;
         } catch (err) {
-            setError(err.message || 'Không tải được dữ liệu giải đấu.');
+            if (!background) setError(err.message || 'Không tải được dữ liệu giải đấu.');
+            return false;
         } finally {
-            setLoading(false);
+            if (!background) setLoading(false);
         }
     }, [slug]);
 
     useEffect(() => {
-        load();
-    }, [load]);
+        let cancelled = false;
 
-    // Realtime: refetch (debounce) khi matches/games thay đổi.
-    const tournamentId = data?.tournament?.id;
-    useEffect(() => {
-        if (!tournamentId) return undefined;
-
-        function scheduleRefetch() {
-            if (refetchTimer.current) clearTimeout(refetchTimer.current);
-            refetchTimer.current = setTimeout(() => {
-                load();
-            }, 600);
+        function clearPoll() {
+            if (pollTimer.current) {
+                clearTimeout(pollTimer.current);
+                pollTimer.current = null;
+            }
         }
 
-        const channel = supabase
-            .channel(`tour-public-${tournamentId}`)
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'tournament_matches' }, scheduleRefetch)
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'tournament_games' }, scheduleRefetch)
-            .subscribe();
+        function schedulePoll(success) {
+            if (cancelled || document.visibilityState === 'hidden') return;
+            pollDelay.current = nextPollingDelay(pollDelay.current, { success });
+            clearPoll();
+            pollTimer.current = setTimeout(async () => {
+                const ok = await load({ background: true });
+                schedulePoll(ok);
+            }, pollDelay.current);
+        }
 
+        async function refreshNow() {
+            if (cancelled || document.visibilityState === 'hidden') return;
+            clearPoll();
+            const ok = await load({ background: true });
+            schedulePoll(ok);
+        }
+
+        load().then((ok) => schedulePoll(ok));
+        window.addEventListener('focus', refreshNow);
+        document.addEventListener('visibilitychange', refreshNow);
         return () => {
-            if (refetchTimer.current) clearTimeout(refetchTimer.current);
-            supabase.removeChannel(channel);
+            cancelled = true;
+            clearPoll();
+            window.removeEventListener('focus', refreshNow);
+            document.removeEventListener('visibilitychange', refreshNow);
         };
-    }, [tournamentId, load]);
+    }, [load]);
 
     if (loading) {
         return (
@@ -187,7 +191,9 @@ export default function PublicTournamentPage({ params }) {
         );
     }
 
-    const { tournament, stages = [], entrants = [], matches = [] } = data;
+    const {
+        tournament, stages = [], entrants = [], matches = [], gamesByMatchId = {},
+    } = data;
 
     const entrantsById = {};
     for (const e of entrants) entrantsById[String(e.id)] = e;
@@ -236,6 +242,7 @@ export default function PublicTournamentPage({ params }) {
                         <StageSection
                             stage={activeStage}
                             matches={stageMatches}
+                            gamesByMatchId={gamesByMatchId}
                             entrantsById={entrantsById}
                             standings={standingsByStage[String(activeStage.id)]}
                         />
@@ -244,7 +251,7 @@ export default function PublicTournamentPage({ params }) {
             )}
 
             <footer className="v2pub-foot">
-                <p>Cập nhật trực tiếp khi có kết quả mới.</p>
+                <p>Tự động cập nhật khi có kết quả mới.</p>
             </footer>
         </div>
     );

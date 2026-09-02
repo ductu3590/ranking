@@ -94,6 +94,11 @@
       "version": 18,
       "filename": "018_tournament_public_identity.sql",
       "checksum": "d56076485e3cb1e897f05d62bd4ff11bd3a1fc16b657aa6bdf76126e684fa406"
+    },
+    {
+      "version": 19,
+      "filename": "019_tournament_atomic_mutations.sql",
+      "checksum": "9484fe2fb0cd258e5aa0bc5fb5d2f7f24235cd5d5c54f479d1d02eb9fce296b9"
     }
   ],
   "duplicateVersions": [

@@ -119,6 +119,11 @@
       "version": 23,
       "filename": "023_webhook_idempotency.sql",
       "checksum": "793512fe0d9858950f1b10d0a3773afd5a0a985de12d98cf5e3a219596c52924"
+    },
+    {
+      "version": 24,
+      "filename": "024_atomic_stage_advance.sql",
+      "checksum": "db8b3a5da2498982a7313754fe4c6de52034b81999c5ba9e2fb1235baef578aa"
     }
   ],
   "duplicateVersions": [

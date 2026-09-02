@@ -33,4 +33,4 @@
 ### Task 3: Verify evidence and commit
 
 - [x] Regenerate local migration ledger (020), run focused/regression/build gates, and record that production SQL remains unapplied.
-- [ ] Commit without changing Phase 1 to completed.
+- [x] Commit without changing Phase 1 to completed.

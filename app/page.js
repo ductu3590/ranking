@@ -11,23 +11,26 @@ const EMPTY_CREATE_FORM = {
     memberPassword: '',
 };
 
-export default function TeamFundHomePage() {
+const GROUP_STORAGE_KEY = 'teamfund-current-group';
+
+export default function PickhubHomePage() {
     const router = useRouter();
     const [activeModal, setActiveModal] = useState(null);
     const [createForm, setCreateForm] = useState(EMPTY_CREATE_FORM);
     const [joinForm, setJoinForm] = useState({ code: '', password: '' });
     const [currentGroup, setCurrentGroup] = useState(null);
+    const [hasLoadedStoredGroup, setHasLoadedStoredGroup] = useState(false);
     const [createdGroup, setCreatedGroup] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
     useEffect(() => {
-        const storedGroup = window.localStorage.getItem('teamfund-current-group');
+        const storedGroup = window.localStorage.getItem(GROUP_STORAGE_KEY);
         if (storedGroup) {
             try {
                 setCurrentGroup(JSON.parse(storedGroup));
             } catch {
-                window.localStorage.removeItem('teamfund-current-group');
+                window.localStorage.removeItem(GROUP_STORAGE_KEY);
             }
         }
 
@@ -37,6 +40,8 @@ export default function TeamFundHomePage() {
             setJoinForm((prev) => ({ ...prev, code: groupCode.toUpperCase() }));
             setActiveModal('join');
         }
+
+        setHasLoadedStoredGroup(true);
     }, []);
 
     function updateCreateForm(field, value) {
@@ -50,7 +55,7 @@ export default function TeamFundHomePage() {
     function rememberGroup(group, role) {
         const nextGroup = { ...group, role };
         setCurrentGroup(nextGroup);
-        window.localStorage.setItem('teamfund-current-group', JSON.stringify(nextGroup));
+        window.localStorage.setItem(GROUP_STORAGE_KEY, JSON.stringify(nextGroup));
     }
 
     async function handleCreateGroup(event) {
@@ -129,8 +134,8 @@ export default function TeamFundHomePage() {
         ctx.fillStyle = '#ffffff';
         ctx.font = '700 42px Arial, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('Quản lý quỹ nhóm', canvas.width / 2, 94);
-        ctx.fillText('Đơn giản minh bạch', canvas.width / 2, 145);
+        ctx.fillText('Cùng xây dựng cộng đồng', canvas.width / 2, 94);
+        ctx.fillText('Pickleball phát triển.', canvas.width / 2, 145);
 
         drawRoundedRect(ctx, 390, 220, 120, 120, 30, '#18b96f');
         ctx.fillStyle = '#ffffff';
@@ -139,7 +144,7 @@ export default function TeamFundHomePage() {
 
         ctx.fillStyle = '#20242c';
         ctx.font = '900 54px Arial, sans-serif';
-        ctx.fillText('TeamFund', canvas.width / 2, 390);
+        ctx.fillText('Pickhub', canvas.width / 2, 390);
 
         ctx.fillStyle = '#687081';
         ctx.font = '600 27px Arial, sans-serif';
@@ -163,7 +168,7 @@ export default function TeamFundHomePage() {
 
         const link = document.createElement('a');
         link.href = canvas.toDataURL('image/png');
-        link.download = `teamfund-${createdGroup.group.code}.png`;
+        link.download = `pickhub-${createdGroup.group.code}.png`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -177,43 +182,42 @@ export default function TeamFundHomePage() {
                         <PeopleWalletIcon />
                     </div>
                     <div className="teamfund-appbar-text">
-                        <h1>TeamFund</h1>
-                        <p>Quản lý quỹ nhóm minh bạch, đơn giản</p>
+                        <h1>Pickhub</h1>
+                        <p>Cùng xây dựng cộng đồng Pickleball phát triển.</p>
                     </div>
                 </header>
 
                 <div className="teamfund-content">
-                    {currentGroup && (
+                    {hasLoadedStoredGroup && currentGroup && (
                         <section className="teamfund-block">
                             <h2 className="teamfund-section-title">
                                 <UsersIcon />
-                                Nhóm của tôi
+                                Tiếp tục
                             </h2>
 
-                            <article className="teamfund-group-card">
-                                <div className="teamfund-row-main">
-                                    <div className="teamfund-tile teamfund-tile-orange">
+                            <a
+                                className="teamfund-action-row teamfund-continue-card"
+                                href={currentGroup.role === 'admin' ? '/admin' : '/quy'}
+                                aria-label="Vào nhóm của bạn"
+                            >
+                                <span className="teamfund-row-main">
+                                    <span className="teamfund-tile teamfund-tile-orange">
                                         <WalletIcon />
-                                    </div>
-                                    <div className="teamfund-item-text">
-                                        <strong>{currentGroup.name}</strong>
+                                    </span>
+                                    <span className="teamfund-item-text">
+                                        <strong>Vào nhóm của bạn</strong>
+                                        <span>{currentGroup.name}</span>
                                         <span className="teamfund-role-pill">
                                             {currentGroup.role === 'admin' ? 'Quản trị viên' : 'Thành viên'}
                                         </span>
-                                    </div>
-                                </div>
-                                <a
-                                    className="teamfund-more"
-                                    href={currentGroup.role === 'admin' ? '/admin' : '/quy'}
-                                    aria-label="Vào nhóm hiện tại"
-                                >
-                                    <ChevronIcon />
-                                </a>
-                            </article>
+                                    </span>
+                                </span>
+                                <ChevronIcon />
+                            </a>
                         </section>
                     )}
 
-                    <section className="teamfund-block">
+                    {hasLoadedStoredGroup && <section className="teamfund-block">
                         <h2 className="teamfund-section-title">Bắt đầu</h2>
                         <div className="teamfund-actions">
                             <button
@@ -250,7 +254,7 @@ export default function TeamFundHomePage() {
                                 <ChevronIcon />
                             </button>
                         </div>
-                    </section>
+                    </section>}
                 </div>
             </div>
 

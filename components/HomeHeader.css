@@ -73,6 +73,9 @@
     transition: all 0.2s;
     border: 1px solid transparent;
     white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .nav-link:hover {
@@ -81,46 +84,38 @@
     border-color: var(--border-color);
 }
 
-.nav-link.active,
-.nav-link.tournament-link {
+.nav-link.active {
     background: var(--court-midnight);
     color: var(--pickle-lime);
     border-color: rgba(202, 255, 40, 0.28);
 }
 
-.nav-link.tournament-link {
-    font-weight: 700;
+.nav-link-icon {
+    font-size: 15px;
+    line-height: 1;
 }
 
-.nav-link.highlight {
-    background: #FFF7ED;
-    color: #EA580C;
-    border-color: rgba(234, 88, 12, 0.2);
+.nav-link.featured {
+    background: var(--gradient-court-action);
+    color: var(--court-midnight);
+    border-color: rgba(7, 27, 24, 0.12);
+    font-weight: 800;
+    box-shadow: 0 7px 18px rgba(157, 242, 11, 0.2);
 }
 
-.nav-link.highlight:hover {
-    background: #FFEDD5;
+.nav-link.featured:hover {
+    background: var(--gradient-court-action);
+    color: var(--court-midnight);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(234, 88, 12, 0.15);
+    border-color: rgba(7, 27, 24, 0.22);
+    box-shadow: 0 9px 22px rgba(157, 242, 11, 0.28);
 }
 
-.nav-link.admin-link {
-    background: var(--surface-court-soft);
-    color: var(--court-midnight);
-    border-color: var(--border-color);
-    font-size: 13px;
-}
-
-.nav-link.admin-link:hover {
-    color: var(--court-midnight);
-    background: var(--surface-court-soft);
-}
-
-.nav-link.tournament-link:hover {
+.nav-link.featured.active {
     background: var(--court-midnight);
     color: var(--pickle-lime);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-sm);
+    border-color: var(--pickle-lime);
+    box-shadow: 0 0 0 3px rgba(202, 255, 40, 0.2);
 }
 
 .header-right {

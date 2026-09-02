@@ -1,8 +1,8 @@
 import './globals.css'
 
 export const metadata = {
-    title: 'Quỹ CLB Pickleball 246',
-    description: 'Hệ thống quản lý quỹ và sự kiện đóng quỹ CLB Pickleball 246',
+    title: 'Pickhub',
+    description: 'Cùng xây dựng cộng đồng Pickleball phát triển.',
     viewport: 'width=device-width, initial-scale=1, maximum-scale=5',
 }
 

@@ -17,9 +17,9 @@ assert(
     branding.includes('getEffectiveGroupContext') &&
     branding.includes('supabaseAdmin') &&
     branding.includes('logoUrl') &&
-    branding.includes('PickHub') &&
+    branding.includes('Pickhub') &&
     branding.includes('context.is_default'),
-    'Branding route should expose PickHub by default and active club name/logo for a real group session.'
+    'Branding route should expose Pickhub by default and active club name/logo for a real group session.'
 );
 
 const settings = read('app/api/club/settings/route.js');
@@ -36,11 +36,11 @@ assert(
     'HomeHeader should fetch /api/club/branding and render club name + logo.'
 );
 assert(
-    header.includes("name: 'PickHub'") &&
+    header.includes("name: 'Pickhub'") &&
     !header.includes('toUpperCase()') &&
     header.includes('branding-updated') &&
     header.includes('window.addEventListener'),
-    'HomeHeader should default to PickHub, preserve brand casing, and refresh when club branding changes.'
+    'HomeHeader should default to Pickhub, preserve brand casing, and refresh when club branding changes.'
 );
 
 const clubSettings = read('app/admin/ClubSettings.js');

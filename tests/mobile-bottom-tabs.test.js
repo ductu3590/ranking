@@ -7,11 +7,10 @@ const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 
 const homeHeaderJs = read('components/HomeHeader.js');
 const homeHeaderCss = read('components/HomeHeader.css');
+const globalNavigation = require('../lib/globalNavigation');
 const quyLayoutJs = read('app/quy/layout.js');
 const giaiDauLayoutJs = read('app/giai-dau/layout.js');
 const giaiDauPageJs = read('app/giai-dau/page.js');
-const giaiDauLivePageJs = read('app/giai-dau/live/page.js');
-const giaiDauPairingsPageJs = read('app/giai-dau/admin/pairings/page.js');
 const quyPageJs = read('app/quy/page.js');
 const quyMembersPageJs = read('app/quy/members/page.js');
 const globalsCss = read('app/globals.css');
@@ -44,14 +43,8 @@ assert(
 );
 
 assert(
-    giaiDauLayoutJs.includes('TournamentModuleNav'),
-    'Tournament layout should render a module subnav instead of a separate app navbar.'
-);
-
-assert(
     !giaiDauPageJs.includes('TournamentNavBar') &&
-    !giaiDauLivePageJs.includes('TournamentNavBar') &&
-    !giaiDauPairingsPageJs.includes('TournamentNavBar'),
+    !giaiDauLayoutJs.includes('TournamentNavBar'),
     'Tournament pages should not import or render TournamentNavBar.'
 );
 
@@ -61,8 +54,13 @@ assert(
 );
 
 assert(
-    mobileBottomNavJs.includes('/quy/members') && mobileBottomNavJs.includes('/giai-dau') && mobileBottomNavJs.includes('/admin'),
-    'MobileBottomNav fund tabs should include members, tournament, and admin links.'
+    homeHeaderJs.includes('GLOBAL_NAV_LINKS') && mobileBottomNavJs.includes('GLOBAL_NAV_LINKS'),
+    'Desktop and mobile navigation should render the same global menu definition.'
+);
+
+assert(
+    globalNavigation.GLOBAL_NAV_LINKS.map((link) => link.label).join('|') === 'Quỹ|Thành viên|BXH|Giải|Cấu hình',
+    'Global navigation should expose the approved five-item menu in order.'
 );
 
 assert(
@@ -81,13 +79,8 @@ assert(
 );
 
 assert(
-    mobileBottomNavJs.includes('function isActivePath') && mobileBottomNavJs.includes("pathname.startsWith(`${href}/`)"),
-    'MobileBottomNav should keep role/action tabs active on nested routes.'
-);
-
-assert(
-    mobileBottomNavJs.includes("href === '/giai-dau'") && mobileBottomNavJs.includes("pathname.startsWith('/giai-dau/')"),
-    'MobileBottomNav should keep the global tournament tab active on tournament subroutes.'
+    homeHeaderJs.includes('isGlobalNavActive') && mobileBottomNavJs.includes('isGlobalNavActive'),
+    'Desktop and mobile navigation should share nested-route active state behavior.'
 );
 
 assert(
@@ -97,8 +90,16 @@ assert(
 );
 
 assert(
-    mobileBottomNavCss.includes('position: fixed') && mobileBottomNavCss.includes('bottom: 0') && mobileBottomNavCss.includes('mobile-bottom-nav'),
-    'MobileBottomNav CSS should fix mobile tabs to the bottom.'
+    mobileBottomNavCss.includes('position: fixed') &&
+    mobileBottomNavCss.includes('bottom: 0') &&
+    mobileBottomNavCss.includes('repeat(5') &&
+    mobileBottomNavCss.includes('mobile-bottom-nav-link.featured'),
+    'MobileBottomNav should fix five tabs to the bottom and visually feature BXH.'
+);
+
+assert(
+    homeHeaderCss.includes('.nav-link.featured'),
+    'Desktop navigation should visually feature BXH.'
 );
 
 assert(

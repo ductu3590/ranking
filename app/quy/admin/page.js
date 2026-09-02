@@ -274,10 +274,7 @@ export default function AdminPage({ embedded = false }) {
         try {
             await fetch('/api/groups/session', { method: 'DELETE' });
         } catch {
-            // Ignore network errors; still clear local state below.
-        }
-        if (typeof window !== 'undefined') {
-            window.localStorage.removeItem('teamfund-current-group');
+            // Ignore network errors; the homepage can still use the remembered group.
         }
         router.push('/');
     }

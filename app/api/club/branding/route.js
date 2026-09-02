@@ -7,7 +7,7 @@ import { getEffectiveGroupContext } from '@/lib/groupSession';
 export async function GET() {
     const context = getEffectiveGroupContext();
     if (context.is_default) {
-        return NextResponse.json({ name: 'PickHub', logoUrl: null });
+        return NextResponse.json({ name: 'Pickhub', logoUrl: null });
     }
 
     const { data: group, error } = await supabaseAdmin

@@ -217,7 +217,19 @@
     cursor: pointer;
     font: inherit;
     text-align: left;
+    color: var(--text-primary);
+    text-decoration: none;
     transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease;
+}
+
+.teamfund-continue-card {
+    border-color: rgba(15, 168, 103, .32);
+    background: linear-gradient(135deg, #ffffff 0%, #f0fff8 100%);
+}
+
+.teamfund-continue-card:hover,
+.teamfund-continue-card:focus-visible {
+    border-color: var(--court-green);
 }
 
 .teamfund-action-row:hover,

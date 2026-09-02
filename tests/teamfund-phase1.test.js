@@ -30,11 +30,30 @@ assert(
 );
 
 assert(
-    rootPage.includes('TeamFund') &&
+    rootPage.includes('<h1>Pickhub</h1>') &&
+    rootPage.includes('Cùng xây dựng cộng đồng Pickleball phát triển.') &&
     rootPage.includes('Tạo nhóm mới') &&
     rootPage.includes('Tham gia nhóm') &&
-    rootPage.includes('Nhóm của tôi'),
-    'Root page should include TeamFund landing content and the two phase-1 actions.'
+    rootPage.includes('Tiếp tục') &&
+    rootPage.includes('Vào nhóm của bạn') &&
+    rootPage.includes('currentGroup.name'),
+    'Root page should include Pickhub branding, returning-user continuation, and the two start actions.'
+);
+
+assert(
+    rootPage.includes("const GROUP_STORAGE_KEY = 'teamfund-current-group'") &&
+    rootPage.includes('window.localStorage.getItem(GROUP_STORAGE_KEY)') &&
+    rootPage.includes('currentGroup &&') &&
+    rootPage.includes("href={currentGroup.role === 'admin' ? '/admin' : '/quy'}") &&
+    rootPage.includes('currentGroup.name'),
+    'Returning users should get a cached-group shortcut that opens the correct area without another password prompt.'
+);
+
+const layout = read('app/layout.js');
+assert(
+    layout.includes("title: 'Pickhub'") &&
+    layout.includes('Cùng xây dựng cộng đồng Pickleball phát triển.'),
+    'Root metadata should use the Pickhub name and approved slogan.'
 );
 
 assert(

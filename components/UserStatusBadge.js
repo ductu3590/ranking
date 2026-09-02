@@ -30,7 +30,6 @@ export default function UserStatusBadge() {
         try {
             await fetch('/api/groups/session', { method: 'DELETE' });
         } finally {
-            window.localStorage.removeItem('teamfund-current-group');
             window.location.href = '/';
         }
     }

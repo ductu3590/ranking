@@ -1,12 +1,15 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
+import navigation from '@/lib/globalNavigation';
 import UserStatusBadge from './UserStatusBadge';
 import './HomeHeader.css';
 
+const { GLOBAL_NAV_LINKS, isGlobalNavActive } = navigation;
+
 export default function HomeHeader({ showAdmin = true }) {
     const pathname = usePathname();
-    const [branding, setBranding] = useState({ name: 'PickHub', logoUrl: null });
+    const [branding, setBranding] = useState({ name: 'Pickhub', logoUrl: null });
 
     useEffect(() => {
         let active = true;
@@ -28,11 +31,9 @@ export default function HomeHeader({ showAdmin = true }) {
         };
     }, []);
 
-    const navLinks = [
-        { href: '/quy', label: '💰 Quản lý quỹ' },
-        { href: '/quy/members', label: '👥 Thành viên' },
-        { href: '/giai-dau', label: '🏆 Giải đấu', className: 'tournament-link' },
-    ];
+    const navLinks = showAdmin
+        ? GLOBAL_NAV_LINKS
+        : GLOBAL_NAV_LINKS.filter((link) => link.href !== '/admin');
 
     return (
         <header className="home-header">
@@ -47,20 +48,20 @@ export default function HomeHeader({ showAdmin = true }) {
                 </div>
 
                 <nav className="header-nav">
-                    {navLinks.map((link) => (
-                        <a
-                            key={link.href}
-                            href={link.href}
-                            className={`nav-link ${isActivePath(pathname, link.href) ? 'active' : ''} ${link.className || ''}`}
-                        >
-                            {link.label}
-                        </a>
-                    ))}
-                    {showAdmin && (
-                        <a href="/admin" className={`nav-link admin-link ${isActivePath(pathname, '/admin') ? 'active' : ''}`}>
-                            ⚙️ Quản trị
-                        </a>
-                    )}
+                    {navLinks.map((link) => {
+                        const isActive = isGlobalNavActive(pathname, link.href);
+                        return (
+                            <a
+                                key={link.href}
+                                href={link.href}
+                                className={`nav-link ${isActive ? 'active' : ''} ${link.featured ? 'featured' : ''}`}
+                                aria-current={isActive ? 'page' : undefined}
+                            >
+                                <span className="nav-link-icon" aria-hidden="true">{link.icon}</span>
+                                <span>{link.label}</span>
+                            </a>
+                        );
+                    })}
                 </nav>
 
                 <div className="header-right">
@@ -69,11 +70,4 @@ export default function HomeHeader({ showAdmin = true }) {
             </div>
         </header>
     );
-}
-
-function isActivePath(pathname, href) {
-    if (pathname === href) return true;
-    if (href === '/giai-dau') return pathname.startsWith('/giai-dau/');
-    if (href === '/quy') return false;
-    return pathname.startsWith(`${href}/`);
 }

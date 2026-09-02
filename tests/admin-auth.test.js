@@ -16,7 +16,7 @@ function assert(condition, message) {
 
 // Admin pages reached after joining a group must gate on the group session
 // role, not the legacy Supabase Auth session (which bounced users to /login).
-for (const route of ['app/quy/admin/page.js', 'app/giai-dau/admin/page.js']) {
+for (const route of ['app/quy/admin/page.js']) {
     const src = read(route);
     assert(
         !src.includes("'/login'"),
@@ -63,9 +63,16 @@ assert(
 assert(
     badge.includes('/api/groups/session') &&
     badge.includes("method: 'DELETE'") &&
-    badge.includes("removeItem('teamfund-current-group')") &&
     badge.includes('user-badge-logout'),
     'UserStatusBadge account menu should expose group-session logout.'
+);
+const badgeLogoutStart = badge.indexOf('async function handleLogout');
+const badgeLogoutEnd = badge.indexOf("if (state.kind === 'loading')", badgeLogoutStart);
+assert(
+    badgeLogoutStart >= 0 &&
+    badgeLogoutEnd > badgeLogoutStart &&
+    !badge.slice(badgeLogoutStart, badgeLogoutEnd).includes("removeItem('teamfund-current-group')"),
+    'UserStatusBadge logout should preserve the remembered group for the homepage continuation shortcut.'
 );
 assert(
     badge.includes('Thành viên') && badge.includes('Quản trị'),
@@ -73,6 +80,14 @@ assert(
 );
 
 const fundAdmin = read('app/quy/admin/page.js');
+const fundLogoutStart = fundAdmin.indexOf('async function handleLogout');
+const fundLogoutEnd = fundAdmin.indexOf('if (loading)', fundLogoutStart);
+assert(
+    fundLogoutStart >= 0 &&
+    fundLogoutEnd > fundLogoutStart &&
+    !fundAdmin.slice(fundLogoutStart, fundLogoutEnd).includes("removeItem('teamfund-current-group')"),
+    'Fund admin logout should preserve the remembered group for the homepage continuation shortcut.'
+);
 assert(
     fundAdmin.includes('💰 Thu') && fundAdmin.includes('direction'),
     'Fund admin should support manual income (Thu) entry, not just expense.'

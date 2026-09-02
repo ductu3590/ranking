@@ -86,7 +86,9 @@ Mutation có nguy cơ retry nhận `idempotency_key`. Record thường xuyên b�
 - Không tạo tài khoản cá nhân hoặc hồ sơ athlete mới.
 - Không tạo giải liên CLB.
 - Không xây rating hoặc ghép cân bằng.
-- Không redesign giao diện ngoài sửa cần thiết cho bảo mật và luồng public.
+- Không xây màn hình nghiệp vụ mới ngoài app shell, token, route guard, public
+  fallback và các sửa giao diện cần thiết cho bảo mật/regression. Các màn hình
+  còn lại triển khai theo lát cắt UI của phase tương ứng.
 
 ## 5. Migration strategy
 

@@ -25,11 +25,16 @@ Một thay đổi làm khác đi ranh giới module, mô hình sở hữu dữ l
    - [Phase 5 — Trình độ và ghép cân bằng](./05-phase-player-rating.md)
    - [Phase 6 — Mở rộng toàn quốc](./06-phase-national-scale.md)
 5. [Chiến lược giao diện](./UI-STRATEGY.md)
-6. [Nhật ký quyết định kiến trúc](./decisions/README.md)
+6. [Bộ nhận diện UI đã duyệt](./UI-BRAND-SYSTEM.md) và [đặc tả preview](./UI-PREVIEW-SPEC.md)
+7. [Kế hoạch tích hợp UI theo sáu phase](../superpowers/plans/2026-09-02-pickhub-ui-six-phase-integration.md)
+8. [Nhật ký quyết định kiến trúc](./decisions/README.md)
 
 ## Trạng thái hiện tại
 
-Blueprint đang ở trạng thái `awaiting_approval`. Chưa giai đoạn triển khai nào được phép bắt đầu cho đến khi bộ tài liệu này được duyệt và merge vào `main`.
+Blueprint đang ở trạng thái `awaiting_approval`. Design baseline UI đã được
+duyệt và khóa, nhưng việc đưa UI vào production vẫn tuân theo sáu phase, branch
+riêng, test evidence và merge gate; không được dùng preview để bỏ qua việc
+duyệt blueprint hoặc core phase.
 
 ## Quy tắc bất biến
 

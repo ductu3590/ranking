@@ -1,4 +1,4 @@
-# PickHub UI Brand System — bản nháp để duyệt
+# PickHub UI Brand System — baseline đã duyệt
 
 ## 1. Định vị
 
@@ -14,7 +14,7 @@ PickHub là không gian giúp các CLB pickleball vận hành minh bạch, kết
 4. Công bằng có thể giải thích: PHR, ghép cặp, bốc thăm và xếp hạng đều có dấu vết.
 5. Cộng đồng trước thành tích: giao diện khuyến khích tiến bộ và giao lưu, không tạo cảm giác phán xét.
 
-## 2. Draft visual direction
+## 2. Visual direction đã duyệt
 
 ### Màu thương hiệu nền tảng
 
@@ -83,6 +83,15 @@ Logo prototype dùng chữ **P** cách điệu bằng một quỹ đạo cong v�
 - Hỗ trợ `prefers-reduced-motion`.
 - Biểu đồ và BXH có bảng dữ liệu thay thế cho người dùng không phân biệt được màu.
 
-## 8. Review status
+## 8. Trạng thái và phạm vi hiệu lực
 
-Đây là định hướng thương hiệu và UI draft. Prototype trong cùng thư mục là vật liệu để duyệt hướng hình ảnh trước khi đưa token vào production components. Chưa đánh dấu là bộ nhận diện cuối cùng.
+Hướng hình ảnh được người phụ trách sản phẩm xác nhận ngày `2026-09-02` trên
+nhánh `codex/pickhub-ui-brand-preview`, commit `e147885`. Các token và quy tắc
+trong tài liệu này là baseline bắt buộc cho UI production của sáu phase.
+
+Prototype trong cùng thư mục là reference artifact đã được kiểm thử; nó không
+phải production route và không được gọi API thật. Mỗi phase sẽ đưa đúng lát
+cắt UI vào nhánh phase tương ứng, chạy test/evidence, chờ xác nhận rồi mới
+merge `main`. Chi tiết nằm trong
+[`UI-STRATEGY.md`](./UI-STRATEGY.md) và
+[`2026-09-02-pickhub-ui-six-phase-integration.md`](../superpowers/plans/2026-09-02-pickhub-ui-six-phase-integration.md).

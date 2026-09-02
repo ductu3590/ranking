@@ -159,7 +159,8 @@ Giao diện tham khảo trải nghiệm của source Giao Hữu nhưng dữ li�
 - Payment/refund, waitlist tự động, check-in và substitution nâng cao.
 - Rating tự động và tích hợp DUPR.
 - Full court/time optimizer.
-- Visual redesign toàn hệ thống.
+- Không big-bang redesign ngoài lát cắt UI giải liên CLB được mô tả ở mục 8;
+  các lát cắt vận hành, rating và community thuộc phase sau.
 
 ## 10. Test matrix bắt buộc
 
@@ -204,6 +205,9 @@ Giao diện tham khảo trải nghiệm của source Giao Hữu nhưng dữ li�
 - Evidence `evidence/phase-3-test-report.md` PASS.
 - Public archive hoạt động sau khi giải completed.
 
-## 12. Điều kiện mở Phase 4 và UI redesign
+## 12. Điều kiện mở Phase 4
 
-Phase 3 merge vào `main`, pilot retrospective được lưu và các workflow/API chính ổn định. Khi đó có thể tạo `codex/ui-redesign-foundation` theo chiến lược UI, đồng thời Phase 4 vẫn tuân nhánh core riêng.
+Phase 3 merge vào `main`, pilot retrospective được lưu và các workflow/API chính
+ổn định. Lát cắt UI Phase 3 phải đã dùng design baseline và có visual evidence;
+Phase 4 tiếp tục triển khai trên nhánh core riêng theo kế hoạch tích hợp UI sáu
+phase.

@@ -116,7 +116,9 @@ API route chỉ là adapter. Mọi use case trả audit metadata và stable erro
 - Athlete “Hồ sơ của tôi” tối thiểu.
 - Trạng thái forbidden và request-access rõ ràng.
 
-Đây là UI chức năng, chưa phải visual redesign.
+UI phase này dùng design baseline đã duyệt trong `UI-BRAND-SYSTEM.md`; chỉ triển
+khai đúng lát cắt identity/club, không đưa workflow giải hoặc rating của phase
+sau vào sớm.
 
 ## 9. Ngoài phạm vi
 

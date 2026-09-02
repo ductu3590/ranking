@@ -10,6 +10,11 @@
 
 **Spec:** `docs/pickhub-core/UI-BRAND-SYSTEM.md` and `docs/pickhub-core/UI-PREVIEW-SPEC.md`
 
+**Status:** Completed as a reference/design-lock artifact on `2026-09-02`;
+visual direction was approved in commit `e147885`. Production UI rollout is
+not a separate redesign project; it is embedded in the six phase branches as
+specified by [`2026-09-02-pickhub-ui-six-phase-integration.md`](./2026-09-02-pickhub-ui-six-phase-integration.md).
+
 ## Global Constraints
 
 - Preserve the club-first entry model and read-only club access code for members.
@@ -143,18 +148,18 @@ Expected: both commands exit 0.
 - Create: `docs/pickhub-core/evidence/ui-preview-review.md`
 
 **Interfaces:**
-- Records the preview branch, screenshots, verification commands and explicit approval status; production redesign remains blocked until the user reviews it.
+- Records the preview branch, screenshots, verification commands and explicit approval status; production rollout remains phase-gated even though the visual direction is approved.
 
-- [ ] **Step 1: Record preview status as awaiting review**
+- [x] **Step 1: Record preview status as approved design lock**
 
-Write the exact branch name, asset paths, and verification evidence. Do not mark the UI phase complete.
+Write the exact branch name, asset paths, verification evidence and approval date. Mark only the UI design-lock track complete; do not mark a core phase complete.
 
 - [ ] **Step 2: Run the final review checklist**
 
 Verify that all three contexts render, all links are local, no production API is called, and all required decisions are reflected.
 
-- [ ] **Step 3: Commit the isolated preview branch**
+- [x] **Step 3: Commit the isolated preview branch**
 
-Run: `git add docs/pickhub-core docs/superpowers/plans/2026-09-02-pickhub-ui-brand-preview.md output/playwright; git commit -m "feat: add PickHub brand and UI preview"`
+Completed with commit `e147885` on `codex/pickhub-ui-brand-preview`.
 
-Expected: one commit on `codex/pickhub-ui-brand-preview`; merge is deferred until the user approves the visual direction.
+Expected: one isolated reference commit; future production changes are merged only through the six phase branches after their own evidence and approval.

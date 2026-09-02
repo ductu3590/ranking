@@ -1,5 +1,10 @@
 # PickHub UI Preview Specification
 
+> Trạng thái: `approved` ngày `2026-09-02` trên nhánh
+> `codex/pickhub-ui-brand-preview`, commit `e147885`. Tài liệu này mô tả
+> reference artifact; triển khai production phải theo kế hoạch tích hợp sáu
+> phase và quality gate tương ứng.
+
 ## Mục đích
 
 Prototype này giúp xem trước một hệ thống giao diện thống nhất trước khi bắt đầu visual redesign production. Nó dùng dữ liệu giả lập, không gọi Supabase và không thay đổi route hiện có.
@@ -46,7 +51,7 @@ Prototype này giúp xem trước một hệ thống giao diện thống nhất 
 - Giải: PickHub Community Open, hai nội dung, vòng bảng và nhánh thắng/nhánh thua.
 - Kết quả: điểm trận có thể là 15–12; xử thua hiển thị 15–0 theo luật vòng.
 
-## Tiêu chí duyệt visual
+## Tiêu chí baseline đã đạt
 
 1. Không gian CLB, leader và public tournament nhận ra là cùng một sản phẩm.
 2. Ba chỉ số chính của thành viên đọc được trong vòng vài giây trên màn hình điện thoại.
@@ -56,9 +61,15 @@ Prototype này giúp xem trước một hệ thống giao diện thống nhất 
 6. Bracket có thể đọc được trên desktop; mobile ưu tiên trận hiện tại và cuộn ngang.
 7. Prototype không yêu cầu tài khoản VĐV, không gọi API và không tạo dữ liệu thật.
 
-## Câu hỏi sau preview
+## Checklist dùng lại khi nghiệm thu production
 
-- Màu và mức độ “thể thao” đã đủ mạnh nhưng vẫn khoa học chưa?
-- Thành viên có nhìn thấy đúng ba nội dung minh bạch ưu tiên không?
-- Dashboard trưởng nhóm có làm nổi bật việc cần xử lý không?
-- Trang giải có phù hợp vừa xem công khai vừa trình chiếu tại sân không?
+- Màu và mức độ “thể thao” vẫn đúng palette sáng, không xuất hiện surface nền
+  đen/navy đặc.
+- Thành viên vẫn nhìn thấy đúng BXH đóng quỹ, tổng quan quỹ và tổng số thành
+  viên/phân bổ trình độ trong luồng phù hợp.
+- Tab `BXH` vẫn ở giữa năm tab của thành viên; tab `Thông tin` hiển thị hồ sơ,
+  PHR cá nhân, lịch sử và các CLB đang sinh hoạt.
+- Dashboard trưởng nhóm vẫn làm nổi bật thu–chi, thành viên và việc cần xử lý.
+- Trang giải vẫn phù hợp để xem công khai trên mobile và trình chiếu tại bàn
+  BTC trên desktop.
+- Mọi theme override giữ tương phản, focus, touch target và privacy boundary.

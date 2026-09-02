@@ -17,12 +17,14 @@
     "merge_commit": null
   },
   "ui_preview": {
-    "status": "awaiting_approval",
+    "status": "completed",
     "branch": "codex/pickhub-ui-brand-preview",
     "evidence": "docs/pickhub-core/evidence/ui-preview-review.md",
-    "approved_at": null,
-    "completion_commit": null,
-    "merge_commit": null
+    "approved_at": "2026-09-02",
+    "approved_by": "product-owner",
+    "completion_commit": "e147885",
+    "merge_commit": null,
+    "rollout_policy": "phase-embedded"
   },
   "phases": [
     {
@@ -98,5 +100,19 @@
       "merge_commit": null
     }
   ],
-  "completion_history": []
+  "completion_history": [
+    {
+      "type": "ui_design_lock",
+      "id": "ui-preview",
+      "name": "PickHub UI Brand & Preview",
+      "status": "completed",
+      "branch": "codex/pickhub-ui-brand-preview",
+      "approved_by": "product-owner",
+      "approved_at": "2026-09-02",
+      "completion_commit": "e147885",
+      "merge_commit": null,
+      "evidence": "docs/pickhub-core/evidence/ui-preview-review.md",
+      "notes": "Visual direction approved; production UI rollout is embedded in phases 1-6."
+    }
+  ]
 }

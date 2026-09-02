@@ -5,7 +5,10 @@
 - Branch: `codex/pickhub-ui-brand-preview`
 - Worktree: `C:\Users\ductu\ranking\.worktrees\pickhub-ui-brand-preview`
 - Scope: brand system + static member/leader/public tournament preview.
-- Status: `awaiting_approval`; chưa merge vào `main` và chưa đánh dấu phase core completed.
+- Status: `completed` — visual direction đã được người phụ trách sản phẩm xác
+  nhận ngày `2026-09-02`. Đây là design-lock track, không phải một phase core;
+  preview chưa được dùng để bypass migration, authorization hoặc quality gate.
+- Completion commit: `e147885`.
 
 ## Artifacts
 
@@ -39,4 +42,8 @@
 - Bản màu mới dùng tím/lavender, vàng pastel, coral và cyan nhạt; các surface nền đen/navy đã được thay bằng nền sáng.
 - Leader dashboard đưa thu–chi, thành viên và việc cần xử lý lên trung tâm.
 - Bracket public là bản minh họa double elimination với scroll ngang ở mobile.
-- Cần người phụ trách sản phẩm duyệt màu, mức độ thể thao, wording và ưu tiên thông tin trước khi tách component production.
+- Visual direction đã được duyệt: nền sáng, palette tím/lavender làm chủ đạo,
+  vàng pastel/coral/cyan làm accent; không dùng surface nền đen hoặc navy đặc.
+- Wording và hierarchy đã được duyệt cho các màn hình preview. Component
+  production sẽ được tách theo lát cắt UI của Phase 1–6 và nghiệm thu ở nhánh
+  phase tương ứng.

@@ -38,8 +38,10 @@ assert(
 
 const navSrc = read('components/MobileBottomNav.js');
 assert(
-    navSrc.includes('getCurrentGroupClient') && !navSrc.includes('supabase.auth'),
-    'MobileBottomNav should derive role from the group session, not Supabase Auth.'
+    navSrc.includes('/api/groups/session') &&
+    !navSrc.includes('getCurrentGroupClient') &&
+    !navSrc.includes('supabase.auth'),
+    'MobileBottomNav should derive role from the signed session API, not browser or Supabase auth state.'
 );
 
 const settingsRoute = read('app/api/club/settings/route.js');

@@ -54,8 +54,9 @@ assert(
 );
 
 assert(
-    homeHeaderJs.includes('GLOBAL_NAV_LINKS') && mobileBottomNavJs.includes('GLOBAL_NAV_LINKS'),
-    'Desktop and mobile navigation should render the same global menu definition.'
+    homeHeaderJs.includes('GLOBAL_NAV_LINKS') &&
+    mobileBottomNavJs.includes('getGlobalNavLinksForRole'),
+    'Desktop and mobile navigation should derive their links from the shared global menu definition.'
 );
 
 assert(

@@ -1,16 +1,18 @@
 'use client';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { getCurrentGroupClient } from '@/lib/groupClient';
+import fundDashboardUtils from '@/lib/fundDashboard';
 import './page.css';
 
+const { buildFundEventPanel } = fundDashboardUtils;
 
 export default function HomePage() {
     const [isAdmin, setIsAdmin] = useState(false);
-    const [activeTab, setActiveTab] = useState('events');
 
     // Transactions state
     const [transactions, setTransactions] = useState([]);
     const [loadingTx, setLoadingTx] = useState(true);
+    const [txError, setTxError] = useState('');
     const [filterDirection, setFilterDirection] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
     const [txPage, setTxPage] = useState(1);
@@ -20,7 +22,9 @@ export default function HomePage() {
     const [events, setEvents] = useState([]);
     const [members, setMembers] = useState([]);
     const [loadingEvents, setLoadingEvents] = useState(true);
+    const [eventsError, setEventsError] = useState('');
     const [expandedEvent, setExpandedEvent] = useState(null);
+    const [showMoreEvents, setShowMoreEvents] = useState(false);
 
     // Create Event modal
     const [showCreateModal, setShowCreateModal] = useState(false);
@@ -51,10 +55,19 @@ export default function HomePage() {
 
     async function loadTransactions() {
         setLoadingTx(true);
-        const res = await fetch('/api/club/transactions');
-        const data = await res.json();
-        setTransactions(res.ok ? (data.transactions || []) : []);
-        setLoadingTx(false);
+        setTxError('');
+        try {
+            const res = await fetch('/api/club/transactions');
+            if (!res.ok) throw new Error('Máy chủ không phản hồi dữ liệu giao dịch.');
+            const data = await res.json();
+            setTransactions(data.transactions || []);
+        } catch (error) {
+            console.error('Không thể tải giao dịch:', error);
+            setTxError('Không thể tải lịch sử giao dịch. Vui lòng thử lại.');
+            setTransactions([]);
+        } finally {
+            setLoadingTx(false);
+        }
     }
 
     const filteredTx = transactions.filter(t => {
@@ -77,14 +90,35 @@ export default function HomePage() {
     };
     stats.balance = stats.totalIn - stats.totalOut;
 
+    const {
+        featuredEvent,
+        otherActiveEvents,
+        archivedEvents,
+        secondaryEvents,
+        visibleEvents,
+        showPanel: showEventPanel,
+    } = useMemo(
+        () => buildFundEventPanel(events, showMoreEvents),
+        [events, showMoreEvents]
+    );
+
     // ─── Fund Events ─────────────────────────────────────────────
 
     async function loadEvents() {
         setLoadingEvents(true);
-        const res = await fetch('/api/club/events');
-        const data = await res.json();
-        setEvents(res.ok ? (data.events || []) : []);
-        setLoadingEvents(false);
+        setEventsError('');
+        try {
+            const res = await fetch('/api/club/events');
+            if (!res.ok) throw new Error('Máy chủ không phản hồi dữ liệu sự kiện.');
+            const data = await res.json();
+            setEvents(data.events || []);
+        } catch (error) {
+            console.error('Không thể tải sự kiện:', error);
+            setEventsError('Không thể tải sự kiện. Vui lòng thử lại.');
+            setEvents([]);
+        } finally {
+            setLoadingEvents(false);
+        }
     }
 
     async function loadMembers() {
@@ -210,6 +244,34 @@ export default function HomePage() {
         <div className="home-dark">
             <div className="home-main">
 
+                <header className="dashboard-header">
+                    <div>
+                        <span className="section-eyebrow">TỔNG QUAN QUỸ</span>
+                        <h1>Dòng tiền minh bạch, dễ theo dõi</h1>
+                        <p>Giao dịch mới nhất được hiển thị ngay trên màn hình chính.</p>
+                    </div>
+                    <div className="dashboard-actions">
+                        {!featuredEvent && archivedEvents.length > 0 && (
+                            <button
+                                type="button"
+                                className="btn-event-history"
+                                aria-expanded={showMoreEvents}
+                                aria-controls="fund-event-panel"
+                                onClick={() => setShowMoreEvents((current) => !current)}
+                            >
+                                {showMoreEvents
+                                    ? 'Ẩn sự kiện cũ'
+                                    : `Sự kiện đã qua (${archivedEvents.length})`}
+                            </button>
+                        )}
+                        {isAdmin && (
+                            <button className="btn-create" onClick={() => setShowCreateModal(true)}>
+                                + Tạo sự kiện
+                            </button>
+                        )}
+                    </div>
+                </header>
+
                 {/* Stats */}
                 <div className="stats-grid">
                     <div className="stat-card balance-card">
@@ -217,66 +279,57 @@ export default function HomePage() {
                         <div className="stat-info">
                             <div className="stat-label">Số dư quỹ</div>
                             <div className={`stat-value ${stats.balance >= 0 ? 'positive' : 'negative'}`}>
-                                {formatMoney(stats.balance)}
+                                {txError ? '—' : formatMoney(stats.balance)}
                             </div>
                         </div>
                     </div>
                     <div className="stat-card">
                         <div className="stat-icon in-icon">⬇️</div>
                         <div className="stat-info">
-                            <div className="stat-label">Tiền vào</div>
-                            <div className="stat-value positive">{formatMoney(stats.totalIn)}</div>
+                            <div className="stat-label">Tổng thu</div>
+                            <div className="stat-value positive">{txError ? '—' : formatMoney(stats.totalIn)}</div>
                         </div>
                     </div>
                     <div className="stat-card">
                         <div className="stat-icon out-icon">⬆️</div>
                         <div className="stat-info">
-                            <div className="stat-label">Tiền ra</div>
-                            <div className="stat-value negative">{formatMoney(stats.totalOut)}</div>
+                            <div className="stat-label">Tổng chi</div>
+                            <div className="stat-value negative">{txError ? '—' : formatMoney(stats.totalOut)}</div>
                         </div>
                     </div>
                 </div>
 
-                {/* Tabs */}
-                <div className="tab-bar">
-                    <button
-                        className={`tab-btn ${activeTab === 'events' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('events')}
-                    >
-                        📋 Sự kiện đóng quỹ
-                    </button>
-                    <button
-                        className={`tab-btn ${activeTab === 'transactions' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('transactions')}
-                    >
-                        📑 Lịch sử giao dịch
-                    </button>
-                </div>
+                <div className={`fund-dashboard-grid ${(loadingEvents || showEventPanel || eventsError) ? 'has-event' : ''}`}>
 
-                {/* ── Tab: Sự kiện đóng quỹ ── */}
-                {activeTab === 'events' && (
-                    <div className="tab-content">
-                        {/* Admin: Tạo sự kiện */}
-                        {isAdmin && (
-                            <div className="admin-bar">
-                                <span className="admin-note">👑 Chế độ admin</span>
-                                <button className="btn-create" onClick={() => setShowCreateModal(true)}>
-                                    + Tạo sự kiện đóng quỹ
-                                </button>
+                {/* ── Sự kiện cần theo dõi ── */}
+                {(loadingEvents || showEventPanel || eventsError) && (
+                    <aside className="tab-content fund-event-panel" id="fund-event-panel">
+                        <div className="section-heading compact">
+                            <div>
+                                <span className="section-eyebrow">
+                                    {eventsError ? 'KHÔNG KẾT NỐI ĐƯỢC' : featuredEvent ? 'CẦN THEO DÕI' : 'LỊCH SỬ'}
+                                </span>
+                                <h2>{eventsError ? 'Không thể tải sự kiện' : featuredEvent ? 'Sự kiện đang thu' : 'Sự kiện đã qua'}</h2>
                             </div>
-                        )}
+                            {!loadingEvents && !eventsError && (
+                                <span className="event-active-count">
+                                    {featuredEvent
+                                        ? `${1 + otherActiveEvents.length} hoạt động`
+                                        : `${archivedEvents.length} đã qua`}
+                                </span>
+                            )}
+                        </div>
 
                         {loadingEvents ? (
                             <div className="loading-state">⏳ Đang tải sự kiện...</div>
-                        ) : events.length === 0 ? (
-                            <div className="empty-state">
-                                <div className="empty-icon">📋</div>
-                                <p>Chưa có sự kiện đóng quỹ nào</p>
-                                {isAdmin && <p className="empty-hint">Nhấn &quot;+ Tạo sự kiện đóng quỹ&quot; để bắt đầu</p>}
+                        ) : eventsError ? (
+                            <div className="data-error-state">
+                                <p>{eventsError}</p>
+                                <button type="button" className="btn-retry" onClick={loadEvents}>Thử lại</button>
                             </div>
                         ) : (
                             <div className="events-list">
-                                {events.map(event => {
+                                {visibleEvents.map((event, eventIndex) => {
                                     const participants = event.fund_event_participants || [];
                                     const paidCount = participants.filter(p => p.has_paid).length;
                                     const total = participants.length;
@@ -284,12 +337,9 @@ export default function HomePage() {
                                     const isExpanded = expandedEvent === event.id;
 
                                     return (
-                                        <div key={event.id} className="event-card">
+                                        <div key={event.id} className={`event-card ${eventIndex === 0 ? 'featured-event' : ''}`}>
                                             {/* Event header */}
-                                            <div
-                                                className="event-header"
-                                                onClick={() => setExpandedEvent(isExpanded ? null : event.id)}
-                                            >
+                                            <div className="event-header">
                                                 <div className="event-meta">
                                                     <h3 className="event-title">{event.title}</h3>
                                                     <div className="event-details">
@@ -310,10 +360,13 @@ export default function HomePage() {
                                                 </div>
 
                                                 <div className="event-progress-wrap">
-                                                    <div className="event-count">
-                                                        <span className="paid-count">{paidCount}</span>
-                                                        <span className="total-count">/{total}</span>
-                                                        <span className="paid-label"> đã đóng</span>
+                                                    <div className="event-progress-top">
+                                                        <div className="event-count">
+                                                            <span className="paid-count">{paidCount}</span>
+                                                            <span className="total-count">/{total}</span>
+                                                            <span className="paid-label"> đã đóng</span>
+                                                        </div>
+                                                        <div className="progress-pct">{pct}%</div>
                                                     </div>
                                                     <div className="progress-bar-bg">
                                                         <div
@@ -321,21 +374,30 @@ export default function HomePage() {
                                                             style={{ width: `${pct}%` }}
                                                         />
                                                     </div>
-                                                    <div className="progress-pct">{pct}%</div>
-                                                    <span className="expand-icon">{isExpanded ? '▲' : '▼'}</span>
-                                                    <button
-                                                        className={`btn-share-event ${copiedEventId === event.id ? 'copied' : ''}`}
-                                                        onClick={(e) => handleShareEvent(e, event.id)}
-                                                        title="Chia sẻ link sự kiện"
-                                                    >
-                                                        {copiedEventId === event.id ? '✅ Đã sao chép!' : '🔗 Chia sẻ'}
-                                                    </button>
+                                                    <div className="event-inline-actions">
+                                                        <button
+                                                            type="button"
+                                                            className="expand-action"
+                                                            aria-expanded={isExpanded}
+                                                            aria-controls={`event-body-${event.id}`}
+                                                            onClick={() => setExpandedEvent(isExpanded ? null : event.id)}
+                                                        >
+                                                            {isExpanded ? 'Thu gọn ▲' : 'Chi tiết ▼'}
+                                                        </button>
+                                                        <button
+                                                            className={`btn-share-event ${copiedEventId === event.id ? 'copied' : ''}`}
+                                                            onClick={(e) => handleShareEvent(e, event.id)}
+                                                            title="Chia sẻ link sự kiện"
+                                                        >
+                                                            {copiedEventId === event.id ? 'Đã sao chép' : 'Chia sẻ'}
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
 
                                             {/* Member list (expanded) */}
                                             {isExpanded && (
-                                                <div className="event-body">
+                                                <div className="event-body" id={`event-body-${event.id}`}>
                                                     {isAdmin && (
                                                         <div className="event-actions">
                                                             <button
@@ -419,24 +481,48 @@ export default function HomePage() {
                                         </div>
                                     );
                                 })}
+                                {secondaryEvents.length > 0 && (
+                                    <button
+                                        type="button"
+                                        className="btn-more-events"
+                                        onClick={() => setShowMoreEvents((current) => !current)}
+                                    >
+                                        {showMoreEvents
+                                            ? 'Thu gọn sự kiện'
+                                            : `Xem thêm ${secondaryEvents.length} sự kiện`}
+                                    </button>
+                                )}
                             </div>
                         )}
-                    </div>
+                    </aside>
                 )}
 
-                {/* ── Tab: Lịch sử giao dịch ── */}
-                {activeTab === 'transactions' && (
-                    <div className="tab-content">
+                {/* ── Lịch sử giao dịch luôn hiển thị ── */}
+                    <section className="tab-content transactions-panel" aria-labelledby="transaction-heading">
+                        <div className="section-heading">
+                            <div>
+                                <span className="section-eyebrow">HOẠT ĐỘNG QUỸ</span>
+                                <h2 id="transaction-heading">Lịch sử giao dịch</h2>
+                                <p>{txError ? 'Dữ liệu giao dịch tạm thời không khả dụng' : `${transactions.length} giao dịch được ghi nhận`}</p>
+                            </div>
+                        </div>
+                        {txError && (
+                            <div className="data-error-state horizontal">
+                                <p>{txError}</p>
+                                <button type="button" className="btn-retry" onClick={loadTransactions}>Thử lại</button>
+                            </div>
+                        )}
                         {/* Filter bar */}
                         <div className="filter-bar">
                             {[
-                                { key: 'all', label: `📋 Tất cả (${transactions.length})` },
-                                { key: 'in', label: `⬇️ Tiền vào (${transactions.filter(t => t.huong_giao_dich === 'in').length})` },
-                                { key: 'out', label: `⬆️ Tiền ra (${transactions.filter(t => t.huong_giao_dich === 'out').length})` },
+                                { key: 'all', label: `Tất cả ${txError ? '—' : transactions.length}` },
+                                { key: 'in', label: `Tiền vào ${txError ? '—' : transactions.filter(t => t.huong_giao_dich === 'in').length}` },
+                                { key: 'out', label: `Tiền ra ${txError ? '—' : transactions.filter(t => t.huong_giao_dich === 'out').length}` },
                             ].map(f => (
                                 <button
                                     key={f.key}
                                     className={`filter-btn ${filterDirection === f.key ? 'active' : ''}`}
+                                    disabled={Boolean(txError)}
                                     onClick={() => { setFilterDirection(f.key); setTxPage(1); }}
                                 >
                                     {f.label}
@@ -446,13 +532,16 @@ export default function HomePage() {
 
                         {/* Search */}
                         <div className="search-bar">
-                            <input
-                                type="text"
-                                placeholder="🔍 Tìm theo nội dung, người gửi, mã GD..."
-                                value={searchQuery}
-                                onChange={e => { setSearchQuery(e.target.value); setTxPage(1); }}
-                                className="search-input"
-                            />
+                            <div className="search-input-wrap">
+                                <input
+                                    type="text"
+                                    placeholder="Tìm nội dung, người gửi, mã giao dịch..."
+                                    value={searchQuery}
+                                    disabled={Boolean(txError)}
+                                    onChange={e => { setSearchQuery(e.target.value); setTxPage(1); }}
+                                    className="search-input"
+                                />
+                            </div>
                             {searchQuery && (
                                 <div className="search-result-count">Tìm thấy {filteredTx.length} kết quả</div>
                             )}
@@ -461,37 +550,49 @@ export default function HomePage() {
                         {/* Transactions list */}
                         {loadingTx ? (
                             <div className="loading-state">⏳ Đang tải giao dịch...</div>
-                        ) : (
+                        ) : txError ? null : (
                             <>
                                 <div className="tx-list">
                                     {paginatedTx.map(t => (
-                                        <div key={t.id} className={`tx-item ${t.huong_giao_dich}`}>
-                                            <div className="tx-top">
-                                                <span className="tx-date">
-                                                    📅 {new Date(t.created_at).toLocaleString('vi-VN')}
+                                        <details key={t.id} className={`tx-item ${t.huong_giao_dich}`}>
+                                            <summary className="tx-summary">
+                                                <span className={`tx-direction-icon ${t.huong_giao_dich}`} aria-hidden="true">
+                                                    {t.huong_giao_dich === 'in' ? '↙' : '↗'}
+                                                </span>
+                                                <span className="tx-primary">
+                                                    <strong>{t.nguoi_nop || 'Không xác định'}</strong>
+                                                    <span className="tx-description">
+                                                        {t.noi_dung_goc || 'Không có nội dung'}
+                                                    </span>
+                                                    <span className="tx-date">
+                                                        {new Date(t.created_at).toLocaleString('vi-VN')}
+                                                    </span>
                                                 </span>
                                                 <span className={`tx-amount ${t.huong_giao_dich}`}>
-                                                    {t.huong_giao_dich === 'in' ? '+' : '-'}{t.so_tien?.toLocaleString()}đ
+                                                    {t.huong_giao_dich === 'in' ? '+' : '-'}
+                                                    {formatMoney(Math.abs(Number(t.so_tien) || 0))}
                                                 </span>
-                                            </div>
-                                            <div className="tx-body">
-                                                <div className="tx-row">
-                                                    <span className="tx-label">👤 Người gửi</span>
-                                                    <span className="tx-val">{t.nguoi_nop}</span>
+                                            </summary>
+                                            <div className="tx-detail">
+                                                <div className="tx-detail-copy">
+                                                    <div>
+                                                        <span className="tx-detail-label">Người giao dịch</span>
+                                                        <span>{t.nguoi_nop || 'Không xác định'}</span>
+                                                    </div>
+                                                    <div>
+                                                        <span className="tx-detail-label">Nội dung đầy đủ</span>
+                                                        <span>{t.noi_dung_goc || 'Không có nội dung'}</span>
+                                                    </div>
                                                 </div>
-                                                <div className="tx-row">
-                                                    <span className="tx-label">📝 Nội dung</span>
-                                                    <span className="tx-val content">{t.noi_dung_goc || 'Không có nội dung'}</span>
-                                                </div>
-                                                <div className="tx-footer">
+                                                <div className="tx-detail-meta">
                                                     <span className={`badge badge-${t.loai_giao_dich}`}>
-                                                        {t.loai_giao_dich === 'nop_phat' ? '🚨 Nộp phạt' :
-                                                            t.loai_giao_dich === 'nop_quy' ? '🏆 Nộp quỹ' : '📝 Khác'}
+                                                        {t.loai_giao_dich === 'nop_phat' ? 'Nộp phạt' :
+                                                            t.loai_giao_dich === 'nop_quy' ? 'Nộp quỹ' : 'Khác'}
                                                     </span>
-                                                    <span className="tx-code">🔢 {t.ma_giao_dich || 'N/A'}</span>
+                                                    <span className="tx-code">Mã GD: {t.ma_giao_dich || 'N/A'}</span>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </details>
                                     ))}
                                     {paginatedTx.length === 0 && (
                                         <div className="empty-state">
@@ -519,8 +620,8 @@ export default function HomePage() {
                                 )}
                             </>
                         )}
-                    </div>
-                )}
+                    </section>
+                </div>
             </div>
 
             {/* ── Modal tạo sự kiện ── */}

@@ -9,6 +9,7 @@ import {
     publicGroupPayload,
 } from '@/lib/groupAuth';
 import { setGroupSessionCookie, signGroupSession } from '@/lib/groupSession';
+import { consumeRateLimit, getClientIdentifier, rateLimitResponse } from '@/lib/rateLimit';
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -29,6 +30,12 @@ async function createUniqueGroupCode() {
 
 export async function POST(request) {
     try {
+        const rate = consumeRateLimit(
+            `group-create:${getClientIdentifier(request)}`,
+            { limit: 5, windowMs: 5 * 60_000 },
+        );
+        if (!rate.allowed) return rateLimitResponse(rate);
+
         const body = await request.json();
         const name = String(body?.name || '').trim();
         const description = String(body?.description || '').trim();

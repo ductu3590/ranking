@@ -120,7 +120,13 @@ export default function PublicTournamentPage({ params }) {
             setStandingsByStage(snapshot.standingsByStage || {});
             return true;
         } catch (err) {
-            if (!background) setError(err.message || 'Không tải được dữ liệu giải đấu.');
+            if (background && err.status === 404) {
+                setData(null);
+                setStandingsByStage({});
+                setError(err.message || 'Giải đấu không tồn tại.');
+            } else if (!background) {
+                setError(err.message || 'Không tải được dữ liệu giải đấu.');
+            }
             return false;
         } finally {
             if (!background) setLoading(false);

@@ -11,4 +11,5 @@ assert(!s.includes('supabaseClient') && !s.includes("from '@/lib/supabaseClient'
 assert(!s.includes('.channel(') && !s.includes('postgres_changes'), 'không subscribe realtime broad channel');
 assert(s.includes('nextPollingDelay'), 'polling adaptive có backoff');
 assert(s.includes('standingsByStage') && s.includes('gamesByMatchId'), 'dùng standings/game từ snapshot');
+assert(s.includes('err.status === 404') && s.includes('setData(null)'), 'xóa snapshot stale khi link bị thu hồi');
 console.log('ui-public contract ok');

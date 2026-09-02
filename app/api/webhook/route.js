@@ -22,7 +22,10 @@ export async function POST(req) {
 
         const amount = data.transferAmount || 0;
         const content = data.content || data.transferContent || '';
-        const reference = data.referenceCode || data.code || String(data.id || '');
+        const reference = String(data.referenceCode || data.code || data.id || '').trim();
+        if (!reference.trim()) {
+            return NextResponse.json({ message: 'Missing transaction reference' }, { status: 422 });
+        }
         const accountName = data.description || data.accountName || '';
         const huongGiaoDich = data.transferType === 'out' ? 'out' : 'in';
 

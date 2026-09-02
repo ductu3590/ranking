@@ -137,6 +137,20 @@ GROUP BY group_id, lower(regexp_replace(btrim(full_name), '\s+', ' ', 'g'))
 HAVING count(*) > 1
 ORDER BY group_id, normalized_name;
 
+-- 5b. Webhook idempotency key collisions. Migration 023 aborts rather than
+-- selecting one row when a reference has already been duplicated.
+SELECT
+    group_id,
+    lower(btrim(ma_giao_dich)) AS normalized_transaction_reference,
+    count(*) AS duplicate_count,
+    array_agg(id ORDER BY id) AS transaction_ids
+FROM public.quy_pickleball
+WHERE ma_giao_dich IS NOT NULL
+  AND btrim(ma_giao_dich) <> ''
+GROUP BY group_id, lower(btrim(ma_giao_dich))
+HAVING count(*) > 1
+ORDER BY group_id, normalized_transaction_reference;
+
 -- 6. Orphan và cross-tenant rows ở mô hình giải đấu/fund hiện tại.
 WITH violations AS (
     SELECT 'fund_event_participants.event_id' AS relation_name, count(*) AS violation_count

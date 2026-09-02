@@ -114,6 +114,11 @@
       "version": 22,
       "filename": "022_fund_participant_tenancy.sql",
       "checksum": "508887e12f436bd6e95fc6fb0ae0629c65b89bd6f14e81ea266556082e98e9a0"
+    },
+    {
+      "version": 23,
+      "filename": "023_webhook_idempotency.sql",
+      "checksum": "793512fe0d9858950f1b10d0a3773afd5a0a985de12d98cf5e3a219596c52924"
     }
   ],
   "duplicateVersions": [

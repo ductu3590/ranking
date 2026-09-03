@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "architecture_version": "1.0.0",
-  "active_phase": 1,
+  "active_phase": 2,
   "access_model": {
     "status": "club-code-password",
     "decision": "docs/pickhub-core/decisions/ADR-003-club-code-password-first-access.md",
@@ -57,13 +57,13 @@
     {
       "id": 2,
       "name": "identity-clubs",
-      "status": "not_started",
-      "branch": "codex/phase-2-identity-clubs",
+      "status": "awaiting_approval",
+      "branch": "codex/pickhub-ui-brand-preview",
       "depends_on": [1],
-      "evidence": null,
+      "evidence": "evidence/phase-2-test-report.md",
       "approved_by": null,
       "completed_at": null,
-      "completion_commit": null,
+      "completion_commit": "97514ed",
       "merge_commit": null
     },
     {

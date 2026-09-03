@@ -1,0 +1,63 @@
+# Phase 1 schema preflight — production after migration 025
+
+This evidence is retained for the post-025 checkpoint; the current checkpoint
+after follow-up migrations 026–027 is
+`phase-1-schema-preflight-production-post-027.txt`.
+
+Environment: Supabase `Ranking 246 / main PRODUCTION`
+Executed through Supabase MCP on 2026-09-03 after migration 025 and ledger registration.
+
+The complete `database/audits/phase-1-schema-preflight.sql` batch completed
+without a SQL error. The MCP multi-statement response exposes the final result
+set, so the integrity counters below were also run as a separate read-only
+verification query.
+
+## Integrity counters
+
+| check | metric | value |
+| --- | --- | ---: |
+| member_origin | entrant_member_rows | 56 |
+| member_origin | missing_member_group_id | 0 |
+| member_origin | guest_with_member_group_id | 0 |
+| member_origin | member_origin_mismatch | 0 |
+| duplicates | member_duplicate_groups | 0 |
+| duplicates | webhook_duplicate_groups | 0 |
+| tenant_nulls | total_null_group_id | 0 |
+| relations | total_checked_violations | 0 |
+| schema | member_group_column | present |
+| schema | composite_member_fk | present |
+| schema | old_member_fk | absent |
+| schema | origin_trigger | present |
+| ledger | migration_025_rows | 1 |
+| rls | public_tables_with_rls_disabled | 0 |
+
+## Section 10 — RLS flags
+
+| table_name | rls_enabled | force_rls |
+| --- | --- | --- |
+| club_members | true | false |
+| fund_event_participants | true | false |
+| fund_events | true | false |
+| gh_clubs | true | false |
+| gh_draws | true | false |
+| gh_matches | true | false |
+| gh_pairs | true | false |
+| gh_rounds | true | false |
+| gh_secrets | true | false |
+| gh_settings | true | false |
+| group_bank_accounts | true | false |
+| group_members | true | false |
+| groups | true | false |
+| pickhub_mutation_idempotency | true | false |
+| pickhub_schema_migrations | true | false |
+| quy_pickleball | true | false |
+| ranking_snapshots | true | false |
+| tournament_entrant_members | true | false |
+| tournament_entrants | true | false |
+| tournament_games | true | false |
+| tournament_matches | true | false |
+| tournament_stage_entrants | true | false |
+| tournament_stages | true | false |
+| tournaments | true | false |
+
+Result: production schema and data integrity checks pass after migration 025.

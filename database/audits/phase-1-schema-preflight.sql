@@ -5,38 +5,44 @@
 BEGIN TRANSACTION READ ONLY;
 
 -- 1. Inventory và phân loại ownership của các bảng phải có trong Phase 1.
-WITH expected(table_name, data_scope, tenant_column_required) AS (
+WITH expected(table_name, data_scope, tenant_column_required, member_origin_column_required) AS (
     VALUES
-        ('groups', 'platform', false),
-        ('group_members', 'club', true),
-        ('group_bank_accounts', 'club', true),
-        ('club_members', 'club', true),
-        ('quy_pickleball', 'club', true),
-        ('ranking_snapshots', 'club', true),
-        ('fund_events', 'club', true),
-        ('fund_event_participants', 'club', true),
-        ('tournaments', 'club', true),
-        ('tournament_stages', 'club', true),
-        ('tournament_entrants', 'club', true),
-        ('tournament_entrant_members', 'club', true),
-        ('tournament_stage_entrants', 'club', true),
-        ('tournament_matches', 'club', true),
-        ('tournament_games', 'club', true),
-        ('pickhub_schema_migrations', 'platform', false)
+        ('groups', 'platform', false, false),
+        ('group_members', 'club', true, false),
+        ('group_bank_accounts', 'club', true, false),
+        ('club_members', 'club', true, false),
+        ('quy_pickleball', 'club', true, false),
+        ('ranking_snapshots', 'club', true, false),
+        ('fund_events', 'club', true, false),
+        ('fund_event_participants', 'club', true, false),
+        ('tournaments', 'club', true, false),
+        ('tournament_stages', 'club', true, false),
+        ('tournament_entrants', 'club', true, false),
+        ('tournament_entrant_members', 'club', true, true),
+        ('tournament_stage_entrants', 'club', true, false),
+        ('tournament_matches', 'club', true, false),
+        ('tournament_games', 'club', true, false),
+        ('pickhub_schema_migrations', 'platform', false, false)
 )
 SELECT
     expected.table_name,
     expected.data_scope,
     expected.tenant_column_required,
+    expected.member_origin_column_required,
     to_regclass(format('public.%I', expected.table_name)) IS NOT NULL AS table_exists,
-    columns.column_name IS NOT NULL AS has_group_id,
-    columns.is_nullable AS group_id_nullable,
-    columns.data_type AS group_id_type
+    group_columns.column_name IS NOT NULL AS has_group_id,
+    group_columns.is_nullable AS group_id_nullable,
+    group_columns.data_type AS group_id_type,
+    member_origin_columns.column_name IS NOT NULL AS has_member_group_id
 FROM expected
-LEFT JOIN information_schema.columns AS columns
-    ON columns.table_schema = 'public'
-   AND columns.table_name = expected.table_name
-   AND columns.column_name = 'group_id'
+LEFT JOIN information_schema.columns AS group_columns
+    ON group_columns.table_schema = 'public'
+   AND group_columns.table_name = expected.table_name
+   AND group_columns.column_name = 'group_id'
+LEFT JOIN information_schema.columns AS member_origin_columns
+    ON member_origin_columns.table_schema = 'public'
+   AND member_origin_columns.table_name = expected.table_name
+   AND member_origin_columns.column_name = 'member_group_id'
 ORDER BY expected.table_name;
 
 -- 2. Migration ledger presence. So sánh checksum bằng JSON/SQL do
@@ -125,6 +131,30 @@ SELECT
     END AS null_group_id
 FROM public.ranking_snapshots;
 
+-- 4b. Member origin belongs to the member's club, not the tournament owner.
+-- `to_jsonb` keeps the audit readable before migration 025 adds the column.
+SELECT
+    count(*) AS entrant_member_rows,
+    count(*) FILTER (
+        WHERE member_id IS NOT NULL
+          AND (to_jsonb(tournament_entrant_members)->>'member_group_id') IS NULL
+    ) AS missing_member_group_id,
+    count(*) FILTER (
+        WHERE member_id IS NULL
+          AND (to_jsonb(tournament_entrant_members)->>'member_group_id') IS NOT NULL
+    ) AS guest_with_member_group_id,
+    count(*) FILTER (
+        WHERE member_id IS NOT NULL
+          AND member.id IS NULL
+    ) AS member_origin_mismatch
+FROM public.tournament_entrant_members
+LEFT JOIN public.club_members AS member
+  ON member.id = tournament_entrant_members.member_id
+ AND member.group_id = NULLIF(
+     to_jsonb(tournament_entrant_members)->>'member_group_id',
+     ''
+ )::bigint;
+
 -- 5. Duplicate tên trong cùng CLB. Tên không phải identity, nhưng policy hiện
 -- tại vẫn cần xác định rõ trước khi thay global unique constraint.
 SELECT
@@ -187,9 +217,23 @@ WITH violations AS (
     UNION ALL
     SELECT 'tournament_entrant_members.member_id', count(*)
     FROM public.tournament_entrant_members AS child
-    LEFT JOIN public.club_members AS parent ON parent.id = child.member_id
+    LEFT JOIN public.club_members AS parent
+      ON parent.id = child.member_id
+     AND (
+         NOT EXISTS (
+             SELECT 1
+             FROM information_schema.columns
+             WHERE table_schema = 'public'
+               AND table_name = 'tournament_entrant_members'
+               AND column_name = 'member_group_id'
+         )
+         OR parent.group_id = NULLIF(
+             to_jsonb(child)->>'member_group_id',
+             ''
+         )::bigint
+     )
     WHERE child.member_id IS NOT NULL
-      AND (parent.id IS NULL OR child.group_id IS DISTINCT FROM parent.group_id)
+      AND parent.id IS NULL
 
     UNION ALL
     SELECT 'tournament_stage_entrants.stage_id', count(*)

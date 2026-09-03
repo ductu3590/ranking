@@ -124,6 +124,21 @@
       "version": 24,
       "filename": "024_atomic_stage_advance.sql",
       "checksum": "db8b3a5da2498982a7313754fe4c6de52034b81999c5ba9e2fb1235baef578aa"
+    },
+    {
+      "version": 25,
+      "filename": "025_tournament_member_origin.sql",
+      "checksum": "1295471e85a685ce1852a2b179568b7f221d9c65f9cbf73cefee754180ea6714"
+    },
+    {
+      "version": 26,
+      "filename": "026_harden_member_origin_trigger.sql",
+      "checksum": "ae3fe2986d3aac0cadb1d1dd063b6e1dc70764280e57f68554b3bc8c620b42e3"
+    },
+    {
+      "version": 27,
+      "filename": "027_index_member_origin_fk.sql",
+      "checksum": "4eb2303ed5c28199e0d9752fa9169b176ab2ad0932429458497d51d8d177c842"
     }
   ],
   "duplicateVersions": [

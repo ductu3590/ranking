@@ -20,11 +20,11 @@
     {
       "id": 1,
       "name": "foundation-hardening",
-      "status": "in_progress",
+      "status": "awaiting_approval",
       "branch": "codex/phase-1-foundation-hardening",
       "depends_on": ["core-blueprint"],
-      "evidence": null,
-      "approved_by": null,
+      "evidence": "evidence/phase-1-test-report.md",
+      "approved_by": "product owner smoke confirmation (2026-09-03)",
       "completed_at": null,
       "completion_commit": null,
       "merge_commit": null

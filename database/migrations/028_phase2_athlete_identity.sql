@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS public.athletes (
   status text NOT NULL DEFAULT 'unclaimed'
     CHECK (status IN ('unclaimed', 'linked', 'merged', 'restricted', 'deleted')),
   merged_into_athlete_id bigint REFERENCES public.athletes(id) ON DELETE RESTRICT,
-  legacy_club_member_id bigint UNIQUE REFERENCES public.club_members(id) ON DELETE RESTRICT,
+  legacy_club_member_id bigint UNIQUE REFERENCES public.club_members(id) ON DELETE SET NULL,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   CHECK (
@@ -68,6 +68,7 @@ CREATE TABLE IF NOT EXISTS public.club_member_athlete_map (
   legacy_club_member_id bigint NOT NULL UNIQUE,
   club_id bigint NOT NULL REFERENCES public.groups(id) ON DELETE RESTRICT,
   athlete_id bigint NOT NULL REFERENCES public.athletes(id) ON DELETE RESTRICT,
+  source_athlete_id bigint NOT NULL UNIQUE,
   club_membership_id bigint NOT NULL UNIQUE
     REFERENCES public.club_memberships(id) ON DELETE RESTRICT,
   migrated_at timestamptz NOT NULL DEFAULT now(),
@@ -79,7 +80,11 @@ CREATE TABLE IF NOT EXISTS public.club_member_athlete_map (
   CONSTRAINT club_member_athlete_map_membership_fk
     FOREIGN KEY (club_membership_id, club_id, athlete_id)
     REFERENCES public.club_memberships(id, club_id, athlete_id)
-    ON DELETE RESTRICT
+    ON DELETE RESTRICT,
+  CONSTRAINT club_member_athlete_map_source_athlete_fk
+    FOREIGN KEY (source_athlete_id) REFERENCES public.athletes(id) ON DELETE RESTRICT,
+  CONSTRAINT club_member_athlete_map_provenance_ck
+    CHECK (source_athlete_id = athlete_id)
 );
 
 CREATE TABLE IF NOT EXISTS public.membership_assessments (
@@ -89,7 +94,7 @@ CREATE TABLE IF NOT EXISTS public.membership_assessments (
   athlete_id bigint NOT NULL REFERENCES public.athletes(id) ON DELETE RESTRICT,
   assessed_at timestamptz NOT NULL DEFAULT now(),
   effective_from date NOT NULL DEFAULT current_date,
-  skill_level numeric(4, 2) CHECK (skill_level >= 0 AND skill_level <= 10),
+  skill_level numeric(4, 2) CHECK (skill_level >= 1.0 AND skill_level <= 5.0),
   source text NOT NULL DEFAULT 'club_admin'
     CHECK (source IN ('club_admin', 'verified_match', 'import', 'correction')),
   notes text,
@@ -202,9 +207,10 @@ INSERT INTO public.club_member_athlete_map (
   legacy_club_member_id,
   club_id,
   athlete_id,
+  source_athlete_id,
   club_membership_id
 )
-SELECT member.id, member.group_id, athlete.id, membership.id
+SELECT member.id, member.group_id, athlete.id, athlete.id, membership.id
 FROM public.club_members AS member
 JOIN public.athletes AS athlete ON athlete.legacy_club_member_id = member.id
 JOIN public.club_memberships AS membership
@@ -312,6 +318,83 @@ CREATE INDEX IF NOT EXISTS idx_tournament_entrant_members_identity
   ON public.tournament_entrant_members(club_membership_id, membership_club_id, athlete_id);
 CREATE INDEX IF NOT EXISTS idx_tournament_entrant_members_athlete
   ON public.tournament_entrant_members(athlete_id) WHERE athlete_id IS NOT NULL;
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_fund_event_participants_event_membership
+  ON public.fund_event_participants(event_id, club_membership_id)
+  WHERE club_membership_id IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_fund_event_participants_event_athlete
+  ON public.fund_event_participants(event_id, athlete_id)
+  WHERE athlete_id IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_fund_event_participants_event_member_legacy
+  ON public.fund_event_participants(event_id, member_id)
+  WHERE member_id IS NOT NULL;
+-- Legacy invariant remains: UNIQUE (event_id, member_id) for non-null member_id.
+
+CREATE OR REPLACE FUNCTION public.sync_club_member_identity()
+RETURNS trigger
+LANGUAGE plpgsql
+SET search_path = public
+AS $$
+DECLARE
+  mapped record;
+BEGIN
+  SELECT map.athlete_id, map.club_membership_id
+    INTO mapped
+  FROM public.club_member_athlete_map map
+  WHERE map.legacy_club_member_id = NEW.id;
+  IF mapped.athlete_id IS NULL THEN
+    INSERT INTO public.athletes (display_name, normalized_name, status, legacy_club_member_id)
+    VALUES (btrim(NEW.full_name), lower(regexp_replace(btrim(NEW.full_name), '\s+', ' ', 'g')), 'unclaimed', NEW.id)
+    RETURNING id INTO mapped.athlete_id;
+    INSERT INTO public.club_memberships (club_id, athlete_id, status, effective_from, joined_on, club_alias, primary_for_athlete)
+    VALUES (NEW.group_id, mapped.athlete_id, CASE WHEN NEW.is_active THEN 'active' ELSE 'inactive' END, COALESCE(NEW.created_at::date, current_date), NEW.created_at::date, btrim(NEW.full_name), true)
+    RETURNING id INTO mapped.club_membership_id;
+    INSERT INTO public.club_member_athlete_map (legacy_club_member_id, club_id, athlete_id, source_athlete_id, club_membership_id)
+    VALUES (NEW.id, NEW.group_id, mapped.athlete_id, mapped.athlete_id, mapped.club_membership_id);
+  ELSE
+    UPDATE public.athletes
+       SET display_name = btrim(NEW.full_name),
+           normalized_name = lower(regexp_replace(btrim(NEW.full_name), '\s+', ' ', 'g')),
+           updated_at = now()
+     WHERE id = mapped.athlete_id AND status NOT IN ('merged', 'deleted');
+    UPDATE public.club_memberships
+       SET status = CASE WHEN NEW.is_active THEN 'active' ELSE 'inactive' END,
+           club_alias = btrim(NEW.full_name), updated_at = now(), version = version + 1
+     WHERE id = mapped.club_membership_id;
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS club_members_sync_phase2_identity ON public.club_members;
+CREATE TRIGGER club_members_sync_phase2_identity
+AFTER INSERT OR UPDATE OF full_name, is_active, group_id ON public.club_members
+FOR EACH ROW EXECUTE FUNCTION public.sync_club_member_identity();
+
+CREATE OR REPLACE FUNCTION public.soft_delete_club_member()
+RETURNS trigger LANGUAGE plpgsql SET search_path = public AS $$
+BEGIN
+  UPDATE public.club_members SET is_active = false, updated_at = now() WHERE id = OLD.id;
+  RETURN NULL;
+END;
+$$;
+DROP TRIGGER IF EXISTS club_members_soft_delete ON public.club_members;
+CREATE TRIGGER club_members_soft_delete BEFORE DELETE ON public.club_members
+FOR EACH ROW EXECUTE FUNCTION public.soft_delete_club_member();
+
+CREATE OR REPLACE FUNCTION public.enforce_club_member_athlete_provenance()
+RETURNS trigger LANGUAGE plpgsql SET search_path = public AS $$
+BEGIN
+  IF NEW.source_athlete_id <> NEW.athlete_id THEN
+    RAISE EXCEPTION 'source athlete provenance cannot change';
+  END IF;
+  RETURN NEW;
+END;
+$$;
+DROP TRIGGER IF EXISTS club_member_athlete_map_provenance ON public.club_member_athlete_map;
+CREATE TRIGGER club_member_athlete_map_provenance
+BEFORE INSERT OR UPDATE ON public.club_member_athlete_map
+FOR EACH ROW EXECUTE FUNCTION public.enforce_club_member_athlete_provenance();
 
 -- Synchronize a legacy member reference to its Phase 2 identity. New athletes
 -- without a legacy row keep member_id NULL; callers must use the new columns.

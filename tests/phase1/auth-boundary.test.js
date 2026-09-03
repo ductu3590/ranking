@@ -11,14 +11,33 @@ const {
 const secret = 'phase1-test-secret';
 const now = 1_700_000_000_000;
 const token = signSession({ groupId: 42, groupCode: 'ABC123', groupName: 'Test', role: 'admin', now }, secret);
-const session = verifySession(token, secret, now + 1000);
+const session = verifySession(token, secret, now + 1000, { currentAccessVersion: 1 });
 assert.strictEqual(session.group_id, 42);
 assert.strictEqual(session.session_version, 1);
+assert.strictEqual(session.access_version, 1);
 assert.strictEqual(session.expires_at, now + GROUP_SESSION_MAX_AGE_MS);
 assert.deepStrictEqual(getActorFromSession(session), {
   groupId: 42, groupCode: 'ABC123', groupName: 'Test', role: 'admin', session,
 });
 assert.strictEqual(verifySession(token, 'wrong-secret', now), null);
+assert.strictEqual(
+  verifySession(token, secret, now + 1000, { currentAccessVersion: 2 }),
+  null,
+  'a bumped club access version revokes an older token without changing token format version'
+);
+const rotatedToken = signSession({
+  groupId: 42,
+  groupCode: 'ABC123',
+  groupName: 'Test',
+  role: 'admin',
+  accessVersion: 2,
+  now,
+}, secret);
+assert.strictEqual(
+  verifySession(rotatedToken, secret, now + 1000, { currentAccessVersion: 2 }).access_version,
+  2,
+  'a newly issued token carries and satisfies the bumped access version'
+);
 assert.strictEqual(verifySession(token, secret, now + GROUP_SESSION_MAX_AGE_MS + 1), null);
 assert.strictEqual(verifySession('not-a-token', secret, now), null);
 assert.strictEqual(authorizeActor(null, ['admin']).status, 401);

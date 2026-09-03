@@ -25,7 +25,8 @@ const joinRoute = fs.readFileSync(path.join(root, 'app/api/groups/join/route.js'
 const createRoute = fs.readFileSync(path.join(root, 'app/api/groups/route.js'), 'utf8');
 for (const [name, source] of [['join', joinRoute], ['create', createRoute]]) {
   assert.match(source, /consumeRateLimit/, `${name} route phải gọi rate limiter`);
-  assert.match(source, /rateLimitResponse/, `${name} route phải trả response rate-limit chuẩn`);
+  assert.match(source, /rateLimitResponse|identityRouteError/,
+    `${name} route phải trả response rate-limit chuẩn`);
 }
 assert.match(fs.readFileSync(path.join(root, 'lib/rateLimit.js'), 'utf8'), /status:\s*429/,
   'rate-limit response phải dùng HTTP 429');

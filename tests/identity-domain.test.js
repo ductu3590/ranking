@@ -35,7 +35,8 @@ const activeSession = {
   role: 'member',
   issued_at: 1_000,
   expires_at: 5_000,
-  session_version: 4,
+  session_version: 1,
+  access_version: 4,
 };
 assert.equal(
   getClubSessionState(activeSession, { now: 4_999, currentAccessVersion: 4 }),

@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import QRCode from 'qrcode';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
-import { requireGroupAdmin } from '@/lib/groupSession';
+import { requireValidatedGroupAdmin } from '@/lib/groupSession';
 import { hashPassword } from '@/lib/groupAuth';
+import { nextAccessVersion } from '@/lib/domain/identity/session';
 
 async function buildJoin(request, code) {
     const origin = request.headers.get('origin') || new URL(request.url).origin;
@@ -24,12 +25,12 @@ function safeGroupForClient(group) {
 }
 
 export async function GET(request) {
-    const adminCheck = requireGroupAdmin();
+    const adminCheck = await requireValidatedGroupAdmin();
     if (!adminCheck.ok) return adminCheck.response;
 
     const { data: group, error } = await supabaseAdmin
         .from('groups')
-        .select('id, code, name, description, logo_url, sepay_webhook_secret')
+        .select('id, code, name, description, logo_url, sepay_webhook_secret, access_version')
         .eq('id', adminCheck.groupId)
         .single();
     if (error) {
@@ -41,7 +42,7 @@ export async function GET(request) {
 }
 
 export async function PATCH(request) {
-    const adminCheck = requireGroupAdmin();
+    const adminCheck = await requireValidatedGroupAdmin();
     if (!adminCheck.ok) return adminCheck.response;
 
     const body = await request.json();
@@ -90,11 +91,15 @@ export async function PATCH(request) {
         return NextResponse.json({ error: 'Không có thay đổi.' }, { status: 400 });
     }
 
+    if (updates.admin_password_hash || updates.member_password_hash) {
+        updates.access_version = nextAccessVersion(adminCheck.session?.access_version || 1);
+    }
+
     const { data: group, error } = await supabaseAdmin
         .from('groups')
         .update(updates)
         .eq('id', adminCheck.groupId)
-        .select('id, code, name, description, logo_url, sepay_webhook_secret')
+        .select('id, code, name, description, logo_url, sepay_webhook_secret, access_version')
         .single();
     if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });

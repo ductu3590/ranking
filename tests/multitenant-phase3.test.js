@@ -9,7 +9,7 @@ const settings = read('app/api/club/settings/route.js');
 assert(
     settings.includes('export async function GET') &&
     settings.includes('export async function PATCH') &&
-    settings.includes('requireGroupAdmin') &&
+    /require(?:Validated)?GroupAdmin/.test(settings) &&
     settings.includes('hashPassword') &&
     settings.includes('member_password_hash'),
     'Settings route should expose admin-guarded GET + PATCH and hash the member password.'
@@ -18,7 +18,7 @@ assert(
 const regen = read('app/api/club/settings/regenerate-code/route.js');
 assert(
     regen.includes('export async function POST') &&
-    regen.includes('requireGroupAdmin') &&
+    /require(?:Validated)?GroupAdmin/.test(regen) &&
     regen.includes('generateGroupCode') &&
     regen.includes('QRCode.toDataURL'),
     'Regenerate-code route should be admin-guarded and return a new unique code + QR.'

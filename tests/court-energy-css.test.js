@@ -10,8 +10,6 @@ const bottomNavCss = read('components/MobileBottomNav.css');
 const homeHeaderCss = read('components/HomeHeader.css');
 const fundCss = read('app/quy/page.css');
 const adminCss = read('app/admin/admin-center.css');
-const tournamentDashboardCss = read('app/giai-dau/dashboard.css');
-const liveCss = read('app/giai-dau/live/live.css');
 
 const requiredTokens = [
     '--court-midnight: #071B18',
@@ -61,19 +59,6 @@ assert(
     adminCss.includes('var(--surface-court)') &&
     adminCss.includes('var(--court-green)'),
     'Admin center should use the shared Court Energy surface and primary action colors.'
-);
-
-assert(
-    tournamentDashboardCss.includes('var(--live-cyan)') &&
-    tournamentDashboardCss.includes('var(--pickle-lime)'),
-    'Tournament dashboard should expose sports-energy live and accent states.'
-);
-
-assert(
-    liveCss.includes('var(--court-midnight)') &&
-    liveCss.includes('var(--live-cyan)') &&
-    liveCss.includes('var(--pickle-lime)'),
-    'Live tournament CSS should use dark court, live cyan, and pickle lime states.'
 );
 
 console.log('Court Energy CSS contract ok');

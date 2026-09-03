@@ -11,4 +11,5 @@ assert(s.includes('getMatchEngine') && s.includes('resolveMatch'), 'gọi match 
 assert(s.includes('advanceWinner'), 'đẩy winner lên bracket cha');
 assert(s.includes('tournament_games') && s.includes('tournament_matches'), 'thao tác games + matches');
 assert(s.includes('winner_entrant_id') && s.includes("'done'"), 'set winner + status done');
+assert(s.includes("rpc('replace_tournament_games'"), 'replace games qua database transaction RPC');
 console.log('api-games contract ok');

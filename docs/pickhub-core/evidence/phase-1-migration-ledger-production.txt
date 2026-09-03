@@ -1,0 +1,20 @@
+# Phase 1 production migration ledger verification
+
+Environment: Supabase `Ranking 246 / main PRODUCTION`
+Verified after manual registration of migrations 017–027.
+
+| filename | version | checksum | applied_at | applied_by |
+| --- | ---: | --- | --- | --- |
+| 017_phase1_migration_ledger.sql | 17 | 4e0330023c044328cf4e5120cbe7e25c88cb609209486215aaaba2513128b4e9 | 2026-09-03 04:12:22.024138+00 | postgres |
+| 018_tournament_public_identity.sql | 18 | d56076485e3cb1e897f05d62bd4ff11bd3a1fc16b657aa6bdf76126e684fa406 | 2026-09-03 04:12:22.024138+00 | postgres |
+| 019_tournament_atomic_mutations.sql | 19 | 9484fe2fb0cd258e5aa0bc5fb5d2f7f24235cd5d5c54f479d1d02eb9fce296b9 | 2026-09-03 04:12:22.024138+00 | postgres |
+| 020_phase1_tenant_constraints.sql | 20 | a7deb9852b614fb590c20ce7a6077662ebe1f5ddaa8c3bf4ad2a9b6e4b517420 | 2026-09-03 04:12:22.024138+00 | postgres |
+| 021_phase1_rls_hardening.sql | 21 | 166eda7790d7cf0f295516054410fe04e52ccc3073cb6f72bc4fe9e9a349c7b5 | 2026-09-03 04:12:22.024138+00 | postgres |
+| 022_fund_participant_tenancy.sql | 22 | 508887e12f436bd6e95fc6fb0ae0629c65b89bd6f14e81ea266556082e98e9a0 | 2026-09-03 04:12:22.024138+00 | postgres |
+| 023_webhook_idempotency.sql | 23 | 793512fe0d9858950f1b10d0a3773afd5a0a985de12d98cf5e3a219596c52924 | 2026-09-03 04:12:22.024138+00 | postgres |
+| 024_atomic_stage_advance.sql | 24 | db8b3a5da2498982a7313754fe4c6de52034b81999c5ba9e2fb1235baef578aa | 2026-09-03 04:12:22.024138+00 | postgres |
+| 025_tournament_member_origin.sql | 25 | 1295471e85a685ce1852a2b179568b7f221d9c65f9cbf73cefee754180ea6714 | 2026-09-03 05:29:21.416354+00 | postgres |
+| 026_harden_member_origin_trigger.sql | 26 | ae3fe2986d3aac0cadb1d1dd063b6e1dc70764280e57f68554b3bc8c620b42e3 | 2026-09-03 05:32:19.238568+00 | postgres |
+| 027_index_member_origin_fk.sql | 27 | 4eb2303ed5c28199e0d9752fa9169b176ab2ad0932429458497d51d8d177c842 | 2026-09-03 05:34:00.708294+00 | postgres |
+
+Result: all eleven Phase 1 production ledger rows match the repository manifest.

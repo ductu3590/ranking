@@ -6,8 +6,11 @@ const assert = (c, m) => { if (!c) { console.error(`FAIL: ${m}`); process.exit(1
 const f = 'app/api/tournament-v2/public/route.js';
 assert(exists(f), 'route tồn tại');
 const s = read(f);
-assert(s.includes('getEffectiveGroupContext'), 'đọc theo group context (không cần admin)');
+assert(!s.includes('getEffectiveGroupContext'), 'public resolver không phụ thuộc cookie/group context');
 assert(!s.includes('requireGroupAdmin'), 'public không chặn admin');
-assert(s.includes('public_slug') && s.includes(".eq('group_id'"), 'tra theo slug + scope group');
-assert(s.includes('tournament_stages') && s.includes('tournament_matches'), 'trả stage + match');
+assert(s.includes('public_slug') && s.includes(".in('visibility'"), 'tra slug theo visibility công khai');
+assert(s.includes('PUBLIC_TOURNAMENT_SELECT') || s.includes("select('id, public_slug"), 'tournament projection allowlist');
+assert(s.includes('buildPublicSnapshot'), 'trả snapshot projection duy nhất');
+assert(s.includes('tournament_stages') && s.includes('tournament_matches') && s.includes('tournament_games'), 'trả stage + match + game');
+assert(s.includes('standingsByStage'), 'snapshot có BXH server-side');
 console.log('api-public contract ok');

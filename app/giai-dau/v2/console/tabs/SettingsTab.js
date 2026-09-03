@@ -12,7 +12,7 @@ export default function SettingsTab({ tournament, stage, stageId, stages, isAdmi
 
     // Chỉnh sửa thông tin giải
     const [editInfo, setEditInfo] = useState(false);
-    const [infoForm, setInfoForm] = useState({ name: '', event_date: '', location: '' });
+    const [infoForm, setInfoForm] = useState({ name: '', event_date: '', location: '', visibility: 'unlisted' });
     const [infoBusy, setInfoBusy] = useState(false);
 
     // Chỉnh sửa cài đặt stage hiện tại
@@ -41,6 +41,7 @@ export default function SettingsTab({ tournament, stage, stageId, stages, isAdmi
                 name: tournament.name || '',
                 event_date: tournament.event_date ? tournament.event_date.slice(0, 10) : '',
                 location: tournament.location || '',
+                visibility: tournament.visibility || 'unlisted',
             });
         }
     }, [tournament]);
@@ -87,6 +88,7 @@ export default function SettingsTab({ tournament, stage, stageId, stages, isAdmi
                 name: infoForm.name.trim(),
                 event_date: infoForm.event_date || null,
                 location: infoForm.location || null,
+                visibility: infoForm.visibility,
             });
             setNotice('Đã cập nhật thông tin giải.');
             setEditInfo(false);
@@ -190,6 +192,18 @@ export default function SettingsTab({ tournament, stage, stageId, stages, isAdmi
                                         placeholder="VD: Sân Quận 7"
                                     />
                                 </div>
+                                <div className="v2-field">
+                                    <label>Quyền truy cập link</label>
+                                    <select
+                                        value={infoForm.visibility}
+                                        onChange={(e) => setInfoForm((c) => ({ ...c, visibility: e.target.value }))}
+                                    >
+                                        <option value="private">Riêng tư</option>
+                                        <option value="unlisted">Không liệt kê (có link)</option>
+                                        <option value="public">Công khai</option>
+                                    </select>
+                                    <p className="v2-field-hint">Riêng tư sẽ trả 404 cho link công khai.</p>
+                                </div>
                             </div>
                             <div className="v2-wizard-nav">
                                 <button type="button" className="v2-btn-secondary" onClick={() => setEditInfo(false)}>Hủy</button>
@@ -203,6 +217,7 @@ export default function SettingsTab({ tournament, stage, stageId, stages, isAdmi
                             <li><span>Tên:</span> {tournament.name}</li>
                             {tournament.event_date ? <li><span>Ngày:</span> {tournament.event_date.slice(0, 10)}</li> : null}
                             {tournament.location ? <li><span>Địa điểm:</span> {tournament.location}</li> : null}
+                            <li><span>Link:</span> {tournament.visibility === 'public' ? 'Công khai' : tournament.visibility === 'private' ? 'Riêng tư' : 'Không liệt kê'}</li>
                         </ul>
                     )}
                 </section>

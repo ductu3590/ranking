@@ -1,0 +1,25 @@
+# Supabase advisors — production after migrations 025–027
+
+Environment: Supabase `Ranking 246 / main PRODUCTION`
+Checked through Supabase MCP on 2026-09-03 after migrations 026 and 027.
+
+## Security
+
+- Total lints: 27.
+- The new member-origin trigger search-path warning is resolved.
+- Remaining warnings are pre-existing: `update_fund_events_updated_at` has a
+  mutable search path; Auth leaked-password protection is disabled; legacy GH
+  `SECURITY DEFINER` RPCs are executable by anon/authenticated; and 11 tables
+  have RLS enabled without policies (intentional deny-by-default tables should
+  be reviewed separately).
+
+## Performance
+
+- Total lints: 53.
+- The new composite member-origin FK warning is resolved by
+  `idx_tournament_entrant_members_member_origin_fk`.
+- Remaining notices are existing unindexed foreign keys, RLS init-plan
+  optimizations, and unused indexes. The new indexes may continue to show as
+  unused until the corresponding production queries run.
+
+Result: no new unresolved advisor warning remains for the member-origin changes.

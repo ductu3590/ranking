@@ -1,11 +1,19 @@
+import { randomUUID } from 'crypto';
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { requireGroupAdmin } from '@/lib/groupSession';
 import { getScheduleEngine } from '@/lib/tournament/engines';
-import { scheduleToInsertRows, resolveParentLinks } from '@/lib/tournament/persistence';
+import { scheduleToInsertRows } from '@/lib/tournament/persistence';
 
 const db = supabaseAdmin || supabaseServer;
+
+function rpcErrorResponse(error) {
+    const code = error?.code;
+    const status = code === '40001' ? 409 : code === '22023' ? 400 : code === 'P0002' ? 404 : 500;
+    const message = code === '40001' ? 'Lịch thi đấu đã thay đổi, hãy tải lại.' : error?.message || 'Không sinh được lịch.';
+    return NextResponse.json({ error: message, code: code || 'MUTATION_FAILED' }, { status });
+}
 
 export async function POST(request) {
     try {
@@ -64,17 +72,7 @@ export async function POST(request) {
             return NextResponse.json({ error: 'Cần ít nhất 2 đội' }, { status: 400 });
         }
 
-        // 3. Delete existing matches for this stage (regenerate); games cascade via FK
-        const { error: delErr } = await db
-            .from('tournament_matches')
-            .delete()
-            .eq('group_id', groupId)
-            .eq('stage_id', stageId);
-        if (delErr) {
-            return NextResponse.json({ error: delErr.message }, { status: 500 });
-        }
-
-        // 4. Generate schedule via engine
+        // 3. Generate and validate the schedule before entering the database transaction.
         let engine;
         try {
             engine = getScheduleEngine(stage.schedule_format);
@@ -94,40 +92,27 @@ export async function POST(request) {
             return NextResponse.json({ error: e.message }, { status: 400 });
         }
 
-        // 5. Insert matches
         const rows = scheduleToInsertRows(sched, { stageId, groupId });
-        const { data: inserted, error: insErr } = await db
-            .from('tournament_matches')
-            .insert(rows)
-            .select('id, round, bracket_slot');
-        if (insErr) {
-            return NextResponse.json({ error: insErr.message }, { status: 500 });
+        const rpcMatches = rows.map((row, index) => ({
+            ...row,
+            _key: String(sched[index].slot != null ? sched[index].slot : index),
+            _parent_key: sched[index].parent_slot != null ? String(sched[index].parent_slot) : null,
+        }));
+        const idempotencyKey = String(
+            body?.idempotency_key || body?.idempotencyKey || randomUUID(),
+        ).trim();
+        if (!idempotencyKey || idempotencyKey.length > 200) {
+            return NextResponse.json({ error: 'idempotency_key không hợp lệ' }, { status: 400 });
         }
 
-        // 6. Resolve parent links (map local slot -> real id) and set parent_match_id
-        const links = resolveParentLinks(sched, inserted || []);
-        for (const link of links) {
-            const { error: linkErr } = await db
-                .from('tournament_matches')
-                .update({ parent_match_id: link.parent_match_id })
-                .eq('id', link.id)
-                .eq('group_id', groupId);
-            if (linkErr) {
-                return NextResponse.json({ error: linkErr.message }, { status: 500 });
-            }
-        }
-
-        // 7. Mark stage active
-        const { error: stageUpdErr } = await db
-            .from('tournament_stages')
-            .update({ status: 'active' })
-            .eq('id', stageId)
-            .eq('group_id', groupId);
-        if (stageUpdErr) {
-            return NextResponse.json({ error: stageUpdErr.message }, { status: 500 });
-        }
-
-        return NextResponse.json({ success: true, matchCount: rows.length });
+        const { data, error } = await db.rpc('replace_tournament_schedule', {
+            p_group_id: groupId,
+            p_stage_id: stageId,
+            p_matches: rpcMatches,
+            p_idempotency_key: idempotencyKey,
+        });
+        if (error) return rpcErrorResponse(error);
+        return NextResponse.json({ ...(data || { success: true }), matchCount: data?.matchCount ?? rows.length });
     } catch (err) {
         console.error('Generate v2 POST error:', err);
         return NextResponse.json({ error: err.message }, { status: 500 });

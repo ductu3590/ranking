@@ -1,0 +1,5 @@
+
+> quy-pickleball@0.1.0 test:isolation
+> node tests/isolation.integration.test.js
+
+isolation ok (anon sees no rows)

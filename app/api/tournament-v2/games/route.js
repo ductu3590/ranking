@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
@@ -6,6 +7,23 @@ import { getMatchEngine } from '@/lib/tournament/engines';
 import { advanceWinner } from '@/lib/tournament/results';
 
 const db = supabaseAdmin || supabaseServer;
+
+function rpcErrorResponse(error) {
+    const code = error?.code;
+    const status = code === '40001' ? 409 : code === '22023' ? 400 : code === 'P0002' ? 404 : 500;
+    const message = code === '40001' ? 'Dữ liệu trận đã thay đổi, hãy tải lại.' : error?.message || 'Không lưu được tỉ số.';
+    return NextResponse.json({ error: message, code: code || 'MUTATION_FAILED' }, { status });
+}
+
+function normalizeGames(games) {
+    return games.map((game, index) => ({
+        game_no: Number(game.game_no) || index + 1,
+        kind: game.kind || 'game',
+        score_a: Number(game.score_a) || 0,
+        score_b: Number(game.score_b) || 0,
+        lineup: game.lineup && typeof game.lineup === 'object' ? game.lineup : {},
+    }));
+}
 
 async function handleGames(request) {
     try {
@@ -16,20 +34,15 @@ async function handleGames(request) {
         const body = await request.json();
         const matchId = body?.matchId;
         const games = Array.isArray(body?.games) ? body.games : [];
-        if (!matchId) {
-            return NextResponse.json({ error: 'matchId is required' }, { status: 400 });
-        }
+        if (!matchId) return NextResponse.json({ error: 'matchId is required' }, { status: 400 });
 
-        // 2. Load match + its stage
         const { data: match, error: matchErr } = await db
             .from('tournament_matches')
             .select('*')
             .eq('id', matchId)
             .eq('group_id', groupId)
             .single();
-        if (matchErr || !match) {
-            return NextResponse.json({ error: 'Match không tồn tại' }, { status: 404 });
-        }
+        if (matchErr || !match) return NextResponse.json({ error: 'Match không tồn tại' }, { status: 404 });
 
         const { data: stage, error: stageErr } = await db
             .from('tournament_stages')
@@ -37,103 +50,66 @@ async function handleGames(request) {
             .eq('id', match.stage_id)
             .eq('group_id', groupId)
             .single();
-        if (stageErr || !stage) {
-            return NextResponse.json({ error: 'Stage không tồn tại' }, { status: 404 });
-        }
+        if (stageErr || !stage) return NextResponse.json({ error: 'Stage không tồn tại' }, { status: 404 });
 
-        // 3. Replace games
-        const { error: delErr } = await db
-            .from('tournament_games')
-            .delete()
-            .eq('group_id', groupId)
-            .eq('match_id', matchId);
-        if (delErr) {
-            return NextResponse.json({ error: delErr.message }, { status: 500 });
-        }
-
-        if (games.length) {
-            const gameRows = games.map((g, idx) => ({
-                group_id: groupId,
-                match_id: matchId,
-                game_no: g.game_no || (idx + 1),
-                kind: g.kind || 'game',
-                score_a: Number(g.score_a) || 0,
-                score_b: Number(g.score_b) || 0,
-                lineup: g.lineup || {},
-            }));
-            const { error: insErr } = await db
-                .from('tournament_games')
-                .insert(gameRows);
-            if (insErr) {
-                return NextResponse.json({ error: insErr.message }, { status: 500 });
-            }
-        }
-
-        // 4. Resolve match via engine
         let engine;
         try {
             engine = getMatchEngine(stage.match_format);
-        } catch (e) {
-            return NextResponse.json({ error: e.message }, { status: 400 });
+        } catch (error) {
+            return NextResponse.json({ error: error.message }, { status: 400 });
         }
 
-        let r;
+        const normalizedGames = normalizeGames(games);
+        let resolved;
         try {
-            r = engine.resolveMatch(
+            resolved = engine.resolveMatch(
                 { entrant_a_id: match.entrant_a_id, entrant_b_id: match.entrant_b_id },
-                games,
+                normalizedGames,
                 stage.config || {},
             );
-        } catch (e) {
-            console.error('Resolve match engine error:', e);
-            return NextResponse.json({ error: e.message }, { status: 400 });
+        } catch (error) {
+            console.error('Resolve match engine error:', error);
+            return NextResponse.json({ error: error.message }, { status: 400 });
         }
 
-        // 5. Persist outcome
-        if (r.complete) {
-            const { error: updErr } = await db
-                .from('tournament_matches')
-                .update({ winner_entrant_id: r.winner_entrant_id, status: 'done' })
-                .eq('id', matchId)
-                .eq('group_id', groupId);
-            if (updErr) {
-                return NextResponse.json({ error: updErr.message }, { status: 500 });
-            }
-
-            const adv = advanceWinner({
-                winner_entrant_id: r.winner_entrant_id,
+        const advancement = resolved.complete
+            ? advanceWinner({
+                winner_entrant_id: resolved.winner_entrant_id,
                 parent_match_id: match.parent_match_id,
                 bracket_slot: match.bracket_slot,
-            });
-            if (adv) {
-                const { error: advErr } = await db
-                    .from('tournament_matches')
-                    .update({ [adv.field]: adv.entrant_id })
-                    .eq('id', adv.parent_match_id)
-                    .eq('group_id', groupId);
-                if (advErr) {
-                    return NextResponse.json({ error: advErr.message }, { status: 500 });
-                }
-            }
-        } else {
-            const { error: updErr } = await db
-                .from('tournament_matches')
-                .update({ status: 'live', winner_entrant_id: null })
-                .eq('id', matchId)
-                .eq('group_id', groupId);
-            if (updErr) {
-                return NextResponse.json({ error: updErr.message }, { status: 500 });
-            }
+            })
+            : null;
+        const idempotencyKey = String(
+            body?.idempotency_key || body?.idempotencyKey || randomUUID(),
+        ).trim();
+        if (!idempotencyKey || idempotencyKey.length > 200) {
+            return NextResponse.json({ error: 'idempotency_key không hợp lệ' }, { status: 400 });
+        }
+        const expectedVersion = body?.expected_version == null ? null : Number(body.expected_version);
+        if (expectedVersion !== null && !Number.isInteger(expectedVersion)) {
+            return NextResponse.json({ error: 'expected_version không hợp lệ' }, { status: 400 });
         }
 
-        return NextResponse.json({
+        const { data, error } = await db.rpc('replace_tournament_games', {
+            p_group_id: groupId,
+            p_match_id: matchId,
+            p_games: normalizedGames,
+            p_winner_entrant_id: resolved.complete ? resolved.winner_entrant_id : null,
+            p_status: resolved.complete ? 'done' : 'live',
+            p_parent_field: advancement?.field || null,
+            p_expected_version: expectedVersion,
+            p_idempotency_key: idempotencyKey,
+        });
+        if (error) return rpcErrorResponse(error);
+
+        return NextResponse.json(data || {
             success: true,
-            complete: r.complete,
-            winner_entrant_id: r.complete ? r.winner_entrant_id : null,
+            complete: resolved.complete,
+            winner_entrant_id: resolved.complete ? resolved.winner_entrant_id : null,
         });
     } catch (err) {
         console.error('Games v2 PUT error:', err);
-        return NextResponse.json({ error: err.message }, { status: 500 });
+        return rpcErrorResponse(err);
     }
 }
 

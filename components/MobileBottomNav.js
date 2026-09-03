@@ -1,17 +1,39 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import navigation from '@/lib/globalNavigation';
 import './MobileBottomNav.css';
 
-const { GLOBAL_NAV_LINKS, isGlobalNavActive } = navigation;
+const { getGlobalNavLinksForRole, isGlobalNavActive } = navigation;
 
 export default function MobileBottomNav() {
     const pathname = usePathname();
+    const [role, setRole] = useState('member');
+
+    useEffect(() => {
+        let active = true;
+
+        fetch('/api/groups/session', { cache: 'no-store' })
+            .then((response) => (response.ok ? response.json() : null))
+            .then((payload) => {
+                const sessionRole = payload?.session?.role;
+                if (active && ['admin', 'member'].includes(sessionRole)) {
+                    setRole(sessionRole);
+                }
+            })
+            .catch(() => {});
+
+        return () => {
+            active = false;
+        };
+    }, []);
+
+    const navLinks = getGlobalNavLinksForRole(role);
 
     return (
         <nav className="mobile-bottom-nav" aria-label="Điều hướng chính trên mobile">
-            {GLOBAL_NAV_LINKS.map((link) => {
+            {navLinks.map((link) => {
                 const isActive = isGlobalNavActive(pathname, link.href);
                 return (
                     <a

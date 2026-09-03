@@ -9,5 +9,5 @@ const s = read(f);
 assert(s.includes('requireGroupAdmin'), 'admin guard');
 assert(s.includes('tournament_entrants') && s.includes('tournament_entrant_members'), 'thao tác cả entrant + members');
 assert(s.includes(".eq('group_id'") && s.includes('tournament_id'), 'scope');
-assert(s.includes('member_id') && s.includes('display_name') && s.includes('gender'), 'member có member_id/tên/giới tính');
+assert(s.includes('member_id') && s.includes('member_group_id') && s.includes('display_name') && s.includes('gender'), 'member có member_id, nguồn CLB, tên và giới tính');
 console.log('api-entrants contract ok');

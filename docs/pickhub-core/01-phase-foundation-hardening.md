@@ -29,7 +29,8 @@ Nhánh: `codex/phase-1-foundation-hardening`
 - Thêm `group_id` cho `ranking_snapshots` và mọi bảng dữ liệu CLB còn thiếu; backfill trước khi đặt `NOT NULL`.
 - Unique/index phải bao gồm tenant ở nơi dữ liệu chỉ cần duy nhất trong CLB.
 - Foreign key liên quan tenant phải ngăn row con trỏ sang parent thuộc CLB khác. Ưu tiên composite uniqueness/FK hoặc trigger invariant có test.
-- `tournament_entrant_members.member_id` phải có FK hợp lệ hoặc được phân loại rõ là guest. Không để một số ID không có semantic.
+- `tournament_entrant_members.group_id` là tenant của giải/CLB tổ chức, không phải tenant nguồn của thành viên.
+- `tournament_entrant_members.member_group_id` giữ CLB nguồn của `member_id`; cặp `(member_id, member_group_id)` phải có FK hợp lệ. Guest dùng cả hai giá trị `NULL`.
 
 ### 3.3 Public tournament identity
 
@@ -118,6 +119,7 @@ Không drop dữ liệu giải/quỹ hiện hữu để “làm sạch”. Mọi
 
 - Hai CLB có thành viên trùng tên vẫn tạo được.
 - Duplicate trong cùng CLB được xử lý theo policy đã chốt.
+- Giải do CLB A tổ chức có thể chứa thành viên thuộc CLB B mà vẫn giữ đúng nguồn thành viên.
 - Cross-tenant read/write bị chặn ở API và RLS.
 - Anonymous không đọc private/unlisted data ngoài link hợp lệ.
 - Public slug resolve không cần cookie.

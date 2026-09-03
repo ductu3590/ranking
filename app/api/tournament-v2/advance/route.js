@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
@@ -7,6 +8,15 @@ import { buildResolvedMatches } from '@/lib/tournament/results';
 import { isStageComplete, seedNextStage } from '@/lib/tournament/orchestrator';
 
 const db = supabaseAdmin || supabaseServer;
+
+function rpcErrorResponse(error) {
+    const code = error?.code;
+    const status = code === '40001' ? 409 : code === '22023' ? 400 : code === 'P0002' ? 404 : 500;
+    const message = code === '40001'
+        ? 'Stage đã thay đổi, hãy tải lại.'
+        : error?.message || 'Không thể chuyển stage.';
+    return NextResponse.json({ error: message, code: code || 'MUTATION_FAILED' }, { status });
+}
 
 // Load entrants + resolvedMatches + raw matches for a group-scoped stage.
 async function loadStageData(stage, groupId) {
@@ -89,6 +99,12 @@ export async function POST(request) {
         if (!stageId) {
             return NextResponse.json({ error: 'stageId is required' }, { status: 400 });
         }
+        const idempotencyKey = String(
+            body?.idempotency_key || body?.idempotencyKey || randomUUID(),
+        ).trim();
+        if (!idempotencyKey || idempotencyKey.length > 200) {
+            return NextResponse.json({ error: 'idempotency_key không hợp lệ' }, { status: 400 });
+        }
 
         // 1. Load current stage group-scoped
         const { data: stage, error: stageErr } = await db
@@ -152,67 +168,26 @@ export async function POST(request) {
             .eq('stage_order', stage.stage_order + 1)
             .single();
 
-        if (nextErr || !nextStage) {
-            // No next stage: this was the final stage. Mark completed, return champion.
-            const { error: finalUpdErr } = await db
-                .from('tournament_stages')
-                .update({ status: 'completed' })
-                .eq('id', stage.id)
-                .eq('group_id', groupId);
-            if (finalUpdErr) {
-                return NextResponse.json({ error: finalUpdErr.message }, { status: 500 });
-            }
-            return NextResponse.json({ success: true, final: true, champion: seeded });
+        if (nextErr && nextErr.code !== 'PGRST116') {
+            return NextResponse.json({ error: nextErr.message }, { status: 500 });
         }
 
-        // 6. Replace next stage's seedings
-        const { error: delErr } = await db
-            .from('tournament_stage_entrants')
-            .delete()
-            .eq('group_id', groupId)
-            .eq('stage_id', nextStage.id);
-        if (delErr) {
-            return NextResponse.json({ error: delErr.message }, { status: 500 });
-        }
+        // 6. Commit finalization + next-stage seedings atomically in PostgreSQL.
+        const { data, error } = await db.rpc('advance_tournament_stage', {
+            p_group_id: groupId,
+            p_stage_id: stage.id,
+            p_next_stage_id: nextStage?.id || null,
+            p_seeded: seeded,
+            p_idempotency_key: idempotencyKey,
+        });
+        if (error) return rpcErrorResponse(error);
 
-        if (seeded.length) {
-            const seedRows = seeded.map((s) => ({
-                group_id: groupId,
-                stage_id: nextStage.id,
-                entrant_id: s.entrant_id,
-                seed_in_stage: s.seed_in_stage,
-            }));
-            const { error: insErr } = await db
-                .from('tournament_stage_entrants')
-                .insert(seedRows);
-            if (insErr) {
-                return NextResponse.json({ error: insErr.message }, { status: 500 });
-            }
-        }
-
-        // 7. Update statuses: current completed, next pending
-        const { error: curUpdErr } = await db
-            .from('tournament_stages')
-            .update({ status: 'completed' })
-            .eq('id', stage.id)
-            .eq('group_id', groupId);
-        if (curUpdErr) {
-            return NextResponse.json({ error: curUpdErr.message }, { status: 500 });
-        }
-
-        const { error: nextUpdErr } = await db
-            .from('tournament_stages')
-            .update({ status: 'pending' })
-            .eq('id', nextStage.id)
-            .eq('group_id', groupId);
-        if (nextUpdErr) {
-            return NextResponse.json({ error: nextUpdErr.message }, { status: 500 });
-        }
-
-        return NextResponse.json({
+        return NextResponse.json(data || {
             success: true,
-            nextStageId: nextStage.id,
-            advanced: seeded.length,
+            ...(nextStage ? { nextStageId: nextStage.id, advanced: seeded.length } : {
+                final: true,
+                champion: seeded,
+            }),
         });
     } catch (err) {
         console.error('Advance v2 POST error:', err);

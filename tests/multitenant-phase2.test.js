@@ -86,8 +86,8 @@ assert(
     'app/quy/members/page.js should not query Supabase directly.'
 );
 assert(
-    membersPage.includes('/api/club/members'),
-    'app/quy/members/page.js should read members through the server API.'
+    membersPage.includes('/api/identity/roster'),
+    'app/quy/members/page.js should read athlete/membership roster through the Phase 2 server API.'
 );
 
 const rls = read('database/migrations/009_enable_rls.sql');

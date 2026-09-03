@@ -422,7 +422,7 @@
 .leaderboard-state-icon { font-size: 46px; }
 
 .leaderboard-state button {
-    min-height: 42px;
+    min-height: 44px;
     margin-top: 18px;
     padding: 0 18px;
     border: 0;
@@ -433,6 +433,20 @@
     font-weight: 800;
     cursor: pointer;
 }
+
+.leaderboard-state-action {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    margin-top: 18px;
+    padding: 0 18px;
+    border-radius: 10px;
+    background: var(--ph-indigo);
+    color: #fff;
+    font-weight: 800;
+    text-decoration: none;
+}
+.leaderboard-state button:focus-visible, .leaderboard-state-action:focus-visible { outline: 3px solid var(--ph-gold); outline-offset: 2px; }
 
 .leaderboard-loader {
     width: 38px;

@@ -1,0 +1,6 @@
+.role-action-bar { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.role-action-bar button, .role-action-bar a { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; padding: 0 15px; border: 1px solid #dcd6f2; border-radius: 12px; background: var(--ph-lavender); color: var(--ph-indigo); font: inherit; font-size: 13px; font-weight: 850; text-decoration: none; cursor: pointer; }
+.role-action-bar button:first-child, .role-action-bar a:first-child { border-color: var(--ph-indigo); background: var(--ph-indigo); color: #fff; }
+.role-action-bar button:disabled { cursor: wait; opacity: .55; }
+.role-action-bar button:focus-visible, .role-action-bar a:focus-visible { outline: 3px solid var(--ph-gold); outline-offset: 2px; }
+@media (max-width: 560px) { .role-action-bar { justify-content: stretch; } .role-action-bar button, .role-action-bar a { flex: 1 1 140px; } }

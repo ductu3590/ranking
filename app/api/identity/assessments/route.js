@@ -1,4 +1,4 @@
-import { identityRepository, readSignedClubSession } from '@/lib/identityRuntime';
+import { identityRepository, readSignedClubSession, requireIdentitySession } from '@/lib/identityRuntime';
 import assessmentModule from '@/lib/application/identity/assessments';
 import { toIdentityResponse, identityRouteError } from '@/lib/application/identity/routeAdapter';
 import {
@@ -8,6 +8,21 @@ import {
 
 const { createRecordMembershipAssessment } = assessmentModule;
 const recordMembershipAssessment = createRecordMembershipAssessment({ repository: identityRepository });
+
+export async function GET(request) {
+    try {
+        const session = await requireIdentitySession('read');
+        const membershipId = new URL(request.url).searchParams.get('membershipId');
+        const assessments = (await identityRepository.listMembershipAssessments(session.group_id, membershipId || null))
+            .map((assessment) => ({
+                ...assessment,
+                notes: session.role === 'admin' ? assessment.notes : null,
+            }));
+        return toIdentityResponse({ assessments });
+    } catch (error) {
+        return identityRouteError(error);
+    }
+}
 
 export async function POST(request) {
     try {

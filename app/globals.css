@@ -1,6 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');
 
 :root {
+  --ph-ink: #28243D;
+  --ph-indigo: #6F48C9;
+  --ph-lavender: #EEE9FF;
+  --ph-gold: #FFC95E;
+  --ph-cyan: #A8DFE9;
+  --ph-coral: #FF8B83;
+  --ph-surface: #F5F6FB;
+  --ph-card: #FFFFFF;
+  --ph-line: #E4E9F2;
+  --ph-muted: #667085;
+  --ph-text: #20213A;
+  --ph-shadow: 0 16px 40px rgba(40, 36, 61, .10);
+  --ph-shadow-soft: 0 8px 24px rgba(40, 36, 61, .06);
   --court-midnight: #071B18;
   --court-green: #0D7565;
   --court-green-strong: #064F45;
@@ -80,6 +93,15 @@ body {
 
 * {
   box-sizing: border-box;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--ph-gold);
+  outline-offset: 2px;
 }
 
 .app-background {

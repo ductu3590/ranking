@@ -5,6 +5,7 @@ const {
   hashSessionKey,
   toRosterProjection,
   toPublicCandidate,
+  toAssessmentProjection,
 } = require('../lib/repositories/identity/compatibilityRepository');
 
 assert.equal(hashSessionKey('session-secret'), hashSessionKey('session-secret'));
@@ -60,6 +61,31 @@ assert.deepEqual(toPublicCandidate({
   status: 'unclaimed',
   aliases: ['An'],
   club_ids: [7, 8],
+});
+
+assert.deepEqual(toAssessmentProjection({
+  id: 81,
+  club_id: 7,
+  club_membership_id: 41,
+  athlete_id: 31,
+  assessed_at: '2026-09-03T08:00:00Z',
+  effective_from: '2026-09-03',
+  skill_level: '3.20',
+  source: 'club_admin',
+  notes: 'public assessment note',
+  actor_type: 'club_admin_session',
+  private_notes: 'never expose',
+}), {
+  id: 81,
+  clubId: 7,
+  membershipId: 41,
+  athleteId: 31,
+  assessedAt: '2026-09-03T08:00:00Z',
+  effectiveFrom: '2026-09-03',
+  skillLevel: 3.2,
+  source: 'club_admin',
+  notes: 'public assessment note',
+  actorType: 'club_admin_session',
 });
 
 console.log('identity compatibility repository tests ok');

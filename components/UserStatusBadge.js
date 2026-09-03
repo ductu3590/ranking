@@ -1,30 +1,36 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getCurrentGroupClient } from '@/lib/groupClient';
 import './UserStatusBadge.css';
 
-export default function UserStatusBadge() {
+export default function UserStatusBadge({ sessionView: providedSessionView = null }) {
     const [state, setState] = useState({ kind: 'loading' });
 
     useEffect(() => {
-        try {
-            const stored = window.localStorage.getItem('teamfund-current-group');
-            if (stored) {
-                const group = getCurrentGroupClient();
+        let active = true;
+        if (providedSessionView) {
+            const session = providedSessionView.session;
+            if (providedSessionView.loading) setState({ kind: 'loading' });
+            else if (providedSessionView.permissions?.canViewClub && session) {
                 setState({
                     kind: 'group',
-                    name: group.name || 'Nhóm của tôi',
-                    role: group.role === 'admin' ? 'admin' : 'member',
+                    name: session.group_name || 'CLB của tôi',
+                    role: session.role,
                 });
-                return;
-            }
-        } catch {
-            window.localStorage.removeItem('teamfund-current-group');
+            } else setState({ kind: 'guest' });
+            return () => { active = false; };
         }
-
-        setState({ kind: 'guest' });
-    }, []);
+        fetch('/api/groups/session', { cache: 'no-store' })
+            .then((response) => response.json())
+            .then((payload) => {
+                if (!active) return;
+                if (payload.permissions?.canViewClub && payload.session) {
+                    setState({ kind: 'group', name: payload.session.group_name || 'CLB của tôi', role: payload.session.role });
+                } else setState({ kind: 'guest' });
+            })
+            .catch(() => { if (active) setState({ kind: 'guest' }); });
+        return () => { active = false; };
+    }, [providedSessionView]);
 
     async function handleLogout() {
         try {

@@ -37,15 +37,15 @@ assert(
 assert(
     bottomNavCss.includes('position: fixed') &&
     bottomNavCss.includes('env(safe-area-inset-bottom)') &&
-    bottomNavCss.includes('var(--court-midnight)') &&
-    bottomNavCss.includes('var(--pickle-lime)'),
-    'Mobile bottom nav should stay fixed, safe-area aware, and use active Court Energy styling.'
+    bottomNavCss.includes('var(--ph-lavender)') &&
+    bottomNavCss.includes('var(--ph-indigo)'),
+    'Mobile bottom nav should stay fixed, safe-area aware, and use the approved light PickHub styling.'
 );
 
 assert(
-    homeHeaderCss.includes('var(--court-midnight)') &&
-    homeHeaderCss.includes('var(--pickle-lime)'),
-    'HomeHeader should use Court Energy brand colors.'
+    homeHeaderCss.includes('var(--ph-lavender)') &&
+    homeHeaderCss.includes('var(--ph-indigo)'),
+    'HomeHeader should use the approved light PickHub brand colors.'
 );
 
 assert(

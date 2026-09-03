@@ -6,12 +6,13 @@ import {
     getGroupSessionFromCookies,
 } from '@/lib/groupSession';
 import { identityRepository } from '@/lib/identityRuntime';
+import sessionViewModule from '@/lib/clubSessionView';
+
+const { buildClubSessionView } = sessionViewModule;
 
 export async function GET() {
     const session = await getValidatedGroupSessionFromCookies();
-    return NextResponse.json({
-        session: session || getDefaultGroupContext(),
-    });
+    return NextResponse.json(buildClubSessionView(session || getDefaultGroupContext()));
 }
 
 export async function DELETE() {

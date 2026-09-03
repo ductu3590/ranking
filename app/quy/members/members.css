@@ -1,325 +1,41 @@
-/* =====================================================
-   MEMBERS PAGE - LIGHT THEME (Quy Members Module)
-   ===================================================== */
-
-.members-page {
-    min-height: 100vh;
-    background:
-        radial-gradient(circle at top right, rgba(202, 255, 40, 0.12), transparent 28rem),
-        var(--surface-court);
-    color: var(--text-primary);
-    font-family: var(--font-family);
-}
-
-.members-main {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 24px 20px;
-}
-
-/* ─── Header ─── */
-.members-header {
-    background: #fff;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-md);
-    padding: 24px 28px;
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
-    box-shadow: var(--shadow-sm);
-}
-
-.members-title {
-    margin: 0 0 6px 0;
-    font-size: 26px;
-    font-weight: 700;
-    color: var(--text-primary);
-}
-
-.members-subtitle {
-    margin: 0;
-    font-size: 14px;
-    color: var(--text-secondary);
-}
-
-.members-summary {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.summary-badge {
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 600;
-}
-
-.active-badge {
-    background: var(--pickle-lime-soft);
-    color: var(--court-midnight);
-    border: 1px solid rgba(202, 255, 40, 0.44);
-}
-
-.inactive-badge {
-    background: var(--surface-court-soft);
-    color: var(--text-secondary);
-    border: 1px solid var(--border-color);
-}
-
-/* ─── Filter ─── */
-.members-filter {
-    display: flex;
-    gap: 8px;
-    background: #fff;
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 8px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-    box-shadow: var(--shadow-sm);
-}
-
-.filter-btn {
-    flex: 1;
-    min-width: 140px;
-    padding: 10px 16px;
-    border: 1px solid var(--border-color);
-    background: transparent;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.filter-btn:hover {
-    border-color: var(--court-green);
-    color: var(--text-primary);
-    background: var(--surface-court-soft);
-}
-
-.filter-btn.active {
-    background: var(--court-midnight);
-    color: var(--pickle-lime);
-    border-color: var(--court-midnight);
-    box-shadow: var(--shadow-md);
-}
-
-/* ─── Table ─── */
-.members-table-wrap {
-    background: #fff;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-md);
-    overflow: hidden;
-    box-shadow: var(--shadow-sm);
-}
-
-.members-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.members-table thead tr {
-    background: var(--surface-court-soft);
-    border-bottom: 2px solid var(--border-color);
-}
-
-.members-table th {
-    padding: 14px 20px;
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    text-align: left;
-}
-
-.col-stt { width: 70px; text-align: center; }
-.col-status { width: 180px; }
-
-.members-table tbody tr {
-    border-bottom: 1px solid var(--border-color);
-    transition: background 0.15s;
-}
-
-.members-table tbody tr:last-child {
-    border-bottom: none;
-}
-
-.members-table tbody tr:hover {
-    background: var(--surface-court-soft);
-}
-
-.inactive-row {
-    opacity: 0.6;
-}
-
-.members-table td {
-    padding: 14px 20px;
-    vertical-align: middle;
-}
-
-.col-stt td, td.col-stt {
-    text-align: center;
-}
-
-/* STT badge */
-.stt-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 30px;
-    height: 30px;
-    background: var(--surface-court-soft);
-    border-radius: 50%;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--text-secondary);
-    margin: 0 auto;
-}
-
-/* Member name */
-.member-name-wrap {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.member-avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: var(--gradient-court-hero);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 15px;
-    font-weight: 700;
-    color: white;
-    flex-shrink: 0;
-    text-transform: uppercase;
-}
-
-.inactive-row .member-avatar {
-    background: var(--border-strong);
-    color: var(--court-midnight);
-}
-
-.member-fullname {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.inactive-row .member-fullname {
-    color: var(--text-secondary);
-}
-
-/* Status badge */
-.status-badge {
-    display: inline-block;
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.status-active {
-    background: var(--pickle-lime-soft);
-    color: var(--court-midnight);
-    border: 1px solid rgba(202, 255, 40, 0.44);
-}
-
-.status-inactive {
-    background: var(--surface-court-soft);
-    color: var(--text-secondary);
-    border: 1px solid var(--border-color);
-}
-
-/* ─── Loading / Empty ─── */
-.loading-state {
-    text-align: center;
-    padding: 60px;
-    font-size: 16px;
-    color: var(--text-secondary);
-    background: #fff;
-    border: 1px solid var(--border-color);
-    border-radius: 14px;
-}
-
-.empty-state {
-    text-align: center;
-    padding: 60px 20px;
-}
-
-.empty-icon {
-    font-size: 56px;
-    margin-bottom: 16px;
-}
-
-.empty-state p {
-    color: var(--text-secondary);
-    font-size: 15px;
-}
-
-/* ─── Responsive ─── */
-@media (max-width: 768px) {
-    .members-main {
-        padding: 16px 12px;
-    }
-
-    .members-header {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 18px 20px;
-    }
-
-    .members-title {
-        font-size: 22px;
-    }
-
-    .members-filter {
-        flex-direction: column;
-    }
-
-    .filter-btn {
-        min-width: unset;
-        width: 100%;
-    }
-
-    .members-table th,
-    .members-table td {
-        padding: 12px 14px;
-    }
-
-    .col-status {
-        width: 140px;
-    }
-
-    .member-fullname {
-        font-size: 14px;
-    }
-
-    .status-badge {
-        font-size: 11px;
-        padding: 4px 8px;
-    }
-}
-
-@media (max-width: 480px) {
-    .member-avatar {
-        width: 30px;
-        height: 30px;
-        font-size: 13px;
-    }
-
-    .members-table th,
-    .members-table td {
-        padding: 10px 10px;
-    }
-}
+.members-page { min-height: 100vh; background: radial-gradient(circle at 90% 4%, rgba(168,223,233,.3), transparent 28rem), var(--ph-surface); color: var(--ph-text); }
+.members-page.is-embedded { min-height: auto; background: transparent; }
+.members-main { width: min(100% - 32px, 1180px); margin: 0 auto; padding: 28px 0 104px; }
+.is-embedded .members-main { width: 100%; padding: 0; }
+.members-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 18px; }
+.members-kicker { color: var(--ph-indigo); font-size: 10px; font-weight: 850; letter-spacing: .11em; text-transform: uppercase; }
+.members-title { margin: 5px 0 0; color: var(--ph-ink); font-size: clamp(28px, 4vw, 40px); letter-spacing: -.045em; }
+.members-subtitle { margin: 8px 0 0; color: var(--ph-muted); font-size: 13px; }
+.members-filter { display: flex; gap: 7px; margin-bottom: 15px; padding: 6px; overflow-x: auto; border: 1px solid var(--ph-line); border-radius: 15px; background: var(--ph-card); box-shadow: var(--ph-shadow-soft); }
+.filter-btn { min-height: 44px; flex: 1 0 auto; padding: 0 15px; border: 0; border-radius: 10px; background: transparent; color: var(--ph-muted); font: inherit; font-size: 12px; font-weight: 850; cursor: pointer; }
+.filter-btn.active { background: var(--ph-lavender); color: var(--ph-indigo); }
+.members-mutation-status { margin: 0 0 12px; padding: 11px 13px; border-radius: 11px; background: var(--ph-lavender); color: var(--ph-indigo); font-size: 12px; font-weight: 750; }
+.members-table-wrap { overflow-x: auto; border: 1px solid var(--ph-line); border-radius: 19px; background: var(--ph-card); box-shadow: var(--ph-shadow-soft); }
+.members-table { width: 100%; min-width: 880px; border-collapse: collapse; }
+.members-table th { padding: 13px 16px; border-bottom: 1px solid var(--ph-line); background: #fafafe; color: var(--ph-muted); font-size: 10px; letter-spacing: .08em; text-align: left; text-transform: uppercase; }
+.members-table td { padding: 14px 16px; border-bottom: 1px solid var(--ph-line); color: var(--ph-text); font-size: 13px; vertical-align: middle; }
+.members-table tr:last-child td { border-bottom: 0; }
+.members-table tr.inactive-row { opacity: .65; }
+.member-name-wrap { display: flex; align-items: center; gap: 11px; }
+.member-name-wrap > span:last-child, .members-table td > span { display: grid; gap: 3px; }
+.member-name-wrap small, .members-table td small { display: block; color: var(--ph-muted); font-size: 10px; }
+.member-avatar { width: 40px; height: 40px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 13px; background: var(--ph-lavender); color: var(--ph-indigo); font-weight: 900; text-transform: uppercase; }
+.member-fullname { color: var(--ph-ink); }
+.status-badge { display: inline-flex; padding: 5px 9px; border-radius: 999px; background: var(--ph-lavender); color: var(--ph-indigo); font-size: 11px; font-weight: 850; }
+.status-badge.status-inactive { background: #f0f1f5; color: var(--ph-muted); }
+.roster-row-actions { display: flex; gap: 6px; }
+.roster-row-actions button { min-height: 44px; padding: 0 10px; border: 1px solid var(--ph-line); border-radius: 10px; background: var(--ph-card); color: var(--ph-indigo); font: inherit; font-size: 11px; font-weight: 800; cursor: pointer; }
+.roster-row-actions button.is-danger { color: #a83e38; }
+.roster-state { min-height: 260px; display: grid; place-content: center; justify-items: center; padding: 24px; text-align: center; }
+.roster-state > span { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 14px; background: var(--ph-lavender); color: var(--ph-indigo); font-weight: 900; }
+.roster-state h2 { margin: 12px 0 0; color: var(--ph-ink); font-size: 19px; }
+.roster-state p { max-width: 420px; margin: 6px 0 0; color: var(--ph-muted); line-height: 1.5; }
+.roster-state a, .roster-state button { min-height: 44px; display: inline-flex; align-items: center; margin-top: 15px; padding: 0 15px; border: 0; border-radius: 11px; background: var(--ph-indigo); color: #fff; font: inherit; font-weight: 850; text-decoration: none; cursor: pointer; }
+.roster-modal-backdrop { position: fixed; z-index: 1500; inset: 0; display: grid; place-items: center; padding: 16px; background: rgba(40,36,61,.28); backdrop-filter: blur(6px); }
+.roster-modal { width: min(100%, 440px); padding: 22px; border: 1px solid var(--ph-line); border-radius: 20px; background: var(--ph-card); box-shadow: var(--ph-shadow); }
+.roster-modal h2 { margin: 0; color: var(--ph-ink); }.roster-modal > p { margin: 7px 0 18px; color: var(--ph-muted); font-size: 12px; }
+.roster-modal form, .roster-modal label { display: grid; gap: 8px; }.roster-modal form { gap: 14px; }.roster-modal label { color: var(--ph-text); font-size: 12px; font-weight: 800; }
+.roster-modal input { min-height: 44px; padding: 0 12px; border: 1px solid var(--ph-line); border-radius: 11px; background: var(--ph-surface); color: var(--ph-text); font: inherit; }
+.roster-modal form > div { display: flex; justify-content: flex-end; gap: 8px; }.roster-modal button { min-height: 44px; padding: 0 15px; border: 1px solid var(--ph-line); border-radius: 11px; background: var(--ph-card); color: var(--ph-text); font: inherit; font-weight: 850; cursor: pointer; }.roster-modal button[type='submit'] { border-color: var(--ph-indigo); background: var(--ph-indigo); color: #fff; }
+.members-page button:focus-visible, .members-page input:focus-visible, .members-page a:focus-visible { outline: 3px solid var(--ph-gold); outline-offset: 2px; }
+@media (max-width: 720px) { .members-main { width: min(100% - 24px, 1180px); padding-top: 19px; } .members-header { align-items: stretch; flex-direction: column; gap: 14px; } }

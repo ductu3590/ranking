@@ -1,0 +1,293 @@
+
+> quy-pickleball@0.1.0 test:ci
+> npm run test:regression && npm run build
+
+
+> quy-pickleball@0.1.0 test:regression
+> npm run test:phase1 && npm run test:teamfund && npm run test:phase2 && npm run test:phase3 && npm run test:phase4 && npm run test:phase5 && npm run test:phase6 && npm run test:mobile-nav && npm run test:leaderboard && npm run test:debug-guard && npm run test:admin-auth && npm run test:court-energy-css && npm run test:tournament
+
+
+> quy-pickleball@0.1.0 test:phase1
+> node tests/phase1/progress.test.js && node tests/phase1/navigation-role.test.js && node tests/phase1/migration-ledger.test.js && node tests/phase1/public-snapshot.test.js && node tests/phase1/polling-backoff.test.js && node tests/phase1/public-identity-migration.test.js && node tests/phase1/auth-boundary.test.js && node tests/phase1/atomic-mutations.test.js && node tests/phase1/tenant-constraints.test.js && node tests/phase1/tournament-member-origin.test.js && node tests/phase1/member-origin-trigger-hardening.test.js && node tests/phase1/member-origin-index.test.js && node tests/phase1/snapshot-tenant-scope.test.js && node tests/phase1/rls-hardening.test.js && node tests/phase1/fund-participant-tenancy.test.js && node tests/phase1/rate-limit.test.js && node tests/phase1/webhook-idempotency.test.js && node tests/phase1/advance-atomicity.test.js
+
+phase 1 progress contract ok
+phase 1 navigation role behavior ok
+phase 1 migration ledger behavior ok
+phase 1 public snapshot projection behavior ok
+phase 1 polling backoff behavior ok
+phase 1 public identity migration contract ok
+phase 1 auth boundary behavior ok
+phase 1 atomic mutation contract ok
+phase 1 tenant constraints contract ok
+phase 1 tournament member origin contract ok
+phase 1 member-origin trigger hardening contract ok
+phase 1 member-origin FK index contract ok
+phase 1 snapshot tenant scope contract ok
+phase 1 RLS hardening contract ok
+phase 1 fund participant tenancy contract ok
+phase 1 rate limit behavior ok
+phase 1 webhook idempotency contract ok
+phase 1 atomic stage advance contract ok
+
+> quy-pickleball@0.1.0 test:teamfund
+> node tests/teamfund-phase1.test.js && node tests/home-continuation.test.js
+
+teamfund phase 1 contract ok
+homepage continuation logout contract ok
+
+> quy-pickleball@0.1.0 test:phase2
+> node tests/multitenant-phase2.test.js
+
+multitenant phase 2 contract ok
+
+> quy-pickleball@0.1.0 test:phase3
+> node tests/multitenant-phase3.test.js
+
+multitenant phase 3 contract ok
+
+> quy-pickleball@0.1.0 test:phase4
+> node tests/multitenant-phase4.test.js
+
+multitenant phase 4 contract ok
+
+> quy-pickleball@0.1.0 test:phase5
+> node tests/multitenant-phase5.test.js
+
+multitenant phase 5 contract ok
+
+> quy-pickleball@0.1.0 test:phase6
+> node tests/multitenant-phase6.test.js
+
+multitenant phase 6 contract ok
+
+> quy-pickleball@0.1.0 test:mobile-nav
+> node tests/mobile-bottom-tabs.test.js
+
+mobile bottom tabs contract ok
+
+> quy-pickleball@0.1.0 test:leaderboard
+> node tests/fund-leaderboard.test.js && node tests/global-navigation.test.js
+
+fund leaderboard logic ok
+global navigation contract ok
+
+> quy-pickleball@0.1.0 test:debug-guard
+> node tests/debug-routes-guard.test.js
+
+debug routes guard ok
+
+> quy-pickleball@0.1.0 test:admin-auth
+> node tests/admin-auth.test.js
+
+admin auth contract ok
+
+> quy-pickleball@0.1.0 test:court-energy-css
+> node tests/court-energy-css.test.js
+
+Court Energy CSS contract ok
+
+> quy-pickleball@0.1.0 test:tournament
+> npm run test:t-migration && npm run test:t-engines && npm run test:t-api && npm run test:t-ui
+
+
+> quy-pickleball@0.1.0 test:t-migration
+> node tests/tournament/migration-015.test.js
+
+migration-015 contract ok
+
+> quy-pickleball@0.1.0 test:t-engines
+> node tests/tournament/seeding.test.js && node tests/tournament/match-simple.test.js && node tests/tournament/match-mlp.test.js && node tests/tournament/mlp-pairs.test.js && node tests/tournament/round-robin-schedule.test.js && node tests/tournament/round-robin-groups.test.js && node tests/tournament/round-robin-standings.test.js && node tests/tournament/knockout-schedule.test.js && node tests/tournament/knockout-standings.test.js && node tests/tournament/registry.test.js && node tests/tournament/orchestrator.test.js && node tests/tournament/mix-integration.test.js
+
+seeding ok
+match-simple ok
+match-mlp ok
+T1 8 members/4 rounds ok
+T2 4 members/4 rounds subKinds ok
+T3 determinism ok
+T4 odd members bench rotate ok
+T5 <2 VĐV throw ok
+T6 2 members/2 rounds subKinds ok
+T7 4 members/2 rounds subKinds ok
+mlp-pairs ok
+round-robin-schedule ok
+round-robin-groups ok
+round-robin-standings ok
+knockout-schedule ok
+knockout-standings ok
+registry ok
+orchestrator ok
+mix-integration ok
+
+> quy-pickleball@0.1.0 test:t-api
+> node tests/tournament/persistence.test.js && node tests/tournament/results.test.js && node tests/tournament/api-tournaments.contract.test.js && node tests/tournament/api-stages.contract.test.js && node tests/tournament/api-entrants.contract.test.js && node tests/tournament/api-generate.contract.test.js && node tests/tournament/api-games.contract.test.js && node tests/tournament/api-standings.contract.test.js && node tests/tournament/api-advance.contract.test.js && node tests/tournament/api-public.contract.test.js && node tests/tournament/api-matches.contract.test.js
+
+persistence ok
+results ok
+api-tournaments contract ok
+api-stages contract ok
+api-entrants contract ok
+api-generate contract ok
+api-games contract ok
+api-standings contract ok
+api-advance contract ok
+api-public contract ok
+api-matches contract ok
+
+> quy-pickleball@0.1.0 test:t-ui
+> node tests/tournament/ui-client.contract.test.js && node tests/tournament/ui-list.contract.test.js && node tests/tournament/ui-wizard.contract.test.js && node tests/tournament/ui-console.contract.test.js && node tests/tournament/ui-results.contract.test.js && node tests/tournament/ui-standings.contract.test.js && node tests/tournament/ui-public.contract.test.js
+
+ui-client contract ok
+ui-list contract ok
+ui-wizard contract ok
+ui-console contract ok
+ui-results contract ok
+ui-standings contract ok
+ui-public contract ok
+
+> quy-pickleball@0.1.0 build
+> next build
+
+   ▲ Next.js 14.1.0
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+   Collecting page data ...
+ ⨯ ESLint: Plugin "@next/next" was conflicted between ".eslintrc.json » eslint-config-next/core-web-vitals » plugin:@next/next/core-web-vitals" and "..\..\.eslintrc.json » eslint-config-next/core-web-vitals » plugin:@next/next/core-web-vitals".
+   Generating static pages (0/39) ...
+
+   Generating static pages (9/39) 
+Public v2 GET error: ex [Error]: Dynamic server usage: Page couldn't be rendered statically because it used `request.url`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at Object.eP [as staticGenerationBailout] (C:\Users\ductu\ranking\.worktrees\phase-1-foundation-hardening\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:29358)
+    at i (C:\Users\ductu\ranking\.worktrees\phase-1-foundation-hardening\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:34692)
+    at Object.get (C:\Users\ductu\ranking\.worktrees\phase-1-foundation-hardening\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:34788)
+    at m (C:\Users\ductu\ranking\.worktrees\phase-1-foundation-hardening\.next\server\app\api\tournament-v2\public\route.js:1:731)
+    at C:\Users\ductu\ranking\.worktrees\phase-1-foundation-hardening\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:42490
+    at C:\Users\ductu\ranking\.worktrees\phase-1-foundation-hardening\node_modules\next\dist\server\lib\trace\tracer.js:133:36
+    at NoopContextManager.with (C:\Users\ductu\ranking\.worktrees\phase-1-foundation-hardening\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (C:\Users\ductu\ranking\.worktrees\phase-1-foundation-hardening\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (C:\Users\ductu\ranking\.worktrees\phase-1-foundation-hardening\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093)
+    at ProxyTracer.startActiveSpan (C:\Users\ductu\ranking\.worktrees\phase-1-foundation-hardening\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18854) {
+  description: "Page couldn't be rendered statically because it used `request.url`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+
+   Generating static pages (19/39) 
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_not-found. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_not-found. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /giai-dau/admin. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /giai-dau/admin. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /giai-dau/admin. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /test-webhook. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /test-webhook. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /test-parsing. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /test-parsing. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /quy. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /quy. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /giai-dau. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /giai-dau. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /giai-dau. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /quy/members. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /quy/members. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /quy/admin. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /quy/admin. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /quy/bxh. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /quy/bxh. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /admin. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /admin. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+
+   Generating static pages (29/39) 
+ ⚠ Unsupported metadata viewport is configured in metadata export in /giai-dau/v2. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /giai-dau/v2. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+
+ ✓ Generating static pages (39/39) 
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                              Size     First Load JS
+┌ ○ /                                    138 B          88.1 kB
+├ ○ /_not-found                          882 B          85.3 kB
+├ ○ /admin                               4.98 kB        94.8 kB
+├ λ /api/club/bank-accounts              0 B                0 B
+├ ○ /api/club/branding                   0 B                0 B
+├ λ /api/club/events                     0 B                0 B
+├ λ /api/club/events/[id]                0 B                0 B
+├ λ /api/club/members                    0 B                0 B
+├ λ /api/club/participants               0 B                0 B
+├ λ /api/club/settings                   0 B                0 B
+├ λ /api/club/settings/regenerate-code   0 B                0 B
+├ λ /api/club/transactions               0 B                0 B
+├ λ /api/debug/check-setting             0 B                0 B
+├ λ /api/debug/fix-reveal-time           0 B                0 B
+├ λ /api/debug/live-pairings-test        0 B                0 B
+├ λ /api/debug/pairings-status           0 B                0 B
+├ λ /api/debug/player-join-test          0 B                0 B
+├ λ /api/debug/reveal-time-check         0 B                0 B
+├ λ /api/debug/supabase-test             0 B                0 B
+├ λ /api/debug/webhook-inspect           0 B                0 B
+├ λ /api/groups                          0 B                0 B
+├ λ /api/groups/join                     0 B                0 B
+├ λ /api/groups/session                  0 B                0 B
+├ λ /api/save-snapshot                   0 B                0 B
+├ λ /api/test-parse                      0 B                0 B
+├ λ /api/tournament-v2/advance           0 B                0 B
+├ λ /api/tournament-v2/entrants          0 B                0 B
+├ λ /api/tournament-v2/games             0 B                0 B
+├ λ /api/tournament-v2/generate          0 B                0 B
+├ λ /api/tournament-v2/matches           0 B                0 B
+├ λ /api/tournament-v2/pairs             0 B                0 B
+├ λ /api/tournament-v2/public            0 B                0 B
+├ λ /api/tournament-v2/stages            0 B                0 B
+├ λ /api/tournament-v2/standings         0 B                0 B
+├ λ /api/tournament-v2/tournaments       0 B                0 B
+├ λ /api/webhook                         0 B                0 B
+├ ○ /giai-dau                            141 B          84.5 kB
+├ ○ /giai-dau/admin                      141 B          84.5 kB
+├ ○ /giai-dau/v2                         23.8 kB         111 kB
+├ λ /giai-dau/v2/[slug]                  2.23 kB        89.2 kB
+├ λ /join                                138 B          88.1 kB
+├ ○ /quy                                 5.53 kB        89.9 kB
+├ ○ /quy/admin                           172 B          89.9 kB
+├ ○ /quy/bxh                             2.59 kB          87 kB
+├ ○ /quy/members                         1.15 kB        85.6 kB
+├ λ /quy/su-kien/[id]                    1.94 kB        86.3 kB
+├ ○ /test-parsing                        1.79 kB        86.2 kB
+└ ○ /test-webhook                        2 kB           86.4 kB
++ First Load JS shared by all            84.4 kB
+  ├ chunks/69-c81055bf8f24e4d2.js        28.9 kB
+  ├ chunks/fd9d1056-7bd00a2066ce8835.js  53.4 kB
+  └ other shared chunks (total)          2.13 kB
+
+
+○  (Static)   prerendered as static content
+λ  (Dynamic)  server-rendered on demand using Node.js
+

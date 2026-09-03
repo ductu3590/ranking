@@ -37,7 +37,25 @@ export async function POST(request) {
     if (!title) {
         return NextResponse.json({ error: 'Tên sự kiện là bắt buộc.' }, { status: 400 });
     }
-    const memberIds = Array.isArray(body?.memberIds) ? body.memberIds : [];
+    const rawMemberIds = Array.isArray(body?.memberIds) ? body.memberIds : [];
+    const memberIds = [...new Set(rawMemberIds.map(Number))];
+    if (memberIds.some((memberId) => !Number.isSafeInteger(memberId) || memberId < 1)) {
+        return NextResponse.json({ error: 'Danh sách thành viên không hợp lệ.' }, { status: 400 });
+    }
+
+    if (memberIds.length > 0) {
+        const { data: members, error: memberError } = await supabaseAdmin
+            .from('club_members')
+            .select('id')
+            .eq('group_id', groupId)
+            .in('id', memberIds);
+        if (memberError) {
+            return NextResponse.json({ error: memberError.message }, { status: 500 });
+        }
+        if ((members || []).length !== memberIds.length) {
+            return NextResponse.json({ error: 'Một hoặc nhiều thành viên không thuộc CLB.' }, { status: 400 });
+        }
+    }
 
     const { data: event, error } = await supabaseAdmin
         .from('fund_events')
@@ -56,6 +74,7 @@ export async function POST(request) {
 
     if (memberIds.length > 0) {
         const rows = memberIds.map((memberId) => ({
+            group_id: groupId,
             event_id: event.id,
             member_id: memberId,
             has_paid: false,

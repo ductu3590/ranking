@@ -197,7 +197,7 @@ function MatchCard({ match, savedGames, isMlp, entrantsById, isAdmin, onSaved, p
                     }
                     return game;
                 });
-            const resp = await saveGames(match.id, games);
+            const resp = await saveGames(match.id, games, { expectedVersion: match.version });
             if (resp.complete) {
                 const w = resp.winner_entrant_id;
                 setMsg(`Đã lưu. Thắng: ${entrantName(entrantsById, w, '—')}`);

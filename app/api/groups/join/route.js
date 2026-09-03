@@ -3,6 +3,7 @@ import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { normalizeGroupCode, publicGroupPayload, verifyPassword } from '@/lib/groupAuth';
 import { setGroupSessionCookie, signGroupSession } from '@/lib/groupSession';
+import { consumeRateLimit, getClientIdentifier, rateLimitResponse } from '@/lib/rateLimit';
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -11,6 +12,12 @@ export async function POST(request) {
         const body = await request.json();
         const code = normalizeGroupCode(body?.code);
         const password = String(body?.password || '');
+
+        const rate = consumeRateLimit(
+            `group-join:${getClientIdentifier(request)}:${code || 'unknown'}`,
+            { limit: 8, windowMs: 60_000 },
+        );
+        if (!rate.allowed) return rateLimitResponse(rate);
 
         if (!code || !password) {
             return NextResponse.json({ error: 'Vui lòng nhập mã nhóm và mật khẩu.' }, { status: 400 });

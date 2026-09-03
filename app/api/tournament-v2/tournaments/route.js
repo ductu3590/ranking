@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
+import { randomBytes } from 'crypto';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
-import { requireGroupAdmin, getEffectiveGroupContext } from '@/lib/groupSession';
+import { requireGroupAdmin, getClubScope } from '@/lib/groupSession';
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -12,9 +13,11 @@ const ALLOWED_TOURNAMENT_FIELDS = [
     'status',
     'location',
     'entrant_type',
-    'public_slug',
+    'visibility',
     'settings',
 ];
+
+const VISIBILITIES = new Set(['private', 'unlisted', 'public']);
 
 function buildTournamentPayload(body, groupId) {
     const payload = {};
@@ -26,6 +29,8 @@ function buildTournamentPayload(body, groupId) {
             payload[field] = body[field] || 'pair';
         } else if (field === 'settings') {
             payload[field] = body[field] || {};
+        } else if (field === 'visibility') {
+            payload[field] = body[field] || null;
         } else {
             payload[field] = body[field] || null;
         }
@@ -52,13 +57,30 @@ function slugify(name) {
 
 function generateSlug(name) {
     const base = slugify(name) || 'giai';
-    const suffix = Math.random().toString(36).slice(2, 6);
+    const suffix = randomBytes(9).toString('hex');
     return `${base}-${suffix}`;
+}
+
+function normalizeVisibility(value, fallback) {
+    const visibility = value == null || value === '' ? fallback : String(value).trim().toLowerCase();
+    return VISIBILITIES.has(visibility) ? visibility : null;
+}
+
+async function insertWithSlugRetry(payload) {
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+        const { data, error } = await db.from('tournaments').insert(payload).select().single();
+        if (!error) return { data, error: null };
+        if (error.code !== '23505' || attempt === 2) return { data: null, error };
+        payload = { ...payload, public_slug: generateSlug(payload.name) };
+    }
+    return { data: null, error: new Error('Unable to generate a unique public slug') };
 }
 
 export async function GET() {
     try {
-        const { group_id: groupId } = getEffectiveGroupContext();
+        const scope = getClubScope();
+        if (!scope.ok) return scope.response;
+        const groupId = scope.groupId;
 
         const { data, error } = await db
             .from('tournaments')
@@ -89,20 +111,22 @@ export async function POST(request) {
             return NextResponse.json({ error: 'Tournament name is required' }, { status: 400 });
         }
 
+        const visibility = normalizeVisibility(body.visibility, 'unlisted');
+        if (!visibility) {
+            return NextResponse.json({ error: 'Invalid tournament visibility' }, { status: 400 });
+        }
+
         const payload = buildTournamentPayload({
             ...body,
             name,
             status: body.status || 'draft',
             entrant_type: body.entrant_type || 'pair',
             settings: body.settings || {},
-            public_slug: body.public_slug || generateSlug(name),
+            visibility,
         }, adminCheck.groupId);
+        payload.public_slug = generateSlug(name);
 
-        const { data, error } = await db
-            .from('tournaments')
-            .insert(payload)
-            .select()
-            .single();
+        const { data, error } = await insertWithSlugRetry(payload);
 
         if (error) {
             return NextResponse.json({ error: error.message }, { status: 500 });
@@ -124,6 +148,10 @@ export async function PATCH(request) {
         const id = body?.id;
         if (!id) {
             return NextResponse.json({ error: 'Tournament id is required' }, { status: 400 });
+        }
+
+        if ('visibility' in body && !normalizeVisibility(body.visibility, null)) {
+            return NextResponse.json({ error: 'Invalid tournament visibility' }, { status: 400 });
         }
 
         const payload = buildTournamentPayload(body);

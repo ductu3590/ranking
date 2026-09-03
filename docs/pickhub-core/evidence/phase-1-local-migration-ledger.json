@@ -1,0 +1,153 @@
+{
+  "migrations": [
+    {
+      "version": 1,
+      "filename": "001_add_members_and_categorization.sql",
+      "checksum": "37cb097ef144df8064395aef1a0d456b590d7e826afdd70fa809517a5d45e607"
+    },
+    {
+      "version": 2,
+      "filename": "002_add_ranking_snapshots.sql",
+      "checksum": "927776a8f759611567db9b248568380ce6dbeb622dc0242be56abfe9abdf5843"
+    },
+    {
+      "version": 3,
+      "filename": "003_remove_member_contact_fields.sql",
+      "checksum": "412574814de6747a9306f5b44b6bf3efa940966515f35cac380e4bbd0027dbb7"
+    },
+    {
+      "version": 4,
+      "filename": "004_tournament_tables.sql",
+      "checksum": "36dcab1e861c4c177ac875b54147e4cc8f72034a0af6edab74ade52f40fe201d"
+    },
+    {
+      "version": 5,
+      "filename": "005_fund_events.sql",
+      "checksum": "372405f098dc41740cd2ab1cdfce106ab72baf0fad439d3ace4ab4773f4ee49c"
+    },
+    {
+      "version": 6,
+      "filename": "006_create_tournaments.sql",
+      "checksum": "f2ac07fd300369574fd39cb85e1a26d3dde8e414d79a12d60b363fae79b9565b"
+    },
+    {
+      "version": 7,
+      "filename": "007_multigroup_phase1.sql",
+      "checksum": "c19ee386c2babdf535cfaec15dba37a29745728d79bb910b35e646342e88a98c"
+    },
+    {
+      "version": 8,
+      "filename": "008_group_members.sql",
+      "checksum": "7992f83937a2265d97502ed35d1e51cae0ed0e37e5e5b01e8588ff91a3eb7ec7"
+    },
+    {
+      "version": 9,
+      "filename": "009_enable_rls.sql",
+      "checksum": "6af7b8d068e12fe92d44a9872270cdd5ccb200240daf3cc74fdc9227ad1ad57c"
+    },
+    {
+      "version": 10,
+      "filename": "010_group_bank_accounts.sql",
+      "checksum": "50cfed633e9c5fe0698a43dd64d64baecbc7a59a1c5630ffba5be093d65d2e0d"
+    },
+    {
+      "version": 11,
+      "filename": "011_group_branding.sql",
+      "checksum": "0bb930a4ca3882b24ee94d594c67ee0fc04498d60337e8c4489e1b9f03d4e09d"
+    },
+    {
+      "version": 11,
+      "filename": "011_group_sepay_webhook_secret.sql",
+      "checksum": "fae15f6edfa422e0204ce28d191c5d06d850e07d249a1d9227c4a71461fca47e"
+    },
+    {
+      "version": 12,
+      "filename": "012_tournament_management_v2.sql",
+      "checksum": "83acbe20410c5abd5886d058ebeac512bbddf2a3a15e39ff0855b738c320888d"
+    },
+    {
+      "version": 13,
+      "filename": "013_tournament_settings_group_unique.sql",
+      "checksum": "30daa3ea978c04ae78ae278cedf8ee0c5d0f426598c5e76973163aea10b47f0d"
+    },
+    {
+      "version": 14,
+      "filename": "014_tournaments_id_default.sql",
+      "checksum": "e1a00a570a8b47b2b6814b5b775114a843362f3ce26af9797ed0a970a807be69"
+    },
+    {
+      "version": 15,
+      "filename": "015_tournament_module_v2.sql",
+      "checksum": "d763e4d1f57da6a4324a9add1b17d811182744701d41c125f95907b1e93843d3"
+    },
+    {
+      "version": 16,
+      "filename": "016_tournament_v2_enable_rls.sql",
+      "checksum": "1a8af203af7dd03b7a006b388a00020e7780f1c2aa4ea215e22a3f6ebfdd980c"
+    },
+    {
+      "version": 17,
+      "filename": "017_phase1_migration_ledger.sql",
+      "checksum": "4e0330023c044328cf4e5120cbe7e25c88cb609209486215aaaba2513128b4e9"
+    },
+    {
+      "version": 18,
+      "filename": "018_tournament_public_identity.sql",
+      "checksum": "d56076485e3cb1e897f05d62bd4ff11bd3a1fc16b657aa6bdf76126e684fa406"
+    },
+    {
+      "version": 19,
+      "filename": "019_tournament_atomic_mutations.sql",
+      "checksum": "9484fe2fb0cd258e5aa0bc5fb5d2f7f24235cd5d5c54f479d1d02eb9fce296b9"
+    },
+    {
+      "version": 20,
+      "filename": "020_phase1_tenant_constraints.sql",
+      "checksum": "a7deb9852b614fb590c20ce7a6077662ebe1f5ddaa8c3bf4ad2a9b6e4b517420"
+    },
+    {
+      "version": 21,
+      "filename": "021_phase1_rls_hardening.sql",
+      "checksum": "166eda7790d7cf0f295516054410fe04e52ccc3073cb6f72bc4fe9e9a349c7b5"
+    },
+    {
+      "version": 22,
+      "filename": "022_fund_participant_tenancy.sql",
+      "checksum": "508887e12f436bd6e95fc6fb0ae0629c65b89bd6f14e81ea266556082e98e9a0"
+    },
+    {
+      "version": 23,
+      "filename": "023_webhook_idempotency.sql",
+      "checksum": "793512fe0d9858950f1b10d0a3773afd5a0a985de12d98cf5e3a219596c52924"
+    },
+    {
+      "version": 24,
+      "filename": "024_atomic_stage_advance.sql",
+      "checksum": "db8b3a5da2498982a7313754fe4c6de52034b81999c5ba9e2fb1235baef578aa"
+    },
+    {
+      "version": 25,
+      "filename": "025_tournament_member_origin.sql",
+      "checksum": "1295471e85a685ce1852a2b179568b7f221d9c65f9cbf73cefee754180ea6714"
+    },
+    {
+      "version": 26,
+      "filename": "026_harden_member_origin_trigger.sql",
+      "checksum": "ae3fe2986d3aac0cadb1d1dd063b6e1dc70764280e57f68554b3bc8c620b42e3"
+    },
+    {
+      "version": 27,
+      "filename": "027_index_member_origin_fk.sql",
+      "checksum": "4eb2303ed5c28199e0d9752fa9169b176ab2ad0932429458497d51d8d177c842"
+    }
+  ],
+  "duplicateVersions": [
+    {
+      "version": 11,
+      "filenames": [
+        "011_group_branding.sql",
+        "011_group_sepay_webhook_secret.sql"
+      ]
+    }
+  ]
+}

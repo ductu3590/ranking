@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
-import { requireGroupAdmin, getEffectiveGroupContext } from '@/lib/groupSession';
+import { requireGroupAdmin, getClubScope } from '@/lib/groupSession';
 import { generatePairSchedule } from '@/lib/tournament/match/mlpPairs';
 
 const db = supabaseAdmin || supabaseServer;
@@ -10,7 +10,9 @@ const db = supabaseAdmin || supabaseServer;
 // Đọc pairSchedule hiện có của 1 stage. null nếu chưa sinh.
 export async function GET(request) {
     try {
-        const { group_id: groupId } = getEffectiveGroupContext();
+        const scope = getClubScope();
+        if (!scope.ok) return scope.response;
+        const groupId = scope.groupId;
         const { searchParams } = new URL(request.url);
         const stageId = searchParams.get('stageId');
         if (!stageId) {

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
-import { requireGroupAdmin, getEffectiveGroupContext } from '@/lib/groupSession';
+import { requireGroupAdmin, getClubScope } from '@/lib/groupSession';
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -26,20 +26,66 @@ function buildEntrantPayload(body, groupId) {
     return payload;
 }
 
-function buildMemberRows(members, groupId, entrantId) {
+function normalizeMemberId(value) {
+    if (value === null || value === undefined || value === '') return null;
+    const id = Number(value);
+    return Number.isInteger(id) && id > 0 ? id : null;
+}
+
+async function resolveMemberGroups(members) {
+    if (!Array.isArray(members) || members.length === 0) {
+        return { memberGroups: new Map(), error: null };
+    }
+
+    const memberIds = [];
+    for (const member of members) {
+        if (member?.member_id === null || member?.member_id === undefined || member?.member_id === '') {
+            continue;
+        }
+        const memberId = normalizeMemberId(member.member_id);
+        if (!memberId) {
+            return { memberGroups: new Map(), error: 'member_id không hợp lệ' };
+        }
+        if (!memberIds.includes(memberId)) memberIds.push(memberId);
+    }
+
+    if (memberIds.length === 0) {
+        return { memberGroups: new Map(), error: null };
+    }
+
+    const { data, error } = await db
+        .from('club_members')
+        .select('id, group_id')
+        .in('id', memberIds);
+    if (error) return { memberGroups: new Map(), error: error.message };
+
+    const memberGroups = new Map((data || []).map((member) => [Number(member.id), member.group_id]));
+    if (memberIds.some((memberId) => !memberGroups.has(memberId))) {
+        return { memberGroups: new Map(), error: 'Một hoặc nhiều member_id không tồn tại' };
+    }
+    return { memberGroups, error: null };
+}
+
+function buildMemberRows(members, groupId, entrantId, memberGroups = new Map()) {
     if (!Array.isArray(members)) return [];
-    return members.map((m) => ({
-        group_id: groupId,
-        entrant_id: entrantId,
-        member_id: m.member_id || null,
-        display_name: m.display_name || null,
-        gender: m.gender || null,
-    }));
+    return members.map((m) => {
+        const memberId = normalizeMemberId(m?.member_id);
+        return {
+            group_id: groupId,
+            entrant_id: entrantId,
+            member_id: memberId,
+            member_group_id: memberId === null ? null : memberGroups.get(memberId),
+            display_name: m?.display_name || null,
+            gender: m?.gender || null,
+        };
+    });
 }
 
 export async function GET(request) {
     try {
-        const { group_id: groupId } = getEffectiveGroupContext();
+        const scope = getClubScope();
+        if (!scope.ok) return scope.response;
+        const groupId = scope.groupId;
         const { searchParams } = new URL(request.url);
         const tournamentId = searchParams.get('tournamentId');
         if (!tournamentId) {
@@ -106,6 +152,10 @@ export async function POST(request) {
         }
 
         const payload = buildEntrantPayload(body, adminCheck.groupId);
+        const memberResolution = await resolveMemberGroups(body.members);
+        if (memberResolution.error) {
+            return NextResponse.json({ error: memberResolution.error }, { status: 400 });
+        }
 
         const { data: entrant, error } = await db
             .from('tournament_entrants')
@@ -118,7 +168,12 @@ export async function POST(request) {
         }
 
         let members = [];
-        const memberRows = buildMemberRows(body.members, adminCheck.groupId, entrant.id);
+        const memberRows = buildMemberRows(
+            body.members,
+            adminCheck.groupId,
+            entrant.id,
+            memberResolution.memberGroups,
+        );
         if (memberRows.length) {
             const { data: inserted, error: membersErr } = await db
                 .from('tournament_entrant_members')
@@ -152,6 +207,11 @@ export async function PATCH(request) {
         delete payload.group_id;
         delete payload.tournament_id;
 
+        const memberResolution = await resolveMemberGroups(body.members);
+        if (memberResolution.error) {
+            return NextResponse.json({ error: memberResolution.error }, { status: 400 });
+        }
+
         const { data: entrant, error } = await db
             .from('tournament_entrants')
             .update(payload)
@@ -175,7 +235,12 @@ export async function PATCH(request) {
                 return NextResponse.json({ error: delErr.message }, { status: 500 });
             }
 
-            const memberRows = buildMemberRows(body.members, adminCheck.groupId, id);
+            const memberRows = buildMemberRows(
+                body.members,
+                adminCheck.groupId,
+                id,
+                memberResolution.memberGroups,
+            );
             if (memberRows.length) {
                 const { data: inserted, error: insErr } = await db
                     .from('tournament_entrant_members')

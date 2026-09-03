@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "architecture_version": "1.0.0",
-  "active_phase": null,
+  "active_phase": 1,
   "allowed_statuses": [
     "not_started",
     "in_progress",
@@ -20,11 +20,11 @@
     {
       "id": 1,
       "name": "foundation-hardening",
-      "status": "not_started",
+      "status": "awaiting_approval",
       "branch": "codex/phase-1-foundation-hardening",
       "depends_on": ["core-blueprint"],
-      "evidence": null,
-      "approved_by": null,
+      "evidence": "evidence/phase-1-test-report.md",
+      "approved_by": "product owner smoke confirmation (2026-09-03)",
       "completed_at": null,
       "completion_commit": null,
       "merge_commit": null

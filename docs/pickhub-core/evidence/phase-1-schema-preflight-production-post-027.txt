@@ -1,0 +1,39 @@
+# Phase 1 schema preflight — production after migrations 025–027
+
+Environment: Supabase `Ranking 246 / main PRODUCTION`
+Executed through Supabase MCP on 2026-09-03 after migrations 025, 026, and 027
+and their ledger registrations.
+
+The complete `database/audits/phase-1-schema-preflight.sql` batch completed
+without a SQL error. The MCP multi-statement response exposes the final result
+set, so the integrity counters below were also run as a separate read-only
+verification query.
+
+## Integrity counters
+
+| check | metric | value |
+| --- | --- | ---: |
+| member_origin | entrant_member_rows | 56 |
+| member_origin | missing_member_group_id | 0 |
+| member_origin | guest_with_member_group_id | 0 |
+| member_origin | member_origin_mismatch | 0 |
+| duplicates | member_duplicate_groups | 0 |
+| duplicates | webhook_duplicate_groups | 0 |
+| tenant_nulls | total_null_group_id | 0 |
+| relations | total_checked_violations | 0 |
+| schema | member_group_column | present |
+| schema | composite_member_fk | present |
+| schema | old_member_fk | absent |
+| schema | origin_trigger | present |
+| schema | origin_trigger_search_path | public |
+| schema | member_origin_fk_index | present |
+| ledger | migration_025_rows | 1 |
+| ledger | migration_026_rows | 1 |
+| ledger | migration_027_rows | 1 |
+| rls | public_tables_with_rls_disabled | 0 |
+
+## Section 10 — RLS flags
+
+All 24 public tables report `rls_enabled = true` and `force_rls = false`.
+
+Result: production schema and data integrity checks pass after migrations 025–027.

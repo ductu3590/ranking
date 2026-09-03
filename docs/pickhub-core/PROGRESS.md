@@ -7,7 +7,7 @@ File này là bản đọc cho con người. Trạng thái chuẩn cho máy nằ
 | Hạng mục | Trạng thái | Nhánh | Điều kiện tiếp theo |
 |---|---|---|---|
 | Core blueprint | `completed` | `codex/pickhub-core-blueprint` | Đã được product owner duyệt ngày 2026-09-02 và merge vào `main` (`c210c358`) |
-| Phase 1 — Ổn định nền tảng | `not_started` | Chưa tạo | Tạo nhánh sau khi blueprint merge vào `main` |
+| Phase 1 — Ổn định nền tảng | `awaiting_approval` | `codex/phase-1-foundation-hardening` | Merge vào `main`, smoke lại trên `main`, rồi chuyển `completed` |
 | Phase 2 — Danh tính VĐV và CLB | `not_started` | Chưa tạo | Phase 1 completed và merge |
 | Phase 3 — MVP giải liên CLB | `not_started` | Chưa tạo | Phase 2 completed và merge |
 | Phase 4 — Vận hành giải | `not_started` | Chưa tạo | Phase 3 completed và merge |
@@ -16,7 +16,8 @@ File này là bản đọc cho con người. Trạng thái chuẩn cho máy nằ
 
 ## Completion ledger
 
-Chưa có phase triển khai nào hoàn thành.
+Phase 1 đã hoàn thành kiểm thử trên branch/Preview và đang chờ merge vào `main`.
+Chưa có phase triển khai nào được ghi `completed`.
 
 Mỗi completion record sau này phải chứa: phase, thời gian, branch, completion commit, merge commit, người xác nhận, test evidence và ghi chú migration/release.
 

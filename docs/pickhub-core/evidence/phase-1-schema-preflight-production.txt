@@ -1,0 +1,329 @@
+## File này lưu toàn bộ kết quả preflight production
+-- 1. Inventory và phân loại ownership của các bảng phải có trong Phase 1.
+| table_name                 | data_scope | tenant_column_required | table_exists | has_group_id | group_id_nullable | group_id_type |
+| -------------------------- | ---------- | ---------------------- | ------------ | ------------ | ----------------- | ------------- |
+| club_members               | club       | true                   | true         | true         | NO                | bigint        |
+| fund_event_participants    | club       | true                   | true         | true         | NO                | bigint        |
+| fund_events                | club       | true                   | true         | true         | NO                | bigint        |
+| group_bank_accounts        | club       | true                   | true         | true         | NO                | bigint        |
+| group_members              | club       | true                   | true         | true         | NO                | bigint        |
+| groups                     | platform   | false                  | true         | false        | null              | null          |
+| pickhub_schema_migrations  | platform   | false                  | true         | false        | null              | null          |
+| quy_pickleball             | club       | true                   | true         | true         | NO                | bigint        |
+| ranking_snapshots          | club       | true                   | true         | true         | NO                | bigint        |
+| tournament_entrant_members | club       | true                   | true         | true         | NO                | bigint        |
+| tournament_entrants        | club       | true                   | true         | true         | NO                | bigint        |
+| tournament_games           | club       | true                   | true         | true         | NO                | bigint        |
+| tournament_matches         | club       | true                   | true         | true         | NO                | bigint        |
+| tournament_stage_entrants  | club       | true                   | true         | true         | NO                | bigint        |
+| tournament_stages          | club       | true                   | true         | true         | NO                | bigint        |
+| tournaments                | club       | true                   | true         | true         | NO                | bigint        |
+
+-- 2. Migration ledger presence. So sánh checksum bằng JSON/SQL do
+| ledger_exists | next_action                                                       |
+| ------------- | ----------------------------------------------------------------- |
+| true          | compare stored checksums with phase-1-local-migration-ledger.json |
+
+-- 3. Exact NULL tenant counts trên các bảng hiện đang có group_id.
+| table_name                 | row_count | null_group_id |
+| -------------------------- | --------- | ------------- |
+| club_members               | 21        | 0             |
+| fund_event_participants    | 28        | 0             |
+| fund_events                | 2         | 0             |
+| group_bank_accounts        | 1         | 0             |
+| group_members              | 1         | 0             |
+| quy_pickleball             | 649       | 0             |
+| tournament_entrant_members | 56        | 0             |
+| tournament_entrants        | 12        | 0             |
+| tournament_games           | 0         | 0             |
+| tournament_matches         | 6         | 0             |
+| tournament_stage_entrants  | 0         | 0             |
+| tournament_stages          | 7         | 0             |
+| tournaments                | 7         | 0             |
+
+-- 4. ranking_snapshots phải được backfill group_id trong Phase 1.
+| ranking_snapshot_rows | has_group_id | null_group_id |
+| --------------------- | ------------ | ------------- |
+| 20                    | true         | 0             |
+
+-- 5. Duplicate tên trong cùng CLB. Tên không phải identity, nhưng policy hiện
+5a - 5b: Success. No rows returned
+
+-- 6. Orphan và cross-tenant rows ở mô hình giải đấu/fund hiện tại.
+| relation_name                         | violation_count |
+| ------------------------------------- | --------------- |
+| fund_event_participants.event_id      | 0               |
+| fund_event_participants.member_id     | 0               |
+| tournament_entrant_members.entrant_id | 0               |
+| tournament_entrant_members.member_id  | 0               |
+| tournament_entrants.tournament_id     | 0               |
+| tournament_games.match_id             | 0               |
+| tournament_games.winner_entrant_id    | 0               |
+| tournament_matches.entrant_a_id       | 0               |
+| tournament_matches.entrant_b_id       | 0               |
+| tournament_matches.parent_match_id    | 0               |
+| tournament_matches.stage_id           | 0               |
+| tournament_matches.winner_entrant_id  | 0               |
+| tournament_stage_entrants.entrant_id  | 0               |
+| tournament_stage_entrants.stage_id    | 0               |
+| tournament_stages.tournament_id       | 0               |
+
+-- 7. Constraints/FK thực tế, gồm định nghĩa để phát hiện FK chỉ theo id.
+| table_name                   | constraint_name                                  | constraint_type | definition                                                                                                                   |
+| ---------------------------- | ------------------------------------------------ | --------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| club_members                 | club_members_group_id_fkey                       | f               | FOREIGN KEY (group_id) REFERENCES groups(id)                                                                                 |
+| club_members                 | club_members_pkey                                | p               | PRIMARY KEY (id)                                                                                                             |
+| fund_event_participants      | fund_event_participants_event_id_fkey            | f               | FOREIGN KEY (event_id) REFERENCES fund_events(id) ON DELETE CASCADE                                                          |
+| fund_event_participants      | fund_event_participants_group_event_fk           | f               | FOREIGN KEY (event_id, group_id) REFERENCES fund_events(id, group_id) ON DELETE CASCADE                                      |
+| fund_event_participants      | fund_event_participants_group_id_fkey            | f               | FOREIGN KEY (group_id) REFERENCES groups(id)                                                                                 |
+| fund_event_participants      | fund_event_participants_group_member_fk          | f               | FOREIGN KEY (member_id, group_id) REFERENCES club_members(id, group_id) ON DELETE CASCADE                                    |
+| fund_event_participants      | fund_event_participants_member_id_fkey           | f               | FOREIGN KEY (member_id) REFERENCES club_members(id) ON DELETE CASCADE                                                        |
+| fund_event_participants      | fund_event_participants_pkey                     | p               | PRIMARY KEY (id)                                                                                                             |
+| fund_event_participants      | fund_event_participants_event_id_member_id_key   | u               | UNIQUE (event_id, member_id)                                                                                                 |
+| fund_events                  | fund_events_group_id_fkey                        | f               | FOREIGN KEY (group_id) REFERENCES groups(id)                                                                                 |
+| fund_events                  | fund_events_pkey                                 | p               | PRIMARY KEY (id)                                                                                                             |
+| gh_clubs                     | gh_clubs_pkey                                    | p               | PRIMARY KEY (id)                                                                                                             |
+| gh_draws                     | gh_draws_group_no_check                          | c               | CHECK (group_no >= 1 AND group_no <= 5)                                                                                      |
+| gh_draws                     | gh_draws_club_id_fkey                            | f               | FOREIGN KEY (club_id) REFERENCES gh_clubs(id) ON DELETE CASCADE                                                              |
+| gh_draws                     | gh_draws_pair_id_fkey                            | f               | FOREIGN KEY (pair_id) REFERENCES gh_pairs(id) ON DELETE CASCADE                                                              |
+| gh_draws                     | gh_draws_round_fkey                              | f               | FOREIGN KEY (round) REFERENCES gh_rounds(round) ON DELETE CASCADE                                                            |
+| gh_draws                     | gh_draws_pkey                                    | p               | PRIMARY KEY (id)                                                                                                             |
+| gh_draws                     | gh_draws_round_group_no_club_id_key              | u               | UNIQUE (round, group_no, club_id)                                                                                            |
+| gh_draws                     | gh_draws_round_pair_id_key                       | u               | UNIQUE (round, pair_id)                                                                                                      |
+| gh_matches                   | gh_matches_group_no_check                        | c               | CHECK (group_no >= 1 AND group_no <= 5)                                                                                      |
+| gh_matches                   | gh_matches_match_no_check                        | c               | CHECK (match_no >= 1 AND match_no <= 3)                                                                                      |
+| gh_matches                   | gh_matches_score_a_check                         | c               | CHECK (score_a >= 0)                                                                                                         |
+| gh_matches                   | gh_matches_score_b_check                         | c               | CHECK (score_b >= 0)                                                                                                         |
+| gh_matches                   | gh_matches_pair_a_fkey                           | f               | FOREIGN KEY (pair_a) REFERENCES gh_pairs(id) ON DELETE CASCADE                                                               |
+| gh_matches                   | gh_matches_pair_b_fkey                           | f               | FOREIGN KEY (pair_b) REFERENCES gh_pairs(id) ON DELETE CASCADE                                                               |
+| gh_matches                   | gh_matches_round_fkey                            | f               | FOREIGN KEY (round) REFERENCES gh_rounds(round) ON DELETE CASCADE                                                            |
+| gh_matches                   | gh_matches_pkey                                  | p               | PRIMARY KEY (id)                                                                                                             |
+| gh_matches                   | gh_matches_round_group_no_match_no_key           | u               | UNIQUE (round, group_no, match_no)                                                                                           |
+| gh_pairs                     | gh_pairs_slot_check                              | c               | CHECK (slot >= 1 AND slot <= 5)                                                                                              |
+| gh_pairs                     | gh_pairs_club_id_fkey                            | f               | FOREIGN KEY (club_id) REFERENCES gh_clubs(id) ON DELETE CASCADE                                                              |
+| gh_pairs                     | gh_pairs_round_fkey                              | f               | FOREIGN KEY (round) REFERENCES gh_rounds(round) ON DELETE CASCADE                                                            |
+| gh_pairs                     | gh_pairs_pkey                                    | p               | PRIMARY KEY (id)                                                                                                             |
+| gh_pairs                     | gh_pairs_club_id_round_slot_key                  | u               | UNIQUE (club_id, round, slot)                                                                                                |
+| gh_rounds                    | gh_rounds_round_check                            | c               | CHECK (round = ANY (ARRAY[1, 2]))                                                                                            |
+| gh_rounds                    | gh_rounds_pkey                                   | p               | PRIMARY KEY (round)                                                                                                          |
+| gh_secrets                   | gh_secrets_pkey                                  | p               | PRIMARY KEY (key)                                                                                                            |
+| gh_settings                  | gh_settings_pkey                                 | p               | PRIMARY KEY (key)                                                                                                            |
+| group_bank_accounts          | group_bank_accounts_group_id_fkey                | f               | FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE                                                               |
+| group_bank_accounts          | group_bank_accounts_pkey                         | p               | PRIMARY KEY (id)                                                                                                             |
+| group_bank_accounts          | group_bank_accounts_account_number_key           | u               | UNIQUE (account_number)                                                                                                      |
+| group_members                | group_members_role_check                         | c               | CHECK (role = ANY (ARRAY['owner'::text, 'admin'::text]))                                                                     |
+| group_members                | group_members_group_id_fkey                      | f               | FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE                                                               |
+| group_members                | group_members_user_id_fkey                       | f               | FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE                                                            |
+| group_members                | group_members_pkey                               | p               | PRIMARY KEY (id)                                                                                                             |
+| group_members                | group_members_group_id_user_id_key               | u               | UNIQUE (group_id, user_id)                                                                                                   |
+| groups                       | groups_code_length                               | c               | CHECK (char_length(code) = 8)                                                                                                |
+| groups                       | groups_sepay_webhook_secret_not_blank            | c               | CHECK (sepay_webhook_secret IS NULL OR btrim(sepay_webhook_secret) <> ''::text)                                              |
+| groups                       | groups_pkey                                      | p               | PRIMARY KEY (id)                                                                                                             |
+| groups                       | groups_code_key                                  | u               | UNIQUE (code)                                                                                                                |
+| pickhub_mutation_idempotency | pickhub_mutation_idempotency_response_hash_check | c               | CHECK (response_hash ~ '^[0-9a-f]{32}$'::text)                                                                               |
+| pickhub_mutation_idempotency | pickhub_mutation_idempotency_group_id_fkey       | f               | FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE                                                               |
+| pickhub_mutation_idempotency | pickhub_mutation_idempotency_pkey                | p               | PRIMARY KEY (group_id, operation, idempotency_key)                                                                           |
+| pickhub_schema_migrations    | pickhub_schema_migrations_checksum_check         | c               | CHECK (checksum ~ '^[0-9a-f]{64}$'::text)                                                                                    |
+| pickhub_schema_migrations    | pickhub_schema_migrations_version_check          | c               | CHECK (version > 0)                                                                                                          |
+| pickhub_schema_migrations    | pickhub_schema_migrations_pkey                   | p               | PRIMARY KEY (filename)                                                                                                       |
+| quy_pickleball               | quy_pickleball_huong_giao_dich_check             | c               | CHECK (huong_giao_dich = ANY (ARRAY['in'::text, 'out'::text]))                                                               |
+| quy_pickleball               | quy_pickleball_loai_giao_dich_check              | c               | CHECK (loai_giao_dich = ANY (ARRAY['nop_phat'::text, 'nop_quy'::text, 'khac'::text]))                                        |
+| quy_pickleball               | quy_pickleball_group_id_fkey                     | f               | FOREIGN KEY (group_id) REFERENCES groups(id)                                                                                 |
+| quy_pickleball               | quy_pickleball_pkey                              | p               | PRIMARY KEY (id)                                                                                                             |
+| quy_pickleball               | quy_pickleball_ma_giao_dich_key                  | u               | UNIQUE (ma_giao_dich)                                                                                                        |
+| ranking_snapshots            | ranking_snapshots_rank_positive                  | c               | CHECK (rank_position > 0)                                                                                                    |
+| ranking_snapshots            | ranking_snapshots_group_id_fkey                  | f               | FOREIGN KEY (group_id) REFERENCES groups(id)                                                                                 |
+| ranking_snapshots            | ranking_snapshots_pkey                           | p               | PRIMARY KEY (id)                                                                                                             |
+| tournament_entrant_members   | tournament_entrant_members_gender_check          | c               | CHECK (gender = ANY (ARRAY['m'::text, 'f'::text]))                                                                           |
+| tournament_entrant_members   | tournament_entrant_members_entrant_id_fkey       | f               | FOREIGN KEY (entrant_id) REFERENCES tournament_entrants(id) ON DELETE CASCADE                                                |
+| tournament_entrant_members   | tournament_entrant_members_group_entrant_fk      | f               | FOREIGN KEY (entrant_id, group_id) REFERENCES tournament_entrants(id, group_id)                                              |
+| tournament_entrant_members   | tournament_entrant_members_group_id_fkey         | f               | FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE                                                               |
+| tournament_entrant_members   | tournament_entrant_members_member_fk             | f               | FOREIGN KEY (member_id) REFERENCES club_members(id) ON DELETE SET NULL                                                       |
+| tournament_entrant_members   | tournament_entrant_members_pkey                  | p               | PRIMARY KEY (id)                                                                                                             |
+| tournament_entrants          | tournament_entrants_group_id_fkey                | f               | FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE                                                               |
+| tournament_entrants          | tournament_entrants_group_tournament_fk          | f               | FOREIGN KEY (tournament_id, group_id) REFERENCES tournaments(id, group_id)                                                   |
+| tournament_entrants          | tournament_entrants_tournament_id_fkey           | f               | FOREIGN KEY (tournament_id) REFERENCES tournaments(id) ON DELETE CASCADE                                                     |
+| tournament_entrants          | tournament_entrants_pkey                         | p               | PRIMARY KEY (id)                                                                                                             |
+| tournament_games             | tournament_games_kind_check                      | c               | CHECK (kind = ANY (ARRAY['game'::text, 'womens'::text, 'mens'::text, 'mixed1'::text, 'mixed2'::text, 'dreambreaker'::text])) |
+| tournament_games             | tournament_games_group_id_fkey                   | f               | FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE                                                               |
+| tournament_games             | tournament_games_group_match_fk                  | f               | FOREIGN KEY (match_id, group_id) REFERENCES tournament_matches(id, group_id)                                                 |
+| tournament_games             | tournament_games_group_winner_fk                 | f               | FOREIGN KEY (winner_entrant_id, group_id) REFERENCES tournament_entrants(id, group_id)                                       |
+| tournament_games             | tournament_games_match_id_fkey                   | f               | FOREIGN KEY (match_id) REFERENCES tournament_matches(id) ON DELETE CASCADE                                                   |
+| tournament_games             | tournament_games_winner_entrant_id_fkey          | f               | FOREIGN KEY (winner_entrant_id) REFERENCES tournament_entrants(id) ON DELETE SET NULL                                        |
+| tournament_games             | tournament_games_pkey                            | p               | PRIMARY KEY (id)                                                                                                             |
+| tournament_matches           | tournament_matches_status_check                  | c               | CHECK (status = ANY (ARRAY['pending'::text, 'live'::text, 'done'::text]))                                                    |
+| tournament_matches           | tournament_matches_version_positive              | c               | CHECK (version > 0)                                                                                                          |
+| tournament_matches           | tournament_matches_entrant_a_id_fkey             | f               | FOREIGN KEY (entrant_a_id) REFERENCES tournament_entrants(id) ON DELETE SET NULL                                             |
+| tournament_matches           | tournament_matches_entrant_b_id_fkey             | f               | FOREIGN KEY (entrant_b_id) REFERENCES tournament_entrants(id) ON DELETE SET NULL                                             |
+| tournament_matches           | tournament_matches_group_entrant_a_fk            | f               | FOREIGN KEY (entrant_a_id, group_id) REFERENCES tournament_entrants(id, group_id)                                            |
+| tournament_matches           | tournament_matches_group_entrant_b_fk            | f               | FOREIGN KEY (entrant_b_id, group_id) REFERENCES tournament_entrants(id, group_id)                                            |
+| tournament_matches           | tournament_matches_group_id_fkey                 | f               | FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE                                                               |
+| tournament_matches           | tournament_matches_group_parent_fk               | f               | FOREIGN KEY (parent_match_id, group_id) REFERENCES tournament_matches(id, group_id)                                          |
+| tournament_matches           | tournament_matches_group_stage_fk                | f               | FOREIGN KEY (stage_id, group_id) REFERENCES tournament_stages(id, group_id)                                                  |
+| tournament_matches           | tournament_matches_group_winner_fk               | f               | FOREIGN KEY (winner_entrant_id, group_id) REFERENCES tournament_entrants(id, group_id)                                       |
+| tournament_matches           | tournament_matches_parent_match_id_fkey          | f               | FOREIGN KEY (parent_match_id) REFERENCES tournament_matches(id) ON DELETE SET NULL                                           |
+| tournament_matches           | tournament_matches_stage_id_fkey                 | f               | FOREIGN KEY (stage_id) REFERENCES tournament_stages(id) ON DELETE CASCADE                                                    |
+| tournament_matches           | tournament_matches_winner_entrant_id_fkey        | f               | FOREIGN KEY (winner_entrant_id) REFERENCES tournament_entrants(id) ON DELETE SET NULL                                        |
+| tournament_matches           | tournament_matches_pkey                          | p               | PRIMARY KEY (id)                                                                                                             |
+| tournament_stage_entrants    | tournament_stage_entrants_entrant_id_fkey        | f               | FOREIGN KEY (entrant_id) REFERENCES tournament_entrants(id) ON DELETE CASCADE                                                |
+| tournament_stage_entrants    | tournament_stage_entrants_group_entrant_fk       | f               | FOREIGN KEY (entrant_id, group_id) REFERENCES tournament_entrants(id, group_id)                                              |
+| tournament_stage_entrants    | tournament_stage_entrants_group_id_fkey          | f               | FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE                                                               |
+| tournament_stage_entrants    | tournament_stage_entrants_group_stage_fk         | f               | FOREIGN KEY (stage_id, group_id) REFERENCES tournament_stages(id, group_id)                                                  |
+| tournament_stage_entrants    | tournament_stage_entrants_stage_id_fkey          | f               | FOREIGN KEY (stage_id) REFERENCES tournament_stages(id) ON DELETE CASCADE                                                    |
+| tournament_stage_entrants    | tournament_stage_entrants_pkey                   | p               | PRIMARY KEY (id)                                                                                                             |
+| tournament_stages            | tournament_stages_match_format_check             | c               | CHECK (match_format = ANY (ARRAY['simple'::text, 'mlp'::text]))                                                              |
+| tournament_stages            | tournament_stages_schedule_format_check          | c               | CHECK (schedule_format = ANY (ARRAY['round_robin'::text, 'knockout'::text]))                                                 |
+| tournament_stages            | tournament_stages_status_check                   | c               | CHECK (status = ANY (ARRAY['pending'::text, 'active'::text, 'completed'::text]))                                             |
+| tournament_stages            | tournament_stages_group_id_fkey                  | f               | FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE                                                               |
+| tournament_stages            | tournament_stages_group_tournament_fk            | f               | FOREIGN KEY (tournament_id, group_id) REFERENCES tournaments(id, group_id)                                                   |
+| tournament_stages            | tournament_stages_tournament_id_fkey             | f               | FOREIGN KEY (tournament_id) REFERENCES tournaments(id) ON DELETE CASCADE                                                     |
+| tournament_stages            | tournament_stages_pkey                           | p               | PRIMARY KEY (id)                                                                                                             |
+| tournaments                  | tournaments_entrant_type_check                   | c               | CHECK (entrant_type = ANY (ARRAY['pair'::text, 'team'::text]))                                                               |
+| tournaments                  | tournaments_status_check                         | c               | CHECK (status = ANY (ARRAY['draft'::text, 'active'::text, 'completed'::text]))                                               |
+| tournaments                  | tournaments_visibility_check                     | c               | CHECK (visibility = ANY (ARRAY['private'::text, 'unlisted'::text, 'public'::text]))                                          |
+| tournaments                  | tournaments_group_id_fkey                        | f               | FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE                                                               |
+| tournaments                  | tournaments_pkey                                 | p               | PRIMARY KEY (id)                                                                                                             |
+
+
+-- 8. Index thực tế để phát hiện unique toàn cục và thiếu tenant prefix.
+| schemaname | tablename                    | indexname                                      | indexdef                                                                                                                                                                                                      |
+| ---------- | ---------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| public     | club_members                 | club_members_id_group_key                      | CREATE UNIQUE INDEX club_members_id_group_key ON public.club_members USING btree (id, group_id)                                                                                                               |
+| public     | club_members                 | club_members_pkey                              | CREATE UNIQUE INDEX club_members_pkey ON public.club_members USING btree (id)                                                                                                                                 |
+| public     | club_members                 | idx_club_members_group_full_name               | CREATE UNIQUE INDEX idx_club_members_group_full_name ON public.club_members USING btree (group_id, lower(regexp_replace(btrim(full_name), '\s+'::text, ' '::text, 'g'::text)))                                |
+| public     | club_members                 | idx_club_members_group_id                      | CREATE INDEX idx_club_members_group_id ON public.club_members USING btree (group_id)                                                                                                                          |
+| public     | club_members                 | idx_members_full_name                          | CREATE INDEX idx_members_full_name ON public.club_members USING btree (full_name)                                                                                                                             |
+| public     | fund_event_participants      | fund_event_participants_event_id_member_id_key | CREATE UNIQUE INDEX fund_event_participants_event_id_member_id_key ON public.fund_event_participants USING btree (event_id, member_id)                                                                        |
+| public     | fund_event_participants      | fund_event_participants_pkey                   | CREATE UNIQUE INDEX fund_event_participants_pkey ON public.fund_event_participants USING btree (id)                                                                                                           |
+| public     | fund_event_participants      | idx_fund_event_participants_event_id           | CREATE INDEX idx_fund_event_participants_event_id ON public.fund_event_participants USING btree (event_id)                                                                                                    |
+| public     | fund_event_participants      | idx_fund_event_participants_member_id          | CREATE INDEX idx_fund_event_participants_member_id ON public.fund_event_participants USING btree (member_id)                                                                                                  |
+| public     | fund_events                  | fund_events_id_group_key                       | CREATE UNIQUE INDEX fund_events_id_group_key ON public.fund_events USING btree (id, group_id)                                                                                                                 |
+| public     | fund_events                  | fund_events_pkey                               | CREATE UNIQUE INDEX fund_events_pkey ON public.fund_events USING btree (id)                                                                                                                                   |
+| public     | fund_events                  | idx_fund_events_active                         | CREATE INDEX idx_fund_events_active ON public.fund_events USING btree (is_active, created_at DESC)                                                                                                            |
+| public     | fund_events                  | idx_fund_events_group_id                       | CREATE INDEX idx_fund_events_group_id ON public.fund_events USING btree (group_id)                                                                                                                            |
+| public     | gh_clubs                     | gh_clubs_pkey                                  | CREATE UNIQUE INDEX gh_clubs_pkey ON public.gh_clubs USING btree (id)                                                                                                                                         |
+| public     | gh_draws                     | gh_draws_pkey                                  | CREATE UNIQUE INDEX gh_draws_pkey ON public.gh_draws USING btree (id)                                                                                                                                         |
+| public     | gh_draws                     | gh_draws_round_group_no_club_id_key            | CREATE UNIQUE INDEX gh_draws_round_group_no_club_id_key ON public.gh_draws USING btree (round, group_no, club_id)                                                                                             |
+| public     | gh_draws                     | gh_draws_round_pair_id_key                     | CREATE UNIQUE INDEX gh_draws_round_pair_id_key ON public.gh_draws USING btree (round, pair_id)                                                                                                                |
+| public     | gh_matches                   | gh_matches_pkey                                | CREATE UNIQUE INDEX gh_matches_pkey ON public.gh_matches USING btree (id)                                                                                                                                     |
+| public     | gh_matches                   | gh_matches_round_group_no_match_no_key         | CREATE UNIQUE INDEX gh_matches_round_group_no_match_no_key ON public.gh_matches USING btree (round, group_no, match_no)                                                                                       |
+| public     | gh_pairs                     | gh_pairs_club_id_round_slot_key                | CREATE UNIQUE INDEX gh_pairs_club_id_round_slot_key ON public.gh_pairs USING btree (club_id, round, slot)                                                                                                     |
+| public     | gh_pairs                     | gh_pairs_pkey                                  | CREATE UNIQUE INDEX gh_pairs_pkey ON public.gh_pairs USING btree (id)                                                                                                                                         |
+| public     | gh_rounds                    | gh_rounds_pkey                                 | CREATE UNIQUE INDEX gh_rounds_pkey ON public.gh_rounds USING btree (round)                                                                                                                                    |
+| public     | gh_secrets                   | gh_secrets_pkey                                | CREATE UNIQUE INDEX gh_secrets_pkey ON public.gh_secrets USING btree (key)                                                                                                                                    |
+| public     | gh_settings                  | gh_settings_pkey                               | CREATE UNIQUE INDEX gh_settings_pkey ON public.gh_settings USING btree (key)                                                                                                                                  |
+| public     | group_bank_accounts          | group_bank_accounts_account_number_key         | CREATE UNIQUE INDEX group_bank_accounts_account_number_key ON public.group_bank_accounts USING btree (account_number)                                                                                         |
+| public     | group_bank_accounts          | group_bank_accounts_pkey                       | CREATE UNIQUE INDEX group_bank_accounts_pkey ON public.group_bank_accounts USING btree (id)                                                                                                                   |
+| public     | group_bank_accounts          | idx_group_bank_accounts_group_id               | CREATE INDEX idx_group_bank_accounts_group_id ON public.group_bank_accounts USING btree (group_id)                                                                                                            |
+| public     | group_members                | group_members_group_id_user_id_key             | CREATE UNIQUE INDEX group_members_group_id_user_id_key ON public.group_members USING btree (group_id, user_id)                                                                                                |
+| public     | group_members                | group_members_pkey                             | CREATE UNIQUE INDEX group_members_pkey ON public.group_members USING btree (id)                                                                                                                               |
+| public     | group_members                | idx_group_members_group_id                     | CREATE INDEX idx_group_members_group_id ON public.group_members USING btree (group_id)                                                                                                                        |
+| public     | group_members                | idx_group_members_user_id                      | CREATE INDEX idx_group_members_user_id ON public.group_members USING btree (user_id)                                                                                                                          |
+| public     | groups                       | groups_code_key                                | CREATE UNIQUE INDEX groups_code_key ON public.groups USING btree (code)                                                                                                                                       |
+| public     | groups                       | groups_pkey                                    | CREATE UNIQUE INDEX groups_pkey ON public.groups USING btree (id)                                                                                                                                             |
+| public     | pickhub_mutation_idempotency | pickhub_mutation_idempotency_pkey              | CREATE UNIQUE INDEX pickhub_mutation_idempotency_pkey ON public.pickhub_mutation_idempotency USING btree (group_id, operation, idempotency_key)                                                               |
+| public     | pickhub_schema_migrations    | pickhub_schema_migrations_pkey                 | CREATE UNIQUE INDEX pickhub_schema_migrations_pkey ON public.pickhub_schema_migrations USING btree (filename)                                                                                                 |
+| public     | quy_pickleball               | idx_confidence_score                           | CREATE INDEX idx_confidence_score ON public.quy_pickleball USING btree (confidence_score)                                                                                                                     |
+| public     | quy_pickleball               | idx_huong_giao_dich                            | CREATE INDEX idx_huong_giao_dich ON public.quy_pickleball USING btree (huong_giao_dich)                                                                                                                       |
+| public     | quy_pickleball               | idx_is_manually_categorized                    | CREATE INDEX idx_is_manually_categorized ON public.quy_pickleball USING btree (is_manually_categorized)                                                                                                       |
+| public     | quy_pickleball               | idx_loai_giao_dich                             | CREATE INDEX idx_loai_giao_dich ON public.quy_pickleball USING btree (loai_giao_dich)                                                                                                                         |
+| public     | quy_pickleball               | idx_nguoi_nop                                  | CREATE INDEX idx_nguoi_nop ON public.quy_pickleball USING btree (nguoi_nop)                                                                                                                                   |
+| public     | quy_pickleball               | idx_quy_pickleball_group_id                    | CREATE INDEX idx_quy_pickleball_group_id ON public.quy_pickleball USING btree (group_id)                                                                                                                      |
+| public     | quy_pickleball               | idx_quy_pickleball_group_transaction           | CREATE UNIQUE INDEX idx_quy_pickleball_group_transaction ON public.quy_pickleball USING btree (group_id, lower(btrim(ma_giao_dich))) WHERE ((ma_giao_dich IS NOT NULL) AND (btrim(ma_giao_dich) <> ''::text)) |
+| public     | quy_pickleball               | quy_pickleball_ma_giao_dich_key                | CREATE UNIQUE INDEX quy_pickleball_ma_giao_dich_key ON public.quy_pickleball USING btree (ma_giao_dich)                                                                                                       |
+| public     | quy_pickleball               | quy_pickleball_pkey                            | CREATE UNIQUE INDEX quy_pickleball_pkey ON public.quy_pickleball USING btree (id)                                                                                                                             |
+| public     | ranking_snapshots            | idx_snapshots_date                             | CREATE INDEX idx_snapshots_date ON public.ranking_snapshots USING btree (snapshot_date DESC)                                                                                                                  |
+| public     | ranking_snapshots            | idx_snapshots_date_nguoi_nop                   | CREATE INDEX idx_snapshots_date_nguoi_nop ON public.ranking_snapshots USING btree (snapshot_date DESC, nguoi_nop)                                                                                             |
+| public     | ranking_snapshots            | idx_snapshots_nguoi_nop                        | CREATE INDEX idx_snapshots_nguoi_nop ON public.ranking_snapshots USING btree (nguoi_nop)                                                                                                                      |
+| public     | ranking_snapshots            | ranking_snapshots_group_member_date            | CREATE UNIQUE INDEX ranking_snapshots_group_member_date ON public.ranking_snapshots USING btree (group_id, nguoi_nop, snapshot_date)                                                                          |
+| public     | ranking_snapshots            | ranking_snapshots_pkey                         | CREATE UNIQUE INDEX ranking_snapshots_pkey ON public.ranking_snapshots USING btree (id)                                                                                                                       |
+| public     | tournament_entrant_members   | tournament_entrant_members_pkey                | CREATE UNIQUE INDEX tournament_entrant_members_pkey ON public.tournament_entrant_members USING btree (id)                                                                                                     |
+| public     | tournament_entrants          | tournament_entrants_id_group_key               | CREATE UNIQUE INDEX tournament_entrants_id_group_key ON public.tournament_entrants USING btree (id, group_id)                                                                                                 |
+| public     | tournament_entrants          | tournament_entrants_pkey                       | CREATE UNIQUE INDEX tournament_entrants_pkey ON public.tournament_entrants USING btree (id)                                                                                                                   |
+| public     | tournament_games             | idx_tournament_games_match_game_no             | CREATE UNIQUE INDEX idx_tournament_games_match_game_no ON public.tournament_games USING btree (group_id, match_id, game_no)                                                                                   |
+| public     | tournament_games             | tournament_games_pkey                          | CREATE UNIQUE INDEX tournament_games_pkey ON public.tournament_games USING btree (id)                                                                                                                         |
+| public     | tournament_matches           | idx_tournament_matches_group_stage             | CREATE INDEX idx_tournament_matches_group_stage ON public.tournament_matches USING btree (group_id, stage_id)                                                                                                 |
+| public     | tournament_matches           | tournament_matches_id_group_key                | CREATE UNIQUE INDEX tournament_matches_id_group_key ON public.tournament_matches USING btree (id, group_id)                                                                                                   |
+| public     | tournament_matches           | tournament_matches_pkey                        | CREATE UNIQUE INDEX tournament_matches_pkey ON public.tournament_matches USING btree (id)                                                                                                                     |
+| public     | tournament_stage_entrants    | idx_stage_entrants_unique                      | CREATE UNIQUE INDEX idx_stage_entrants_unique ON public.tournament_stage_entrants USING btree (group_id, stage_id, entrant_id)                                                                                |
+| public     | tournament_stage_entrants    | tournament_stage_entrants_pkey                 | CREATE UNIQUE INDEX tournament_stage_entrants_pkey ON public.tournament_stage_entrants USING btree (id)                                                                                                       |
+| public     | tournament_stages            | idx_tournament_stages_group_tournament         | CREATE INDEX idx_tournament_stages_group_tournament ON public.tournament_stages USING btree (group_id, tournament_id)                                                                                         |
+| public     | tournament_stages            | tournament_stages_id_group_key                 | CREATE UNIQUE INDEX tournament_stages_id_group_key ON public.tournament_stages USING btree (id, group_id)                                                                                                     |
+| public     | tournament_stages            | tournament_stages_pkey                         | CREATE UNIQUE INDEX tournament_stages_pkey ON public.tournament_stages USING btree (id)                                                                                                                       |
+| public     | tournaments                  | idx_tournaments_public_slug_lower              | CREATE UNIQUE INDEX idx_tournaments_public_slug_lower ON public.tournaments USING btree (lower(public_slug)) WHERE (public_slug IS NOT NULL)                                                                  |
+| public     | tournaments                  | tournaments_id_group_key                       | CREATE UNIQUE INDEX tournaments_id_group_key ON public.tournaments USING btree (id, group_id)                                                                                                                 |
+| public     | tournaments                  | tournaments_pkey                               | CREATE UNIQUE INDEX tournaments_pkey ON public.tournaments USING btree (id) 
+
+                                                                                                                                  |
+-- 9. Toàn bộ RLS policy. Nhiều policy permissive có thể cộng quyền với nhau.
+| schemaname | tablename               | policyname                       | permissive | roles                | cmd    | qual                                                                                                                                                                           | with_check                                                                                                                                                                     |
+| ---------- | ----------------------- | -------------------------------- | ---------- | -------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| public     | club_members            | club_members_by_group            | PERMISSIVE | {authenticated}      | ALL    | (group_id IN ( SELECT gm.group_id
+   FROM group_members gm
+  WHERE (gm.user_id = auth.uid())))                                                                                 | (group_id IN ( SELECT gm.group_id
+   FROM group_members gm
+  WHERE (gm.user_id = auth.uid())))                                                                                 |
+| public     | fund_event_participants | fund_event_participants_by_group | PERMISSIVE | {authenticated}      | ALL    | (event_id IN ( SELECT fe.id
+   FROM fund_events fe
+  WHERE (fe.group_id IN ( SELECT gm.group_id
+           FROM group_members gm
+          WHERE (gm.user_id = auth.uid()))))) | (event_id IN ( SELECT fe.id
+   FROM fund_events fe
+  WHERE (fe.group_id IN ( SELECT gm.group_id
+           FROM group_members gm
+          WHERE (gm.user_id = auth.uid()))))) |
+| public     | fund_events             | fund_events_by_group             | PERMISSIVE | {authenticated}      | ALL    | (group_id IN ( SELECT gm.group_id
+   FROM group_members gm
+  WHERE (gm.user_id = auth.uid())))                                                                                 | (group_id IN ( SELECT gm.group_id
+   FROM group_members gm
+  WHERE (gm.user_id = auth.uid())))                                                                                 |
+| public     | gh_clubs                | gh_clubs_read                    | PERMISSIVE | {anon,authenticated} | SELECT | true                                                                                                                                                                           | null                                                                                                                                                                           |
+| public     | gh_draws                | gh_draws_read                    | PERMISSIVE | {anon,authenticated} | SELECT | true                                                                                                                                                                           | null                                                                                                                                                                           |
+| public     | gh_matches              | gh_matches_read                  | PERMISSIVE | {anon,authenticated} | SELECT | true                                                                                                                                                                           | null                                                                                                                                                                           |
+| public     | gh_pairs                | gh_pairs_read                    | PERMISSIVE | {anon,authenticated} | SELECT | true                                                                                                                                                                           | null                                                                                                                                                                           |
+| public     | gh_rounds               | gh_rounds_read                   | PERMISSIVE | {anon,authenticated} | SELECT | true                                                                                                                                                                           | null                                                                                                                                                                           |
+| public     | gh_settings             | gh_settings_read                 | PERMISSIVE | {anon,authenticated} | SELECT | true                                                                                                                                                                           | null                                                                                                                                                                           |
+| public     | group_bank_accounts     | group_bank_accounts_by_group     | PERMISSIVE | {authenticated}      | ALL    | (group_id IN ( SELECT gm.group_id
+   FROM group_members gm
+  WHERE (gm.user_id = auth.uid())))                                                                                 | (group_id IN ( SELECT gm.group_id
+   FROM group_members gm
+  WHERE (gm.user_id = auth.uid())))                                                                                 |
+| public     | group_members           | group_members_self               | PERMISSIVE | {authenticated}      | SELECT | (user_id = auth.uid())                                                                                                                                                         | null                                                                                                                                                                           |
+| public     | groups                  | groups_admin_all                 | PERMISSIVE | {authenticated}      | ALL    | (id IN ( SELECT gm.group_id
+   FROM group_members gm
+  WHERE (gm.user_id = auth.uid())))                                                                                       | (id IN ( SELECT gm.group_id
+   FROM group_members gm
+  WHERE (gm.user_id = auth.uid())))                                                                                       |
+| public     | quy_pickleball          | quy_pickleball_by_group          | PERMISSIVE | {authenticated}      | ALL    | (group_id IN ( SELECT gm.group_id
+   FROM group_members gm
+  WHERE (gm.user_id = auth.uid())))                                                                                 | (group_id IN ( SELECT gm.group_id
+   FROM group_members gm
+  WHERE (gm.user_id = auth.uid())))                                                                                 |
+
+-- 10. Cờ RLS và FORCE RLS của từng bảng public.
+| table_name                   | rls_enabled | force_rls |
+| ---------------------------- | ----------- | --------- |
+| club_members                 | true        | false     |
+| fund_event_participants      | true        | false     |
+| fund_events                  | true        | false     |
+| gh_clubs                     | true        | false     |
+| gh_draws                     | true        | false     |
+| gh_matches                   | true        | false     |
+| gh_pairs                     | true        | false     |
+| gh_rounds                    | true        | false     |
+| gh_secrets                   | true        | false     |
+| gh_settings                  | true        | false     |
+| group_bank_accounts          | true        | false     |
+| group_members                | true        | false     |
+| groups                       | true        | false     |
+| pickhub_mutation_idempotency | true        | false     |
+| pickhub_schema_migrations    | true        | false     |
+| quy_pickleball               | true        | false     |
+| ranking_snapshots            | true        | false     |
+| tournament_entrant_members   | true        | false     |
+| tournament_entrants          | true        | false     |
+| tournament_games             | true        | false     |
+| tournament_matches           | true        | false     |
+| tournament_stage_entrants    | true        | false     |
+| tournament_stages            | true        | false     |
+| tournaments                  | true        | false     |

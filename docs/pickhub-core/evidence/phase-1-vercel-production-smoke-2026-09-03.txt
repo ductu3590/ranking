@@ -1,0 +1,16 @@
+Phase 1 production deployment and smoke evidence
+Date: 2026-09-03 (Asia/Bangkok)
+Main merge commit: bc68e05c01a3c0a812151888f96fe28fa26ee73c
+Vercel deployment: dpl_9W34rhQFyGQetvKkPU1MvGGWRzWw
+Deployment URL: https://ranking-cf1wbakm3-do-duc-tus-projects.vercel.app
+Production alias: https://rank.soccernow.net
+Deployment target/status: production / READY
+
+Read-only HTTP checks through Vercel CLI:
+- GET/HEAD https://rank.soccernow.net/ -> HTTP 200
+- GET/HEAD https://rank.soccernow.net/api/tournament-v2/public?slug=test-5-wsnn -> HTTP 200
+- GET/HEAD https://rank.soccernow.net/api/tournament-v2/tournaments (anonymous) -> HTTP 401
+
+Product owner smoke confirmation:
+- Basic application smoke test completed without errors before production promotion.
+- No additional production write smoke was run by the agent; production data was not modified by these checks.

@@ -8,11 +8,11 @@ const human = fs.readFileSync(path.join(root, 'docs/pickhub-core/PROGRESS.md'), 
 const phase = progress.phases.find((item) => item.id === 1);
 
 assert.strictEqual(progress.active_phase, 1);
-assert.strictEqual(phase.status, 'awaiting_approval');
+assert.strictEqual(phase.status, 'completed');
 assert.strictEqual(phase.branch, 'codex/phase-1-foundation-hardening');
 assert.match(
     human,
-    /Phase 1 — Ổn định nền tảng \| `awaiting_approval` \| `codex\/phase-1-foundation-hardening`/
+    /Phase 1 — Ổn định nền tảng \| `completed` \| `codex\/phase-1-foundation-hardening`/
 );
 
 console.log('phase 1 progress contract ok');

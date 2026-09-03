@@ -7,7 +7,7 @@ File này là bản đọc cho con người. Trạng thái chuẩn cho máy nằ
 | Hạng mục | Trạng thái | Nhánh | Điều kiện tiếp theo |
 |---|---|---|---|
 | Core blueprint | `completed` | `codex/pickhub-core-blueprint` | Đã được product owner duyệt ngày 2026-09-02 và merge vào `main` (`c210c358`) |
-| Phase 1 — Ổn định nền tảng | `awaiting_approval` | `codex/phase-1-foundation-hardening` | Merge vào `main`, smoke lại trên `main`, rồi chuyển `completed` |
+| Phase 1 — Ổn định nền tảng | `completed` | `codex/phase-1-foundation-hardening` | Đã merge vào `main` (`bc68e05`) và smoke production xanh ngày 2026-09-03 |
 | Phase 2 — Danh tính VĐV và CLB | `not_started` | Chưa tạo | Phase 1 completed và merge |
 | Phase 3 — MVP giải liên CLB | `not_started` | Chưa tạo | Phase 2 completed và merge |
 | Phase 4 — Vận hành giải | `not_started` | Chưa tạo | Phase 3 completed và merge |
@@ -16,10 +16,17 @@ File này là bản đọc cho con người. Trạng thái chuẩn cho máy nằ
 
 ## Completion ledger
 
-Phase 1 đã hoàn thành kiểm thử trên branch/Preview và đang chờ merge vào `main`.
-Chưa có phase triển khai nào được ghi `completed`.
+Phase 1 đã được merge vào `main`, deploy production và xác nhận smoke sau deploy.
+Phase 1 được ghi `completed` theo completion record trong `progress.json`.
 
-Mỗi completion record sau này phải chứa: phase, thời gian, branch, completion commit, merge commit, người xác nhận, test evidence và ghi chú migration/release.
+Completion record của Phase 1:
+
+- Thời gian: 2026-09-03.
+- Completion commit: `bdc2d0081490d62ab126cabb4429da42a3d6cb27`.
+- Merge commit: `bc68e05c01a3c0a812151888f96fe28fa26ee73c`.
+- Production deployment: `dpl_9W34rhQFyGQetvKkPU1MvGGWRzWw` (`READY`).
+- Migration/release: production ledger 017–027 đã khớp checksum; không chạy lại migration khi deploy.
+- Test evidence: `evidence/phase-1-test-report.md`, `evidence/phase-1-test-ci-main.txt`, `evidence/phase-1-test-isolation-production.txt`.
 
 ## Quy tắc cập nhật
 

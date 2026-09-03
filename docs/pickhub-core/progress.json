@@ -20,14 +20,14 @@
     {
       "id": 1,
       "name": "foundation-hardening",
-      "status": "awaiting_approval",
+      "status": "completed",
       "branch": "codex/phase-1-foundation-hardening",
       "depends_on": ["core-blueprint"],
       "evidence": "evidence/phase-1-test-report.md",
       "approved_by": "product owner smoke confirmation (2026-09-03)",
-      "completed_at": null,
-      "completion_commit": null,
-      "merge_commit": null
+      "completed_at": "2026-09-03T15:00:28+07:00",
+      "completion_commit": "bdc2d0081490d62ab126cabb4429da42a3d6cb27",
+      "merge_commit": "bc68e05c01a3c0a812151888f96fe28fa26ee73c"
     },
     {
       "id": 2,
@@ -90,5 +90,21 @@
       "merge_commit": null
     }
   ],
-  "completion_history": []
+  "completion_history": [
+    {
+      "phase": 1,
+      "completed_at": "2026-09-03T15:00:28+07:00",
+      "branch": "codex/phase-1-foundation-hardening",
+      "completion_commit": "bdc2d0081490d62ab126cabb4429da42a3d6cb27",
+      "merge_commit": "bc68e05c01a3c0a812151888f96fe28fa26ee73c",
+      "approved_by": "product owner smoke confirmation (2026-09-03)",
+      "test_evidence": [
+        "evidence/phase-1-test-report.md",
+        "evidence/phase-1-test-ci-main.txt",
+        "evidence/phase-1-test-isolation-production.txt",
+        "evidence/phase-1-vercel-production-smoke-2026-09-03.txt"
+      ],
+      "migration_release_notes": "Production ledger 017–027 verified; deployment dpl_9W34rhQFyGQetvKkPU1MvGGWRzWw is READY and aliased to rank.soccernow.net."
+    }
+  ]
 }

@@ -7,11 +7,14 @@
   already applied in production. Migrations `025`–`027` were verified through
   Supabase MCP with the member-origin FK, compatibility trigger hardening, index,
   and ledger checksums.
-- Application deployment observed: Vercel production branch `main`, commit `c92d994`.
+- Application deployment observed: Vercel production deployment
+  `dpl_9W34rhQFyGQetvKkPU1MvGGWRzWw`, commit
+  `bc68e05c01a3c0a812151888f96fe28fa26ee73c`.
 - Phase 1 Preview deployment: `https://ranking-aeaclq5rx-do-duc-tus-projects.vercel.app`
   (Vercel deployment `dpl_Hhs1h6s76MwpvDrKAfTFaTwgW4FK`, target `preview`, status
   `READY`). Production aliases were not promoted.
-- Phase 1 implementation branch: `codex/phase-1-foundation-hardening`, commit `605659c`.
+- Phase 1 implementation branch: `codex/phase-1-foundation-hardening`, commit
+  `bdc2d0081490d62ab126cabb4429da42a3d6cb27`, merged into `main`.
 - Raw evidence: `phase-1-schema-preflight-production.txt` (pre-025) and
   `phase-1-schema-preflight-production-post-027.txt` (post-025–027).
 - Advisor evidence: `phase-1-supabase-advisors-production.txt`.
@@ -69,16 +72,16 @@ It does not rerun migrations or alter business tables.
 
 ## Local verification
 
-The branch verification completed successfully:
+The main-branch verification completed successfully after the merge:
 
 - `npm run test:phase1` — pass, including the migration-025 member-origin contract.
 - `npm run test:t-api` — pass, including the entrants API contract.
 - `npm run test:ci` — exit code 0 (regression suite and Next.js production build).
 - `npm run test:isolation` — pass (`anon sees no rows`) against the configured
   production Supabase project; evidence is in `phase-1-test-isolation-production.txt`.
-- Preview smoke evidence: `phase-1-vercel-preview-smoke-2026-09-03.txt`. Read-only
-  route checks returned 200 for the home, tournament shell, public route, and
-  public snapshot API; anonymous tournament listing returned the expected 401.
+- Production smoke evidence: `phase-1-vercel-production-smoke-2026-09-03.txt`.
+  Read-only route checks returned 200 for the home and public snapshot API;
+  anonymous tournament listing returned the expected 401.
 
 The build still prints pre-existing warnings about an ESLint plugin conflict,
 dynamic rendering of the public tournament route, and metadata viewport exports.
@@ -88,8 +91,8 @@ warnings; no new member-origin security warning remains after 026–027.
 
 ## Release status
 
-This review is **AWAITING APPROVAL**. Migrations 025–027, post-apply preflight,
-Preview deployment, and branch verification are complete. The product owner has
-confirmed that the basic smoke test runs without errors. Vercel production still
-runs the pre-Phase-1 commit, so the branch must be merged and smoke-tested on
-`main` before production promotion and before recording Phase 1 as `completed`.
+This review is **COMPLETED/PASS**. Migrations 025–027, post-apply preflight,
+main-branch verification, production deployment, and post-deploy read-only smoke
+are complete. The product owner confirmed that the basic smoke test runs without
+errors. Backup/PITR remains unavailable on the current Free plan and was
+explicitly accepted for this phase.

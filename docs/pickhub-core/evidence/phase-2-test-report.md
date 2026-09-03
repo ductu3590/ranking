@@ -29,6 +29,7 @@ Implementation branch: `codex/pickhub-ui-brand-preview` (temporary worktree; cre
 
 The migration and RLS integration suite must be run against a staging Supabase project
 before merge. It must verify Club A/B isolation, legacy mapping counts, and revocation
-after password/code rotation. Product-owner approval is also required; this report does
-not mark Phase 2 as completed.
-
+after password/code rotation. The remaining migration-window task is to move the
+legacy tournament/quỹ mutation consumers from the synchronous compatibility guard to
+the DB-backed validated session guard before locking `club_members` writes. Product-owner
+approval is also required; this report does not mark Phase 2 as completed.

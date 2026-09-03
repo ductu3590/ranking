@@ -44,9 +44,9 @@ visual smoke.
   smoke test trên `main`.
 - Design baseline là bắt buộc; không thay `--ph-ink` thành background và không
   dùng màu theme để thay thế trạng thái success/warning/error.
-- Thành viên vẫn có thể truy cập dữ liệu CLB bằng mã CLB theo mô hình hiện tại;
-  account claim là opt-in trong migration window của Phase 2, không tạo rào cản
-  ban đầu.
+- Thành viên và trưởng nhóm vẫn truy cập bằng Mã CLB + mật khẩu theo mô hình hiện
+  tại; không có email/OTP/account cá nhân trong acceptance criteria của Phase 2.
+  Account claim chỉ là adapter tùy chọn của một phase tương lai.
 - VĐV có thể thuộc nhiều CLB; CLB mặc định chỉ quyết định không gian mở đầu,
   không cấp thêm quyền. Trưởng nhóm chỉ thấy action theo role/scope server trả.
 - Public tournament chỉ hiển thị allowlist và có link riêng; không lộ quỹ,
@@ -109,7 +109,7 @@ authorization result từ server.
   surface nền đen/navy đặc, keyboard/focus và overflow mobile đạt; ghi evidence,
   xin xác nhận, merge và smoke test `main`.
 
-## Task 2: Phase 2 — Identity, club switcher và hai trải nghiệm role
+## Task 2: Phase 2 — Athlete/membership, club switcher và hai trải nghiệm role
 
 **Branch:** `codex/phase-2-identity-clubs`  
 **Depends on:** Phase 1 đã merge và `main` xanh  
@@ -126,13 +126,15 @@ authorization result từ server.
 - Create: `tests/pickhub-ui-phase2.test.js`,
   `tests/pickhub-ui-phase2.browser.test.js`.
 
-**Interfaces:** `ClubSwitcher` nhận danh sách membership và `defaultClubId`;
-`MemberInfoPanel` nhận profile view model, PHR snapshot, assessment history,
-active memberships và privacy flags; `RoleActionBar` nhận server-provided
-permissions.
+**Interfaces:** `ClubSwitcher` nhận danh sách club access context đã có trên
+thiết bị và `defaultClubId`; việc thêm CLB mới luôn yêu cầu code + password.
+`MemberInfoPanel` nhận athlete/membership view model, PHR snapshot,
+assessment history và privacy flags phù hợp shared session; `RoleActionBar`
+nhận server-provided permissions (`member|admin`).
 
-- [ ] **Step 1: Mở đúng CLB mặc định** — member vào PickHub thấy CLB mặc định,
-  có đổi CLB rõ ràng, nhưng đổi CLB không đổi identity hoặc tự cấp role.
+- [ ] **Step 1: Mở đúng CLB mặc định** — member/leader nhập Mã CLB + mật khẩu,
+  vào đúng CLB mặc định đã lưu trên thiết bị; đổi CLB không đổi identity dữ liệu
+  và không tự cấp role.
 - [ ] **Step 2: Hoàn thiện nav member** — giữ đúng năm tab và thứ tự
   `Quỹ | Thành viên | BXH | Giải | Thông tin`; `BXH` là tab trung tâm với BXH
   đóng phạt/đóng quỹ như PickHub hiện tại; tab `Thông tin` hiển thị thông tin
@@ -140,9 +142,10 @@ permissions.
 - [ ] **Step 3: Hoàn thiện nav leader** — trưởng nhóm vẫn có `Cấu hình`, thấy
   thu–chi, roster, thông báo cần xử lý và action cập nhật PHR theo quyền; không
   hiển thị control quản trị cho member.
-- [ ] **Step 4: Hỗ trợ claimed/unclaimed** — roster hiển thị trạng thái rõ,
-  member chưa có account vẫn dùng mã CLB; claim/invite chỉ là action tùy chọn,
-  consent/privacy không lộ contact.
+- [ ] **Step 4: Giữ mô hình VĐV chưa cần account** — roster hiển thị athlete/
+  membership và alias rõ ràng; member dùng code + password, không có bước claim,
+  invite, OTP hoặc tạo tài khoản; lớp liên kết cá nhân chỉ ghi nhận như adapter
+  tương lai, không đưa vào luồng Phase 2.
 - [ ] **Step 5: Test và gate** — chạy `npm run test:phase2`,
   `npm run test:isolation`, `npm run test:leaderboard`, `npm run test:teamfund`,
   browser test mobile/desktop cho hai role và `npm run build`; cập nhật evidence,

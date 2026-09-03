@@ -1,5 +1,13 @@
 # Multi-tenant Phase 2 — Data Isolation Implementation Plan
 
+> **Lưu ý quyết định sản phẩm hiện hành (2026-09-03):** Đây là kế hoạch kỹ
+> thuật lịch sử cho data isolation. Các task provision Supabase Auth/group
+> owner account trong tài liệu này không còn là yêu cầu trải nghiệm Phase 2.
+> Baseline PickHub là Mã CLB + mật khẩu cho cả member và trưởng nhóm theo
+> `docs/pickhub-core/decisions/ADR-003-club-code-password-first-access.md`.
+> Chỉ tái sử dụng phần RLS/isolation sau khi đối chiếu với Phase 2 core mới;
+> không tự chạy các bước tạo account nếu chưa có ADR và product approval.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Make every club's data genuinely isolated at the database level so untrusted clubs can sign up safely — by enabling Row Level Security (RLS), authenticating club admins through Supabase Auth, and serving member pages through the server instead of the browser's anon key.

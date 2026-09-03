@@ -31,6 +31,13 @@ như một phase thứ bảy.
 
 Mỗi completion record sau này phải chứa: phase, thời gian, branch, completion commit, merge commit, người xác nhận, test evidence và ghi chú migration/release.
 
+## Correction notes
+
+- `2026-09-03`: Xác nhận lại access contract theo ADR-003. Phase 2 không yêu
+  cầu tài khoản cá nhân, email/OTP hoặc Supabase Auth; member và trưởng nhóm
+  dùng Mã CLB + mật khẩu, còn profile/claim chỉ là mở rộng tùy chọn trong tương
+  lai.
+
 ## Quy tắc cập nhật
 
 - Chỉ trạng thái sau được dùng: `not_started`, `in_progress`, `blocked`, `awaiting_approval`, `completed`.

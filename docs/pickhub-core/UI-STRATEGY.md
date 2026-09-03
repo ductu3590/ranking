@@ -32,7 +32,7 @@ polish của phase sau vào phase trước.
 | Phase | Lát cắt UI phải triển khai | Thiết bị ưu tiên |
 |---|---|---|
 | 1 — Ổn định nền tảng | App shell, token, trạng thái tải/rỗng/lỗi/quyền, focus, route guard và public-link fallback. Chỉ sửa giao diện cần cho an toàn và regression. | Mobile và desktop smoke |
-| 2 — Danh tính VĐV và CLB | Club switcher/CLB mặc định, roster claimed/unclaimed, quyền theo vai trò, tab `Thông tin` của thành viên (hồ sơ, PHR cá nhân, lịch sử, CLB đang sinh hoạt) và `Cấu hình` của trưởng nhóm. | Mobile-first, leader responsive |
+| 2 — Danh tính VĐV và CLB | Club switcher/CLB mặc định bằng Mã CLB + mật khẩu, roster athlete/membership chưa cần account, quyền `member/admin`, tab `Thông tin` của thành viên (hồ sơ, PHR cá nhân, lịch sử, CLB đang sinh hoạt) và `Cấu hình` của trưởng nhóm. | Mobile-first, leader responsive |
 | 3 — MVP giải liên CLB | Tạo giải, cấu hình nội dung, mời CLB, captain đăng ký VĐV, duyệt roster, ON/OFF ghép ngẫu nhiên cân bằng theo nội dung, bốc thăm, public link và kết quả. | Desktop cho BTC, mobile cho captain/người xem |
 | 4 — Vận hành giải | Bàn điều hành BTC, lịch sân, check-in, trận đang diễn ra, nhập/sửa điểm, xử thua, offline queue và public court board. | Desktop tại bàn BTC; mobile ngoài sân |
 | 5 — Trình độ và ghép cân bằng | Captain nhập đánh giá, timeline PHR, snapshot khi chốt roster, preview phương án ghép, fairness score, cảnh báo và explanation. | Mobile cho captain; desktop cho director |

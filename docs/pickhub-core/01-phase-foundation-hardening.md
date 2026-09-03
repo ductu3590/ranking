@@ -41,8 +41,11 @@ Nhánh: `codex/phase-1-foundation-hardening`
 
 ### 3.4 Authorization boundary tạm thời
 
-- Chuẩn hóa interface `getActor`, `authorize` và `getClubScope` để Phase 2 thay nguồn auth mà không viết lại toàn bộ use case.
-- Legacy signed group session vẫn được hỗ trợ trong Phase 1 nhưng tất cả mutation phải đi qua server authorization thống nhất.
+- Chuẩn hóa interface `getActor`, `authorize` và `getClubScope` để club session
+  bằng Mã CLB + mật khẩu tiếp tục dùng ổn định và sau này có thể thêm account
+  adapter mà không viết lại toàn bộ use case.
+- Signed `group_session` là baseline của Phase 1–5; tất cả mutation phải đi qua
+  server authorization thống nhất, không có migration bắt buộc sang account.
 - Không dùng localStorage role làm nguồn quyết định quyền.
 - Session có expiry, version hoặc cơ chế revocation tối thiểu; secret rotation được tài liệu hóa.
 - Rate limit login/join và các mutation nhạy cảm.

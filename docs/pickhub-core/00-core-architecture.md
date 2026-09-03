@@ -18,9 +18,9 @@ Các module lõi:
 
 ```text
 Identity & Access
-  ├─ tài khoản cá nhân
+  ├─ club access session bằng Mã CLB + mật khẩu (baseline hiện tại)
   ├─ hồ sơ VĐV có thể chưa được nhận quyền sở hữu
-  └─ role assignment theo phạm vi
+  └─ lớp liên kết tài khoản cá nhân tùy chọn trong tương lai
 
 Clubs
   ├─ roster và membership
@@ -45,11 +45,17 @@ Platform Operations
 
 ## 3. Danh tính và phạm vi sở hữu
 
-### 3.1 Tài khoản không đồng nhất với VĐV
+### 3.1 Session CLB không đồng nhất với VĐV
 
-- `profile`: người đã đăng nhập, dùng để xác thực và ghi nhận ai thao tác.
-- `athlete`: hồ sơ thể thao. Có thể do trưởng CLB tạo trước và chưa có tài khoản.
-- Một athlete chỉ được một profile nhận quyền sở hữu sau khi xác minh.
+- Baseline hiện tại xác thực bằng `group.code` + mật khẩu; server tạo
+  HTTP-only signed `group_session` với role `member` hoặc `admin`.
+- Trưởng nhóm dùng admin password của CLB; thành viên dùng member password.
+  Có thể có nhiều người vận hành cùng một admin credential theo quyết định hiện
+  tại, nhưng audit phải ghi session, thời gian và CLB thay vì giả danh một cá
+  nhân.
+- `athlete`: hồ sơ thể thao. Trưởng nhóm có thể tạo trước và chưa có tài khoản.
+- `profile`/claim là lớp mở rộng tùy chọn; không được yêu cầu để xem quỹ,
+  roster, BXH hoặc đăng ký giải trong các phase hiện tại.
 - Tên không phải định danh duy nhất. Không dùng `full_name UNIQUE` toàn hệ thống.
 
 ### 3.2 VĐV không đồng nhất với thành viên CLB
@@ -119,11 +125,14 @@ Vai trò nền tối thiểu:
 - `tournament_director`, `scorekeeper`, `referee`
 - `athlete`
 
-Một người có thể có nhiều role ở các phạm vi khác nhau. Ví dụ một người là `club_captain` tại CLB A và `scorekeeper` tại giải X.
+Một người có thể có nhiều role ở các phạm vi khác nhau khi hệ thống có profile;
+baseline hiện tại vẫn dùng role của club session (`member`/`admin`) và không
+giả định biết danh tính cá nhân phía sau mật khẩu dùng chung.
 
 Mọi mutation phải qua ba lớp:
 
-1. Xác thực tài khoản hoặc session hợp lệ.
+1. Xác thực club session bằng Mã CLB + mật khẩu, hoặc profile session tùy chọn
+   nếu adapter này đã được bật.
 2. Authorization tại application service.
 3. RLS/constraint/database function làm backstop.
 
@@ -170,7 +179,11 @@ Chi tiết tại [UI-STRATEGY.md](./UI-STRATEGY.md).
 
 ## 12. Các anti-pattern bị cấm
 
-- Dùng mật khẩu chung để cấp quyền ghi mà không biết actor.
+- Dùng mật khẩu chung mà không có biện pháp giảm rủi ro. Baseline hiện tại cho
+  phép một admin credential dùng chung theo ADR-003; bắt buộc hash mật khẩu,
+  HTTP-only session, expiry/revoke, rate limit, rotation, audit session và
+  không dùng client/localStorage để tự cấp quyền. Khi cần truy vết cá nhân hơn,
+  profile account có thể bật thêm nhưng không được biến thành rào cản mặc định.
 - Dùng tên làm khóa liên kết VĐV.
 - Copy VĐV thành guest text cho mọi giải và mất liên kết lịch sử.
 - Gắn giải liên CLB vào `group_id` của CLB đăng cai rồi mở quyền rộng cho CLB khác.

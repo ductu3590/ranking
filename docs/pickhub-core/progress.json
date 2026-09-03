@@ -2,6 +2,21 @@
   "schema_version": 1,
   "architecture_version": "1.0.0-draft",
   "active_phase": "core-blueprint",
+  "access_model": {
+    "status": "club-code-password",
+    "decision": "docs/pickhub-core/decisions/ADR-003-club-code-password-first-access.md",
+    "personal_account_required": false,
+    "roles": ["member", "admin"],
+    "notes": "Member and leader access by club code + password; optional account linking is not a Phase 2 gate."
+  },
+  "decision_history": [
+    {
+      "id": "ADR-003",
+      "date": "2026-09-03",
+      "status": "accepted",
+      "summary": "Club code + password remains the default access model; personal accounts are optional and deferred."
+    }
+  ],
   "allowed_statuses": [
     "not_started",
     "in_progress",

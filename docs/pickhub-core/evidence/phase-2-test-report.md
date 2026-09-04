@@ -27,6 +27,11 @@ Implementation branch: `codex/pickhub-ui-brand-preview` (temporary worktree; cre
 
 ## Remaining release gate
 
+Manual smoke confirmation: product owner reported that selected Phase 2 UI operations
+passed on the localhost production build (`npm run build` + `npm run start`) on
+2026-09-04. This is recorded as a smoke result, not as evidence that every mutation
+scenario was exercised.
+
 The migration and RLS integration suite must be run against a staging Supabase project
 before merge. It must verify Club A/B isolation, legacy mapping counts, and revocation
 after password/code rotation. The remaining migration-window task is to move the

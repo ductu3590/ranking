@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getCurrentGroupClient } from '@/lib/groupClient';
 import { useRouter } from 'next/navigation';
 import './admin.css';
 import UserStatusBadge from '@/components/UserStatusBadge';
@@ -52,18 +51,22 @@ export default function AdminPage({ embedded = false }) {
             router.replace('/admin');
             return;
         }
-
-        checkAuth();
-    }, [embedded, router]);
-
-    function checkAuth() {
-        const group = getCurrentGroupClient();
-        if (group.role !== 'admin') {
-            router.replace('/');
-            return;
+        let active = true;
+        async function loadAuthorizedData() {
+            const response = await fetch('/api/groups/session', { cache: 'no-store' });
+            const sessionView = await response.json();
+            if (!active) return;
+            if (!sessionView.permissions?.canManageFund) {
+                router.replace('/');
+                return;
+            }
+            loadData();
         }
-        loadData();
-    }
+        loadAuthorizedData();
+        return () => { active = false; };
+        // Data loading is intentionally coupled to the one-time server permission check.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [embedded, router]);
 
     async function loadData() {
         setLoading(true);

@@ -1,7 +1,22 @@
 {
   "schema_version": 1,
   "architecture_version": "1.0.0",
-  "active_phase": 1,
+  "active_phase": 2,
+  "access_model": {
+    "status": "club-code-password",
+    "decision": "docs/pickhub-core/decisions/ADR-003-club-code-password-first-access.md",
+    "personal_account_required": false,
+    "roles": ["member", "admin"],
+    "notes": "Member and leader access by club code + password; optional account linking is not a Phase 2 gate."
+  },
+  "decision_history": [
+    {
+      "id": "ADR-003",
+      "date": "2026-09-03",
+      "status": "accepted",
+      "summary": "Club code + password remains the default access model; personal accounts are optional and deferred."
+    }
+  ],
   "allowed_statuses": [
     "not_started",
     "in_progress",
@@ -15,6 +30,16 @@
     "approved_at": "2026-09-02",
     "completion_commit": "60048bf41e10462e8053b26fb242bfb2b3eef56b",
     "merge_commit": "c210c3583758ddbc9209fe4da176dc1a2ed6a633"
+  },
+  "ui_preview": {
+    "status": "completed",
+    "branch": "codex/pickhub-ui-brand-preview",
+    "evidence": "docs/pickhub-core/evidence/ui-preview-review.md",
+    "approved_at": "2026-09-02",
+    "approved_by": "product-owner",
+    "completion_commit": "e147885",
+    "merge_commit": null,
+    "rollout_policy": "phase-embedded"
   },
   "phases": [
     {
@@ -32,13 +57,13 @@
     {
       "id": 2,
       "name": "identity-clubs",
-      "status": "not_started",
-      "branch": "codex/phase-2-identity-clubs",
+      "status": "awaiting_approval",
+      "branch": "codex/pickhub-ui-brand-preview",
       "depends_on": [1],
-      "evidence": null,
+      "evidence": "evidence/phase-2-test-report.md",
       "approved_by": null,
       "completed_at": null,
-      "completion_commit": null,
+      "completion_commit": "97514ed",
       "merge_commit": null
     },
     {
@@ -91,6 +116,19 @@
     }
   ],
   "completion_history": [
+    {
+      "type": "ui_design_lock",
+      "id": "ui-preview",
+      "name": "PickHub UI Brand & Preview",
+      "status": "completed",
+      "branch": "codex/pickhub-ui-brand-preview",
+      "approved_by": "product-owner",
+      "approved_at": "2026-09-02",
+      "completion_commit": "e147885",
+      "merge_commit": null,
+      "evidence": "docs/pickhub-core/evidence/ui-preview-review.md",
+      "notes": "Visual direction approved; production UI rollout is embedded in phases 1-6."
+    },
     {
       "phase": 1,
       "completed_at": "2026-09-03T15:00:28+07:00",

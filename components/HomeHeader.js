@@ -3,16 +3,31 @@ import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import navigation from '@/lib/globalNavigation';
 import UserStatusBadge from './UserStatusBadge';
+import ClubSwitcher from './pickhub/ClubSwitcher';
+import { readClubAccessContexts, readDefaultClubId } from '@/lib/clubAccessClient';
 import './HomeHeader.css';
 
-const { GLOBAL_NAV_LINKS, isGlobalNavActive } = navigation;
+const { isGlobalNavActive } = navigation;
 
-export default function HomeHeader({ showAdmin = true }) {
+export default function HomeHeader() {
     const pathname = usePathname();
     const [branding, setBranding] = useState({ name: 'Pickhub', logoUrl: null });
+    const [sessionView, setSessionView] = useState({ session: null, permissions: {}, loading: true });
+    const [clubContexts, setClubContexts] = useState([]);
+    const [defaultClubId, setDefaultClubId] = useState(null);
 
     useEffect(() => {
         let active = true;
+        setClubContexts(readClubAccessContexts());
+        setDefaultClubId(readDefaultClubId());
+        fetch('/api/groups/session', { cache: 'no-store' })
+            .then((response) => response.json())
+            .then((payload) => {
+                if (active) setSessionView({ ...payload, loading: false });
+            })
+            .catch(() => {
+                if (active) setSessionView({ session: null, permissions: {}, loading: false });
+            });
         function loadBranding() {
             fetch('/api/club/branding')
                 .then((res) => (res.ok ? res.json() : null))
@@ -31,9 +46,8 @@ export default function HomeHeader({ showAdmin = true }) {
         };
     }, []);
 
-    const navLinks = showAdmin
-        ? GLOBAL_NAV_LINKS
-        : GLOBAL_NAV_LINKS.filter((link) => link.href !== '/admin');
+    const role = sessionView.permissions?.canViewClub ? sessionView.session?.role : 'member';
+    const navLinks = navigation.getGlobalNavLinksForRole(role);
 
     return (
         <header className="home-header">
@@ -46,6 +60,12 @@ export default function HomeHeader({ showAdmin = true }) {
                         <h1>{branding.name}</h1>
                     </a>
                 </div>
+
+                <ClubSwitcher
+                    clubs={clubContexts}
+                    defaultClubId={defaultClubId}
+                    currentSession={sessionView.permissions?.canViewClub ? sessionView.session : null}
+                />
 
                 <nav className="header-nav">
                     {navLinks.map((link) => {
@@ -65,7 +85,7 @@ export default function HomeHeader({ showAdmin = true }) {
                 </nav>
 
                 <div className="header-right">
-                    <UserStatusBadge />
+                    <UserStatusBadge sessionView={sessionView} />
                 </div>
             </div>
         </header>

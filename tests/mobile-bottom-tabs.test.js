@@ -54,14 +54,15 @@ assert(
 );
 
 assert(
-    homeHeaderJs.includes('GLOBAL_NAV_LINKS') &&
+    homeHeaderJs.includes('getGlobalNavLinksForRole') &&
     mobileBottomNavJs.includes('getGlobalNavLinksForRole'),
-    'Desktop and mobile navigation should derive their links from the shared global menu definition.'
+    'Desktop and mobile navigation should derive their links from the shared server-role menu function.'
 );
 
 assert(
-    globalNavigation.GLOBAL_NAV_LINKS.map((link) => link.label).join('|') === 'Quỹ|Thành viên|BXH|Giải|Cấu hình',
-    'Global navigation should expose the approved five-item menu in order.'
+    globalNavigation.getGlobalNavLinksForRole('member').map((link) => link.label).join('|') === 'Quỹ|Thành viên|BXH|Giải|Thông tin' &&
+    globalNavigation.getGlobalNavLinksForRole('admin').map((link) => link.label).join('|') === 'Quỹ|Thành viên|BXH|Giải|Cấu hình',
+    'Global navigation should expose both approved five-item role menus in order.'
 );
 
 assert(

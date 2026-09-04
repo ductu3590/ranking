@@ -1,6 +1,5 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
-import { getCurrentGroupClient } from '@/lib/groupClient';
 import fundDashboardUtils from '@/lib/fundDashboard';
 import './page.css';
 
@@ -8,6 +7,7 @@ const { buildFundEventPanel } = fundDashboardUtils;
 
 export default function HomePage() {
     const [isAdmin, setIsAdmin] = useState(false);
+    const [accessState, setAccessState] = useState({ kind: 'loading', message: 'Đang xác thực phiên CLB…' });
 
     // Transactions state
     const [transactions, setTransactions] = useState([]);
@@ -44,11 +44,31 @@ export default function HomePage() {
     const [copiedEventId, setCopiedEventId] = useState(null);
 
     useEffect(() => {
-        const group = getCurrentGroupClient();
-        setIsAdmin(group.role === 'admin');
-        loadTransactions();
-        loadEvents();
-        loadMembers();
+        let active = true;
+        fetch('/api/groups/session', { cache: 'no-store' })
+            .then((response) => response.json())
+            .then((payload) => {
+                if (!active) return;
+                if (!payload.permissions?.canViewClub) {
+                    setAccessState({ kind: 'forbidden', message: 'Phiên CLB không hợp lệ hoặc đã hết hạn.' });
+                    setLoadingTx(false);
+                    setLoadingEvents(false);
+                    return;
+                }
+                setIsAdmin(payload.permissions?.canManageFund === true);
+                setAccessState({ kind: 'ready', message: '' });
+                loadTransactions();
+                loadEvents();
+                loadMembers();
+            })
+            .catch(() => {
+                if (active) {
+                    setAccessState({ kind: 'error', message: 'Không thể kiểm tra phiên CLB.' });
+                    setLoadingTx(false);
+                    setLoadingEvents(false);
+                }
+            });
+        return () => { active = false; };
     }, []);
 
     // ─── Transactions ────────────────────────────────────────────
@@ -239,6 +259,20 @@ export default function HomePage() {
     // ─── Render ──────────────────────────────────────────────────
 
     const formatMoney = (amount) => new Intl.NumberFormat('vi-VN').format(amount) + 'đ';
+
+    if (accessState.kind !== 'ready') {
+        return (
+            <main className="home-dark">
+                <section className={`fund-access-state is-${accessState.kind}`} role={accessState.kind === 'loading' ? 'status' : 'alert'}>
+                    <span aria-hidden="true">{accessState.kind === 'loading' ? '◌' : '!'}</span>
+                    <h1>{accessState.kind === 'loading' ? 'Đang mở quỹ CLB' : accessState.kind === 'forbidden' ? 'Không có quyền truy cập' : 'Chưa mở được quỹ'}</h1>
+                    <p>{accessState.message}</p>
+                    {accessState.kind === 'forbidden' && <a href="/">Nhập lại Mã CLB + mật khẩu</a>}
+                    {accessState.kind === 'error' && <button type="button" onClick={() => window.location.reload()}>Thử lại</button>}
+                </section>
+            </main>
+        );
+    }
 
     return (
         <div className="home-dark">

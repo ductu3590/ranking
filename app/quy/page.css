@@ -1434,3 +1434,22 @@
     }
 
 }
+.fund-access-state {
+    width: min(calc(100% - 32px), 900px);
+    min-height: 360px;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    margin: 32px auto;
+    padding: 30px;
+    border: 1px solid var(--ph-line);
+    border-radius: 20px;
+    background: var(--ph-card);
+    color: var(--ph-text);
+    text-align: center;
+}
+.fund-access-state > span { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 14px; background: var(--ph-lavender); color: var(--ph-indigo); font-weight: 900; }
+.fund-access-state h1 { margin: 13px 0 0; color: var(--ph-ink); }
+.fund-access-state p { margin: 7px 0 0; color: var(--ph-muted); }
+.fund-access-state a, .fund-access-state button { min-height: 44px; display: inline-flex; align-items: center; margin-top: 16px; padding: 0 16px; border: 0; border-radius: 12px; background: var(--ph-indigo); color: #fff; font: inherit; font-weight: 850; text-decoration: none; cursor: pointer; }
+.fund-access-state a:focus-visible, .fund-access-state button:focus-visible { outline: 3px solid var(--ph-gold); outline-offset: 2px; }

@@ -54,7 +54,7 @@
 
 .admin-center-tabs button,
 .admin-center-subtabs button {
-    min-height: 40px;
+    min-height: 44px;
     border: 1px solid var(--border-color);
     border-radius: 999px;
     background: var(--bg-card);
@@ -64,6 +64,25 @@
     padding: 0 16px;
     white-space: nowrap;
 }
+
+.admin-access-state {
+    min-height: 320px;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    padding: 28px;
+    border: 1px solid var(--ph-line);
+    border-radius: 20px;
+    background: var(--ph-card);
+    color: var(--ph-text);
+    text-align: center;
+}
+
+.admin-access-state > span { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 14px; background: var(--ph-lavender); color: var(--ph-indigo); font-weight: 900; }
+.admin-access-state h2 { margin: 12px 0 0; color: var(--ph-ink); }
+.admin-access-state p { margin: 7px 0 0; color: var(--ph-muted); }
+.admin-access-state a { min-height: 44px; display: inline-flex; align-items: center; margin-top: 15px; padding: 0 16px; border-radius: 12px; background: var(--ph-indigo); color: white; font-weight: 850; text-decoration: none; }
+.admin-center button:focus-visible, .admin-center a:focus-visible { outline: 3px solid var(--ph-gold); outline-offset: 2px; }
 
 .admin-center-tabs button.active,
 .admin-center-subtabs button.active {

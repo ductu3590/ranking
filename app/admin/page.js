@@ -1,11 +1,12 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import HomeHeader from '@/components/HomeHeader';
 import MobileBottomNav from '@/components/MobileBottomNav';
 import FundAdminPage from '@/app/quy/admin/page';
 import ClubSettings from '@/app/admin/ClubSettings';
+import MembersPage from '@/app/quy/members/page';
 import './admin-center.css';
 
 export default function UnifiedAdminCenter() {
@@ -20,6 +21,20 @@ function UnifiedAdminCenterContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const section = searchParams.get('section') || 'fund';
+    const [access, setAccess] = useState({ kind: 'loading', permissions: {} });
+
+    useEffect(() => {
+        let active = true;
+        fetch('/api/groups/session', { cache: 'no-store' })
+            .then((response) => response.json())
+            .then((payload) => {
+                if (!active) return;
+                if (payload.permissions?.canManageSettings) setAccess({ kind: 'ready', permissions: payload.permissions });
+                else setAccess({ kind: 'forbidden', permissions: payload.permissions || {} });
+            })
+            .catch(() => { if (active) setAccess({ kind: 'error', permissions: {} }); });
+        return () => { active = false; };
+    }, []);
 
     function setSection(nextSection) {
         router.push(`/admin?section=${nextSection}`);
@@ -38,7 +53,14 @@ function UnifiedAdminCenterContent() {
                     </div>
                 </section>
 
-                <nav className="admin-center-tabs" aria-label="Khu vực quản trị">
+                {access.kind === 'ready' && <nav className="admin-center-tabs" aria-label="Khu vực quản trị">
+                    <button
+                        type="button"
+                        className={section === 'roster' ? 'active' : ''}
+                        onClick={() => setSection('roster')}
+                    >
+                        Thành viên &amp; PHR
+                    </button>
                     <button
                         type="button"
                         className={section === 'fund' ? 'active' : ''}
@@ -53,10 +75,14 @@ function UnifiedAdminCenterContent() {
                     >
                         Cài đặt
                     </button>
-                </nav>
+                </nav>}
 
-                {section === 'fund' && <FundAdminPage embedded />}
-                {section === 'settings' && (
+                {access.kind === 'loading' ? <AdminAccessState title="Đang xác thực quyền" message="Máy chủ đang kiểm tra phiên trưởng nhóm…" />
+                    : access.kind === 'forbidden' ? <AdminAccessState title="Không có quyền quản trị" message="Hãy nhập Mã CLB và mật khẩu trưởng nhóm để mở Cấu hình." action />
+                    : access.kind === 'error' ? <AdminAccessState title="Chưa kiểm tra được quyền" message="Không thể kết nối máy chủ. Vui lòng tải lại trang." />
+                    : section === 'fund' ? <FundAdminPage embedded />
+                    : section === 'roster' ? <MembersPage embedded />
+                    : section === 'settings' && (
                     <section className="admin-center-panel">
                         <ClubSettings />
                     </section>
@@ -66,4 +92,8 @@ function UnifiedAdminCenterContent() {
             <MobileBottomNav />
         </div>
     );
+}
+
+function AdminAccessState({ title, message, action = false }) {
+    return <section className="admin-access-state" role="alert"><span aria-hidden="true">{action ? '!' : '◌'}</span><h2>{title}</h2><p>{message}</p>{action && <a href="/">Nhập lại thông tin CLB</a>}</section>;
 }

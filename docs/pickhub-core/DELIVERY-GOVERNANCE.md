@@ -35,6 +35,26 @@ Quy trình nhánh:
 
 Không tạo sẵn cả sáu nhánh vì chúng sẽ lệch khỏi `main` và tạo xung đột không cần thiết.
 
+### 2.1 Quy tắc UI sau khi đã chốt visual
+
+- `UI-BRAND-SYSTEM.md` là baseline bắt buộc: nền sáng, palette tím/lavender
+  làm chủ đạo và không có surface nền đen hoặc navy đặc. Màu CLB/giải chỉ là
+  theme override trong các token accent được phép.
+- Không tạo nhánh redesign dài hạn riêng khỏi roadmap. UI production của Phase
+  N nằm trên `codex/phase-N-*` cùng với API, quyền, migration và domain rules
+  của phase đó.
+- Nhánh `codex/pickhub-ui-brand-preview` chỉ chứa design lock/reference
+  artifact; không dùng nó để bypass quality gate hoặc đưa business logic vào
+  prototype.
+- Mỗi phase phải chỉ rõ lát cắt UI, breakpoint, role surface và trạng thái
+  loading/empty/error/forbidden/offline/conflict trong phase plan trước khi code.
+- Gate E của phase có thêm visual regression trên viewport liên quan, keyboard
+  focus smoke, touch target và kiểm tra không tràn ngang ở mobile. Với phase có
+  vận hành tại sân, phải kiểm tra desktop BTC và mobile scorekeeper riêng.
+- Khi visual bug không liên quan đến core contract, sửa trên nhánh phase hiện
+  tại. Khi thiếu contract hoặc invariant, tạo ADR/use-case thay vì xử lý ngầm
+  trong component.
+
 ## 3. Definition of Done chung
 
 Một phase chỉ được xem là hoàn thành khi đạt đủ tất cả điều kiện:
@@ -50,6 +70,8 @@ Một phase chỉ được xem là hoàn thành khi đạt đủ tất cả đi�
 - Dữ liệu production hiện hữu được bảo toàn hoặc có migration được phê duyệt rõ ràng.
 - Audit/privacy/observability được cập nhật tương ứng với dữ liệu mới.
 - Tài liệu PickHub Core và ADR không mâu thuẫn với code.
+- Lát cắt UI của phase tuân baseline thương hiệu, có visual evidence và không
+  làm thay đổi quyền hoặc business rule ở client.
 - `PROGRESS.md` và `progress.json` khớp nhau.
 - Có test evidence và người phụ trách sản phẩm xác nhận.
 

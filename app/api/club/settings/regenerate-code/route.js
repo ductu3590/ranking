@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import QRCode from 'qrcode';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
-import { requireGroupAdmin } from '@/lib/groupSession';
+import { requireValidatedGroupAdmin } from '@/lib/groupSession';
 import { generateGroupCode, normalizeGroupCode } from '@/lib/groupAuth';
+import { nextAccessVersion } from '@/lib/domain/identity/session';
 
 async function createUniqueGroupCode() {
     for (let attempt = 0; attempt < 8; attempt += 1) {
@@ -19,13 +20,13 @@ async function createUniqueGroupCode() {
 }
 
 export async function POST(request) {
-    const adminCheck = requireGroupAdmin();
+    const adminCheck = await requireValidatedGroupAdmin();
     if (!adminCheck.ok) return adminCheck.response;
 
     const code = await createUniqueGroupCode();
     const { data: group, error } = await supabaseAdmin
         .from('groups')
-        .update({ code })
+        .update({ code, access_version: nextAccessVersion(adminCheck.session?.access_version || 1) })
         .eq('id', adminCheck.groupId)
         .select('id, code, name')
         .single();

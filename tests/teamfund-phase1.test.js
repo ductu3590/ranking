@@ -95,6 +95,7 @@ assert(
 
 const createRoute = read('app/api/groups/route.js');
 const joinRoute = read('app/api/groups/join/route.js');
+const joinService = read('lib/application/identity/joinClubWithCode.js');
 
 assert(
     createRoute.includes('admin_password_hash') &&
@@ -118,8 +119,8 @@ assert(
 );
 
 assert(
-    joinRoute.includes("role = 'admin'") &&
-    joinRoute.includes("role = 'member'") &&
+    joinService.includes("role = 'admin'") &&
+    joinService.includes("role = 'member'") &&
     joinRoute.includes('verifyPassword'),
     'Join group API should distinguish admin and member passwords.'
 );

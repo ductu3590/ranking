@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { rememberClubAccessContext } from '@/lib/clubAccessClient';
 import './page.css';
 
 const EMPTY_CREATE_FORM = {
@@ -28,11 +29,28 @@ export default function PickhubHomePage() {
         const storedGroup = window.localStorage.getItem(GROUP_STORAGE_KEY);
         if (storedGroup) {
             try {
-                setCurrentGroup(JSON.parse(storedGroup));
+                const rememberedGroup = JSON.parse(storedGroup);
+                if (rememberedGroup?.code) {
+                    setJoinForm((prev) => ({ ...prev, code: rememberedGroup.code }));
+                }
             } catch {
                 window.localStorage.removeItem(GROUP_STORAGE_KEY);
             }
         }
+
+        fetch('/api/groups/session', { cache: 'no-store' })
+            .then((response) => response.json())
+            .then((payload) => {
+                if (payload.permissions?.canViewClub && payload.session) {
+                    setCurrentGroup({
+                        id: payload.session.group_id,
+                        code: payload.session.group_code,
+                        name: payload.session.group_name,
+                        role: payload.session.role,
+                    });
+                }
+            })
+            .catch(() => {});
 
         const params = new URLSearchParams(window.location.search);
         const groupCode = params.get('group');
@@ -55,7 +73,7 @@ export default function PickhubHomePage() {
     function rememberGroup(group, role) {
         const nextGroup = { ...group, role };
         setCurrentGroup(nextGroup);
-        window.localStorage.setItem(GROUP_STORAGE_KEY, JSON.stringify(nextGroup));
+        rememberClubAccessContext(group);
     }
 
     async function handleCreateGroup(event) {

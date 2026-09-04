@@ -114,7 +114,9 @@ Phase 4 hỗ trợ ledger vận hành, chưa cần payment gateway:
 - Director correction review và audit timeline.
 - Announcement composer và delivery status.
 
-Nếu design system mới đã vượt gate riêng, UI Phase 4 dùng nó; nếu chưa, vẫn dùng reference components ổn định, không chờ redesign.
+UI Phase 4 bắt buộc dùng design baseline đã duyệt và các component foundation
+đã được nghiệm thu từ Phase 1. Không tạo nhánh redesign riêng; mọi thay đổi
+visual hoặc accessibility nằm trên nhánh Phase 4 và đi qua Gate E.
 
 ## 9. Ngoài phạm vi
 

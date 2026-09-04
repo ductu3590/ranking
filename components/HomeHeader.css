@@ -55,6 +55,8 @@
     background-clip: text;
 }
 
+.home-header .club-switcher { margin-right: auto; }
+
 .header-nav {
     display: flex;
     gap: 4px;
@@ -85,9 +87,9 @@
 }
 
 .nav-link.active {
-    background: var(--court-midnight);
-    color: var(--pickle-lime);
-    border-color: rgba(202, 255, 40, 0.28);
+    background: var(--ph-lavender);
+    color: var(--ph-indigo);
+    border-color: #dcd6f2;
 }
 
 .nav-link-icon {
@@ -96,9 +98,9 @@
 }
 
 .nav-link.featured {
-    background: var(--gradient-court-action);
-    color: var(--court-midnight);
-    border-color: rgba(7, 27, 24, 0.12);
+    background: #fff7df;
+    color: var(--ph-ink);
+    border-color: #f1ddb0;
     font-weight: 800;
     box-shadow: 0 7px 18px rgba(157, 242, 11, 0.2);
 }
@@ -112,10 +114,10 @@
 }
 
 .nav-link.featured.active {
-    background: var(--court-midnight);
-    color: var(--pickle-lime);
-    border-color: var(--pickle-lime);
-    box-shadow: 0 0 0 3px rgba(202, 255, 40, 0.2);
+    background: var(--ph-lavender);
+    color: var(--ph-indigo);
+    border-color: var(--ph-indigo);
+    box-shadow: 0 0 0 3px rgba(111, 72, 201, .12);
 }
 
 .header-right {
@@ -170,10 +172,16 @@
         gap: 6px;
     }
 
+    .home-header .club-switcher { margin-right: 0; }
+
     .fund-label { font-size: 9px; }
     .fund-amount { font-size: 13px; }
 }
 
 @media (max-width: 480px) {
-    .header-logo h1 { font-size: 14px; }
+    .header-logo,
+    .header-right { display: none; }
+    .home-header .club-switcher { min-width: 0; width: 100%; }
+    .club-switcher-trigger { width: 100%; }
+    .club-switcher-trigger strong { max-width: calc(100vw - 118px); }
 }

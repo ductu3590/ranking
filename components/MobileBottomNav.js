@@ -10,6 +10,7 @@ const { getGlobalNavLinksForRole, isGlobalNavActive } = navigation;
 export default function MobileBottomNav() {
     const pathname = usePathname();
     const [role, setRole] = useState('member');
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         let active = true;
@@ -18,11 +19,12 @@ export default function MobileBottomNav() {
             .then((response) => (response.ok ? response.json() : null))
             .then((payload) => {
                 const sessionRole = payload?.session?.role;
-                if (active && ['admin', 'member'].includes(sessionRole)) {
+                if (active && payload?.permissions?.canViewClub && ['admin', 'member'].includes(sessionRole)) {
                     setRole(sessionRole);
                 }
             })
-            .catch(() => {});
+            .catch(() => {})
+            .finally(() => { if (active) setLoading(false); });
 
         return () => {
             active = false;
@@ -32,7 +34,7 @@ export default function MobileBottomNav() {
     const navLinks = getGlobalNavLinksForRole(role);
 
     return (
-        <nav className="mobile-bottom-nav" aria-label="Điều hướng chính trên mobile">
+        <nav className="mobile-bottom-nav" aria-label="Điều hướng chính trên mobile" aria-busy={loading}>
             {navLinks.map((link) => {
                 const isActive = isGlobalNavActive(pathname, link.href);
                 return (

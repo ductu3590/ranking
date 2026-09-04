@@ -8,7 +8,8 @@ import {
     normalizeGroupCode,
     publicGroupPayload,
 } from '@/lib/groupAuth';
-import { setGroupSessionCookie, signGroupSession } from '@/lib/groupSession';
+import { setGroupSessionCookie } from '@/lib/groupSession';
+import { issueClubSession } from '@/lib/identityRuntime';
 import { consumeRateLimit, getClientIdentifier, rateLimitResponse } from '@/lib/rateLimit';
 
 const db = supabaseAdmin || supabaseServer;
@@ -65,7 +66,7 @@ export async function POST(request) {
                 admin_password_hash: hashPassword(adminPassword),
                 member_password_hash: hashPassword(memberPassword),
             })
-            .select('id, code, name, description')
+            .select('id, code, name, description, access_version')
             .single();
 
         if (error) throw error;
@@ -88,12 +89,14 @@ export async function POST(request) {
             qrCodeDataUrl,
         });
 
-        setGroupSessionCookie(response, signGroupSession({
+        const issuedSession = await issueClubSession({
             groupId: group.id,
             groupCode: group.code,
             groupName: group.name,
             role: 'admin',
-        }));
+            accessVersion: group.access_version || 1,
+        });
+        setGroupSessionCookie(response, issuedSession.token);
 
         return response;
     } catch (error) {

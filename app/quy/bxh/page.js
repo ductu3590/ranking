@@ -24,6 +24,7 @@ export default function FundLeaderboardPage() {
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [accessState, setAccessState] = useState('loading');
     const [refreshKey, setRefreshKey] = useState(0);
     const [referenceTime, setReferenceTime] = useState(() => new Date());
 
@@ -35,6 +36,13 @@ export default function FundLeaderboardPage() {
             setError('');
 
             try {
+                const sessionResponse = await fetch('/api/groups/session', { cache: 'no-store', signal: controller.signal });
+                const sessionView = await sessionResponse.json();
+                if (!sessionView.permissions?.canViewClub) {
+                    setAccessState('forbidden');
+                    return;
+                }
+                setAccessState('ready');
                 const response = await fetch('/api/club/transactions', { signal: controller.signal });
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.error || 'Không thể tải dữ liệu giao dịch.');
@@ -99,6 +107,13 @@ export default function FundLeaderboardPage() {
                     <span className="leaderboard-loader" aria-hidden="true" />
                     <h2>Đang tổng hợp bảng xếp hạng</h2>
                     <p>Dữ liệu nộp phạt đang được cập nhật...</p>
+                </section>
+            ) : accessState === 'forbidden' ? (
+                <section className="leaderboard-state leaderboard-error" role="alert">
+                    <span className="leaderboard-state-icon" aria-hidden="true">🔒</span>
+                    <h2>Không có quyền xem BXH</h2>
+                    <p>Phiên CLB không hợp lệ hoặc đã hết hạn.</p>
+                    <a className="leaderboard-state-action" href="/">Nhập lại Mã CLB + mật khẩu</a>
                 </section>
             ) : error ? (
                 <section className="leaderboard-state leaderboard-error" role="alert">

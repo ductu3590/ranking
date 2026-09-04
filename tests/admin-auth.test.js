@@ -27,12 +27,12 @@ for (const route of ['app/quy/admin/page.js']) {
         `${route} should not gate access with Supabase Auth.`
     );
     assert(
-        src.includes('getCurrentGroupClient'),
-        `${route} should read the current group session role for access control.`
+        src.includes('/api/groups/session') && src.includes('permissions?.canManageFund'),
+        `${route} should read authoritative fund permissions from the server session API.`
     );
     assert(
-        src.includes("role !== 'admin'"),
-        `${route} should reject sessions whose role is not admin.`
+        !src.includes('getCurrentGroupClient'),
+        `${route} should not trust a browser-stored role for access control.`
     );
 }
 
@@ -53,8 +53,8 @@ assert(
 // The status badge should reflect the current group + role, not Supabase Auth.
 const badge = read('components/UserStatusBadge.js');
 assert(
-    badge.includes('teamfund-current-group'),
-    'UserStatusBadge should read the current group session from storage.'
+    badge.includes('/api/groups/session') && badge.includes('permissions?.canViewClub'),
+    'UserStatusBadge should read the current signed group session from the server.'
 );
 assert(
     !badge.includes('supabase.auth') && !badge.includes('@/lib/supabaseClient'),

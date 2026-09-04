@@ -57,14 +57,14 @@
     {
       "id": 2,
       "name": "identity-clubs",
-      "status": "awaiting_approval",
-      "branch": "codex/pickhub-ui-brand-preview",
+      "status": "completed",
+      "branch": "main",
       "depends_on": [1],
       "evidence": "evidence/phase-2-test-report.md",
-      "approved_by": null,
-      "completed_at": null,
-      "completion_commit": "97514ed",
-      "merge_commit": null
+      "approved_by": "product owner merge/deploy request (2026-09-04)",
+      "completed_at": "2026-09-04T21:00:00+07:00",
+      "completion_commit": "479bdd90e34b2171efc5a8bc1077d2e77620d7a2",
+      "merge_commit": "479bdd90e34b2171efc5a8bc1077d2e77620d7a2"
     },
     {
       "id": 3,
@@ -116,6 +116,19 @@
     }
   ],
   "completion_history": [
+    {
+      "phase": 2,
+      "completed_at": "2026-09-04T21:00:00+07:00",
+      "branch": "main",
+      "completion_commit": "479bdd90e34b2171efc5a8bc1077d2e77620d7a2",
+      "merge_commit": "479bdd90e34b2171efc5a8bc1077d2e77620d7a2",
+      "approved_by": "product owner merge/deploy request (2026-09-04)",
+      "test_evidence": [
+        "evidence/phase-2-test-report.md",
+        "../../TEST_Pharse_2.md"
+      ],
+      "deployment_smoke": "https://rank.soccernow.net/thong-tin returned HTTP 200 after push"
+    },
     {
       "type": "ui_design_lock",
       "id": "ui-preview",

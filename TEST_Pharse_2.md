@@ -20,7 +20,7 @@ SUPABASE_SERVICE_ROLE_KEY=<staging-service-role-key>
 GROUP_SESSION_SECRET=<random-long-secret>
 ```
 
-Snapshot staging. Nếu project hoàn toàn rỗng, phải chạy **toàn bộ migration `001` đến `029`** theo thứ tự tên file; không được chạy riêng `028`/`029` vì chúng phụ thuộc schema của các migration trước. Lưu ý có hai file bắt đầu bằng `011`, cần chạy cả hai trước `012`. Nếu database đã được xác nhận ở `027`, chỉ khi đó mới chạy `028_phase2_athlete_identity.sql` rồi `029_phase2_athlete_link_reviews.sql`. Ghi count `club_members` trước/sau và mapping legacy. Không khóa ghi `club_members` trước khi consumer cũ chuyển xong.
+Snapshot staging. **Project rỗng không thể chạy trực tiếp `001`**: các migration đầu tiên giả định schema legacy (đặc biệt `quy_pickleball`) đã được tạo trước đó, nhưng schema nền này không nằm trong thư mục migration hiện tại. Trước tiên phải import baseline schema/data từ project cũ hoặc tạo một baseline đã được kiểm chứng. Sau khi baseline tồn tại, chạy **toàn bộ migration `001` đến `029`** theo thứ tự tên file; không được chạy riêng `028`/`029` vì chúng phụ thuộc schema của các migration trước. Lưu ý có hai file bắt đầu bằng `011`, cần chạy cả hai trước `012`. Nếu database đã được xác nhận ở `027`, chỉ khi đó mới chạy `028_phase2_athlete_identity.sql` rồi `029_phase2_athlete_link_reviews.sql`. Ghi count `club_members` trước/sau và mapping legacy. Không khóa ghi `club_members` trước khi consumer cũ chuyển xong.
 
 ## Test tự động
 

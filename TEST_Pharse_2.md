@@ -20,7 +20,7 @@ SUPABASE_SERVICE_ROLE_KEY=<staging-service-role-key>
 GROUP_SESSION_SECRET=<random-long-secret>
 ```
 
-Snapshot staging, xác nhận migration đang ở `027`, rồi chạy lần lượt migration `028_phase2_athlete_identity.sql` và `029_phase2_athlete_link_reviews.sql`. Ghi count `club_members` trước/sau và mapping legacy. Không khóa ghi `club_members` trước khi consumer cũ chuyển xong.
+Snapshot staging. Nếu project hoàn toàn rỗng, phải chạy **toàn bộ migration `001` đến `029`** theo thứ tự tên file; không được chạy riêng `028`/`029` vì chúng phụ thuộc schema của các migration trước. Lưu ý có hai file bắt đầu bằng `011`, cần chạy cả hai trước `012`. Nếu database đã được xác nhận ở `027`, chỉ khi đó mới chạy `028_phase2_athlete_identity.sql` rồi `029_phase2_athlete_link_reviews.sql`. Ghi count `club_members` trước/sau và mapping legacy. Không khóa ghi `club_members` trước khi consumer cũ chuyển xong.
 
 ## Test tự động
 
@@ -85,4 +85,3 @@ git diff --check
 **Pass:** test/build xanh, mapping/count bảo toàn, isolation đạt, member không ghi, session cũ bị revoke, UI đúng role và không lộ private fields.
 
 **Fail:** lỗi scope/RLS, stale session còn truy cập, mapping mất, duplicate tự merge, member ghi được hoặc bất kỳ exit code khác `0`; giữ Phase 2 ở `in_progress`/`blocked` và không khóa `club_members` writes.
-

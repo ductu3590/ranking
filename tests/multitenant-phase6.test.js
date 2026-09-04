@@ -9,7 +9,7 @@ const tx = read('app/api/club/transactions/route.js');
 assert(
     tx.includes('export async function POST') &&
     tx.includes('export async function PATCH') &&
-    tx.includes('requireGroupAdmin') &&
+    tx.includes('requireValidatedGroupAdmin') &&
     tx.includes('MANUAL_THU') &&
     tx.includes('MANUAL_CHI'),
     'Club transactions route should support admin-guarded manual create (Thu/Chi) and update/bulk.'
@@ -20,7 +20,7 @@ assert(
     mem.includes('export async function POST') &&
     mem.includes('export async function PATCH') &&
     mem.includes('export async function DELETE') &&
-    mem.includes('requireGroupAdmin'),
+    mem.includes('requireValidatedGroupAdmin'),
     'Club members route should support admin-guarded create/update/delete.'
 );
 

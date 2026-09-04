@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
-import { getGroupIdForDatabase, requireGroupAdmin } from '@/lib/groupSession';
+import { getGroupIdForDatabase, requireValidatedGroupAdmin } from '@/lib/groupSession';
 
 export async function GET() {
     const groupId = getGroupIdForDatabase();
@@ -16,7 +16,7 @@ export async function GET() {
 }
 
 export async function POST(request) {
-    const adminCheck = requireGroupAdmin();
+    const adminCheck = await requireValidatedGroupAdmin();
     if (!adminCheck.ok) return adminCheck.response;
 
     const body = await request.json();
@@ -38,7 +38,7 @@ export async function POST(request) {
 }
 
 export async function PATCH(request) {
-    const adminCheck = requireGroupAdmin();
+    const adminCheck = await requireValidatedGroupAdmin();
     if (!adminCheck.ok) return adminCheck.response;
 
     const body = await request.json();
@@ -72,7 +72,7 @@ export async function PATCH(request) {
 }
 
 export async function DELETE(request) {
-    const adminCheck = requireGroupAdmin();
+    const adminCheck = await requireValidatedGroupAdmin();
     if (!adminCheck.ok) return adminCheck.response;
 
     const { searchParams } = new URL(request.url);

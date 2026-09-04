@@ -56,14 +56,14 @@ const clubEvents = read('app/api/club/events/route.js');
 assert(
     clubEvents.includes('export async function POST') &&
     clubEvents.includes('export async function DELETE') &&
-    clubEvents.includes('requireGroupAdmin') &&
+    clubEvents.includes('requireValidatedGroupAdmin') &&
     clubEvents.includes('fund_event_participants'),
     'Club events route should support admin-guarded create/delete and return nested participants.'
 );
 const clubParticipants = read('app/api/club/participants/route.js');
 assert(
     clubParticipants.includes('export async function PATCH') &&
-    clubParticipants.includes('requireGroupAdmin'),
+    clubParticipants.includes('requireValidatedGroupAdmin'),
     'Club participants route should support an admin-guarded paid toggle.'
 );
 

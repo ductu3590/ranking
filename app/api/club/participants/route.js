@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
-import { requireGroupAdmin } from '@/lib/groupSession';
+import { requireValidatedGroupAdmin } from '@/lib/groupSession';
 
 // Toggle a participant's paid status. Body: { participantId, hasPaid }.
 export async function PATCH(request) {
-    const adminCheck = requireGroupAdmin();
+    const adminCheck = await requireValidatedGroupAdmin();
     if (!adminCheck.ok) return adminCheck.response;
     const groupId = adminCheck.groupId;
 

@@ -3,7 +3,6 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { listTournaments, updateTournament, deleteTournament } from '@/lib/tournamentV2Client';
-import { getCurrentGroupClient } from '@/lib/groupClient';
 import TournamentConsoleV2 from './console/TournamentConsoleV2';
 import TournamentWizard from './TournamentWizard';
 import './v2.css';
@@ -142,8 +141,12 @@ function TournamentV2PageInner() {
     }
 
     useEffect(() => {
-        const group = getCurrentGroupClient();
-        setIsAdmin(group.role === 'admin');
+        fetch('/api/groups/session', { credentials: 'same-origin', cache: 'no-store' })
+            .then((response) => response.json())
+            .then((sessionView) => {
+                setIsAdmin(sessionView?.session?.role === 'admin');
+            })
+            .catch(() => setIsAdmin(false));
         load();
     }, []);
 

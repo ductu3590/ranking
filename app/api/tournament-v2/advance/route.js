@@ -2,7 +2,7 @@ import { randomUUID } from 'crypto';
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
-import { requireGroupAdmin } from '@/lib/groupSession';
+import { requireValidatedGroupAdmin } from '@/lib/groupSession';
 import { getScheduleEngine, getMatchEngine } from '@/lib/tournament/engines';
 import { buildResolvedMatches } from '@/lib/tournament/results';
 import { isStageComplete, seedNextStage } from '@/lib/tournament/orchestrator';
@@ -90,7 +90,7 @@ async function loadStageData(stage, groupId) {
 
 export async function POST(request) {
     try {
-        const adminCheck = requireGroupAdmin();
+        const adminCheck = await requireValidatedGroupAdmin();
         if (!adminCheck.ok) return adminCheck.response;
         const groupId = adminCheck.groupId;
 

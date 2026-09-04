@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
-import { requireGroupAdmin, getClubScope } from '@/lib/groupSession';
+import { requireValidatedGroupAdmin, getClubScope } from '@/lib/groupSession';
 import { generatePairSchedule } from '@/lib/tournament/match/mlpPairs';
 
 const db = supabaseAdmin || supabaseServer;
@@ -45,7 +45,7 @@ export async function GET(request) {
 // Sinh (hoặc regenerate) pairSchedule cho stage MLP. Ghi đè vào stage.config.
 export async function POST(request) {
     try {
-        const adminCheck = requireGroupAdmin();
+        const adminCheck = await requireValidatedGroupAdmin();
         if (!adminCheck.ok) return adminCheck.response;
         const groupId = adminCheck.groupId;
 
@@ -161,7 +161,7 @@ export async function POST(request) {
 // Ghi đè toàn bộ pairSchedule (dùng khi admin sửa thủ công lịch ghép đôi).
 export async function PATCH(request) {
     try {
-        const adminCheck = requireGroupAdmin();
+        const adminCheck = await requireValidatedGroupAdmin();
         if (!adminCheck.ok) return adminCheck.response;
         const groupId = adminCheck.groupId;
 

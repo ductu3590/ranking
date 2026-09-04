@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
-import { getGroupIdForDatabase, requireGroupAdmin } from '@/lib/groupSession';
+import { getGroupIdForDatabase, requireValidatedGroupAdmin } from '@/lib/groupSession';
 
 const EVENT_SELECT = `
     *,
@@ -28,7 +28,7 @@ export async function GET() {
 }
 
 export async function POST(request) {
-    const adminCheck = requireGroupAdmin();
+    const adminCheck = await requireValidatedGroupAdmin();
     if (!adminCheck.ok) return adminCheck.response;
     const groupId = adminCheck.groupId;
 
@@ -90,7 +90,7 @@ export async function POST(request) {
 }
 
 export async function DELETE(request) {
-    const adminCheck = requireGroupAdmin();
+    const adminCheck = await requireValidatedGroupAdmin();
     if (!adminCheck.ok) return adminCheck.response;
     const groupId = adminCheck.groupId;
 

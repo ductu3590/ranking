@@ -55,7 +55,7 @@ assert(
     bankApi.includes('export async function GET') &&
     bankApi.includes('export async function POST') &&
     bankApi.includes('export async function DELETE') &&
-    bankApi.includes('requireGroupAdmin') &&
+    bankApi.includes('requireValidatedGroupAdmin') &&
     bankApi.includes('group_bank_accounts'),
     'Bank-accounts route should expose admin-guarded GET/POST/DELETE on group_bank_accounts.'
 );

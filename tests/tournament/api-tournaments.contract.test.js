@@ -6,7 +6,7 @@ const assert = (c, m) => { if (!c) { console.error(`FAIL: ${m}`); process.exit(1
 const f = 'app/api/tournament-v2/tournaments/route.js';
 assert(exists(f), 'route tồn tại');
 const s = read(f);
-assert(s.includes('requireGroupAdmin'), 'có admin guard');
+assert(s.includes('requireValidatedGroupAdmin'), 'có database-backed admin guard');
 assert(/export async function POST/.test(s) && /export async function PATCH/.test(s) && /export async function DELETE/.test(s) && /export async function GET/.test(s), 'đủ 4 method');
 assert(s.includes('entrant_type') && s.includes('public_slug'), 'hỗ trợ entrant_type + server slug');
 assert(s.includes('visibility') && s.includes('Invalid tournament visibility'), 'validate visibility');

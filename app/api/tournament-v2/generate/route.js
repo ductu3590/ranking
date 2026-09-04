@@ -2,7 +2,7 @@ import { randomUUID } from 'crypto';
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
-import { requireGroupAdmin } from '@/lib/groupSession';
+import { requireValidatedGroupAdmin } from '@/lib/groupSession';
 import { getScheduleEngine } from '@/lib/tournament/engines';
 import { scheduleToInsertRows } from '@/lib/tournament/persistence';
 
@@ -17,7 +17,7 @@ function rpcErrorResponse(error) {
 
 export async function POST(request) {
     try {
-        const adminCheck = requireGroupAdmin();
+        const adminCheck = await requireValidatedGroupAdmin();
         if (!adminCheck.ok) return adminCheck.response;
         const groupId = adminCheck.groupId;
 

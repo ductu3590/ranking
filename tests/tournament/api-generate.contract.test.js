@@ -6,7 +6,7 @@ const assert = (c, m) => { if (!c) { console.error(`FAIL: ${m}`); process.exit(1
 const f = 'app/api/tournament-v2/generate/route.js';
 assert(exists(f), 'route tồn tại');
 const s = read(f);
-assert(s.includes('requireGroupAdmin'), 'admin guard');
+assert(s.includes('requireValidatedGroupAdmin'), 'database-backed admin guard');
 assert(s.includes('getScheduleEngine') && s.includes('generateSchedule'), 'gọi schedule engine');
 assert(s.includes('scheduleToInsertRows'), 'dùng persistence helper để chuẩn hóa payload');
 assert(s.includes('_parent_key') && s.includes('parent_slot'), 'gửi liên kết parent theo khóa schedule');

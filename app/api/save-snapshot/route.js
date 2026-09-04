@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
-import { getClubScope, requireGroupAdmin } from '@/lib/groupSession';
+import { getClubScope, requireValidatedGroupAdmin } from '@/lib/groupSession';
 
 export async function POST() {
-    const adminCheck = requireGroupAdmin();
+    const adminCheck = await requireValidatedGroupAdmin();
     if (!adminCheck.ok) return adminCheck.response;
 
     const groupId = adminCheck.groupId;

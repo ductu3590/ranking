@@ -290,6 +290,33 @@
     cursor: pointer;
 }
 
+.w3-check-add .w3-add-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    background: var(--w3-lavender);
+    color: var(--w3-indigo);
+    font-weight: 800;
+    flex: none;
+}
+.w3-check-add .w3-add-label {
+    margin-left: auto;
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: var(--w3-indigo);
+}
+.w3-check-add:disabled {
+    opacity: 0.55;
+    cursor: default;
+}
+.w3-check-add:disabled .w3-add-icon {
+    background: #e7f6ec;
+    color: #1f7a45;
+}
+
 .w3-check.is-selected {
     border-color: var(--w3-indigo);
     background: var(--w3-lavender);

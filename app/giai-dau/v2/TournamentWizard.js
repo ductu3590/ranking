@@ -920,16 +920,22 @@ export default function TournamentWizard({ onDone }) {
 
                     <div className="w3-section">
                         <h3>Chọn thành viên CLB</h3>
+                        <p className="w3-hint">Bấm vào một thành viên để thêm họ vào giải.</p>
                         {roster.length === 0 ? (
                             <div className="w3-state">Chưa tải được roster thành viên.</div>
                         ) : (
                             <div className="w3-check-grid">
-                                {roster.map((member) => (
-                                    <button key={member.member_id} type="button" className="w3-check" onClick={() => addRosterAthlete(member)} disabled={busy}>
-                                        <span>{member.full_name}</span>
-                                        <span className="w3-tag">{member.athlete_id ? 'Có hồ sơ' : 'Chỉ tên'}</span>
-                                    </button>
-                                ))}
+                                {roster.map((member) => {
+                                    const already = athletesInClub.some((athlete) => String(athlete.athlete_id) === String(member.athlete_id) && member.athlete_id != null);
+                                    return (
+                                        <button key={member.member_id} type="button" className="w3-check w3-check-add" onClick={() => addRosterAthlete(member)} disabled={busy || already}>
+                                            <span className="w3-add-icon">{already ? '✓' : '+'}</span>
+                                            <span>{member.full_name}</span>
+                                            <span className="w3-tag">{member.athlete_id ? 'Có hồ sơ' : 'Chỉ tên'}</span>
+                                            <span className="w3-add-label">{already ? 'Đã thêm' : 'Thêm'}</span>
+                                        </button>
+                                    );
+                                })}
                             </div>
                         )}
                     </div>
@@ -1045,9 +1051,10 @@ export default function TournamentWizard({ onDone }) {
                         </div>
                     )}
 
+                    {organizerMode !== 'internal' && (
                     <div className="w3-section">
-                        <h3>BTC nhập hộ đội hình</h3>
-                        <p className="w3-hint">Bản ghi lưu người thao tác và lý do, ở trạng thái chờ CLB xác nhận. Cảnh báo PHR không chặn gửi hay duyệt.</p>
+                        <h3>BTC nhập hộ đội hình cho CLB khách</h3>
+                        <p className="w3-hint">Chỉ dùng khi CLB khách nhờ BTC nhập hộ (ví dụ gửi danh sách qua Zalo). Mỗi lần chọn một VĐV; bản ghi lưu người thao tác và lý do, ở trạng thái chờ CLB xác nhận. Cảnh báo PHR không chặn gửi hay duyệt.</p>
                         <div className="w3-inline-form">
                             <div className="v2-field">
                                 <label htmlFor="w3-proxy-athlete">VĐV</label>
@@ -1089,6 +1096,7 @@ export default function TournamentWizard({ onDone }) {
                             </ul>
                         )}
                     </div>
+                    )}
 
                     {activeDivision && (entriesByDivision[String(activeDivision.id)] || []).length > 0 && (
                         <div className="w3-section">

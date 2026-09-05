@@ -120,17 +120,17 @@
 ### Task 6: Scorekeeper token and privacy-safe public projection
 
 **Files:**
-- Create: `database/migrations/035_phase3_match_score_tokens.sql`
+- Create: `database/migrations/036_phase3_scorekeeper_tokens.sql`
 - Modify: `lib/tournament/interclub.js`, `app/api/tournament-v2/public/*`
 - Create: `tests/phase3/interclub-public.test.js`, `tests/phase3/score-token.test.js`
 
-- [ ] Write failing tests proving public metadata/schedule/results/standings are returned while notes/contact/private registration fields are omitted.
-- [ ] Run the focused test and confirm failure.
-- [ ] Add signed/hashed match or court score tokens with expiry/revoke/replay protection.
+- [x] Write failing tests proving public metadata/schedule/results/standings are returned while notes/contact/private registration fields are omitted.
+- [x] Run the focused test and confirm failure.
+- [x] Add hashed one-time match scorekeeper tokens with expiry, revocation and replay protection, plus organizer issue/revoke endpoints and token-based score submission.
 - [ ] Allow organizer-entered rosters with audit and later club confirmation.
-- [ ] Implement projection using explicit allowlists, global slug lookup and immutable snapshots.
-- [ ] Publicly expose only display name and representing club for athletes.
-- [ ] Run all Phase 3 tests.
+- [x] Implement projection using explicit allowlists, global slug lookup and immutable snapshots.
+- [x] Publicly expose only display name and representing club for athletes; PHR remains hidden unless `share_settings.public_phr` is enabled.
+- [x] Run all Phase 3 tests.
 
 ### Task 6b: Share link, image export and copy text (Zalo)
 

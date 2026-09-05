@@ -6,6 +6,7 @@ import { requireValidatedGroupAdmin } from '@/lib/groupSession';
 import { getMatchEngine } from '@/lib/tournament/engines';
 import { advanceWinner } from '@/lib/tournament/results';
 import { validateGameScore } from '@/lib/tournament/rules/scoring';
+import { hashScorekeeperToken, validateScorekeeperToken } from '@/lib/tournament/scorekeeperToken';
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -28,14 +29,28 @@ function normalizeGames(games) {
 
 async function handleGames(request) {
     try {
-        const adminCheck = await requireValidatedGroupAdmin();
-        if (!adminCheck.ok) return adminCheck.response;
-        const groupId = adminCheck.groupId;
-
         const body = await request.json();
         const matchId = body?.matchId;
         const games = Array.isArray(body?.games) ? body.games : [];
         if (!matchId) return NextResponse.json({ error: 'matchId is required' }, { status: 400 });
+
+        const adminCheck = await requireValidatedGroupAdmin();
+        let groupId;
+        let scorekeeperToken = null;
+        if (adminCheck.ok) {
+            groupId = adminCheck.groupId;
+        } else if (body?.scorekeeper_token) {
+            const { data: tokenRecord, error: tokenError } = await db.from('tournament_scorekeeper_tokens')
+                .select('id, group_id, match_id, token_hash, expires_at, revoked_at, consumed_at')
+                .eq('token_hash', hashScorekeeperToken(body.scorekeeper_token)).maybeSingle();
+            if (tokenError) return NextResponse.json({ error: 'Scorekeeper token không hợp lệ', code: 'TOKEN_INVALID' }, { status: 401 });
+            const tokenCheck = validateScorekeeperToken(body.scorekeeper_token, tokenRecord, Date.now());
+            if (!tokenCheck.ok || Number(tokenRecord.match_id) !== Number(matchId)) return NextResponse.json({ error: 'Scorekeeper token không hợp lệ', code: tokenCheck.code || 'TOKEN_SCOPE_INVALID' }, { status: 401 });
+            groupId = tokenRecord.group_id;
+            scorekeeperToken = tokenRecord;
+        } else {
+            return adminCheck.response;
+        }
 
         const { data: match, error: matchErr } = await db
             .from('tournament_matches')
@@ -109,6 +124,12 @@ async function handleGames(request) {
             p_idempotency_key: idempotencyKey,
         });
         if (error) return rpcErrorResponse(error);
+
+        if (scorekeeperToken) {
+            const { error: consumeError } = await db.from('tournament_scorekeeper_tokens')
+                .update({ consumed_at: new Date().toISOString() }).eq('id', scorekeeperToken.id).is('consumed_at', null).is('revoked_at', null);
+            if (consumeError) return rpcErrorResponse(consumeError);
+        }
 
         return NextResponse.json(data || {
             success: true,

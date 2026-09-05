@@ -8,13 +8,13 @@ const db = supabaseAdmin || supabaseServer;
 
 const PUBLIC_TOURNAMENT_SELECT = [
     'id', 'public_slug', 'name', 'description', 'event_date',
-    'status', 'location', 'entrant_type', 'visibility',
+    'status', 'location', 'entrant_type', 'visibility', 'share_settings',
 ].join(', ');
 const PUBLIC_STAGE_SELECT = [
     'id', 'tournament_id', 'division_id', 'stage_order', 'name',
     'schedule_format', 'match_format', 'status', 'config',
 ].join(', ');
-const PUBLIC_ENTRANT_SELECT = 'id, division_id, name_snapshot, seed, color_snapshot';
+const PUBLIC_ENTRANT_SELECT = 'id, division_id, name_snapshot, seed, color_snapshot, phr_rating, phr_status';
 const PUBLIC_MATCH_SELECT = [
     'id', 'division_id', 'stage_id', 'round', 'bracket_slot', 'group_label',
     'court', 'match_order', 'entrant_a_id', 'entrant_b_id', 'status',
@@ -70,6 +70,8 @@ export async function GET(request) {
                 name: entry.name_snapshot,
                 seed: entry.seed,
                 color: entry.color_snapshot,
+                phr_rating: entry.phr_rating,
+                phr_status: entry.phr_status,
             }));
         }
         const matches = stageIds.length

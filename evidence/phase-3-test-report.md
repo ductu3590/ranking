@@ -413,3 +413,15 @@ After strengthening the balance assertion, it failed again until the algorithm w
 - `roundRobin.computeStandings` now emits the documented aliases and derived metrics: `wins`, `game_diff`, `point_diff`, `game_ratio`, and `point_ratio`, while retaining `diff` for `legacy_v2` compatibility. `aggregateClubStandings` emits the same ranking fields.
 - The tie-break test now obtains rows from `computeStandings` instead of inventing fields absent from the real engine output. It covers the real `diff`-before-`points_for` case and each new derived criterion.
 - Missing ranking fields are no longer silently indistinguishable from zero: `explanation` records `available: false` for an unavailable criterion. `scope` is honored as `all` versus `tied_group` when calculating head-to-head values.
+
+## Task 6 — scorekeeper token and privacy-safe public projection
+
+### TDD RED
+
+The new behavior tests were run before implementation. The token test failed with `MODULE_NOT_FOUND` for `lib/tournament/scorekeeperToken`, while the strengthened public projection test failed because `lineup` was still exposed. These failures demonstrated missing implementation rather than a test-only string check.
+
+### Implementation
+
+- Added hashed, expiring, revocable, one-time scorekeeper tokens in migration `036_phase3_scorekeeper_tokens.sql` and `lib/tournament/scorekeeperToken.js`.
+- Added organizer issue/revoke API at `/api/tournament-v2/score-tokens`; the games API accepts a valid token for match scoring without requiring a personal account and consumes it after use.
+- Public tournament reads remain global-slug based and use explicit allowlists. Internal notes, contact fields, approval state, lineup/private game data and PHR are omitted by default. Confirmed PHR is included only when `share_settings.public_phr` is explicitly enabled.

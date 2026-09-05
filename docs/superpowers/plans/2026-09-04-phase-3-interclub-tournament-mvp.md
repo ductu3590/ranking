@@ -96,6 +96,9 @@
 - [x] Return warnings when a pool cannot be perfectly spread; only hard-block explicit rulesets.
 - [x] Preserve deterministic ordering and configured standings tie-breaks.
 - [x] Run focused competition tests plus `npm run test:t-engines`.
+- [x] Add non-blocking `evaluateRatingWarning` for missing, pending, confirmed, rejected and over-limit PHR states.
+- [x] Apply duplicate-club distribution policy in the real round-robin draw path, including spread warnings.
+- [x] Handle partial PHR data and odd doubles rosters without blocking the preview.
 
 ### Task 5b: Scoring rules and tie-break policy
 
@@ -104,11 +107,11 @@
 - Modify: `lib/tournament/engines/roundRobin.js`, `lib/tournament/match/simple.js`, `lib/tournament/match/mlp.js`, `lib/tournament/standingsService.js`, `lib/tournament/interclub.js`, `app/api/tournament-v2/{games,generate,standings}/*`
 - Create: `tests/phase3/scoring-rules.test.js`, `tests/phase3/tiebreak-policy.test.js`
 
-- [ ] Write failing tests: `legacy_v2` preset reproduces current `computeStandings` order on the existing engine fixtures; three-way tie resolved with `scope: tied_group`; `draw_lot` deterministic by stage seed; `validateGameScore` rejects 11-10 with `win_by: 2`, accepts 15-14 with `cap: 15`.
-- [ ] Implement `resolveStageScoring`/`resolveTiebreak` (tournament default → division override → stage snapshot) and `SCORING_PRESETS`/`TIEBREAK_PRESETS` as versioned data.
-- [ ] Snapshot resolved `scoring` and `tiebreak` into `tournament_stages.config` inside `CommitDraw`; adapter maps snake_case keys to existing `bestOf`/`winPoints`/`lossPoints`/`subMatches`/`dreambreaker`.
-- [ ] Replace the hard-coded comparator in `roundRobin.computeStandings` and `aggregateClubStandings` with `rankStandings(rows, matches, policy, seed)` returning `explanation[]`.
-- [ ] Validate score submission in the games API against the stage's snapshotted `scoring`; return stable error codes; correction workflow remains the only override path.
+- [x] Write failing tests: `legacy_v2` preset reproduces current `computeStandings` order on the existing engine fixtures; three-way tie resolved with `scope: tied_group`; `draw_lot` deterministic by stage seed; `validateGameScore` rejects 11-10 with `win_by: 2`, accepts 15-14 with `cap: 15`.
+- [x] Implement `resolveStageScoring`/`resolveTiebreak` (tournament default → division override → stage snapshot) and `SCORING_PRESETS`/`TIEBREAK_PRESETS` as versioned data.
+- [x] Snapshot resolved `scoring` and `tiebreak` into `tournament_stages.config` during schedule generation; adapter maps snake_case keys to existing `bestOf`/`winPoints`/`lossPoints`/`subMatches`/`dreambreaker`.
+- [x] Replace the hard-coded comparator in `roundRobin.computeStandings` and `aggregateClubStandings` with `rankStandings(rows, matches, policy, seed)` returning `explanation[]`.
+- [x] Validate score submission in the games API against the stage's snapshotted `scoring`; return stable error codes; correction workflow remains the only override path.
 - [ ] Block `UpdateScoringRules`/`UpdateTiebreakPolicy` for stages already `live`/`done`.
 - [ ] Run focused tests, then `npm run test:t-engines` and confirm existing fixtures are unchanged.
 

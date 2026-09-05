@@ -1,0 +1,13 @@
+const assert = require('assert');
+const { TIEBREAK_PRESETS, resolveTiebreak, rankStandings } = require('../../lib/tournament/rules/tiebreak');
+assert(TIEBREAK_PRESETS.legacy_v2 && TIEBREAK_PRESETS.draw_lot, 'tiebreak presets có version');
+const rows = [1, 2, 3].map((entrant_id) => ({ entrant_id, match_points: 2, diff: 0, points_for: 20, seed: entrant_id, group_label: 'A' }));
+const matches = [{ entrant_a_id: 1, entrant_b_id: 2, winner_entrant_id: 1, status: 'done' }, { entrant_a_id: 2, entrant_b_id: 3, winner_entrant_id: 2, status: 'done' }, { entrant_a_id: 3, entrant_b_id: 1, winner_entrant_id: 3, status: 'done' }];
+const tied = rankStandings(rows, matches, { version: 'tied_group', scope: 'tied_group' }, 1);
+assert(tied.every((row) => Array.isArray(row.explanation)), 'BXH có explanation');
+assert.deepStrictEqual(tied.map((row) => row.rank), [1, 2, 3], 'tied_group vẫn đánh rank liên tục');
+const lotA = rankStandings(rows, matches, { version: 'draw_lot', scope: 'draw_lot' }, 99);
+const lotB = rankStandings(rows, matches, { version: 'draw_lot', scope: 'draw_lot' }, 99);
+assert.deepStrictEqual(lotA, lotB, 'draw_lot deterministic theo seed');
+assert.strictEqual(resolveTiebreak({}, {}, {}).version, 'legacy_v2', 'default tiebreak legacy_v2');
+console.log('phase3 tiebreak policy ok');

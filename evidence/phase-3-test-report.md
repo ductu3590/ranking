@@ -394,3 +394,9 @@ After strengthening the balance assertion, it failed again until the algorithm w
 
 1. PHR currently exists only per tournament in `tournament_athletes` and `tournament_athlete_phr_history`; decide whether to add an athlete-level PHR source of truth and snapshot it into tournaments.
 2. `recorded_by_profile_id` points to a profile table that does not yet exist, while `community_admin` is a platform account; decide how to record the confirming actor required by Phase 4.
+
+## Task 5 / Task 5b follow-up
+
+- Added rating-cap warnings to pairing preview without blocking registration or organizer approval. Partial PHR and odd doubles rosters produce explicit warnings and retain unpaired/available athletes.
+- The real round-robin draw path now distributes duplicate-club entries across pools under the selected policy; it returns a warning only when spread capacity is exceeded.
+- Added versioned scoring/tiebreak policies. `legacy_v2` is verified against the existing round-robin fixture ordering, while game validation and deterministic draw-lot behavior are covered by focused tests.

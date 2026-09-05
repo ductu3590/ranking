@@ -5,6 +5,7 @@ import { supabaseServer } from '@/lib/supabaseServer';
 import { requireValidatedGroupAdmin } from '@/lib/groupSession';
 import { getMatchEngine } from '@/lib/tournament/engines';
 import { advanceWinner } from '@/lib/tournament/results';
+import { validateGameScore } from '@/lib/tournament/rules/scoring';
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -60,12 +61,19 @@ async function handleGames(request) {
         }
 
         const normalizedGames = normalizeGames(games);
+        const scoring = stage.config?.scoring;
+        if (scoring) {
+            for (let index = 0; index < normalizedGames.length; index += 1) {
+                const validation = validateGameScore(normalizedGames[index], scoring, index);
+                if (!validation.ok) return NextResponse.json({ error: 'Tỉ số không hợp lệ', code: validation.code }, { status: 400 });
+            }
+        }
         let resolved;
         try {
             resolved = engine.resolveMatch(
                 { entrant_a_id: match.entrant_a_id, entrant_b_id: match.entrant_b_id },
                 normalizedGames,
-                stage.config || {},
+                { ...(stage.config || {}), ...(scoring?.engine || {}) },
             );
         } catch (error) {
             console.error('Resolve match engine error:', error);

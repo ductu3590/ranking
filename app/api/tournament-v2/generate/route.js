@@ -5,6 +5,8 @@ import { supabaseServer } from '@/lib/supabaseServer';
 import { requireValidatedGroupAdmin } from '@/lib/groupSession';
 import { getScheduleEngine } from '@/lib/tournament/engines';
 import { scheduleToInsertRows } from '@/lib/tournament/persistence';
+import { resolveStageScoring } from '@/lib/tournament/rules/scoring';
+import { resolveTiebreak } from '@/lib/tournament/rules/tiebreak';
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -37,6 +39,25 @@ export async function POST(request) {
             .single();
         if (stageErr || !stage) {
             return NextResponse.json({ error: 'Stage không tồn tại' }, { status: 404 });
+        }
+
+        // Commit the resolved, versioned policies with the draw snapshot. Later
+        // tournament/division edits cannot change this stage's interpretation.
+        if (!stage.config?.scoring || !stage.config?.tiebreak) {
+            const [{ data: tournament, error: tournamentErr }, { data: division, error: divisionErr }] = await Promise.all([
+                db.from('tournaments').select('default_scoring, tiebreak_policy').eq('id', stage.tournament_id).eq('group_id', groupId).single(),
+                stage.division_id
+                    ? db.from('tournament_divisions').select('scoring_override, tiebreak_override').eq('id', stage.division_id).eq('group_id', groupId).single()
+                    : Promise.resolve({ data: {}, error: null }),
+            ]);
+            if (tournamentErr || divisionErr) return NextResponse.json({ error: tournamentErr?.message || divisionErr?.message }, { status: 500 });
+            stage.config = {
+                ...(stage.config || {}),
+                scoring: resolveStageScoring(tournament || {}, division || {}, stage),
+                tiebreak: resolveTiebreak(tournament || {}, division || {}, stage),
+            };
+            const { error: snapshotErr } = await db.from('tournament_stages').update({ config: stage.config }).eq('id', stageId).eq('group_id', groupId);
+            if (snapshotErr) return NextResponse.json({ error: snapshotErr.message }, { status: 500 });
         }
 
         // 2. Get entrants for the stage

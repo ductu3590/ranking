@@ -36,6 +36,50 @@ for (const criterion of ['wins', 'game_diff', 'point_diff', 'game_ratio', 'point
   assert(ranked[0].explanation.some((item) => item.criterion === criterion && item.decided === true), `${criterion} thực sự được sử dụng để tách hạng`);
 }
 
+// A1: tỉ lệ ván và tỉ lệ điểm phải hữu hạn, nằm trong 0..1 và sống sót qua JSON.
+const sweepRows = computeStandings({ config: { winPoints: 2 } }, [{ id: 1, seed: 1 }, { id: 2, seed: 2 }], [
+  { entrant_a_id: 1, entrant_b_id: 2, winner_entrant_id: 1, points_a: 22, points_b: 0, games_a: 2, games_b: 0, status: 'done', group_label: 'A' },
+]);
+const sweepWinner = sweepRows.find((row) => row.entrant_id === 1);
+const sweepLoser = sweepRows.find((row) => row.entrant_id === 2);
+assert(Number.isFinite(sweepWinner.game_ratio), 'game_ratio hữu hạn khi chưa thua ván nào');
+assert(Number.isFinite(sweepWinner.point_ratio), 'point_ratio hữu hạn khi chưa thủng điểm nào');
+assert(sweepWinner.game_ratio > 0 && sweepWinner.game_ratio <= 1, 'game_ratio nằm trong khoảng 0..1');
+assert(sweepWinner.point_ratio > 0 && sweepWinner.point_ratio <= 1, 'point_ratio nằm trong khoảng 0..1');
+assert.strictEqual(typeof JSON.parse(JSON.stringify(sweepWinner)).game_ratio, 'number', 'game_ratio không thành null khi trả JSON');
+assert.strictEqual(typeof JSON.parse(JSON.stringify(sweepWinner)).point_ratio, 'number', 'point_ratio không thành null khi trả JSON');
+assert(sweepWinner.game_ratio > sweepLoser.game_ratio, 'đội thắng vẫn có tỉ lệ ván cao hơn');
+assert(sweepWinner.point_ratio > sweepLoser.point_ratio, 'đội thắng vẫn có tỉ lệ điểm cao hơn');
+
+// A2: scope tied_group tính lại tiêu chí số trên các trận trong nội bộ nhóm hòa.
+// 1, 2, 3 bằng điểm và thắng vòng tròn lẫn nhau; 4 thua cả ba.
+// Hiệu số toàn bảng: 1 (+13) > 2 (+12) > 3 (0). Hiệu số bảng con: 1 (+10) > 3 (-1) > 2 (-9).
+const miniEntrants = [1, 2, 3, 4].map((id) => ({ id, seed: id }));
+const miniMatches = [
+  { entrant_a_id: 1, entrant_b_id: 2, winner_entrant_id: 1, points_a: 21, points_b: 10, games_a: 2, games_b: 0, status: 'done', group_label: 'A' },
+  { entrant_a_id: 2, entrant_b_id: 3, winner_entrant_id: 2, points_a: 21, points_b: 19, games_a: 2, games_b: 0, status: 'done', group_label: 'A' },
+  { entrant_a_id: 3, entrant_b_id: 1, winner_entrant_id: 3, points_a: 21, points_b: 20, games_a: 2, games_b: 0, status: 'done', group_label: 'A' },
+  { entrant_a_id: 1, entrant_b_id: 4, winner_entrant_id: 1, points_a: 21, points_b: 18, games_a: 2, games_b: 0, status: 'done', group_label: 'A' },
+  { entrant_a_id: 2, entrant_b_id: 4, winner_entrant_id: 2, points_a: 21, points_b: 0, games_a: 2, games_b: 0, status: 'done', group_label: 'A' },
+  { entrant_a_id: 3, entrant_b_id: 4, winner_entrant_id: 3, points_a: 21, points_b: 20, games_a: 2, games_b: 0, status: 'done', group_label: 'A' },
+];
+const miniOrder = ['match_points', 'head_to_head', 'game_diff', 'point_diff', 'points_for', 'draw_lot'];
+const miniRows = () => computeStandings({ config: { winPoints: 2 } }, miniEntrants, miniMatches);
+const wholeTable = rankStandings(miniRows(), miniMatches, { version: 'phong_trao_mac_dinh', scope: 'all', order: miniOrder }, 1);
+const tiedGroup = rankStandings(miniRows(), miniMatches, { version: 'phong_trao_mac_dinh', scope: 'tied_group', order: miniOrder }, 1);
+assert.deepStrictEqual(wholeTable.map((row) => row.entrant_id), [1, 2, 3, 4], 'scope all xếp theo hiệu số toàn bảng');
+assert.deepStrictEqual(tiedGroup.map((row) => row.entrant_id), [1, 3, 2, 4], 'scope tied_group xếp theo hiệu số trong nội bộ nhóm hòa');
+assert(
+  tiedGroup.find((row) => row.entrant_id === 3).explanation
+    .some((item) => item.criterion === 'point_diff' && item.scope === 'tied_group'),
+  'explanation ghi rõ tiêu chí được tính trong phạm vi nhóm hòa',
+);
+assert(
+  !wholeTable.find((row) => row.entrant_id === 3).explanation
+    .some((item) => item.scope === 'tied_group'),
+  'scope all không đánh dấu nhóm hòa',
+);
+
 const lotA = rankStandings(cyclicRows, cyclicMatches, { version: 'draw_lot', scope: 'all', order: ['match_points', 'draw_lot'] }, 99);
 const lotB = rankStandings(cyclicRows, cyclicMatches, { version: 'draw_lot', scope: 'all', order: ['match_points', 'draw_lot'] }, 99);
 assert.deepStrictEqual(lotA, lotB, 'draw_lot deterministic theo seed');

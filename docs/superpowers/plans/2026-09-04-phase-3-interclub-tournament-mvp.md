@@ -74,14 +74,14 @@
 - Modify: `lib/tournament/interclub.js`
 - Modify: `tests/phase3/interclub-domain.test.js`
 
-- [ ] Add division attributes: `play_type`, `scoring_scope`, `rating_policy`, `rating_cap`, `pairing_mode`, `scoring_override`, `tiebreak_override`.
-- [ ] Add `tournaments.default_scoring`, `tournaments.tiebreak_policy`, `tournaments.share_settings`.
-- [ ] Add `tournament_external_clubs`; make `tournament_clubs.club_id` nullable with `external_club_id` and a check that exactly one is set; replace `UNIQUE (tournament_id, club_id)` with partial unique indexes for each.
-- [ ] Add `tournament_athletes`, `tournament_pairs` and pair members with snapshots.
-- [ ] Add organizer-submitted roster status and club confirmation workflow.
-- [ ] Add PHR value/status/history needed for warnings; no hard block on registration.
-- [ ] Implement stable error codes and pure validators with no I/O.
-- [ ] Run focused domain tests and then the existing tournament engine tests.
+- [x] Add division attributes: `play_type`, `scoring_scope`, `rating_policy`, `rating_cap`, `pairing_mode`, `scoring_override`, `tiebreak_override`.
+- [x] Add `tournaments.default_scoring`, `tournaments.tiebreak_policy`, `tournaments.share_settings`.
+- [x] Add `tournament_external_clubs`; make `tournament_clubs.club_id` nullable with `external_club_id` and a check that exactly one is set; replace `UNIQUE (tournament_id, club_id)` with partial unique indexes for each.
+- [x] Add `tournament_athletes`, `tournament_pairs` and pair members with snapshots.
+- [x] Add organizer-submitted roster status and club confirmation workflow.
+- [x] Add PHR value/status/history needed for warnings; no hard block on registration.
+- [x] Implement stable error codes and pure validators with no I/O.
+- [x] Run focused domain tests and then the existing tournament engine tests.
 
 ### Task 5: Pairing and ruleset-aware draw
 

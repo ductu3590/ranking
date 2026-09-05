@@ -1,5 +1,8 @@
 -- PickHub Phase 3 Task 4: division rules, external clubs, athletes and pairs.
 -- Forward-only. 030/033/034 remain immutable.
+-- Vocabulary decision: play_type is the user-facing source of truth for format;
+-- legacy entrant_type is retained for compatibility but constrained to the
+-- corresponding shape: singles->individual, doubles->pair, team->team.
 BEGIN;
 
 DO $$
@@ -13,24 +16,30 @@ BEGIN
 END $$;
 
 ALTER TABLE public.tournament_divisions
-  ADD COLUMN IF NOT EXISTS play_type text NOT NULL DEFAULT 'doubles',
-  ADD COLUMN IF NOT EXISTS scoring_scope text NOT NULL DEFAULT 'individual',
+  ADD COLUMN IF NOT EXISTS play_type text NOT NULL DEFAULT 'team',
+  ADD COLUMN IF NOT EXISTS scoring_scope text NOT NULL DEFAULT 'club',
   ADD COLUMN IF NOT EXISTS rating_policy text NOT NULL DEFAULT 'open',
   ADD COLUMN IF NOT EXISTS rating_cap numeric(4,2),
-  ADD COLUMN IF NOT EXISTS pairing_mode text NOT NULL DEFAULT 'manual',
+  ADD COLUMN IF NOT EXISTS pairing_mode text NOT NULL DEFAULT 'none',
   ADD COLUMN IF NOT EXISTS scoring_override jsonb,
   ADD COLUMN IF NOT EXISTS tiebreak_override jsonb;
 ALTER TABLE public.tournament_divisions
   DROP CONSTRAINT IF EXISTS tournament_divisions_play_type_ck,
-  ADD CONSTRAINT tournament_divisions_play_type_ck CHECK (play_type IN ('singles', 'doubles')),
+  ADD CONSTRAINT tournament_divisions_play_type_ck CHECK (play_type IN ('singles', 'doubles', 'team')),
   DROP CONSTRAINT IF EXISTS tournament_divisions_scoring_scope_ck,
-  ADD CONSTRAINT tournament_divisions_scoring_scope_ck CHECK (scoring_scope IN ('individual', 'team')),
+  ADD CONSTRAINT tournament_divisions_scoring_scope_ck CHECK (scoring_scope IN ('athlete', 'club')),
   DROP CONSTRAINT IF EXISTS tournament_divisions_rating_policy_ck,
-  ADD CONSTRAINT tournament_divisions_rating_policy_ck CHECK (rating_policy IN ('open', 'cap')),
+  ADD CONSTRAINT tournament_divisions_rating_policy_ck CHECK (rating_policy IN ('open', 'capped')),
   DROP CONSTRAINT IF EXISTS tournament_divisions_rating_cap_ck,
-  ADD CONSTRAINT tournament_divisions_rating_cap_ck CHECK (rating_policy <> 'cap' OR (rating_cap IS NOT NULL AND rating_cap > 0)),
+  ADD CONSTRAINT tournament_divisions_rating_cap_ck CHECK (rating_policy <> 'capped' OR (rating_cap IS NOT NULL AND rating_cap > 0)),
   DROP CONSTRAINT IF EXISTS tournament_divisions_pairing_mode_ck,
-  ADD CONSTRAINT tournament_divisions_pairing_mode_ck CHECK (pairing_mode IN ('manual', 'random_balanced'));
+  ADD CONSTRAINT tournament_divisions_pairing_mode_ck CHECK (pairing_mode IN ('none', 'manual', 'random_balanced')),
+  DROP CONSTRAINT IF EXISTS tournament_divisions_entrant_type_relation_ck,
+  ADD CONSTRAINT tournament_divisions_entrant_type_relation_ck CHECK (
+    (play_type = 'singles' AND entrant_type = 'individual')
+    OR (play_type = 'doubles' AND entrant_type = 'pair')
+    OR (play_type = 'team' AND entrant_type = 'team')
+  );
 
 ALTER TABLE public.tournaments
   ADD COLUMN IF NOT EXISTS default_scoring jsonb NOT NULL DEFAULT '{}'::jsonb,

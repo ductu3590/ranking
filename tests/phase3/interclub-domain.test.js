@@ -46,12 +46,15 @@ assert(throwsCode(() => validateRosterSubmission({ registrations: [{ athlete_id:
 assert(throwsCode(() => validateRosterSubmission({ registrations: [{ athlete_id: 3, age: 12 }], quota: 3, eligibility: { minAge: 18 } }), 'ELIGIBILITY_FAILED'), 'vi phạm eligibility');
 
 const division = validateDivisionOptions({
-  play_type: 'doubles', scoring_scope: 'team', rating_policy: 'cap', rating_cap: 10.5,
+  play_type: 'doubles', scoring_scope: 'club', rating_policy: 'capped', rating_cap: 10.5,
   pairing_mode: 'random_balanced', scoring_override: { bestOf: 3 }, tiebreak_override: { mode: 'head_to_head' },
 });
 assert(division.play_type === 'doubles' && division.rating_cap === 10.5, 'division options được chuẩn hóa');
-assert(throwsCode(() => validateDivisionOptions({ play_type: 'doubles', rating_policy: 'cap' }), 'RATING_CAP_REQUIRED'), 'rating cap bắt buộc khi policy cap');
+assert(division.scoring_scope === 'club' && division.rating_policy === 'capped', 'division dùng vocabulary athlete/club và open/capped');
+assert(throwsCode(() => validateDivisionOptions({ play_type: 'doubles', rating_policy: 'capped' }), 'RATING_CAP_REQUIRED'), 'rating cap bắt buộc khi policy capped');
 assert(throwsCode(() => validateDivisionOptions({ play_type: 'quadruples' }), 'INVALID_PLAY_TYPE'), 'play type không hợp lệ bị từ chối');
+assert(validateDivisionOptions({ play_type: 'team', scoring_scope: 'club', pairing_mode: 'none' }).play_type === 'team', 'team play type hợp lệ');
+assert(validateDivisionOptions({ play_type: 'singles', scoring_scope: 'athlete', pairing_mode: 'none' }).pairing_mode === 'none', 'singles dùng pairing_mode none');
 
 assert(validateTournamentClubReference({ club_id: 10 }).club_id === 10, 'PickHub club reference hợp lệ');
 assert(validateTournamentClubReference({ external_club_id: 20 }).external_club_id === 20, 'external club reference hợp lệ');

@@ -360,6 +360,12 @@ TypeError: validateDivisionOptions is not a function
 
 ### Live database status
 
-The requested preflight assumption was not identical to the live database: Supabase returned `3 tournaments`, `3 divisions`, `0 entries`, `0 registrations`, but `2 tournament_clubs` (both have valid internal `club_id` values). The MCP safety gate rejected applying migration 035 because it changes `tournament_clubs` and removes its existing uniqueness constraint while the observed count differed from the stated preflight. No live Task 4 DDL was applied.
+The requested preflight assumption differed from the live database: Supabase returned `3 tournaments`, `3 divisions`, `0 entries`, `0 registrations`, but `2 tournament_clubs`. Both existing rows had valid internal `club_id` values, so the vocabulary-corrected migration was then applied successfully as `phase3_domain_schema_035_vocabulary_fix`.
 
-The migration remains forward-only and ready to apply after explicit reconciliation/approval of the two existing `tournament_clubs` rows.
+Live verification after apply:
+
+- `tournament_clubs.club_id`: nullable.
+- `tournament_clubs.external_club_id`: exists and nullable.
+- Partial unique indexes `idx_tournament_clubs_tournament_club` and `idx_tournament_clubs_tournament_external`: present.
+- Division checks: `play_type = singles|doubles|team`, `scoring_scope = athlete|club`, `rating_policy = open|capped`, `pairing_mode = none|manual|random_balanced`.
+- Compatibility decision is enforced: `singles→individual`, `doubles→pair`, `team→team` through `tournament_divisions_entrant_type_relation_ck`.

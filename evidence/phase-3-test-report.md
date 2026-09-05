@@ -407,3 +407,9 @@ After strengthening the balance assertion, it failed again until the algorithm w
 - `rankStandings` now uses seeded Fisher–Yates for `draw_lot`, detects cyclic head-to-head mini-leagues, recursively ranks remaining tied subsets, and reports the configured order plus considered/decisive criteria in `explanation`.
 - Added scoring presets `phong_trao_11`, `phong_trao_15`, `ban_ket_chung_ket`, `mlp_4_van`, and the missing `deciding_game`, `draw_points`, and `mlp` fields.
 - Verification: `test:phase3-interclub`, `test:t-api`, and `test:t-engines` pass; `git diff --name-only -- tests/tournament tests/phase1 tests/phase2` returned no fixture files, confirming legacy fixtures were not edited.
+
+### Task 5b data-shape correction
+
+- `roundRobin.computeStandings` now emits the documented aliases and derived metrics: `wins`, `game_diff`, `point_diff`, `game_ratio`, and `point_ratio`, while retaining `diff` for `legacy_v2` compatibility. `aggregateClubStandings` emits the same ranking fields.
+- The tie-break test now obtains rows from `computeStandings` instead of inventing fields absent from the real engine output. It covers the real `diff`-before-`points_for` case and each new derived criterion.
+- Missing ranking fields are no longer silently indistinguishable from zero: `explanation` records `available: false` for an unavailable criterion. `scope` is honored as `all` versus `tied_group` when calculating head-to-head values.

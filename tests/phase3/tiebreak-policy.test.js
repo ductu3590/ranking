@@ -1,5 +1,6 @@
 const assert = require('assert');
 const { TIEBREAK_PRESETS, resolveTiebreak, rankStandings } = require('../../lib/tournament/rules/tiebreak');
+const { computeStandings } = require('../../lib/tournament/engines/roundRobin');
 assert.deepStrictEqual(TIEBREAK_PRESETS.phong_trao_mac_dinh.order, ['match_points', 'head_to_head', 'game_diff', 'point_diff', 'points_for', 'draw_lot']);
 assert.deepStrictEqual(TIEBREAK_PRESETS.giao_huu_clb.order, ['match_points', 'point_diff', 'points_for', 'head_to_head', 'draw_lot']);
 assert.deepStrictEqual(TIEBREAK_PRESETS.hieu_so_van_truoc.order, ['match_points', 'game_diff', 'head_to_head', 'point_diff', 'draw_lot']);
@@ -22,6 +23,18 @@ const split = rankStandings(splitRows, [], { version: 'hieu_so_van_truoc', scope
 assert.deepStrictEqual(split.map((row) => row.entrant_id), [1, 2, 3], 'game_diff tách nhóm đúng');
 assert(split[0].explanation.some((item) => item.criterion === 'game_diff' && item.decided === true), 'explanation ghi tiêu chí đã tách được');
 assert(!split[0].explanation.some((item) => item.criterion === 'diff'), 'explanation không dùng danh sách legacy cứng');
+
+const realRows = computeStandings({ config: { winPoints: 2, tiebreak: 'phong_trao_mac_dinh' } }, [{ id: 1, seed: 1 }, { id: 2, seed: 2 }], [
+  { entrant_a_id: 1, entrant_b_id: 2, winner_entrant_id: 1, points_a: 30, points_b: 10, games_a: 2, games_b: 0, status: 'done', group_label: 'A' },
+]);
+assert.deepStrictEqual(realRows.map((row) => row.entrant_id), [1, 2], 'computeStandings sinh dữ liệu thật và hiệu số cao xếp trên');
+for (const criterion of ['wins', 'game_diff', 'point_diff', 'game_ratio', 'point_ratio', 'points_against']) {
+  const rowsForCriterion = computeStandings({ config: { winPoints: 2 } }, [{ id: 1, seed: 1 }, { id: 2, seed: 2 }], [
+    { entrant_a_id: 1, entrant_b_id: 2, winner_entrant_id: 1, points_a: 30, points_b: 10, games_a: 2, games_b: 0, status: 'done', group_label: 'A' },
+  ]);
+  const ranked = rankStandings(rowsForCriterion.map((row) => ({ ...row, match_points: 0 })), [], { version: 'criterion_test', scope: 'all', order: [criterion, 'draw_lot'] }, 1);
+  assert(ranked[0].explanation.some((item) => item.criterion === criterion && item.decided === true), `${criterion} thực sự được sử dụng để tách hạng`);
+}
 
 const lotA = rankStandings(cyclicRows, cyclicMatches, { version: 'draw_lot', scope: 'all', order: ['match_points', 'draw_lot'] }, 99);
 const lotB = rankStandings(cyclicRows, cyclicMatches, { version: 'draw_lot', scope: 'all', order: ['match_points', 'draw_lot'] }, 99);

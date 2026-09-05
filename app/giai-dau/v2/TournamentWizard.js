@@ -812,23 +812,44 @@ export default function TournamentWizard({ onDone }) {
                         <div className="w3-state">Chưa có CLB nào tham gia.</div>
                     ) : (
                         <ul className="w3-list">
-                            {clubs.map((club) => (
-                                <li key={club.id} className="w3-row">
-                                    <div className="w3-row-top">
-                                        <span className="w3-row-name">{club.name}</span>
-                                        <span className="w3-tag">{club.invitation_status}</span>
-                                    </div>
-                                    <p className="w3-row-meta">
-                                        {club.is_external ? 'CLB ngoài hệ thống' : 'CLB PickHub'}
-                                        {club.quota ? ` · Quota ${club.quota}` : ''}
-                                    </p>
-                                    <div className="w3-row-actions">
-                                        <button type="button" className="v2-btn-secondary v2-btn-sm" onClick={() => reviewClub(club, 'accept')} disabled={busy}>Xác nhận tham gia</button>
-                                        <button type="button" className="v2-btn-secondary v2-btn-sm" onClick={() => reviewClub(club, 'approve')} disabled={busy}>BTC duyệt đội hình</button>
-                                        <button type="button" className="v2-btn-secondary v2-btn-sm" onClick={() => reviewClub(club, 'request_changes')} disabled={busy}>Yêu cầu sửa</button>
-                                    </div>
-                                </li>
-                            ))}
+                            {clubs.map((club) => {
+                                // CLB chủ giải là chính CLB của bạn — tham gia sẵn, không cần
+                                // mời hay tự xác nhận. Các nút xác nhận/duyệt chỉ dành cho CLB
+                                // khách trong giải giao hữu/cộng đồng, và chỉ hiện khi có nghĩa.
+                                const isHost = !club.is_external && String(club.club_id) === String(group.id);
+                                const actions = [];
+                                if (!isHost && organizerMode !== 'internal') {
+                                    if (club.invitation_status === 'invited') actions.push(['accept', 'Xác nhận tham gia']);
+                                    if (club.invitation_status === 'roster_submitted') {
+                                        actions.push(['approve', 'BTC duyệt đội hình']);
+                                        actions.push(['request_changes', 'Yêu cầu sửa']);
+                                    }
+                                    if (club.invitation_status === 'approved') actions.push(['request_changes', 'Yêu cầu sửa']);
+                                }
+                                return (
+                                    <li key={club.id} className="w3-row">
+                                        <div className="w3-row-top">
+                                            <span className="w3-row-name">{club.name}</span>
+                                            <span className="w3-tag">{isHost ? 'CLB tổ chức' : club.invitation_status}</span>
+                                        </div>
+                                        <p className="w3-row-meta">
+                                            {isHost ? 'CLB của bạn (chủ giải)' : (club.is_external ? 'CLB ngoài hệ thống' : 'CLB PickHub')}
+                                            {club.quota ? ` · Quota ${club.quota}` : ''}
+                                        </p>
+                                        {isHost ? (
+                                            <p className="w3-row-note">CLB của bạn tham gia sẵn — nhập đội hình ở bước sau.</p>
+                                        ) : actions.length > 0 ? (
+                                            <div className="w3-row-actions">
+                                                {actions.map(([action, label]) => (
+                                                    <button key={action} type="button" className="v2-btn-secondary v2-btn-sm" onClick={() => reviewClub(club, action)} disabled={busy}>{label}</button>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <p className="w3-row-note">Chờ CLB khách xác nhận và nộp đội hình.</p>
+                                        )}
+                                    </li>
+                                );
+                            })}
                         </ul>
                     )}
 

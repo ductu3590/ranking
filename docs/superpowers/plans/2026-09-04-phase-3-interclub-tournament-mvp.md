@@ -30,11 +30,11 @@
 - Create: `database/migrations/031_phase3_competition_preflight.sql`
 - Create: `tests/phase3/competition-preflight.test.js`
 
-- [ ] Inventory all legacy tournament rows, stages, entrants, matches and status values.
-- [ ] Define explicit mapping/report for `draft|active|completed` and `pending|live|done`.
-- [ ] Detect orphan stages/matches and ambiguous `group_id` ownership; abort migration on ambiguity.
-- [ ] Decide/record the temporary PickHub system group used by community rows.
-- [ ] Add preflight queries and evidence output before any backfill.
+- [x] Inventory all legacy tournament rows, stages, entrants, matches and status values.
+- [x] Define explicit mapping/report for `draft|active|completed` and `pending|live|done`.
+- [x] Detect orphan stages/matches and ambiguous `group_id` ownership; abort migration on ambiguity.
+- [x] Decide/record the temporary PickHub system group used by community rows.
+- [x] Add preflight queries and evidence output before any backfill.
 
 ### Task 2: Platform identity and organizer authorization
 
@@ -43,13 +43,13 @@
 - Create/modify: `lib/platformSession*`, `lib/domain/identity/*`, `app/api/platform/*`
 - Create: `tests/phase3/platform-auth.test.js`
 
-- [ ] Add `platform_accounts` with hashed password and `community_admin|platform_admin` role.
-- [ ] Add a bootstrap script (`scripts/seed-platform-account.js`, reads env) to create the first `community_admin`; no public sign-up route.
-- [ ] Update `assertTournamentOrganizer` so `community` no longer requires `organizer_community_id`; keep error codes stable.
-- [ ] Add separate signed HTTP-only `platform_session` with expiry, revoke and rate limit.
-- [ ] Add organizer authorization for `community_admin` across all tournaments.
-- [ ] Keep `group_session` for club operations; do not use it for platform actors.
-- [ ] Make profile references nullable/compatibility-safe until profile identity exists.
+- [x] Add `platform_accounts` with hashed password and `community_admin|platform_admin` role.
+- [x] Add a bootstrap script (`scripts/seed-platform-account.js`, reads env) to create the first `community_admin`; no public sign-up route.
+- [x] Update `assertTournamentOrganizer` so `community` no longer requires `organizer_community_id`; keep error codes stable.
+- [x] Add separate signed HTTP-only `platform_session` with expiry, revoke and rate limit.
+- [x] Add organizer authorization for `community_admin` across all tournaments.
+- [x] Keep `group_session` for club operations; do not use it for platform actors.
+- [x] Make profile references nullable/compatibility-safe until profile identity exists.
 
 ### Task 3: Converge division, entry, stage and match
 
@@ -114,8 +114,8 @@
 - [x] Snapshot resolved `scoring` and `tiebreak` into `tournament_stages.config` during schedule generation; adapter maps snake_case keys to existing `bestOf`/`winPoints`/`lossPoints`/`subMatches`/`dreambreaker`.
 - [x] Replace the hard-coded comparator in `roundRobin.computeStandings` and `aggregateClubStandings` with `rankStandings(rows, matches, policy, seed)` returning `explanation[]`.
 - [x] Validate score submission in the games API against the stage's snapshotted `scoring`; return stable error codes; correction workflow remains the only override path.
-- [ ] Block `UpdateScoringRules`/`UpdateTiebreakPolicy` for stages already `live`/`done`.
-- [ ] Run focused tests, then `npm run test:t-engines` and confirm existing fixtures are unchanged.
+- [x] Block `UpdateScoringRules`/`UpdateTiebreakPolicy` for stages already `live`/`done`.
+- [x] Run focused tests, then `npm run test:t-engines` and confirm existing fixtures are unchanged.
 
 ### Task 6: Scorekeeper token and privacy-safe public projection
 
@@ -127,7 +127,7 @@
 - [x] Write failing tests proving public metadata/schedule/results/standings are returned while notes/contact/private registration fields are omitted.
 - [x] Run the focused test and confirm failure.
 - [x] Add hashed one-time match scorekeeper tokens with expiry, revocation and replay protection, plus organizer issue/revoke endpoints and token-based score submission.
-- [ ] Allow organizer-entered rosters with audit and later club confirmation.
+- [x] Allow organizer-entered rosters with audit and later club confirmation.
 - [x] Implement projection using explicit allowlists, global slug lookup and immutable snapshots.
 - [x] Publicly expose only display name and representing club for athletes; PHR remains hidden unless `share_settings.public_phr` is enabled.
 - [x] Run all Phase 3 tests.
@@ -140,11 +140,11 @@
 - Create: `app/api/tournament-v2/public/share-image/route.js`, `app/giai-dau/v2/[slug]/opengraph-image.js`
 - Create: `tests/phase3/share.test.js`
 
-- [ ] Write failing tests: `buildOpenGraph` output has title/description/image and no private fields; `buildShareText` for schedule/result/call-to-court templates; `renderShareImage` refuses non-public visibility.
-- [ ] Add `generateMetadata` with Open Graph on the public tournament page and per-division view, resolved by global slug and honoring `visibility`.
-- [ ] Add a default OG image route rendered from tournament name/date/venue/host logo when no poster is uploaded (`share_settings.poster_url`).
-- [ ] Add "Xuất ảnh" for draw result, schedule (by court/by club), standings, results/bracket and final honors; PNG sized for portrait mobile, watermark with tournament name and export time, built only from the public projection.
-- [ ] Add "Sao chép thông báo" with versioned Vietnamese text templates editable before copy.
+- [x] Write failing tests: `buildOpenGraph` output has title/description/image and no private fields; `buildShareText` for schedule/result/call-to-court templates; `renderShareImage` refuses non-public visibility.
+- [x] Add `generateMetadata` with Open Graph on the public tournament page and per-division view, resolved by global slug and honoring `visibility`.
+- [x] Add a default OG image route rendered from tournament name/date/venue/host logo when no poster is uploaded (`share_settings.poster_url`).
+- [x] Add "Xuất ảnh" for draw result, schedule (by court/by club), standings, results/bracket and final honors; PNG sized for portrait mobile, watermark with tournament name and export time, built only from the public projection.
+- [x] Add "Sao chép thông báo" with versioned Vietnamese text templates editable before copy.
 - [ ] Manually verify in the browser: paste the public link into a chat and confirm the preview card; export one standings image and inspect it for private data.
 
 ### Task 7: Rebuild Wizard on the converged model
@@ -154,14 +154,14 @@
 - Modify/Create: relevant tournament API routes
 - Create: `tests/phase3/wizard-competition-contract.test.js`
 
-- [ ] Make the Wizard select internal/friendly/community organizer mode.
-- [ ] Create multiple “Nội dung thi đấu” divisions in one tournament.
-- [ ] Configure singles/doubles/team, athlete/club scoring, Open/capped PHR and pairing mode per division.
-- [ ] Support internal clubs, invited internal/external clubs and open community registration.
-- [ ] Support club member selection, guest athletes, auto pairing preview and manual pairing.
-- [ ] Show warnings without blocking registration; allow BTC approval and organizer-submitted roster audit.
-- [ ] Add a scoring/tie-break step: choose presets for the tournament, override per division, preview the effective rules per stage before draw commit.
-- [ ] Add share actions on the organizer console and public page: copy link, export image, copy text.
+- [x] Make the Wizard select internal/friendly/community organizer mode.
+- [x] Create multiple “Nội dung thi đấu” divisions in one tournament.
+- [x] Configure singles/doubles/team, athlete/club scoring, Open/capped PHR and pairing mode per division.
+- [x] Support internal clubs, invited internal/external clubs and open community registration.
+- [x] Support club member selection, guest athletes, auto pairing preview and manual pairing.
+- [x] Show warnings without blocking registration; allow BTC approval and organizer-submitted roster audit.
+- [x] Add a scoring/tie-break step: choose presets for the tournament, override per division, preview the effective rules per stage before draw commit.
+- [x] Add share actions on the organizer console and public page: copy link, export image, copy text.
 
 ### Task 8: Phase 3 test runner and runbook
 
@@ -170,19 +170,19 @@
 - Create: `TEST_PHASE_3.md`
 - Create: `evidence/phase-3-test-report.md`
 
-- [ ] Add `test:phase3-interclub` and `test:phase3` scripts that run the Phase 3 test matrix.
-- [ ] Document prerequisites, focused commands, regression commands, migration apply steps, pilot rehearsal and expected outputs in Vietnamese.
-- [ ] Run the complete Phase 3 command and record actual output in the evidence report.
-- [ ] Run `npm run test:ci` or report the exact pre-existing blocker with command output.
+- [x] Add `test:phase3-interclub` and `test:phase3` scripts that run the Phase 3 test matrix.
+- [x] Document prerequisites, focused commands, regression commands, migration apply steps, pilot rehearsal and expected outputs in Vietnamese.
+- [x] Run the complete Phase 3 command and record actual output in the evidence report.
+- [x] Run `npm run test:ci` or report the exact pre-existing blocker with command output.
 
 ## Self-review checklist
 
 - [ ] No new flow reads legacy `tournament_entrants` except the explicit compatibility adapter.
 - [ ] Every new public function has a runtime test that was observed failing before implementation.
-- [ ] SQL is additive/forward-only, preserves old tournament data and has preflight/backfill verification.
-- [ ] A two-division tournament has independent stages, matches and standings.
+- [x] SQL is additive/forward-only, preserves old tournament data and has preflight/backfill verification.
+- [x] A two-division tournament has independent stages, matches and standings.
 - [ ] Community tournament works with platform auth and an external invited club.
 - [ ] Scorekeeper can score through an expiring token without a personal account.
-- [ ] No migration file already applied to Supabase was edited; `legacy_v2` tie-break preset reproduces pre-Phase-3 standings on existing fixtures.
+- [x] No migration file already applied to Supabase was edited; `legacy_v2` tie-break preset reproduces pre-Phase-3 standings on existing fixtures.
 - [ ] Public link shows an Open Graph card; exported images and copy text contain no private data.
 - [ ] Test instructions distinguish local domain tests from Supabase migration and browser rehearsal.

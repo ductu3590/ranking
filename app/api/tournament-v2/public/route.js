@@ -14,6 +14,10 @@ const PUBLIC_STAGE_SELECT = [
     'id', 'tournament_id', 'division_id', 'stage_order', 'name',
     'schedule_format', 'match_format', 'status', 'config',
 ].join(', ');
+const PUBLIC_DIVISION_SELECT = [
+    'id', 'name', 'entrant_type', 'play_type', 'scoring_scope',
+    'competition_template', 'ruleset_version', 'competition_status',
+].join(', ');
 const PUBLIC_ENTRANT_SELECT = 'id, division_id, name_snapshot, seed, color_snapshot';
 const PUBLIC_MATCH_SELECT = [
     'id', 'division_id', 'stage_id', 'round', 'bracket_slot', 'group_label',
@@ -50,6 +54,11 @@ export async function GET(request) {
             return NextResponse.json({ error: 'Giải đấu không tồn tại' }, { status: 404 });
         }
 
+        // Nội dung thi đấu công khai: cần cho tab nội dung, link chia sẻ theo
+        // division và ảnh/text xuất ra nhóm Zalo.
+        const divisions = await readRows('tournament_divisions', PUBLIC_DIVISION_SELECT, [
+            ['eq', 'tournament_id', tournament.id],
+        ]);
         const stages = await readRows('tournament_stages', PUBLIC_STAGE_SELECT, [
             ['eq', 'tournament_id', tournament.id],
         ]);
@@ -111,6 +120,7 @@ export async function GET(request) {
 
         return NextResponse.json(buildPublicSnapshot({
             tournament,
+            divisions,
             stages,
             entrants,
             matches,

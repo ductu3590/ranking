@@ -425,3 +425,82 @@ The new behavior tests were run before implementation. The token test failed wit
 - Added hashed, expiring, revocable, one-time scorekeeper tokens in migration `036_phase3_scorekeeper_tokens.sql` and `lib/tournament/scorekeeperToken.js`.
 - Added organizer issue/revoke API at `/api/tournament-v2/score-tokens`; the games API accepts a valid token for match scoring without requiring a personal account and consumes it after use.
 - Public tournament reads remain global-slug based and use explicit allowlists. Internal notes, contact fields, approval state, lineup/private game data and PHR are omitted by default. Confirmed PHR is included only when `share_settings.public_phr` is explicitly enabled.
+
+## Task 6b, 7, 8 — nghiệm thu và các sửa chữa kèm theo
+
+### Bộ Phase 3 đầy đủ
+
+Lệnh: `npm run test:phase3-interclub` — 14 file, thoát mã 0.
+
+```
+phase3 migration contract ok
+phase3 interclub domain ok
+phase3 interclub competition ok
+phase3 interclub public ok
+phase3 interclub ui contract ok
+Phase 3 Task 1 preflight contract: PASS
+Phase 3 Task 2 platform auth contract: PASS
+Phase 3 Task 3 migration contract: PASS
+Phase 3 Task 3 division-entry convergence integration contract: PASS
+phase3 scoring rules ok
+phase3 tiebreak policy ok
+phase3 scorekeeper token ok
+phase3 share ok
+phase3 wizard competition contract ok
+```
+
+### Hồi quy toàn hệ thống
+
+`npm run test:ci` thoát mã 0. `npm run test:regression` thoát mã 0, và bộ Phase 3
+đã được đưa vào chuỗi hồi quy nên 14 dòng trên xuất hiện bên trong log hồi quy,
+không còn nằm ngoài.
+
+`npm run build` thoát mã 0.
+
+### Sửa chữa phát hiện khi nghiệm thu
+
+**Trang công khai trả 500 với mọi giải.** Route công khai select `phr_rating` và
+`phr_status` từ `tournament_entries`, hai cột không tồn tại ở bảng đó. Xác nhận
+bằng chính câu truy vấn trên database: `ERROR: 42703: column "phr_rating" does
+not exist`. Cả ba giải đều unlisted và có nội dung thi đấu nên nhánh này luôn
+chạy. Đã chuyển sang tổng `skill_snapshot` của `tournament_entry_members`, chỉ
+truy vấn khi `share_settings.public_phr` bật.
+
+**Token nhập điểm dùng một lần.** Giao diện gửi toàn bộ danh sách ván mỗi lần bấm
+lưu, nên người cầm điểm chỉ lưu được đúng một lần mỗi trận. Mô phỏng phiên thật:
+
+```
+1. Lưu sau ván 1                  OK
+2. Lưu sau ván 2                  BỊ TỪ CHỐI (TOKEN_REPLAYED)
+3. Sửa tỉ số gõ nhầm              BỊ TỪ CHỐI (TOKEN_REPLAYED)
+4. Thử lại sau khi mất mạng       BỊ TỪ CHỐI (TOKEN_REPLAYED)
+```
+
+Đã bỏ cơ chế dùng một lần; chống ghi trùng do `p_idempotency_key` của
+`replace_tournament_games` đảm nhiệm. Migration 036 sửa trước khi apply.
+
+**Chuyển vòng không hiểu mô hình entry.** `advance/route.js` giữ một bản sao
+`loadStageData` riêng chỉ đọc `entrant_id` và không xét `division_id`, trong khi
+`standingsService` đã chuyển sang entry ở Task 3. Vòng bảng lên playoff sẽ hỏng
+với giải dùng nội dung thi đấu. Đã xoá bản sao, dùng chung hàm nạp đã được test
+hành vi chứng minh là hiểu entry.
+
+### Hai test cũ được sửa vì kiểm sai thứ chúng tuyên bố
+
+- `tests/tournament/ui-wizard.contract.test.js` bắt chuỗi `saveEntrant`. Wizard
+  mới không còn ghi entrant cấp giải, nên chuỗi đó chỉ tồn tại trong một comment
+  chết để test xanh. Đã đổi sang `saveDivisionEntry` và thêm khẳng định ngược
+  rằng Wizard không gọi `saveEntrant`.
+- `tests/tournament/api-advance.contract.test.js` bắt `tournament_stage_entrants`
+  và `seed_in_stage` với nhãn "ghi stage_entrants kế", nhưng hai chuỗi đó thuộc
+  khối ĐỌC; việc ghi thật nằm trong RPC. Đã đổi sang kiểm `advance_tournament_stage`
+  và `p_seeded`.
+
+### Còn lại, chưa kiểm chứng được bằng máy
+
+- Dán link vào nhóm chat để xác nhận card Open Graph, và soi ảnh xuất ra bằng mắt.
+- Giải cộng đồng chạy end-to-end: cần tạo CLB hệ thống PickHub trước, hiện route
+  trả `SYSTEM_GROUP_REQUIRED` thay vì màn trắng.
+- Người cầm điểm nhập bằng token trên thiết bị thật.
+- `tournament_athletes` chưa có cột `source` (`club_member|guest`) như spec mục
+  4.7; hiện suy ra từ `athlete_id`. Cần quyết định có thêm migration 037 không.

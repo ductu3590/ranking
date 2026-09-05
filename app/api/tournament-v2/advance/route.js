@@ -3,8 +3,8 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { requireValidatedGroupAdmin } from '@/lib/groupSession';
-import { getScheduleEngine, getMatchEngine } from '@/lib/tournament/engines';
-import { buildResolvedMatches } from '@/lib/tournament/results';
+import { getScheduleEngine } from '@/lib/tournament/engines';
+import { loadStageData } from '@/lib/tournament/standingsService';
 import { isStageComplete, seedNextStage } from '@/lib/tournament/orchestrator';
 
 const db = supabaseAdmin || supabaseServer;
@@ -18,75 +18,7 @@ function rpcErrorResponse(error) {
     return NextResponse.json({ error: message, code: code || 'MUTATION_FAILED' }, { status });
 }
 
-// Load entrants + resolvedMatches + raw matches for a group-scoped stage.
-async function loadStageData(stage, groupId) {
-    const stageId = stage.id;
 
-    let entrants = [];
-    const { data: stageEntrants, error: seErr } = await db
-        .from('tournament_stage_entrants')
-        .select('entrant_id, seed_in_stage, group_label')
-        .eq('group_id', groupId)
-        .eq('stage_id', stageId);
-    if (seErr) return { error: { message: seErr.message, status: 500 } };
-
-    if (stageEntrants && stageEntrants.length) {
-        const { data: baseEntrants, error: beErr } = await db
-            .from('tournament_entrants')
-            .select('id, seed')
-            .eq('group_id', groupId)
-            .eq('tournament_id', stage.tournament_id);
-        if (beErr) return { error: { message: beErr.message, status: 500 } };
-        const seedById = {};
-        for (const e of baseEntrants || []) seedById[e.id] = e.seed;
-        entrants = stageEntrants.map((r) => ({
-            id: r.entrant_id,
-            seed: r.seed_in_stage != null ? r.seed_in_stage : seedById[r.entrant_id],
-            group_label: r.group_label,
-        }));
-    } else {
-        const { data: tEntrants, error: teErr } = await db
-            .from('tournament_entrants')
-            .select('id, seed')
-            .eq('group_id', groupId)
-            .eq('tournament_id', stage.tournament_id);
-        if (teErr) return { error: { message: teErr.message, status: 500 } };
-        entrants = (tEntrants || []).map((r) => ({ id: r.id, seed: r.seed }));
-    }
-
-    const { data: matches, error: mErr } = await db
-        .from('tournament_matches')
-        .select('*')
-        .eq('group_id', groupId)
-        .eq('stage_id', stageId);
-    if (mErr) return { error: { message: mErr.message, status: 500 } };
-    const matchList = matches || [];
-
-    const gamesByMatchId = {};
-    const matchIds = matchList.map((m) => m.id);
-    if (matchIds.length) {
-        const { data: games, error: gErr } = await db
-            .from('tournament_games')
-            .select('match_id, score_a, score_b, kind, game_no')
-            .eq('group_id', groupId)
-            .in('match_id', matchIds);
-        if (gErr) return { error: { message: gErr.message, status: 500 } };
-        for (const g of games || []) {
-            if (!gamesByMatchId[g.match_id]) gamesByMatchId[g.match_id] = [];
-            gamesByMatchId[g.match_id].push({
-                score_a: g.score_a,
-                score_b: g.score_b,
-                kind: g.kind,
-                game_no: g.game_no,
-            });
-        }
-    }
-
-    const matchEngine = getMatchEngine(stage.match_format);
-    const resolved = buildResolvedMatches(matchList, gamesByMatchId, matchEngine, stage.config || {});
-
-    return { entrants, resolved, matches: matchList };
-}
 
 export async function POST(request) {
     try {
@@ -120,7 +52,7 @@ export async function POST(request) {
         // 2. Build entrants + resolvedMatches + matches
         let loaded;
         try {
-            loaded = await loadStageData(stage, groupId);
+            loaded = await loadStageData(db, stage, groupId);
         } catch (e) {
             console.error('Advance load/match-engine error:', e);
             return NextResponse.json({ error: e.message }, { status: 400 });

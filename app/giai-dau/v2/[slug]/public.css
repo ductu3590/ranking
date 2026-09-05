@@ -247,3 +247,20 @@
     text-align: center;
     color: #6b7280;
 }
+
+/* Link sang trang riêng của từng nội dung thi đấu (mỗi nội dung có card chia sẻ riêng). */
+.v2pub-division-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 4px 0 12px;
+}
+
+.v2pub-division-link {
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(52, 211, 153, 0.35);
+    color: #d1fae5;
+    font-size: 14px;
+    text-decoration: none;
+}

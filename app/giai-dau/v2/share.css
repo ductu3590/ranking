@@ -1,0 +1,92 @@
+/* Hành động chia sẻ (link / ảnh / thông báo) — mobile-first. */
+.v2share {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px;
+    margin: 12px 0;
+    border-radius: 16px;
+    background: rgba(16, 60, 45, 0.55);
+    border: 1px solid rgba(52, 211, 153, 0.25);
+}
+
+.v2share-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.v2share-btn {
+    flex: 1 1 140px;
+    min-height: 44px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(52, 211, 153, 0.4);
+    background: transparent;
+    color: #d1fae5;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.v2share-btn:disabled {
+    opacity: 0.6;
+    cursor: progress;
+}
+
+.v2share-btn-primary {
+    background: #10b981;
+    border-color: #10b981;
+    color: #05221a;
+}
+
+.v2share-select {
+    flex: 1 1 160px;
+    min-height: 44px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(52, 211, 153, 0.4);
+    background: #0f2a20;
+    color: #d1fae5;
+    font-size: 15px;
+}
+
+.v2share-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.v2share-text {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(52, 211, 153, 0.35);
+    background: #0b1f17;
+    color: #ecfdf5;
+    font-size: 14px;
+    line-height: 1.5;
+    resize: vertical;
+}
+
+.v2share-version {
+    font-size: 12px;
+    color: #9fd8bf;
+}
+
+.v2share-notice,
+.v2share-hint {
+    margin: 0;
+    font-size: 13px;
+    color: #9fd8bf;
+    line-height: 1.5;
+}
+
+@media (min-width: 640px) {
+    .v2share-btn,
+    .v2share-select {
+        flex: 0 1 auto;
+        min-width: 160px;
+    }
+}

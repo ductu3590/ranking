@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { listEntrants, listMatches, advanceStage } from '@/lib/tournamentV2Client';
+import { listEntrants, listMatches, advanceStage, getPublic } from '@/lib/tournamentV2Client';
+import { isShareableVisibility } from '@/lib/tournament/share';
+import ShareActions from '../../ShareActions';
 
 const STATUS_LABELS = {
     draft: 'Nháp',
@@ -22,6 +24,9 @@ export default function OverviewTab({ tournamentId, tournament, stage, stageId, 
     const [error, setError] = useState('');
     const [busy, setBusy] = useState(false);
     const [notice, setNotice] = useState('');
+    // Ảnh/text chia sẻ chỉ được dựng từ projection công khai, nên console cũng
+    // đọc đúng snapshot mà người xem ngoài nhìn thấy.
+    const [publicSnapshot, setPublicSnapshot] = useState(null);
 
     const load = useCallback(async () => {
         setLoading(true);
@@ -45,6 +50,23 @@ export default function OverviewTab({ tournamentId, tournament, stage, stageId, 
     useEffect(() => {
         load();
     }, [load]);
+
+    const shareSlug = tournament?.public_slug;
+    const shareable = isShareableVisibility(tournament?.visibility);
+    useEffect(() => {
+        let cancelled = false;
+        if (!shareSlug || !shareable) {
+            setPublicSnapshot(null);
+            return undefined;
+        }
+        getPublic(shareSlug)
+            .then((snapshot) => { if (!cancelled) setPublicSnapshot(snapshot); })
+            .catch((err) => {
+                console.error('Không tải được snapshot công khai để chia sẻ:', err);
+                if (!cancelled) setPublicSnapshot(null);
+            });
+        return () => { cancelled = true; };
+    }, [shareSlug, shareable]);
 
     async function handleAdvance() {
         if (!stageId) return;
@@ -138,6 +160,19 @@ export default function OverviewTab({ tournamentId, tournament, stage, stageId, 
             ) : (
                 <p className="v2-overview-sub">Chưa có giai đoạn nào.</p>
             )}
+
+            <div className="v2-overview-share">
+                <h3>Chia sẻ vào nhóm Zalo</h3>
+                {publicSnapshot ? (
+                    <ShareActions snapshot={publicSnapshot} stageId={stageId} />
+                ) : (
+                    <p className="v2-overview-sub">
+                        {shareSlug && shareable
+                            ? 'Đang tải dữ liệu công khai để tạo link, ảnh và thông báo...'
+                            : 'Giải chưa công khai nên chưa tạo được link, ảnh và thông báo chia sẻ.'}
+                    </p>
+                )}
+            </div>
 
             {notice ? <p className="v2-notice v2-notice-info">{notice}</p> : null}
 

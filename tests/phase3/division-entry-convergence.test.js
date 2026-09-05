@@ -63,5 +63,21 @@ function fakeDb(fixtures, calls = []) {
   assert.strictEqual(rows[0].entry_a_id, 1011);
   assert.strictEqual(rows[0].entry_b_id, 1012);
   assert(!('entrant_a_id' in rows[0]) && !('entrant_b_id' in rows[0]), 'entry schedule does not write legacy columns');
+
+  // Chuyển vòng phải dùng chung hàm nạp đã được chứng minh ở trên là hiểu entry.
+  // Trước đây advance giữ một bản sao riêng chỉ đọc entrant_id và không xét
+  // division_id, nên vòng bảng lên playoff hỏng với mô hình đã hội tụ.
+  const advanceSource = require('fs').readFileSync(
+    require('path').join(__dirname, '../../app/api/tournament-v2/advance/route.js'), 'utf8',
+  );
+  assert(
+    /import\s*\{[^}]*loadStageData[^}]*\}\s*from\s*'@\/lib\/tournament\/standingsService'/.test(advanceSource),
+    'advance dùng loadStageData chung của standingsService',
+  );
+  assert(
+    !/(async\s+)?function\s+loadStageData\s*\(/.test(advanceSource),
+    'advance không giữ bản sao loadStageData riêng',
+  );
+
   console.log('Phase 3 Task 3 division-entry convergence integration contract: PASS');
 })().catch((error) => { console.error(error); process.exit(1); });

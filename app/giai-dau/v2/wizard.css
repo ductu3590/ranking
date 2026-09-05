@@ -1,0 +1,303 @@
+/* Wizard giải đấu Phase 3 — mobile-first (~380px) rồi mở rộng lên desktop.
+   Dùng lại token màu của baseline PickHub; không tạo hệ màu mới. */
+
+.w3-wrap {
+    --w3-ink: #28243d;
+    --w3-indigo: #6f48c9;
+    --w3-lavender: #eee9ff;
+    --w3-gold: #ffc95e;
+    --w3-coral: #ff8b83;
+    --w3-surface: #f5f6fb;
+    --w3-card: #ffffff;
+    --w3-line: #e4e9f2;
+    --w3-muted: #667085;
+    color: var(--w3-ink);
+}
+
+/* --- Thanh bước: cuộn ngang trên điện thoại --- */
+.w3-steps {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 4px 0 10px;
+    margin: 0 0 14px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.w3-steps::-webkit-scrollbar {
+    display: none;
+}
+
+.w3-step {
+    flex: 0 0 auto;
+    min-height: 44px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--w3-line);
+    background: var(--w3-card);
+    color: var(--w3-muted);
+    font-size: 0.82rem;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.w3-step.is-active {
+    background: var(--w3-indigo);
+    border-color: var(--w3-indigo);
+    color: #fff;
+}
+
+.w3-step.is-done {
+    background: var(--w3-lavender);
+    border-color: var(--w3-lavender);
+    color: var(--w3-indigo);
+}
+
+.w3-step:focus-visible {
+    outline: 3px solid var(--w3-gold);
+    outline-offset: 2px;
+}
+
+/* --- Khối nội dung --- */
+.w3-section {
+    background: var(--w3-card);
+    border: 1px solid var(--w3-line);
+    border-radius: 20px;
+    padding: 14px;
+    margin-bottom: 14px;
+}
+
+.w3-section h3 {
+    margin: 0 0 4px;
+    font-size: 0.98rem;
+    font-weight: 700;
+}
+
+.w3-hint {
+    margin: 0 0 10px;
+    font-size: 0.8rem;
+    line-height: 1.45;
+    color: var(--w3-muted);
+}
+
+.w3-option-list {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.w3-option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    min-height: 44px;
+    padding: 12px;
+    border-radius: 14px;
+    border: 1px solid var(--w3-line);
+    background: var(--w3-card);
+    cursor: pointer;
+}
+
+.w3-option.is-active {
+    border-color: var(--w3-indigo);
+    background: var(--w3-lavender);
+}
+
+.w3-option-title {
+    display: block;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--w3-ink);
+}
+
+.w3-option-sub {
+    display: block;
+    margin-top: 2px;
+    font-size: 0.76rem;
+    line-height: 1.4;
+    color: var(--w3-muted);
+}
+
+/* --- Danh sách thẻ (nội dung, CLB, VĐV, cặp) --- */
+.w3-list {
+    list-style: none;
+    margin: 0 0 12px;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+}
+
+.w3-row {
+    border: 1px solid var(--w3-line);
+    border-radius: 14px;
+    padding: 10px 12px;
+    background: var(--w3-card);
+}
+
+.w3-row-top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.w3-row-name {
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.w3-row-meta {
+    margin: 4px 0 0;
+    font-size: 0.76rem;
+    line-height: 1.45;
+    color: var(--w3-muted);
+}
+
+.w3-row-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.w3-tag {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: var(--w3-lavender);
+    color: var(--w3-indigo);
+    font-size: 0.7rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.w3-tag-warn {
+    background: #fff2ef;
+    color: #b23b32;
+}
+
+.w3-tag-ok {
+    background: #eaf7ef;
+    color: #1f7a45;
+}
+
+/* --- Cảnh báo không chặn --- */
+.w3-warning {
+    border: 1px solid var(--w3-coral);
+    border-left-width: 4px;
+    border-radius: 12px;
+    background: #fff6f4;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+}
+
+.w3-warning p {
+    margin: 0;
+    font-size: 0.8rem;
+    line-height: 1.45;
+    color: #7a2f28;
+}
+
+.w3-warning-note {
+    margin-top: 4px !important;
+    font-weight: 700;
+}
+
+/* --- Trạng thái tải/lỗi/rỗng --- */
+.w3-state {
+    padding: 16px;
+    border-radius: 14px;
+    border: 1px dashed var(--w3-line);
+    background: var(--w3-surface);
+    text-align: center;
+    font-size: 0.84rem;
+    color: var(--w3-muted);
+}
+
+.w3-state-error {
+    border-style: solid;
+    border-color: var(--w3-coral);
+    background: #fff6f4;
+    color: #7a2f28;
+}
+
+/* --- Bảng luật hiệu lực: cuộn ngang trên mobile --- */
+.w3-scroll-x {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.w3-rules-table {
+    width: 100%;
+    min-width: 520px;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+}
+
+.w3-rules-table th,
+.w3-rules-table td {
+    border-bottom: 1px solid var(--w3-line);
+    padding: 8px 6px;
+    text-align: left;
+    vertical-align: top;
+    font-variant-numeric: tabular-nums;
+}
+
+.w3-rules-table th {
+    color: var(--w3-muted);
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* --- Checklist VĐV --- */
+.w3-check-grid {
+    display: grid;
+    gap: 6px;
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+.w3-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 8px 10px;
+    border: 1px solid var(--w3-line);
+    border-radius: 12px;
+    font-size: 0.84rem;
+    cursor: pointer;
+}
+
+.w3-check.is-selected {
+    border-color: var(--w3-indigo);
+    background: var(--w3-lavender);
+}
+
+.w3-inline-form {
+    display: grid;
+    gap: 8px;
+}
+
+@media (min-width: 640px) {
+    .w3-option-list {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .w3-inline-form {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .w3-rules-table {
+        min-width: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .w3-step,
+    .w3-option {
+        transition: none;
+    }
+}

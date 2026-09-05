@@ -28,7 +28,7 @@ Clubs
   └─ cấu hình, thương hiệu
 
 Competitions
-  ├─ tournament → division → stage → match → game
+  ├─ tournament → division/nội dung → stage → match → game
   ├─ CLB tham dự → đăng ký đoàn → entry
   └─ public projection, lịch, BXH, bracket
 
@@ -71,6 +71,8 @@ Platform Operations
 - Giải liên CLB có organizer scope riêng: PickHub/platform, community hoặc CLB đăng cai.
 - Các CLB tham dự được liên kết qua bảng tham gia và ACL.
 - Bảng con của giải lấy phạm vi từ tournament, không dùng `group_id` của một CLB tham dự làm tenant cho toàn giải.
+- `club_admin` là Ban Tổ chức duy nhất của giải do CLB sở hữu trong baseline hiện tại.
+- `community_admin` là quyền cấp hệ thống, được tạo/quản lý mọi giải cộng đồng trên toàn PickHub.
 
 ## 4. Mô hình cạnh tranh chuẩn
 
@@ -86,12 +88,24 @@ Tournament
 ```
 
 - `Tournament`: sự kiện tổng, ví dụ Giải giao hữu ba CLB.
-- `Division`: nội dung thi đấu, ví dụ Đôi nam 3.0–3.49 hoặc Đồng đội MLP.
+- `Division`: một nội dung thi đấu độc lập trong giải tổng, ví dụ Đôi nam 5.2, Đôi nữ 4.8 hoặc Đồng đội MLP. Mỗi division có thể có đơn/đôi, giới tính, giới hạn trình độ, cách tính thành tích, ghép cặp, bracket và giải nhất/nhì/ba riêng.
 - `Stage`: vòng bảng, playoff, knockout hoặc giai đoạn MLP.
 - `Entry`: cá nhân, cặp hoặc đội thực sự được đưa vào lịch.
 - `Registration`: đề nghị tham dự trước khi được duyệt thành entry.
 
+Các thuộc tính cạnh tranh chính của division:
+
+- `play_type`: `singles | doubles | team`.
+- `scoring_scope`: `athlete | club`.
+- `rating_policy`: `open | capped`.
+- `rating_cap`: tổng PHR tối đa của một cặp khi `play_type = doubles` và `rating_policy = capped`.
+- `pairing_mode`: `none | random_balanced | manual`.
+
+Giải tổng có thể chứa nhiều division với các cấu hình khác nhau; giao diện nên gọi division là “Nội dung thi đấu”.
+
 Engine hiện có cho stage/match được giữ lại. Logic đặc thù như “mỗi bảng một cặp của mỗi CLB” được triển khai bằng competition template và constraint policy, không hard-code vào engine vòng tròn chung.
+
+Luật điểm số (`scoring`: best-of, điểm ván, cách biệt, điểm chết, ván quyết định) và thứ tự tie-break (`tiebreak`) là policy có version: đặt mặc định ở tournament, override ở division, snapshot vào stage khi commit draw. Engine nhận policy làm input và không hard-code thứ tự xếp hạng.
 
 ## 5. Ranh giới code
 
@@ -131,14 +145,17 @@ giả định biết danh tính cá nhân phía sau mật khẩu dùng chung.
 
 Mọi mutation phải qua ba lớp:
 
-1. Xác thực club session bằng Mã CLB + mật khẩu, hoặc profile session tùy chọn
-   nếu adapter này đã được bật.
+1. Xác thực club session bằng Mã CLB + mật khẩu; platform session
+   (`platform_accounts` + cookie `platform_session`) cho `community_admin`/`platform_admin`;
+   hoặc profile session tùy chọn nếu adapter này đã được bật. Không dùng
+   `group_session` để giả lập quyền hệ thống.
 2. Authorization tại application service.
 3. RLS/constraint/database function làm backstop.
 
 ## 7. Dữ liệu bất biến và snapshot
 
 - Tên CLB, tên VĐV và rating dùng trong giải được snapshot tại thời điểm duyệt entry.
+- VĐV khách của giải được lưu trong phạm vi tournament, có thể liên kết `profile_id`/athlete chính thức sau này nhưng không tự động trở thành membership của CLB.
 - Sửa hồ sơ hiện tại không làm thay đổi hồ sơ lịch sử của giải đã hoàn thành.
 - Kết quả finalized chỉ được sửa qua correction workflow, có actor, lý do, trước/sau.
 - Rating là ledger có phiên bản thuật toán; không chỉ lưu một con số hiện tại.
@@ -152,6 +169,7 @@ State transition phải được khai báo tập trung và kiểm tra server-sid
 - Club invitation: `invited → accepted|declined → roster_submitted → approved|changes_requested → withdrawn`.
 - Registration: `draft → submitted → waitlisted|approved|rejected → checked_in|withdrawn|no_show`.
 - Match: `pending → assigned → ready → live → submitted → finalized`; correction là workflow riêng.
+- PHR ở nội dung giới hạn trình độ có thể `missing`, `pending`, `confirmed`, `rejected` hoặc `over_limit`. Đây là tín hiệu để BTC duyệt thủ công, không tự động chặn đăng ký.
 
 Không được nhảy trạng thái bằng PATCH tùy ý.
 
@@ -160,7 +178,9 @@ Không được nhảy trạng thái bằng PATCH tùy ý.
 - Public link resolve bằng identifier toàn hệ thống, không phụ thuộc cookie CLB.
 - Tournament có visibility: `private`, `unlisted`, `public`.
 - Public API đọc projection đã kiểm soát, không trả row nội bộ hoặc dữ liệu cá nhân không cần thiết.
+- Trang công khai chỉ hiển thị tên thi đấu và CLB đại diện của VĐV; không hiển thị điện thoại, email, ghi chú xét duyệt hoặc PHR nếu BTC chưa bật công khai.
 - Realtime subscription phải lọc theo tournament/division, có polling fallback và rate limit.
+- Trang công khai có Open Graph metadata và xuất ảnh/copy text từ projection công khai để chia sẻ qua Zalo; không gửi tin thay người dùng và không tích hợp Zalo API trong các phase hiện tại.
 
 ## 10. Độ tin cậy kỹ thuật
 

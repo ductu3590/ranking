@@ -5,6 +5,7 @@ import { getPublic } from '@/lib/tournamentV2Client';
 import { nextPollingDelay } from '@/lib/pollingBackoff';
 import { StandingsView } from '../console/standingsRender';
 import { BracketView } from '../console/bracketRender';
+import ShareActions from '../ShareActions';
 import '../console/bracket.css';
 import './public.css';
 
@@ -222,6 +223,23 @@ export default function PublicTournamentPage({ params }) {
                     {tournament.location ? <span className="v2pub-loc">{tournament.location}</span> : null}
                 </div>
             </header>
+
+            {/* Chia sẻ kênh Zalo: copy link có card, xuất ảnh PNG, copy thông báo. */}
+            <ShareActions snapshot={data} stageId={activeStageId} />
+
+            {(data.divisions || []).length > 1 ? (
+                <nav className="v2pub-division-links" aria-label="Nội dung thi đấu">
+                    {(data.divisions || []).map((division) => (
+                        <a
+                            key={division.id}
+                            className="v2pub-division-link"
+                            href={`/giai-dau/v2/${tournament.public_slug}/noi-dung/${division.id}`}
+                        >
+                            {division.name}
+                        </a>
+                    ))}
+                </nav>
+            ) : null}
 
             {stages.length === 0 ? (
                 <div className="v2pub-state v2pub-empty">

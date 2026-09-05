@@ -2,7 +2,7 @@
 
 ## 1. Mục tiêu
 
-Biến MVP liên CLB thành công cụ vận hành giải ngoài sân đáng tin cậy: đăng ký có capacity/waitlist, check-in, thay người, điều phối sân/giờ, phân quyền nhập điểm, thông báo, xử lý mạng yếu và correction/audit đầy đủ.
+Biến hệ thống giải nội bộ, giao hữu và cộng đồng thành công cụ vận hành ngoài sân đáng tin cậy: đăng ký có capacity/waitlist, xác nhận PHR, check-in, thay người, điều phối sân/giờ, phân quyền nhập điểm, thông báo, xử lý mạng yếu và correction/audit đầy đủ.
 
 Nhánh: `codex/phase-4-tournament-operations`
 
@@ -31,6 +31,8 @@ Nhánh: `codex/phase-4-tournament-operations`
 
 - `submitted` là kết quả chờ director/referee chốt nếu rules yêu cầu.
 - Sau `finalized`, sửa bằng correction request: `requested → approved|rejected → applied`.
+- Match có `result_type`: `played`, `walkover`, `retired`, `no_show`, `double_forfeit`. Kết quả không `played` vẫn được BXH tính theo `scoring`/`tiebreak` snapshot của stage với điểm quy ước cấu hình được.
+- Score submission validate theo `scoring` hiệu lực của stage (Phase 3 mục 4.9); correction là đường duy nhất để ghi kết quả không hợp lệ theo luật.
 
 ### 3.3 Schedule publication
 
@@ -72,7 +74,15 @@ Nhánh: `codex/phase-4-tournament-operations`
 
 - `announcements`: scope, severity, publish/expiry, author.
 - `notification_deliveries`: recipient/channel/template, status, provider ID, retries.
-- Domain phát event; adapter gửi email/Zalo/push. Provider failure không rollback nghiệp vụ chính.
+- Domain phát event; adapter gửi email/push qua interface `NotificationChannel`. Provider failure không rollback nghiệp vụ chính.
+- Zalo trong Phase 4 không phải adapter gửi tin: kênh Zalo được phục vụ bằng link có Open Graph preview, xuất ảnh và copy text để BTC tự dán vào nhóm. Zalo OA/ZNS chỉ là implementation tương lai của `NotificationChannel` khi có pháp nhân và nhu cầu.
+
+### 4.6 Xuất ảnh chia sẻ
+
+- Ảnh render server-side từ public projection theo version lịch/kết quả hiện hành, có watermark tên giải và thời điểm xuất.
+- Loại ảnh: gọi trận vào sân theo court board, lịch theo sân/CLB, BXH, kết quả, bảng vàng.
+- Ảnh không chứa dữ liệu riêng tư; export tuân `visibility` của giải.
+- Khi lịch được `revised`, ảnh cũ không bị thu hồi nhưng ảnh mới mang version mới để người xem đối chiếu.
 
 ## 5. Scheduling
 
@@ -104,6 +114,13 @@ Phase 4 hỗ trợ ledger vận hành, chưa cần payment gateway:
 - Manual paid/unpaid/waived/refunded status có actor và chứng từ note.
 - Settlement rule như tiền thua/tiền ăn là template-specific ledger.
 - Không trộn ledger giải liên CLB với quỹ riêng của một CLB. Chuyển tiền giữa hai hệ phải là transaction liên kết rõ.
+
+## 7.1 PHR confirmation
+
+- `club_admin` cập nhật PHR cho VĐV thuộc CLB mình.
+- `community_admin` xác nhận/từ chối PHR khi division cộng đồng dùng giới hạn trình độ.
+- VĐV/cặp có PHR thiếu, pending hoặc vượt cap vẫn có thể đăng ký; BTC xem warning và duyệt thủ công.
+- Lưu lịch sử thay đổi, người xác nhận và thời điểm xác nhận.
 
 ## 8. Reference UI
 
@@ -173,3 +190,10 @@ visual hoặc accessibility nằm trên nhánh Phase 4 và đi qua Gate E.
 ## 12. Điều kiện mở Phase 5
 
 Kết quả finalized có provenance rõ và có thể replay thành match history. Chỉ dữ liệu đạt chuẩn này mới được phép đưa vào rating.
+
+## 13. Phase 4 dependencies từ Phase 3 convergence
+
+- Operations chỉ chạy trên `tournament_entries` gắn `division_id`; không xây tính năng mới trên `tournament_entrants` cũ.
+- Scheduler, check-in, substitution, score submission và correction đều phải giữ division scope.
+- PHR confirmation là workflow của `community_admin`; thiếu/pending/vượt cap vẫn là warning để BTC duyệt theo audit.
+- External club, guest athlete và organizer-submitted roster phải giữ snapshot/version khi vận hành và thay thế.

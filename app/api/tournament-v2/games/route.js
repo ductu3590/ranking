@@ -41,7 +41,7 @@ async function handleGames(request) {
             groupId = adminCheck.groupId;
         } else if (body?.scorekeeper_token) {
             const { data: tokenRecord, error: tokenError } = await db.from('tournament_scorekeeper_tokens')
-                .select('id, group_id, match_id, token_hash, expires_at, revoked_at, consumed_at')
+                .select('id, group_id, match_id, token_hash, expires_at, revoked_at, last_used_at')
                 .eq('token_hash', hashScorekeeperToken(body.scorekeeper_token)).maybeSingle();
             if (tokenError) return NextResponse.json({ error: 'Scorekeeper token không hợp lệ', code: 'TOKEN_INVALID' }, { status: 401 });
             const tokenCheck = validateScorekeeperToken(body.scorekeeper_token, tokenRecord, Date.now());
@@ -126,9 +126,12 @@ async function handleGames(request) {
         if (error) return rpcErrorResponse(error);
 
         if (scorekeeperToken) {
-            const { error: consumeError } = await db.from('tournament_scorekeeper_tokens')
-                .update({ consumed_at: new Date().toISOString() }).eq('id', scorekeeperToken.id).is('consumed_at', null).is('revoked_at', null);
-            if (consumeError) return rpcErrorResponse(consumeError);
+            // Chỉ ghi dấu để audit. Tỉ số đã lưu xong ở trên nên lỗi ở bước này
+            // không được làm hỏng phản hồi, nếu không client sẽ tưởng thất bại
+            // và gửi lại một thao tác đã thành công.
+            const { error: usageError } = await db.from('tournament_scorekeeper_tokens')
+                .update({ last_used_at: new Date().toISOString() }).eq('id', scorekeeperToken.id);
+            if (usageError) console.error('Scorekeeper token usage stamp failed:', usageError);
         }
 
         return NextResponse.json(data || {

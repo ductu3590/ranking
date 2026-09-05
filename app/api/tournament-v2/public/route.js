@@ -14,7 +14,7 @@ const PUBLIC_STAGE_SELECT = [
     'id', 'tournament_id', 'division_id', 'stage_order', 'name',
     'schedule_format', 'match_format', 'status', 'config',
 ].join(', ');
-const PUBLIC_ENTRANT_SELECT = 'id, division_id, name_snapshot, seed, color_snapshot, phr_rating, phr_status';
+const PUBLIC_ENTRANT_SELECT = 'id, division_id, name_snapshot, seed, color_snapshot';
 const PUBLIC_MATCH_SELECT = [
     'id', 'division_id', 'stage_id', 'round', 'bracket_slot', 'group_label',
     'court', 'match_order', 'entrant_a_id', 'entrant_b_id', 'status',
@@ -70,9 +70,28 @@ export async function GET(request) {
                 name: entry.name_snapshot,
                 seed: entry.seed,
                 color: entry.color_snapshot,
-                phr_rating: entry.phr_rating,
-                phr_status: entry.phr_status,
             }));
+            // PHR công khai lấy từ snapshot lúc duyệt entry, không lấy giá trị
+            // hiện tại của VĐV. Chỉ truy vấn khi BTC đã bật công khai.
+            if (tournament?.share_settings?.public_phr === true) {
+                const entryIds = entrants.map((entry) => entry.id);
+                const members = entryIds.length
+                    ? await readRows('tournament_entry_members', 'entry_id, skill_snapshot', [
+                        ['in', 'entry_id', entryIds],
+                    ])
+                    : [];
+                const totals = new Map();
+                for (const member of members) {
+                    if (member.skill_snapshot == null) continue;
+                    const key = String(member.entry_id);
+                    totals.set(key, (totals.get(key) || 0) + Number(member.skill_snapshot));
+                }
+                entrants = entrants.map((entry) => (
+                    totals.has(String(entry.id))
+                        ? { ...entry, phr_total: totals.get(String(entry.id)) }
+                        : entry
+                ));
+            }
         }
         const matches = stageIds.length
             ? await readRows('tournament_matches', PUBLIC_MATCH_SELECT, [

@@ -14,10 +14,26 @@ assert(projection.tournament.created_by_profile_id === undefined, 'ẩn created_
 assert(projection.clubs[0].captain_contact_profile_id === undefined, 'ẩn captain contact');
 assert(projection.clubs[0].contact_phone === undefined && projection.tournament.private_note === undefined, 'ẩn liên hệ và ghi chú nội bộ');
 assert(projection.entries[0].name === 'Đội A' && projection.entries[0].private_note === undefined, 'entry public allowlist');
-assert(projection.entries[0].phr_rating === undefined && projection.entries[0].phr_status === undefined, 'không lộ PHR khi chưa bật công khai');
+assert(projection.entries[0].phr_total === undefined && projection.entries[0].phr_rating === undefined && projection.entries[0].phr_status === undefined, 'không lộ PHR khi chưa bật công khai');
 assert(projection.matches[0].private_note === undefined && projection.games[0].private_note === undefined && projection.games[0].lineup === undefined, 'ẩn private fields match/game');
-const publicRating = buildPublicInterclubProjection({ tournament: { share_settings: { public_phr: true } }, entries: [{ id: 1, name_snapshot: 'A', phr_rating: 5.2, phr_status: 'confirmed' }] });
-assert(publicRating.entries[0].phr_rating === 5.2, 'chỉ lộ PHR khi BTC bật công khai');
-const snapshotRating = buildPublicSnapshot({ tournament: { share_settings: { public_phr: true } }, entrants: [{ id: 1, name: 'A', phr_rating: 5.2, phr_status: 'confirmed' }], standingsByStage: {} });
-assert(snapshotRating.entrants[0].phr_rating === 5.2, 'public snapshot chỉ lộ PHR khi BTC bật công khai');
+// PHR công khai là tổng snapshot của entry (tournament_entry_members.skill_snapshot),
+// không phải cột trên tournament_entries — bảng đó không có phr_rating/phr_status.
+const publicRating = buildPublicInterclubProjection({ tournament: { share_settings: { public_phr: true } }, entries: [{ id: 1, name_snapshot: 'A', phr_total: 5.2 }] });
+assert(publicRating.entries[0].phr_total === 5.2, 'chỉ lộ tổng PHR khi BTC bật công khai');
+const snapshotRating = buildPublicSnapshot({ tournament: { share_settings: { public_phr: true } }, entrants: [{ id: 1, name: 'A', phr_total: 5.2 }], standingsByStage: {} });
+assert(snapshotRating.entrants[0].phr_total === 5.2, 'public snapshot chỉ lộ tổng PHR khi BTC bật công khai');
+const snapshotHidden = buildPublicSnapshot({ tournament: { share_settings: {} }, entrants: [{ id: 1, name: 'A', phr_total: 5.2 }], standingsByStage: {} });
+assert(snapshotHidden.entrants[0].phr_total === undefined, 'không lộ tổng PHR khi BTC chưa bật công khai');
+
+// Chặn tái diễn lỗi Task 6: route công khai đọc tournament_entries, bảng này
+// không có cột PHR nào. Select sai cột làm cả trang công khai trả 500.
+const publicRouteSource = require('fs').readFileSync(require('path').join(__dirname, '../../app/api/tournament-v2/public/route.js'), 'utf8');
+const entrantSelect = publicRouteSource.match(/PUBLIC_ENTRANT_SELECT\s*=\s*'([^']+)'/);
+assert(entrantSelect, 'không đọc được PUBLIC_ENTRANT_SELECT');
+for (const column of entrantSelect[1].split(',').map((value) => value.trim())) {
+  assert(
+    ['id', 'division_id', 'name_snapshot', 'seed', 'color_snapshot'].includes(column),
+    `tournament_entries không có cột ${column}; select sai cột sẽ làm trang công khai trả 500`,
+  );
+}
 console.log('phase3 interclub public ok');

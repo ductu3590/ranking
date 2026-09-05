@@ -109,6 +109,8 @@
 
 - [x] Write failing tests: `legacy_v2` preset reproduces current `computeStandings` order on the existing engine fixtures; three-way tie resolved with `scope: tied_group`; `draw_lot` deterministic by stage seed; `validateGameScore` rejects 11-10 with `win_by: 2`, accepts 15-14 with `cap: 15`.
 - [x] Implement `resolveStageScoring`/`resolveTiebreak` (tournament default → division override → stage snapshot) and `SCORING_PRESETS`/`TIEBREAK_PRESETS` as versioned data.
+- [x] Align all scoring/tie-break presets and supported fields with `TOURNAMENT-MANAGEMENT-ARCHITECTURE.md` sections 15–16, including `point_diff`, `game_diff`, `wins`, ratios, `points_against`, `draw_lot`, `deciding_game`, `draw_points` and `mlp`.
+- [x] Resolve multi-team ties by recursively re-evaluating the tied subset; detect cyclic head-to-head results instead of using a non-transitive pair comparator; return the configured order and decisive criteria in `explanation`.
 - [x] Snapshot resolved `scoring` and `tiebreak` into `tournament_stages.config` during schedule generation; adapter maps snake_case keys to existing `bestOf`/`winPoints`/`lossPoints`/`subMatches`/`dreambreaker`.
 - [x] Replace the hard-coded comparator in `roundRobin.computeStandings` and `aggregateClubStandings` with `rankStandings(rows, matches, policy, seed)` returning `explanation[]`.
 - [x] Validate score submission in the games API against the stage's snapshotted `scoring`; return stable error codes; correction workflow remains the only override path.

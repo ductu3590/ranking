@@ -2,6 +2,10 @@ const assert = require('assert');
 const { SCORING_PRESETS, resolveStageScoring, validateGameScore } = require('../../lib/tournament/rules/scoring');
 const { computeStandings } = require('../../lib/tournament/engines/roundRobin');
 assert(SCORING_PRESETS.legacy_v2 && SCORING_PRESETS.legacy_v2.version, 'legacy_v2 là preset có version');
+for (const preset of ['phong_trao_11', 'phong_trao_15', 'ban_ket_chung_ket', 'mlp_4_van']) {
+  assert(SCORING_PRESETS[preset], `${preset} phải tồn tại`);
+  assert('deciding_game' in SCORING_PRESETS[preset] && 'draw_points' in SCORING_PRESETS[preset] && 'mlp' in SCORING_PRESETS[preset], `${preset} có đủ cấu trúc scoring`);
+}
 const resolved = resolveStageScoring({ default_scoring: { version: 'custom', points_to: 21 } }, { scoring_override: { version: 'division', points_to: 15 } }, { config: { scoring: { version: 'stage', points_to: 11 } } });
 assert.strictEqual(resolved.version, 'stage', 'stage snapshot ưu tiên cao nhất');
 assert.strictEqual(resolveStageScoring({}, {}, {}).version, 'legacy_v2', 'giải cũ dùng legacy_v2');

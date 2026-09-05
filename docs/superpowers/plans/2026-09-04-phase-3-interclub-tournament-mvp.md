@@ -89,13 +89,13 @@
 - Modify: `lib/tournament/interclub.js`, `lib/tournament/engines/*`
 - Create: `tests/phase3/interclub-competition.test.js`
 
-- [ ] Implement singles entries without pair records.
-- [ ] Implement doubles preview using PHR-balanced pairing, random fallback and manual pairing.
-- [ ] Prevent athlete duplication inside a division and lock confirmed pairs.
-- [ ] Replace global duplicate-club exception with `unique_per_pool`, `spread_if_possible` and `allow_multiple` policies.
-- [ ] Return warnings when a pool cannot be perfectly spread; only hard-block explicit rulesets.
-- [ ] Preserve deterministic ordering and configured standings tie-breaks.
-- [ ] Run focused competition tests plus `npm run test:t-engines`.
+- [x] Implement singles entries without pair records.
+- [x] Implement doubles preview using PHR-balanced pairing, random fallback and manual pairing.
+- [x] Prevent athlete duplication inside a division and lock confirmed pairs.
+- [x] Replace global duplicate-club exception with `unique_per_pool`, `spread_if_possible` and `allow_multiple` policies.
+- [x] Return warnings when a pool cannot be perfectly spread; only hard-block explicit rulesets.
+- [x] Preserve deterministic ordering and configured standings tie-breaks.
+- [x] Run focused competition tests plus `npm run test:t-engines`.
 
 ### Task 5b: Scoring rules and tie-break policy
 

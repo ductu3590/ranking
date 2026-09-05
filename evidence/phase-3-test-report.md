@@ -369,3 +369,28 @@ Live verification after apply:
 - Partial unique indexes `idx_tournament_clubs_tournament_club` and `idx_tournament_clubs_tournament_external`: present.
 - Division checks: `play_type = singles|doubles|team`, `scoring_scope = athlete|club`, `rating_policy = open|capped`, `pairing_mode = none|manual|random_balanced`.
 - Compatibility decision is enforced: `singles→individual`, `doubles→pair`, `team→team` through `tournament_divisions_entrant_type_relation_ck`.
+
+## Task 5 — pairing and ruleset-aware draw
+
+### TDD RED
+
+The behavior test was first changed from the old global duplicate-club exception to the Task 5 policies. It failed before implementation with:
+
+```text
+InterclubError: club 10 appears more than once in pool
+```
+
+After strengthening the balance assertion, it failed again until the algorithm was corrected to pair high PHR with low PHR instead of adjacent sorted athletes. The focused test is now green.
+
+### Implementation
+
+- Added deterministic PHR-balanced doubles preview using `tournament_athletes.phr_rating`; high/low ratings are paired to minimize pair-sum variance.
+- Missing ratings fall back to seeded shuffle; same seed produces the same pairing and returns `PHR_RATING_MISSING` warning.
+- Singles with `pairing_mode = none` return direct entries and no pair records.
+- Added division-wide duplicate-athlete validation and immutable locked pair snapshots.
+- Duplicate-club policy now supports `unique_per_pool` (hard block), `spread_if_possible` (default with warning) and `allow_multiple` (no warning).
+
+### Design questions intentionally left open before Task 7
+
+1. PHR currently exists only per tournament in `tournament_athletes` and `tournament_athlete_phr_history`; decide whether to add an athlete-level PHR source of truth and snapshot it into tournaments.
+2. `recorded_by_profile_id` points to a profile table that does not yet exist, while `community_admin` is a platform account; decide how to record the confirming actor required by Phase 4.

@@ -130,3 +130,126 @@ Result: PASS.
 ### Task 1 status
 
 Task 1 implementation is complete. Do not proceed to Task 2 automatically; the execution protocol requires a stop and human review here.
+
+## Task 2 — Platform identity and organizer authorization
+
+### TDD RED
+
+Command:
+
+```powershell
+node tests/phase3/platform-auth.test.js
+```
+
+Observed failure:
+
+```text
+Error: Cannot find module '../../lib/platformSessionCore'
+```
+
+Expected: the behavior test failed because platform auth implementation did not exist yet.
+
+### TDD GREEN
+
+Command:
+
+```powershell
+node tests/phase3/platform-auth.test.js
+```
+
+Observed output:
+
+```text
+Phase 3 Task 2 platform auth contract: PASS
+```
+
+The test exercises real code for password hashing/verification, wrong password rejection, session expiry, session revocation, login rate limiting, group-session/platform boundary and community organizer validation.
+
+### Supabase preflight before constraint change
+
+Command executed through Supabase MCP:
+
+```sql
+SELECT
+  count(*) FILTER (WHERE organizer_type = 'community')::int AS community_tournaments,
+  count(*)::int AS all_tournaments
+FROM public.tournaments;
+```
+
+Observed result:
+
+```text
+community_tournaments: 0
+all_tournaments: 3
+```
+
+### Migration apply
+
+Migration:
+
+```text
+database/migrations/032_platform_accounts.sql
+```
+
+Applied through Supabase MCP to project `uhhlelemewilgsdijwja`.
+
+Observed result:
+
+```text
+{"success":true}
+```
+
+Migration 032 created platform account/session tables, added `created_by_platform_account_id`, and replaced the organizer constraint so global `community` tournaments do not require `organizer_community_id`. Migrations 030 and 031 were not modified.
+
+### Verification after migration
+
+Observed:
+
+```text
+community_tournaments: 0
+platform_accounts: true
+platform_sessions: true
+creator_column: true
+organizer_constraint: community requires organizer_club_id IS NULL; organizer_community_id is optional
+rls: platform_accounts=true, platform_sessions=true
+```
+
+### Phase 3 regression after Task 2
+
+Command:
+
+```powershell
+npm run test:phase3-interclub
+```
+
+Observed output:
+
+```text
+phase3 migration contract ok
+phase3 interclub domain ok
+phase3 interclub competition ok
+phase3 interclub public ok
+phase3 interclub ui contract ok
+Phase 3 Task 1 preflight contract: PASS
+Phase 3 Task 2 platform auth contract: PASS
+```
+
+Result: PASS.
+
+### Task 2 status
+
+Task 2 implementation is complete. Task 3 was not started; the execution protocol requires a stop and human review here.
+
+Additional Task 2 verification:
+
+- `scripts/seed-platform-account.js` now reads `PICKHUB_PLATFORM_ADMIN_EMAIL`, `PICKHUB_PLATFORM_ADMIN_PASSWORD`, `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`, then creates or updates the first platform account; it does not expose a public signup route.
+- `lib/platformSession.js` validates the separate `platform_session` against account/session rows and revocation/access version.
+- `app/api/platform/session/route.js` provides the server-side login adapter with hashed-password verification, rate limiting and HTTP-only cookie issuance.
+
+Command:
+
+```powershell
+npm run build
+```
+
+Result: PASS. Next.js compiled successfully and included `/api/platform/session`. Existing non-blocking warnings remain for image optimization, viewport metadata and the pre-existing anonymous default export.

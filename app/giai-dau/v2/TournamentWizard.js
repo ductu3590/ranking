@@ -158,7 +158,24 @@ export default function TournamentWizard({ onDone }) {
     const activeDivision = divisions.find((division) => String(division.id) === String(activeDivisionId)) || null;
 
     useEffect(() => {
+        // Quyền admin phải lấy từ session server, không tin role trong localStorage
+        // (anti-pattern của kiến trúc). localStorage chỉ để hiển thị tạm khi chờ.
         setGroup(getCurrentGroupClient());
+        let alive = true;
+        fetch('/api/groups/session', { credentials: 'same-origin', cache: 'no-store' })
+            .then((response) => response.json())
+            .then((view) => {
+                const session = view?.session;
+                if (!alive || !session) return;
+                setGroup((current) => ({
+                    id: session.group_id ?? current.id,
+                    code: session.group_code ?? current.code,
+                    name: session.group_name ?? current.name,
+                    role: session.role || 'member',
+                }));
+            })
+            .catch(() => {});
+        return () => { alive = false; };
     }, []);
 
     /* ==================== Nạp dữ liệu ==================== */

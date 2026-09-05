@@ -341,3 +341,25 @@ The first sandboxed build attempt failed with Windows `spawn EPERM` while Next.j
 - Replaced the previous in-memory division test with a fake Supabase query-chain integration contract. It exercises `computeStageStandings`, `loadStageData`, `tournament_entries` division filtering, entry-based match columns, legacy fallback behavior and entry-based persistence. The first run of this rewritten test was RED before fixture/implementation correction; it now passes.
 - Limitation recorded: `tests/phase3/division-entry-migration.test.js` remains a SQL-text contract and does not prove live database constraints. Live migration verification is still performed separately against Supabase.
 - Public allowlists now omit `group_id` for tournament, stage, match and game records; public standings use an unscoped read path while internal authenticated callers retain tenant filtering.
+
+## Task 4 — domain schema and pure validators
+
+### TDD RED
+
+The new behavior assertions were added to `tests/phase3/interclub-domain.test.js` before implementation. The first run failed as expected:
+
+```text
+TypeError: validateDivisionOptions is not a function
+```
+
+### Implemented in repository
+
+- Added pure, I/O-free validators for division options, exclusive internal/external club references, registered/guest athlete snapshots and pair members.
+- Added stable error codes for invalid play type, rating cap, club reference, athlete identity/PHR and duplicate pair members.
+- Added migration `035_phase3_division_options_guest_clubs_pairings.sql` covering division options, scoring/share policy columns, external clubs, nullable `club_id` with exclusive-reference constraint, two partial unique indexes, athlete/PHR history, pair tables and registration confirmation fields.
+
+### Live database status
+
+The requested preflight assumption was not identical to the live database: Supabase returned `3 tournaments`, `3 divisions`, `0 entries`, `0 registrations`, but `2 tournament_clubs` (both have valid internal `club_id` values). The MCP safety gate rejected applying migration 035 because it changes `tournament_clubs` and removes its existing uniqueness constraint while the observed count differed from the stated preflight. No live Task 4 DDL was applied.
+
+The migration remains forward-only and ready to apply after explicit reconciliation/approval of the two existing `tournament_clubs` rows.

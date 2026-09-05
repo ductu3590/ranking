@@ -183,6 +183,17 @@
     color: #1f7a45;
 }
 
+/* Nguồn VĐV: thành viên CLB vs khách mời */
+.w3-tag-member {
+    background: #eaf1fb;
+    color: #1c4f8f;
+}
+
+.w3-tag-guest {
+    background: #fff4e3;
+    color: #9a5b12;
+}
+
 /* --- Cảnh báo không chặn --- */
 .w3-warning {
     border: 1px solid var(--w3-coral);

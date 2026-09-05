@@ -66,6 +66,15 @@ assert(validateTournamentAthlete({ display_name_snapshot: 'VĐV khách', phr_rat
 assert(throwsCode(() => validateTournamentAthlete({}), 'ATHLETE_IDENTITY_REQUIRED'), 'athlete phải có identity hoặc snapshot');
 assert(throwsCode(() => validateTournamentAthlete({ athlete_id: 5, display_name_snapshot: 'Trùng' }), 'ATHLETE_IDENTITY_AMBIGUOUS'), 'athlete không nhận hai identity');
 
+// source phân biệt VĐV CLB với VĐV khách, được lưu tường minh chứ không suy ra
+// từ athlete_id. Một thành viên CLB chưa có bản ghi athletes (athlete_id null)
+// vẫn phải giữ nguồn club_member khi BTC chọn từ roster.
+assert(validateTournamentAthlete({ athlete_id: 5 }).source === 'club_member', 'athlete có athlete_id mặc định là club_member');
+assert(validateTournamentAthlete({ display_name_snapshot: 'Khách' }).source === 'guest', 'athlete chỉ có snapshot mặc định là guest');
+assert(validateTournamentAthlete({ display_name_snapshot: 'Thành viên chưa map', source: 'club_member' }).source === 'club_member', 'roster member chưa có athlete_id vẫn giữ nguồn club_member');
+assert(validateTournamentAthlete({ athlete_id: 5, source: 'guest' }).source === 'guest', 'BTC có thể đánh dấu athlete_id là khách nếu cần');
+assert(throwsCode(() => validateTournamentAthlete({ athlete_id: 5, source: 'ngoai_le' }), 'INVALID_ATHLETE_SOURCE'), 'source lạ bị từ chối');
+
 assert(validateTournamentPairMembers([{ tournament_athlete_id: 1 }, { tournament_athlete_id: 2 }]).length === 2, 'pair có hai athlete');
 assert(throwsCode(() => validateTournamentPairMembers([{ tournament_athlete_id: 1 }, { tournament_athlete_id: 1 }]), 'PAIR_DUPLICATE_ATHLETE'), 'pair không trùng athlete');
 assert(throwsCode(() => validateTournamentPairMembers([{ tournament_athlete_id: 1 }]), 'PAIR_MEMBER_COUNT'), 'pair phải có đủ thành viên');

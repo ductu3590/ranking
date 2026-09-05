@@ -922,6 +922,7 @@ export default function TournamentWizard({ onDone }) {
                                     <label key={athlete.id} className={`w3-check ${selectedAthleteIds.includes(athlete.id) ? 'is-selected' : ''}`}>
                                         <input type="checkbox" checked={selectedAthleteIds.includes(athlete.id)} onChange={() => toggleAthlete(athlete.id)} />
                                         <span>{athlete.display_name_snapshot || `VĐV #${athlete.athlete_id}`}</span>
+                                        <span className={`w3-tag ${athlete.source === 'guest' ? 'w3-tag-guest' : 'w3-tag-member'}`}>{athlete.source === 'guest' ? 'Khách' : 'Thành viên CLB'}</span>
                                         <span className="w3-tag">{athlete.phr_rating == null ? 'Chưa có PHR' : `PHR ${athlete.phr_rating}`}</span>
                                     </label>
                                 ))}

@@ -7,13 +7,7 @@ import { buildGuestAthletePayload, buildClubMemberAthletePayload } from '@/lib/t
 
 const db = supabaseAdmin || supabaseServer;
 
-const SELECT_FIELDS = 'id, group_id, tournament_id, tournament_club_id, athlete_id, display_name_snapshot, club_name_snapshot, phr_rating, phr_status, created_at';
-
-// Cột `source` chưa tồn tại trong schema đã apply (035); nguồn VĐV được suy ra
-// từ athlete_id để UI phân biệt VĐV roster và VĐV khách.
-function withSource(row) {
-    return { ...row, source: row.athlete_id == null ? 'guest' : 'club_member' };
-}
+const SELECT_FIELDS = 'id, group_id, tournament_id, tournament_club_id, athlete_id, display_name_snapshot, club_name_snapshot, phr_rating, phr_status, source, created_at';
 
 function domainError(error) {
     if (!error?.code || !/^[A-Z_]+$/.test(error.code)) return null;
@@ -65,7 +59,7 @@ export async function GET(request) {
             .eq('tournament_id', tournamentId)
             .order('id', { ascending: true });
         if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-        return NextResponse.json({ athletes: (data || []).map(withSource) });
+        return NextResponse.json({ athletes: data || [] });
     } catch (err) {
         console.error('Tournament athletes GET error:', err);
         return NextResponse.json({ error: err.message }, { status: 500 });
@@ -104,10 +98,9 @@ export async function POST(request) {
             return NextResponse.json({ error: 'CLB tham dự không thuộc giải này' }, { status: 404 });
         }
 
-        const { source, ...insertable } = payload;
         const { data, error } = await db
             .from('tournament_athletes')
-            .insert({ ...insertable, group_id: adminCheck.groupId })
+            .insert({ ...payload, group_id: adminCheck.groupId })
             .select(SELECT_FIELDS)
             .single();
         if (error) {
@@ -127,7 +120,7 @@ export async function POST(request) {
             });
         }
 
-        return NextResponse.json({ success: true, athlete: withSource(data) });
+        return NextResponse.json({ success: true, athlete: data });
     } catch (err) {
         console.error('Tournament athletes POST error:', err);
         return NextResponse.json({ error: err.message }, { status: 500 });

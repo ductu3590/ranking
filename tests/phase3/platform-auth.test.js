@@ -7,9 +7,9 @@ const {
   PlatformLoginRateLimiter,
   authorizePlatformActor,
   validatePlatformLogin,
-  findPlatformAccount,
   getPlatformRateLimitKey,
   validatePlatformSessionRecord,
+  validatePlatformSessionLookup,
   revokePlatformSessionRecord,
 } = require('../../lib/platformSessionCore');
 const { signSession } = require('../../lib/groupSessionCore');
@@ -27,9 +27,7 @@ const now = 1_800_000_000_000;
   const accountRows = [{ id: 7, login: 'admin@example.com', status: 'active' }];
   for (const wildcard of ['admin%', 'admin_', '%admin', '_admin']) {
     assert.deepStrictEqual(validatePlatformLogin(wildcard), { ok: false, status: 401, error: 'Invalid credentials' }, 'wildcard login has generic auth failure');
-    assert.strictEqual(findPlatformAccount(accountRows, wildcard), null, 'wildcard login cannot match an account');
   }
-  assert.strictEqual(findPlatformAccount(accountRows, ' ADMIN@example.com '), null, 'lookup helper does not hide normalization responsibility');
   const invalidLoginLimiter = new PlatformLoginRateLimiter({ maxFailures: 3, windowMs: 60_000, now: () => now });
   for (const wildcard of ['admin%', 'admin_', '%admin']) {
     assert.strictEqual(getPlatformRateLimitKey({ login: wildcard, account: null }), 'platform-invalid-login', 'all wildcard attempts share defensive key');
@@ -57,9 +55,22 @@ const now = 1_800_000_000_000;
     expires_at: new Date(now + 60_000).toISOString(),
     revoked_at: null,
   };
-  assert.ok(validatePlatformSessionRecord(session, secret, now + 30_000, sessionRecord), 'database-backed session is accepted before revoke');
+  const accountRecord = { id: 42, status: 'active', access_version: 1 };
+  assert.ok(validatePlatformSessionRecord(session, secret, now + 30_000, sessionRecord, accountRecord), 'database-backed session is accepted before revoke');
+  assert.strictEqual(validatePlatformSessionRecord(session, secret, now + 30_000, sessionRecord, undefined), null, 'missing account record is rejected');
+  assert.strictEqual(
+    validatePlatformSessionLookup({
+      cookieValue: session,
+      secret,
+      now: now + 30_000,
+      sessionResult: { data: sessionRecord, error: null },
+      accountResult: { data: null, error: new Error('platform_accounts query failed') },
+    }),
+    null,
+    'account query errors reject authentication',
+  );
   revokePlatformSessionRecord(sessionRecord, now + 31_000);
-  assert.strictEqual(validatePlatformSessionRecord(session, secret, now + 31_001, sessionRecord), null, 'database-backed revoked session is rejected through auth validation');
+  assert.strictEqual(validatePlatformSessionRecord(session, secret, now + 31_001, sessionRecord, accountRecord), null, 'database-backed revoked session is rejected through auth validation');
 
   const limiter = new PlatformLoginRateLimiter({ maxFailures: 3, windowMs: 60_000, now: () => now });
   assert.strictEqual(limiter.recordFailure('admin@example.com').blocked, false);

@@ -253,3 +253,46 @@ npm run build
 ```
 
 Result: PASS. Next.js compiled successfully and included `/api/platform/session`. Existing non-blocking warnings remain for image optimization, viewport metadata and the pre-existing anonymous default export.
+
+## Task 2 security remediation — wildcard login/rate-limit bypass
+
+### TDD RED
+
+The regression test was extended before the fix to require exact-login validation, a shared defensive rate-limit key for wildcard variants and database-backed revoke validation. Before implementation it failed at the missing validation helper:
+
+```text
+TypeError: validatePlatformLogin is not a function
+```
+
+### Fix applied
+
+- Replaced account lookup `ilike('login', login)` with exact `.eq('login', login)` in the platform login route and bootstrap script.
+- Normalized seed login with `trim().toLowerCase()` before writing and exact lookup.
+- Rejected `%` and `_` at input validation with the same `401 Invalid credentials` response as wrong credentials.
+- Rate-limit keys use the account ID when an exact account is resolved; malformed wildcard attempts share `platform-invalid-login` instead of using attacker-controlled patterns.
+- Added database-backed session validation and `POST /api/platform/session/logout`, which writes `revoked_at` and clears the HTTP-only cookie.
+
+### Security regression GREEN
+
+```powershell
+node tests/phase3/platform-auth.test.js
+```
+
+```text
+Phase 3 Task 2 platform auth contract: PASS
+```
+
+The test now proves a session accepted before database-backed revoke is rejected after the session record is revoked through the same validation path; it does not pass a hand-built revoked-key set to the verifier.
+
+### Required regression commands
+
+```powershell
+npm run test:phase3-interclub
+npm run test:t-api
+```
+
+Both passed. `npm run build` also passed and included `/api/platform/session/logout`.
+
+### Remaining security debt
+
+The login rate limiter is currently in-memory. This is not effective as a security control on Vercel/serverless because consecutive requests may run in different processes/instances. Before enabling platform login for real users, replace it with a shared counter backed by Supabase (or another shared store) and retain the same account/malformed-input keying policy.

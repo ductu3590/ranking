@@ -4,7 +4,7 @@ const { hashPassword } = require('../lib/platformSessionCore');
 const { createClient } = require('@supabase/supabase-js');
 
 async function main() {
-  const email = process.env.PICKHUB_PLATFORM_ADMIN_EMAIL;
+  const email = String(process.env.PICKHUB_PLATFORM_ADMIN_EMAIL || '').trim().toLowerCase();
   const password = process.env.PICKHUB_PLATFORM_ADMIN_PASSWORD;
   const role = process.env.PICKHUB_PLATFORM_ADMIN_ROLE || 'community_admin';
   if (!email || !password) throw new Error('Set PICKHUB_PLATFORM_ADMIN_EMAIL and PICKHUB_PLATFORM_ADMIN_PASSWORD');
@@ -14,7 +14,7 @@ async function main() {
   if (!supabaseUrl || !serviceKey) throw new Error('Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY');
   const passwordHash = await hashPassword(password);
   const db = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
-  const existing = await db.from('platform_accounts').select('id').ilike('login', email).maybeSingle();
+  const existing = await db.from('platform_accounts').select('id').eq('login', email).maybeSingle();
   if (existing.error) throw existing.error;
   const payload = { login: email, password_hash: passwordHash, role, status: 'active' };
   const result = existing.data

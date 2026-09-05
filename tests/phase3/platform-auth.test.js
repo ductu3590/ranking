@@ -6,6 +6,11 @@ const {
   verifyPlatformSession,
   PlatformLoginRateLimiter,
   authorizePlatformActor,
+  validatePlatformLogin,
+  findPlatformAccount,
+  getPlatformRateLimitKey,
+  validatePlatformSessionRecord,
+  revokePlatformSessionRecord,
 } = require('../../lib/platformSessionCore');
 const { signSession } = require('../../lib/groupSessionCore');
 const { assertTournamentOrganizer } = require('../../lib/tournament/interclub');
@@ -18,6 +23,19 @@ const now = 1_800_000_000_000;
   assert.notStrictEqual(passwordHash, 'Correct123!', 'password must not be stored as plaintext');
   assert.strictEqual(await verifyPassword('Correct123!', passwordHash), true, 'correct password verifies');
   assert.strictEqual(await verifyPassword('Wrong123!', passwordHash), false, 'wrong password is rejected');
+
+  const accountRows = [{ id: 7, login: 'admin@example.com', status: 'active' }];
+  for (const wildcard of ['admin%', 'admin_', '%admin', '_admin']) {
+    assert.deepStrictEqual(validatePlatformLogin(wildcard), { ok: false, status: 401, error: 'Invalid credentials' }, 'wildcard login has generic auth failure');
+    assert.strictEqual(findPlatformAccount(accountRows, wildcard), null, 'wildcard login cannot match an account');
+  }
+  assert.strictEqual(findPlatformAccount(accountRows, ' ADMIN@example.com '), null, 'lookup helper does not hide normalization responsibility');
+  const invalidLoginLimiter = new PlatformLoginRateLimiter({ maxFailures: 3, windowMs: 60_000, now: () => now });
+  for (const wildcard of ['admin%', 'admin_', '%admin']) {
+    assert.strictEqual(getPlatformRateLimitKey({ login: wildcard, account: null }), 'platform-invalid-login', 'all wildcard attempts share defensive key');
+    invalidLoginLimiter.recordFailure(getPlatformRateLimitKey({ login: wildcard, account: null }));
+  }
+  assert.strictEqual(invalidLoginLimiter.canAttempt('platform-invalid-login').allowed, false, 'wildcard variants share one rate-limit bucket');
 
   const session = signPlatformSession({
     accountId: 42,
@@ -33,6 +51,15 @@ const now = 1_800_000_000_000;
     null,
     'revoked session is rejected',
   );
+  const sessionRecord = {
+    account_id: 42,
+    session_key_hash: require('crypto').createHash('sha256').update('platform-session-key-1234').digest('hex'),
+    expires_at: new Date(now + 60_000).toISOString(),
+    revoked_at: null,
+  };
+  assert.ok(validatePlatformSessionRecord(session, secret, now + 30_000, sessionRecord), 'database-backed session is accepted before revoke');
+  revokePlatformSessionRecord(sessionRecord, now + 31_000);
+  assert.strictEqual(validatePlatformSessionRecord(session, secret, now + 31_001, sessionRecord), null, 'database-backed revoked session is rejected through auth validation');
 
   const limiter = new PlatformLoginRateLimiter({ maxFailures: 3, windowMs: 60_000, now: () => now });
   assert.strictEqual(limiter.recordFailure('admin@example.com').blocked, false);

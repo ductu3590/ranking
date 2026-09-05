@@ -22,7 +22,7 @@
     "test:phase2": "node tests/multitenant-phase2.test.js",
     "test:isolation": "node tests/isolation.integration.test.js",
     "test:phase3": "node tests/multitenant-phase3.test.js",
-    "test:phase3-interclub": "node tests/phase3/interclub-migration.test.js && node tests/phase3/interclub-domain.test.js && node tests/phase3/interclub-competition.test.js && node tests/phase3/interclub-public.test.js && node tests/phase3/interclub-ui.test.js && node tests/phase3/competition-preflight.test.js && node tests/phase3/platform-auth.test.js",
+    "test:phase3-interclub": "node tests/phase3/interclub-migration.test.js && node tests/phase3/interclub-domain.test.js && node tests/phase3/interclub-competition.test.js && node tests/phase3/interclub-public.test.js && node tests/phase3/interclub-ui.test.js && node tests/phase3/competition-preflight.test.js && node tests/phase3/platform-auth.test.js && node tests/phase3/division-entry-migration.test.js && node tests/phase3/division-entry-convergence.test.js",
     "test:phase5": "node tests/multitenant-phase5.test.js",
     "test:phase6": "node tests/multitenant-phase6.test.js",
     "test:phase4": "node tests/multitenant-phase4.test.js",

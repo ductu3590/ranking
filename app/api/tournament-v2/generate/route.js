@@ -43,19 +43,28 @@ export async function POST(request) {
         let entrants = [];
         const { data: stageEntrants, error: seErr } = await db
             .from('tournament_stage_entrants')
-            .select('entrant_id, seed_in_stage, group_label')
+            .select('entry_id, entrant_id, seed_in_stage, group_label')
             .eq('group_id', groupId)
             .eq('stage_id', stageId);
         if (seErr) {
             return NextResponse.json({ error: seErr.message }, { status: 500 });
         }
 
-        if (stageEntrants && stageEntrants.length) {
-            entrants = stageEntrants.map((r) => ({
-                id: r.entrant_id,
-                seed: r.seed_in_stage,
-                group_label: r.group_label,
-            }));
+        if (stage.division_id) {
+            const entryRows = stageEntrants?.filter((r) => r.entry_id != null) || [];
+            if (entryRows.length) {
+                entrants = entryRows.map((r) => ({ id: r.entry_id, seed: r.seed_in_stage, group_label: r.group_label }));
+            } else {
+                const { data: divisionEntries, error: entryErr } = await db
+                    .from('tournament_entries')
+                    .select('id, seed')
+                    .eq('group_id', groupId)
+                    .eq('division_id', stage.division_id);
+                if (entryErr) return NextResponse.json({ error: entryErr.message }, { status: 500 });
+                entrants = (divisionEntries || []).map((r) => ({ id: r.id, seed: r.seed }));
+            }
+        } else if (stageEntrants && stageEntrants.length) {
+            entrants = stageEntrants.map((r) => ({ id: r.entrant_id, seed: r.seed_in_stage, group_label: r.group_label }));
         } else {
             const { data: tEntrants, error: teErr } = await db
                 .from('tournament_entrants')
@@ -92,7 +101,8 @@ export async function POST(request) {
             return NextResponse.json({ error: e.message }, { status: 400 });
         }
 
-        const rows = scheduleToInsertRows(sched, { stageId, groupId });
+        const entryBased = Boolean(stage.division_id);
+        const rows = scheduleToInsertRows(sched, { stageId, groupId, divisionId: stage.division_id, entryBased });
         const rpcMatches = rows.map((row, index) => ({
             ...row,
             _key: String(sched[index].slot != null ? sched[index].slot : index),
@@ -105,7 +115,8 @@ export async function POST(request) {
             return NextResponse.json({ error: 'idempotency_key không hợp lệ' }, { status: 400 });
         }
 
-        const { data, error } = await db.rpc('replace_tournament_schedule', {
+        // Legacy adapter remains available for pre-Task-3 stages via rpc('replace_tournament_schedule').
+        const { data, error } = await db.rpc(entryBased ? 'replace_tournament_entry_schedule' : 'replace_tournament_schedule', {
             p_group_id: groupId,
             p_stage_id: stageId,
             p_matches: rpcMatches,

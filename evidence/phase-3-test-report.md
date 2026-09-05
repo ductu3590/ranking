@@ -296,3 +296,48 @@ Both passed. `npm run build` also passed and included `/api/platform/session/log
 ### Remaining security debt
 
 The login rate limiter is currently in-memory. This is not effective as a security control on Vercel/serverless because consecutive requests may run in different processes/instances. Before enabling platform login for real users, replace it with a shared counter backed by Supabase (or another shared store) and retain the same account/malformed-input keying policy.
+
+## Task 3 — division/entry/stage/match convergence
+
+### TDD RED
+
+The new behavior test was written before implementation. Initial run failed because the division convergence projection did not exist:
+
+```text
+Error: Cannot find module '../../lib/tournament/divisionCompetition'
+```
+
+The migration contract test was also run before creating the migration and failed because `033_phase3_division_entry_convergence.sql` did not exist. Both tests were then implemented and pass.
+
+### Database migration
+
+- Applied `033_phase3_division_entry_convergence.sql` forward-only. The first apply exposed a missing composite unique key needed by the stage/match foreign key (`42830`); the migration was corrected by adding the validated `(id, division_id)` stage index and reapplied successfully.
+- Applied `033b_phase3_entry_schedule_rpc.sql` successfully for atomic entry-based schedule replacement.
+- Live Supabase verification after migration: 3 tournaments, 3 legacy-import divisions, 5 stages, 0 matches, 0 entries, 0 games; all stage and match division null counts are zero.
+- Explicit status decision recorded in migration: tournament `active -> registration_open`; match `done -> finalized`.
+- Public slug lookup is global via `lower(public_slug)`; child public reads no longer use `group_id`.
+
+### Implementation
+
+- Division-scoped schedule generation writes `division_id`, `entry_a_id` and `entry_b_id` through `replace_tournament_entry_schedule`.
+- Standings resolve entry-based match references while retaining the legacy `tournament_entrants` read adapter.
+- Public snapshots read `tournament_entries` for division-scoped competitions and expose only allowlisted public fields.
+- The pure convergence test proves two divisions produce independent stages, matches and standings without cross-contamination.
+
+### Required verification
+
+```text
+npm run test:phase3-interclub  PASS
+npm run test:t-api             PASS
+npm run test:t-engines         PASS
+npm run build                  PASS
+```
+
+The first sandboxed build attempt failed with Windows `spawn EPERM` while Next.js tried to create worker processes. The same build completed successfully with the required process permission; only pre-existing lint/metadata warnings remain.
+
+### Follow-up corrections
+
+- Renamed `034_phase3_entry_schedule_rpc.sql` so `lib/migrationLedger.js` includes it; the prior `033b_...` filename was not ledger-compatible. Task 4's planned migration is consequently renumbered from `034_...` to `035_...`.
+- Replaced the previous in-memory division test with a fake Supabase query-chain integration contract. It exercises `computeStageStandings`, `loadStageData`, `tournament_entries` division filtering, entry-based match columns, legacy fallback behavior and entry-based persistence. The first run of this rewritten test was RED before fixture/implementation correction; it now passes.
+- Limitation recorded: `tests/phase3/division-entry-migration.test.js` remains a SQL-text contract and does not prove live database constraints. Live migration verification is still performed separately against Supabase.
+- Public allowlists now omit `group_id` for tournament, stage, match and game records; public standings use an unscoped read path while internal authenticated callers retain tenant filtering.

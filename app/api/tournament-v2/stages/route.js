@@ -7,6 +7,7 @@ const db = supabaseAdmin || supabaseServer;
 
 const ALLOWED_STAGE_FIELDS = [
     'tournament_id',
+    'division_id',
     'stage_order',
     'name',
     'schedule_format',
@@ -97,6 +98,9 @@ export async function POST(request) {
         }
         if (!name) {
             return NextResponse.json({ error: 'Stage name is required' }, { status: 400 });
+        }
+        if (!body.division_id) {
+            return NextResponse.json({ error: 'division_id is required for new stages' }, { status: 400 });
         }
         if (!scheduleFormat) {
             return NextResponse.json({ error: 'schedule_format is required' }, { status: 400 });

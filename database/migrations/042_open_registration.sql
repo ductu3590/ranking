@@ -111,3 +111,8 @@ create index if not exists tpi_group_div_idx on tournament_pair_invites(group_id
 create index if not exists tpi_to_idx on tournament_pair_invites(to_registration_id, status);
 
 comment on table tournament_pair_invites is 'Lời mời ghép cặp do VĐV tự rủ; BTC duyệt cặp sau khi accepted';
+
+-- E. RLS: đồng bộ chuẩn bảo mật của các bảng tournament_* hiện có
+-- (bật RLS, không policy => chỉ service-role truy cập; mọi ghi/đọc đi qua API route).
+alter table tournament_registration_members enable row level security;
+alter table tournament_pair_invites enable row level security;

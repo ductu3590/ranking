@@ -273,31 +273,23 @@ assertThrowsCode(
     'stage không có division_id phải lỗi',
 );
 
-/* ==================== B. Hợp đồng nguồn Wizard ==================== */
+/* ==================== B. Hợp đồng nguồn Wizard ====================
+   Wizard tạo giải đã được thiết kế lại thành luồng 3 bước (spec
+   2026-09-07-tournament-create-wizard-redesign). Hợp đồng nguồn của wizard MỚI
+   nằm ở tests/phase3/wizard-redesign-contract.test.js — kiểm 3 bước, cấu hình
+   thẻ, xem trước sống (previewSchedule), quyền từ /api/groups/session (không
+   dùng getCurrentGroupClient nữa), và hai hình thức đăng ký.
 
-const wizardFile = 'app/giai-dau/v2/TournamentWizard.js';
-assert(exists(wizardFile), 'wizard tồn tại');
-const wizard = exists(wizardFile) ? read(wizardFile) : '';
+   Các hành vi mà wizard cũ gộp chung nhưng đã DỜI sang spec khác (không mất, chỉ
+   chuyển bề mặt): BTC nhập hộ roster + duyệt đăng ký (reviewRegistration,
+   buildRosterAudit) → spec tournament-operations; nối roster/CLB thật + cảnh báo
+   PHR trong luồng đăng ký → spec tournament-open-registration. Các hàm domain
+   liên quan (buildRosterAudit, summarizeRosterWarnings, buildRulesPreview) vẫn
+   được phần A ở trên kiểm chạy thật. */
 
-for (const label of ['Nội bộ CLB', 'Giao hữu liên CLB', 'Cộng đồng', 'Nội dung thi đấu', 'Luật điểm', 'Ghép cặp', 'VĐV khách']) {
-    assert(wizard.includes(label), `wizard có nhãn "${label}"`);
-}
-for (const token of ['wizardModel', 'buildRulesPreview', 'summarizeRosterWarnings', 'ORGANIZER_MODES']) {
-    assert(wizard.includes(token), `wizard dùng ${token} từ view-model`);
-}
-for (const token of ['saveDivision', 'listDivisions', 'previewDivisionPairing', 'confirmDivisionPairing', 'saveTournamentAthlete', 'saveDivisionEntry', 'updateTournamentRules', 'saveRegistration', 'reviewRegistration', 'listRegistrations']) {
-    assert(wizard.includes(token), `wizard gọi API client ${token}`);
-}
-// BTC nhập hộ roster: phải có ô lý do và nút duyệt, cảnh báo không chặn.
-for (const label of ['BTC nhập hộ', 'Lý do', 'Duyệt', 'Chỉ là cảnh báo']) {
-    assert(wizard.includes(label), `wizard có nhãn nhập hộ/duyệt "${label}"`);
-}
-assert(wizard.includes("actor: 'organizer'"), 'wizard ghi actor organizer khi BTC nhập hộ');
-assert(!/saveEntrant\s*\(/.test(wizard), 'wizard không ghi tournament_entrants (legacy) nữa');
-assert(wizard.includes('division_id'), 'wizard gắn division_id cho stage');
-assert(wizard.includes('getCurrentGroupClient'), 'wizard lấy role/CLB từ getCurrentGroupClient');
-assert(wizard.includes('wizard.css'), 'wizard có file CSS kèm');
+assert(exists('app/giai-dau/v2/TournamentWizard.js'), 'wizard tồn tại');
 assert(exists('app/giai-dau/v2/wizard.css'), 'có app/giai-dau/v2/wizard.css');
+assert(!/saveEntrant\s*\(/.test(read('app/giai-dau/v2/TournamentWizard.js')), 'wizard không ghi tournament_entrants (legacy) nữa');
 
 /* ==================== C. Hợp đồng API route ==================== */
 

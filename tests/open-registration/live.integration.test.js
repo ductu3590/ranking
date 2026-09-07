@@ -14,6 +14,7 @@ const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
 const { createClient } = require('@supabase/supabase-js');
+const { signSession } = require('../../lib/groupSessionCore');
 
 const PORT = 4199;
 const BASE = `http://127.0.0.1:${PORT}`;
@@ -56,15 +57,32 @@ async function main() {
   }
   const db = createClient(url, serviceKey, { auth: { persistSession: false } });
 
-  const created = { tournamentId: null, divisionId: null, regIds: [] };
+  const created = { tournamentId: null, divisionId: null, pairDivisionId: null, regIds: [] };
   let server = null;
 
   try {
     // ---- Seed: cần một group thật để làm chủ giải (chỉ dùng làm FK owner) ----
-    const { data: group, error: gErr } = await db.from('groups').select('id').limit(1).maybeSingle();
+    // Lấy thêm code + access_version để ký được cookie group_session admin hợp lệ,
+    // vì bước BTC duyệt cặp gọi PATCH /registrations thật qua HTTP.
+    const { data: group, error: gErr } = await db.from('groups')
+      .select('id, code, name, access_version').limit(1).maybeSingle();
     if (gErr) throw gErr;
     assert(group && group.id, 'phải có ít nhất một group để gắn giải test');
     const groupId = group.id;
+
+    // Cookie admin ký bằng cùng GROUP_SESSION_SECRET route dùng. Không set session_key
+    // để bỏ qua kiểm tra phiên trong DB; access_version phải khớp bản ghi group hiện tại.
+    const adminCookie = signSession({
+      groupId: group.id,
+      groupCode: group.code,
+      groupName: group.name || 'CLB Test',
+      role: 'admin',
+      accessVersion: Number(group.access_version) || 1,
+    }, process.env.GROUP_SESSION_SECRET);
+    const adminHeaders = {
+      'content-type': 'application/json',
+      cookie: `group_session=${adminCookie}`,
+    };
 
     const slug = `test-open-reg-${Date.now()}`;
 
@@ -99,6 +117,22 @@ async function main() {
     }).select('id').single();
     if (dErr) throw dErr;
     created.divisionId = d.id;
+
+    // (2b) Nội dung đôi Nam-Nữ RIÊNG cho luồng ghép cặp (đủ chỗ: sức chứa 4 cặp).
+    const { data: dp, error: dpErr } = await db.from('tournament_divisions').insert({
+      group_id: groupId,
+      tournament_id: t.id,
+      name: 'Đôi Nam-Nữ ghép cặp (test)',
+      entrant_type: 'pair',
+      play_type: 'doubles',
+      gender_mode: 'mixed',
+      rating_policy: 'capped',
+      rating_cap: 4.8,
+      registration_open: true,
+      registration_capacity: 4,
+    }).select('id').single();
+    if (dpErr) throw dpErr;
+    created.pairDivisionId = dp.id;
 
     // ---- Server ----
     const nextBin = require.resolve('next/dist/bin/next');
@@ -202,13 +236,142 @@ async function main() {
       assert(body.registration && body.registration.status === 'submitted', 'tra theo SĐT trả đúng đăng ký B');
     }
 
+    // ================= LUỒNG GHÉP CẶP (solo → mời → duyệt) =================
+    // Đây là phần mutate nhiều bản ghi nhất: hai đăng ký solo, một lời mời, và
+    // bước BTC duyệt gộp thành một cặp submitted + đánh dấu bản ghi phụ merged.
+
+    // Helper: POST một đăng ký SOLO (1 VĐV) vào nội dung ghép cặp dp.
+    async function postSolo(member) {
+      const res = await fetch(`${BASE}/api/tournament-v2/public/registration`, {
+        method: 'POST', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ slug, divisionId: dp.id, members: [member] }),
+      });
+      const body = await json(res);
+      return { res, body };
+    }
+
+    // (a+b) Hai đăng ký solo: một nam, một nữ => cả hai awaiting_partner + needs_partner.
+    const soloMale = { full_name: 'Solo Nam', phone: '0900001001', gender: 'male', phr: 4.1 };
+    const soloFemale = { full_name: 'Solo Nu', phone: '0900001002', gender: 'female', phr: 3.7 };
+    let tokenSolo1 = null; let tokenSolo2 = null; let regId1 = null; let regId2 = null;
+    {
+      const a = await postSolo(soloMale);
+      assert(a.res.status === 200, `solo nam trả 200, nhận ${a.res.status} (${a.body.error || ''})`);
+      assert(a.body.registration && a.body.registration.status === 'awaiting_partner', 'solo nam status=awaiting_partner');
+      assert(a.body.registration.needs_partner === true, 'solo nam needs_partner=true');
+      tokenSolo1 = a.body.track_token; regId1 = a.body.registration.id;
+      created.regIds.push(regId1);
+
+      const b = await postSolo(soloFemale);
+      assert(b.res.status === 200, `solo nữ trả 200, nhận ${b.res.status} (${b.body.error || ''})`);
+      assert(b.body.registration && b.body.registration.status === 'awaiting_partner', 'solo nữ status=awaiting_partner');
+      assert(b.body.registration.needs_partner === true, 'solo nữ needs_partner=true');
+      tokenSolo2 = b.body.track_token; regId2 = b.body.registration.id;
+      created.regIds.push(regId2);
+    }
+
+    // (c) A mời B bằng track_token của A => invite 'pending'.
+    let inviteId = null;
+    {
+      const res = await fetch(`${BASE}/api/tournament-v2/public/pair-invite`, {
+        method: 'POST', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ track_token: tokenSolo1, to_registration_id: regId2 }),
+      });
+      const body = await json(res);
+      assert(res.status === 200, `gửi lời mời trả 200, nhận ${res.status} (${body.error || ''})`);
+      assert(body.invite && body.invite.status === 'pending', 'lời mời ở trạng thái pending');
+      inviteId = body.invite.id;
+    }
+
+    // (d) B chấp nhận bằng track_token của B => 'accepted'.
+    {
+      const res = await fetch(`${BASE}/api/tournament-v2/public/pair-invite`, {
+        method: 'PATCH', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ track_token: tokenSolo2, invite_id: inviteId, action: 'accept' }),
+      });
+      const body = await json(res);
+      assert(res.status === 200, `chấp nhận lời mời trả 200, nhận ${res.status} (${body.error || ''})`);
+      assert(body.status === 'accepted', `lời mời chuyển accepted, nhận ${body.status}`);
+    }
+
+    // (e) BTC duyệt cặp (primary=A, secondary=B) qua PATCH /registrations action='approve_pair'.
+    {
+      const res = await fetch(`${BASE}/api/tournament-v2/registrations`, {
+        method: 'PATCH', headers: adminHeaders,
+        body: JSON.stringify({ id: regId1, action: 'approve_pair', partner_registration_id: regId2 }),
+      });
+      const body = await json(res);
+      assert(res.status === 200, `approve_pair trả 200, nhận ${res.status} (${body.error || body.code || ''})`);
+      assert(body.registration && body.registration.status === 'submitted', `A sau ghép status=submitted, nhận ${body.registration && body.registration.status}`);
+      assert(body.registration.needs_partner === false, 'A needs_partner=false sau ghép');
+      assert(String(body.merged_id) === String(regId2), 'merged_id trỏ đúng B');
+
+      // A phải có ĐÚNG 2 member (ghế 1 và 2).
+      const { data: mems } = await db.from('tournament_registration_members')
+        .select('seat').eq('registration_id', regId1).order('seat');
+      const seats = (mems || []).map((m) => m.seat).sort();
+      assert(seats.length === 2 && seats[0] === 1 && seats[1] === 2, `A phải có đúng 2 ghế (1,2), nhận ${JSON.stringify(seats)}`);
+
+      // B phải là merged + merged_into=A.id.
+      const { data: regB } = await db.from('tournament_registrations')
+        .select('status, merged_into').eq('id', regId2).maybeSingle();
+      assert(regB && regB.status === 'merged', `B status=merged, nhận ${regB && regB.status}`);
+      assert(String(regB.merged_into) === String(regId1), 'B.merged_into trỏ đúng A');
+    }
+
+    // (f) Ca lỗi: ghép hai người CÙNG GIỚI ở nội dung mixed => 400 MIXED_GENDER_REQUIRED.
+    {
+      const m1 = await postSolo({ full_name: 'Nam Mot', phone: '0900002001', gender: 'male', phr: 4.0 });
+      const m2 = await postSolo({ full_name: 'Nam Hai', phone: '0900002002', gender: 'male', phr: 4.0 });
+      assert(m1.res.status === 200 && m2.res.status === 200, 'seed hai solo cùng giới OK');
+      created.regIds.push(m1.body.registration.id, m2.body.registration.id);
+      const res = await fetch(`${BASE}/api/tournament-v2/registrations`, {
+        method: 'PATCH', headers: adminHeaders,
+        body: JSON.stringify({ id: m1.body.registration.id, action: 'approve_pair', partner_registration_id: m2.body.registration.id }),
+      });
+      const body = await json(res);
+      assert(res.status === 400, `ghép cùng giới trả 400, nhận ${res.status}`);
+      assert(body.code === 'MIXED_GENDER_REQUIRED', `code MIXED_GENDER_REQUIRED, nhận ${body.code}`);
+    }
+
+    // (f2) Ca lỗi: ghép hai người TRÙNG SĐT => 400 DUPLICATE_IN_PAIR.
+    //      Dùng insert trực tiếp (POST public sẽ chặn trùng SĐT trước đó), để chạm
+    //      đúng nhánh buildPairFromSolos ở D3.
+    {
+      const dupPhone = '0900003001';
+      const { data: rDup1 } = await db.from('tournament_registrations').insert({
+        group_id: groupId, division_id: dp.id, tournament_club_id: null, entrant_type: 'pair',
+        status: 'awaiting_partner', origin: 'public_self', contact_phone_norm: dupPhone,
+        needs_partner: true, track_token: `dup1-${Date.now()}`,
+      }).select('id').single();
+      const { data: rDup2 } = await db.from('tournament_registrations').insert({
+        group_id: groupId, division_id: dp.id, tournament_club_id: null, entrant_type: 'pair',
+        status: 'awaiting_partner', origin: 'public_self', contact_phone_norm: dupPhone,
+        needs_partner: true, track_token: `dup2-${Date.now()}`,
+      }).select('id').single();
+      created.regIds.push(rDup1.id, rDup2.id);
+      await db.from('tournament_registration_members').insert([
+        { group_id: groupId, registration_id: rDup1.id, seat: 1, full_name: 'Trung SDT 1', phone_norm: dupPhone, gender: 'male' },
+        { group_id: groupId, registration_id: rDup2.id, seat: 1, full_name: 'Trung SDT 2', phone_norm: dupPhone, gender: 'female' },
+      ]);
+      const res = await fetch(`${BASE}/api/tournament-v2/registrations`, {
+        method: 'PATCH', headers: adminHeaders,
+        body: JSON.stringify({ id: rDup1.id, action: 'approve_pair', partner_registration_id: rDup2.id }),
+      });
+      const body = await json(res);
+      assert(res.status === 400, `ghép trùng SĐT trả 400, nhận ${res.status}`);
+      assert(body.code === 'DUPLICATE_IN_PAIR', `code DUPLICATE_IN_PAIR, nhận ${body.code}`);
+    }
+
     console.log('open-registration live integration: OK');
   } finally {
     // (7) Dọn an toàn theo đúng id đã tạo (cascade sẽ xoá members/invites).
     try {
-      if (created.divisionId) {
-        await db.from('tournament_registrations').delete().eq('division_id', created.divisionId);
-        await db.from('tournament_divisions').delete().eq('id', created.divisionId);
+      for (const divId of [created.divisionId, created.pairDivisionId]) {
+        if (!divId) continue;
+        await db.from('tournament_pair_invites').delete().eq('division_id', divId);
+        await db.from('tournament_registrations').delete().eq('division_id', divId);
+        await db.from('tournament_divisions').delete().eq('id', divId);
       }
       if (created.tournamentId) {
         await db.from('tournaments').delete().eq('id', created.tournamentId);

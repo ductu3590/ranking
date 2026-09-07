@@ -72,10 +72,11 @@ async function handleOpenRegAction({ body, access, current }) {
             status: 'merged', merged_into: primary.id, updated_at: new Date().toISOString(),
         }).eq('id', secondary.id).eq('group_id', groupId);
 
-        const primaryNext = body.action === 'approve_pair' && canAdmit({ capacity: division ? division.registration_capacity : null, approvedCount: await countApproved(primary.division_id, groupId) })
-            ? 'approved' : 'submitted';
+        // Ghép cặp (pair) và duyệt lời mời (approve_pair) đều chỉ gộp hai solo thành
+        // một đăng ký đôi ở trạng thái 'submitted'. Việc nhận vào giải ('approved')
+        // vẫn là bước admit riêng của BTC, để tôn trọng sức chứa/waitlist.
         const { data: updated } = await db.from('tournament_registrations').update({
-            status: primaryNext, needs_partner: false, updated_at: new Date().toISOString(),
+            status: 'submitted', needs_partner: false, updated_at: new Date().toISOString(),
         }).eq('id', primary.id).eq('group_id', groupId).select('id, status, needs_partner').single();
 
         return NextResponse.json({ success: true, registration: updated, merged_id: secondary.id });

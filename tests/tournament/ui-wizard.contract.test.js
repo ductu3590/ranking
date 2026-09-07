@@ -6,11 +6,14 @@ const assert = (c, m) => { if (!c) { console.error(`FAIL: ${m}`); process.exit(1
 const f = 'app/giai-dau/v2/TournamentWizard.js';
 assert(exists(f), 'wizard tồn tại');
 const s = read(f);
-// Phase 3 đã hội tụ mô hình: đơn vị xếp lịch là entry theo nội dung thi đấu,
-// không còn entrant cấp giải. Trước đây dòng này bắt chuỗi `saveEntrant`, và
-// Wizard mới phải giữ chuỗi đó trong một comment chết chỉ để test xanh.
-assert(s.includes('createTournament') && s.includes('saveStage') && s.includes('saveDivisionEntry') && s.includes('generateSchedule'), 'gọi 4 bước API');
+// Wizard tạo giải đã đổi sang luồng 3 bước (Thể thức · Thông tin giải · Đăng ký).
+// "Tạo giải" tạo tournament → division → stage → entry theo nội dung thi đấu;
+// đơn vị xếp lịch là entry, không còn entrant cấp giải cũ.
+assert(
+    s.includes('createTournament') && s.includes('saveDivision') && s.includes('saveStage') && s.includes('saveDivisionEntry'),
+    'gọi các API tạo giải: createTournament, saveDivision, saveStage, saveDivisionEntry',
+);
 assert(!/saveEntrant\s*\(/.test(s), 'Wizard không ghi vào bảng entrant cấp giải cũ nữa');
-for (const t of ['pair', 'team', 'round_robin', 'knockout', 'simple', 'mlp']) assert(s.includes(t), `tùy chọn ${t}`);
-for (const label of ['Thông tin', 'Giai đoạn', 'Đội', 'lịch']) assert(s.includes(label), `bước "${label}"`);
+for (const t of ['team', 'doubles', 'round_robin', 'knockout', 'simple', 'mlp']) assert(s.includes(t), `tùy chọn ${t}`);
+for (const label of ['Thể thức', 'Thông tin giải', 'Đăng ký']) assert(s.includes(label), `bước "${label}"`);
 console.log('ui-wizard contract ok');

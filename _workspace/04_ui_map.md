@@ -32,11 +32,26 @@ Mọi component UI v2 gọi API qua `@/lib/tournamentV2Client` (ngoại lệ duy
 - Đọc: `listTournaments()`. Role: `getCurrentGroupClient().role === 'admin'` gate nút "+ Tạo giải".
 - Bao trong `<Suspense>` vì dùng `useSearchParams` (Next 14 App Router).
 
-### Wizard — `app/giai-dau/v2/TournamentWizard.js` (admin-only surface, mở từ nút tạo)
-- 4 bước: thông tin → giai đoạn → đội/cặp → sinh lịch.
-- Calls: `createTournament`/`updateTournament` (B1), `saveStage` (B2, gửi `config={groupCount,advancePerGroup,bestOf}`), `saveEntrant` (B3), `generateSchedule(stages[0].id)` (B4).
-- Sinh lịch chỉ cho **stage đầu tiên**; stage sau sinh ở Settings/advance.
-- **MLP step 4**: sau `generateSchedule` thành công, tự động gọi `generatePairs(stages[0].id)` (state `pairBusy`/`pairError`/`pairSchedule`). Render `PairsPreview` (component nội bộ): mỗi vòng `r` (nhãn theo `subKinds[r]`: Đôi nữ/Đôi nam/Đôi nam nữ 1·2) liệt kê đôi của từng đội (`teams[entrantId].rounds[r]` → "Tên + Tên | Tên + Tên"). Nút "🔀 Sinh lại cặp đôi" gọi `generatePairs` với seed ngẫu nhiên. Luồng Regular không đổi (không gọi pairs).
+### Wizard tạo giải — `app/giai-dau/v2/TournamentWizard.js` (admin-only, mở từ nút "+ Tạo giải")
+- **Luồng 3 bước** (redesign, port từ mockup đã duyệt): **Thể thức** · **Thông tin giải** · **Đăng ký**. Stepper số + connector, bấm nhảy bước tự do. Chân trang: Quay lại / "Bước x / 3" / Tiếp tục → / Tạo giải. Khung rộng `.w3-create` (max 1440px, min-height ~viewport), mobile-first ~380px.
+- **Quyền**: `useEffect` fetch `/api/groups/session` → `{ id, code, name, role }` từ `session.group_id/group_code/group_name/role`. Không phải admin → chỉ hiện thông báo "Chỉ trưởng nhóm/BTC…". KHÔNG đọc role từ localStorage.
+- **Bước 1 — Thể thức** (hai pane `.w3-work`: cấu hình trái `.w3-setup` + Xem trước sống phải `.w3-preview-pane`; mobile có tab `.w3-mtabs` Cấu hình/Xem trước, desktop ≥880px hiện cả hai):
+  - Phạm vi (`.w3-seg`): Nội bộ CLB / Giao hữu (mời CLB) / Cộng đồng 🔒 (khoá `disabled`). Đổi phạm vi áp `defaultConfigForScope` (giao hữu/cộng đồng → `userScoring='club'`).
+  - Đơn vị vào sân (3 thẻ `.w3-selcard`): Cá nhân/Cặp đôi/Đội (MLP). Chọn Đội → ẩn "Tính thành tích", set `userScoring='individual'`.
+  - Tính thành tích (2 thẻ) — CHỈ hiện khi `scope!=='internal' && unit!=='team'`.
+  - Thể thức (4 thẻ): Vòng tròn / Loại trực tiếp 1 nhánh / Loại trực tiếp 2 nhánh (badge "engine đang xây") / Vòng bảng + CK.
+  - Số ván (`.w3-seg` 1/BO3/BO5) khi `unit!=='team'`; hoặc Cấu hình trận đội (`.w3-stepcnt` số người mỗi đội, số ván con) khi `unit==='team'`.
+  - Dòng diễn giải combo dùng `describeCombo` (`.w3-cross`).
+  - **Xem trước sống** (`LivePreview`): mỗi khi cấu hình đổi → `previewSchedule({ competition: resolveCompetition(cfg), entrant_count, seed:1 })`. Render: rr → danh sách trận (6 đầu + "+X trận"); se/de → sơ đồ `.w3-bracket` (de vẽ thêm "Nhánh thua"); mix → cột Bảng A/B + Playoff. `entrant_count` = số người/cặp/đội/CLB đang có, hoặc ước lượng 6. Có trạng thái loading/error rõ ràng.
+- **Bước 2 — Thông tin giải**: Tên giải; Link chia sẻ (`.w3-urlrow` prefix `pickhub.vn/giai/` + slug auto qua `slugify` bỏ dấu tiếng Việt/đ→d, sửa được); Mô tả (textarea); Poster (`.w3-banner` placeholder).
+- **Bước 3 — Đăng ký** (`RegisterStep`, rẽ theo phạm vi):
+  - Nội bộ đơn/đôi: chips người chơi (thêm Enter/dán/xoá, "chọn nhanh từ thành viên CLB"), ghép cặp `.w3-pairs` (chạm 2 người đổi chỗ `tapMember`, "⚁ Ghép ngẫu nhiên"). PHR mẫu `samplePhr()` chỉ minh hoạ.
+  - Nội bộ đội: bộ chia đội `.w3-teams` (± số đội, "⚁ Chia ngẫu nhiên").
+  - Giao hữu: "Hạn nộp danh sách"; "CLB được mời" `.w3-clubs` với trạng thái + nút Duyệt/Yêu cầu sửa (nối `updateTournamentClub` khi club có id thật; CLB mẫu chỉ đổi trạng thái hiển thị).
+  - Cộng đồng: block "Link đăng ký" (copy), "Hạn đăng ký", ai được đăng ký, hàng chờ duyệt. Ghi chú đây là thiết lập; mặt công khai thuộc spec khác. (Cộng đồng khoá ở bước 1 nên không chọn được; nhánh render giữ để dùng khi có community admin.)
+- **"Tạo giải"** (`createGiai`): `createTournament` → auto `inviteTournamentClub(host)` → `saveDivision` (play_type từ `UNIT_TO_PLAY`, scoring_scope từ `resolveCompetition`) → `saveStage` (schedule_format từ resolve, match_format `mlp`/`simple`) → nội bộ: `saveDivisionEntry` mỗi suất (người/cặp/đội) gắn `tournament_club_id` host; giao hữu: `inviteExternalClub` cho CLB ngoài. Mỗi bước phụ bọc try/catch riêng để lỗi lẻ không chặn tạo giải; xong gọi `onDone(tournamentId)` mở console. Toast "✓ Đã tạo giải".
+- **Dữ liệu mẫu (chưa nối API thật)**: danh sách người chơi khởi tạo, `clubPool` chọn nhanh, `inviteClubs`/`regClubs`, PHR hiển thị. Roster thành viên CLB thật + CLB PickHub trong danh sách mời sẽ nối ở console/bước sau.
+- Import config: `resolveCompetition, describeCombo, effectiveScoring, defaultConfigForScope` từ `@/lib/tournament/wizardConfig`.
 
 ### Console — `app/giai-dau/v2/console/TournamentConsoleV2.js`
 - Load: `listTournaments()` (lấy 1 giải theo id) + `listStages(tournamentId)` song song.
@@ -58,6 +73,12 @@ Mọi component UI v2 gọi API qua `@/lib/tournamentV2Client` (ngoại lệ duy
 - Realtime: channel `tour-public-<tournamentId>` trên `tournament_matches` + `tournament_games`, debounce 600ms → `load()`; cleanup `removeChannel` + clear timer khi unmount/đổi id.
 - Lọc `matches` theo `stage_id` ở client. Render: ScheduleList + StandingsView (+ BracketView nếu knockout).
 - **Read-only tuyệt đối**: không gọi hàm mutating, không nút admin.
+
+### Phase 4 — Operations — `app/giai-dau/v2/operations/page.js`
+- Query: `?t=<tournamentId>&stage=<stageId>`; role lấy từ `getCurrentGroupClient()`.
+- Gọi qua client wrapper: `getOperationsDashboard`, `getCourtBoard`, `listMatches`, `listEntrants`, `updateCheckIn`, `createScoreCorrection`.
+- Dashboard hiển thị tóm tắt trận, check-in và bảng sân cuộn ngang trên mobile. Admin mới thấy nút check-in và "Yêu cầu sửa"; correction bắt buộc lý do và gửi qua `/operations/corrections` để server audit.
+- Hợp đồng route operations: GET `/operations/dashboard?tournamentId&stageId`, GET `/operations/court-board?tournamentId&stageId`, POST `/operations/check-in` (`tournament_id`, `stage_id`, `entrant_id`, `status`), GET/POST `/operations/corrections` (POST nhận `match_id`, `games`, `reason`, `idempotency_key`).
 
 ## MLP pairs & lineup trong ResultsTab (qa bắt buộc kiểm)
 

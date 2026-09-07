@@ -5,6 +5,10 @@ import { isPubliclyOpen, resolveOrganizerMode } from '@/lib/tournament/openRegis
 
 const db = supabaseAdmin || supabaseServer;
 
+// Danh sách công khai phải phản ánh DB theo thời gian thực, không được cache tĩnh.
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // Danh sách giải Cộng đồng đang mở đăng ký + các nội dung mở. Công khai, không auth.
 export async function GET() {
   try {

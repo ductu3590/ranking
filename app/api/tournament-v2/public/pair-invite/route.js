@@ -14,6 +14,71 @@ async function authByToken(token) {
   return data || null;
 }
 
+// Tên hiển thị gọn của một đăng ký lẻ (lấy VĐV ghế 1).
+async function primaryMember(registrationId) {
+  const { data } = await db.from('tournament_registration_members')
+    .select('full_name, gender, self_declared_phr').eq('registration_id', registrationId).order('seat').limit(1).maybeSingle();
+  return data || null;
+}
+
+// GET: bối cảnh ghép cặp cho một VĐV lẻ — danh sách VĐV lẻ khác để rủ,
+// lời mời đến (cần phản hồi) và lời mời mình đã gửi. Xác thực bằng track_token.
+export async function GET(request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const me = await authByToken(searchParams.get('token'));
+    if (!me) return NextResponse.json({ error: 'Token không hợp lệ' }, { status: 401 });
+    if (me.status !== 'awaiting_partner') {
+      return NextResponse.json({ candidates: [], incoming: [], outgoing: [], status: me.status });
+    }
+
+    // Các VĐV lẻ khác trong cùng nội dung.
+    const { data: others } = await db.from('tournament_registrations')
+      .select('id, status').eq('division_id', me.division_id).eq('status', 'awaiting_partner').neq('id', me.id);
+    const otherRows = others || [];
+
+    // Lời mời đang chờ liên quan tới mình.
+    const { data: invites } = await db.from('tournament_pair_invites')
+      .select('id, from_registration_id, to_registration_id, status')
+      .eq('division_id', me.division_id).eq('status', 'pending')
+      .or(`from_registration_id.eq.${me.id},to_registration_id.eq.${me.id}`);
+    const inviteRows = invites || [];
+    const incomingByFrom = new Map();
+    const outgoingTo = new Set();
+    for (const inv of inviteRows) {
+      if (inv.to_registration_id === me.id) incomingByFrom.set(inv.from_registration_id, inv.id);
+      if (inv.from_registration_id === me.id) outgoingTo.add(inv.to_registration_id);
+    }
+
+    const candidates = [];
+    for (const o of otherRows) {
+      const m = await primaryMember(o.id);
+      candidates.push({
+        registration_id: o.id,
+        name: m ? m.full_name : 'VĐV',
+        gender: m ? m.gender : null,
+        phr: m ? m.self_declared_phr : null,
+        invited: outgoingTo.has(o.id),
+      });
+    }
+
+    const incoming = [];
+    for (const [fromId, inviteId] of incomingByFrom) {
+      const m = await primaryMember(fromId);
+      incoming.push({ invite_id: inviteId, from_registration_id: fromId, name: m ? m.full_name : 'VĐV', gender: m ? m.gender : null, phr: m ? m.self_declared_phr : null });
+    }
+
+    const outgoing = inviteRows
+      .filter((inv) => inv.from_registration_id === me.id)
+      .map((inv) => ({ invite_id: inv.id, to_registration_id: inv.to_registration_id }));
+
+    return NextResponse.json({ status: me.status, candidates, incoming, outgoing });
+  } catch (err) {
+    console.error('public/pair-invite GET error:', err);
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
+}
+
 // POST: một VĐV solo mời một VĐV solo khác trong cùng nội dung ghép cặp.
 export async function POST(request) {
   try {

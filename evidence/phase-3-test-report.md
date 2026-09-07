@@ -1,5 +1,7 @@
 # Phase 3 Test Report
 
+> Recheck 2026-09-06: **exit gate NOT PASSED**. Regression and the separately rerun build pass, but current route handlers still have community authorization, registration privacy and non-atomic entry/pair writes. See [readiness audit](phase-3-readiness-2026-09-06.md) for reproductions, current Supabase checks and remaining gates. Historical test results below do not establish Phase 3 completion.
+
 ## Scope
 
 Interclub foundation: additive migration contract, domain state/roster validation, constrained pool, club aggregate standings and privacy-safe public projection.
@@ -504,3 +506,34 @@ hành vi chứng minh là hiểu entry.
 - Người cầm điểm nhập bằng token trên thiết bị thật.
 - `tournament_athletes` chưa có cột `source` (`club_member|guest`) như spec mục
   4.7; hiện suy ra từ `athlete_id`. Cần quyết định có thêm migration 037 không.
+
+## Wizard tạo giải — thiết kế lại 3 bước (2026-09-07)
+
+Nhánh: `feat/tournament-create-wizard`. Spec: `docs/superpowers/specs/2026-09-07-tournament-create-wizard-redesign.md`.
+
+### Đã làm
+- `lib/tournament/wizardConfig.js` — resolve cấu hình hai trục thuần (commit 1abc89f).
+- `lib/tournament/schedulePreview.js` — sinh lịch preview không ghi DB (c3c980c).
+- `app/api/tournament-v2/preview-schedule/route.js` + client `previewSchedule` (0b64055).
+- Dựng lại `app/giai-dau/v2/TournamentWizard.js` thành wizard 3 bước (Thể thức · Thông tin giải · Đăng ký), thẻ chọn, hai khung + tab mobile, xem trước sống, quyền từ `/api/groups/session` (5417ddc).
+
+### Kết quả test (thật)
+```
+npm run test:phase3-interclub  -> tất cả ok (gồm wizard config, schedule preview, wizard redesign contract)
+npm run test:t-ui              -> 7 ok
+npm run test:t-api             -> 11 ok
+npm run test:t-engines         -> 19 ok, không sửa fixture
+npm run build                  -> EXIT 0
+```
+
+### Test cũ đã cập nhật theo wizard mới (không nới thành no-op)
+- `tests/tournament/ui-wizard.contract.test.js`: sang createTournament/saveDivision/saveStage/saveDivisionEntry + 3 bước, cấm `saveEntrant(`.
+- `tests/phase3/interclub-ui.test.js`: phạm vi "Giao hữu" + inviteTournamentClub + nhánh "CLB được mời" (thay nhãn "Giải liên CLB" cũ).
+- `tests/phase3/wizard-competition-contract.test.js`: giữ phần A (view-model chạy thật), C (API routes), D (client); thay phần B (nguồn wizard cũ) bằng con trỏ sang wizard-redesign-contract, vì wizard mới bỏ getCurrentGroupClient (dùng session) và dời nhập hộ/duyệt sang spec điều hành.
+
+### Follow-up đã biết (không mất, ghi rõ để làm sau)
+- Wizard hiện dùng dữ liệu mẫu cho: roster thành viên CLB, danh sách CLB PickHub mời được, PHR hiển thị. Nối API thật (`/api/club/members`, danh sách CLB, cảnh báo PHR) thuộc bước wiring kế tiếp.
+- BTC nhập hộ roster + duyệt đăng ký (buildRosterAudit, reviewRegistration) → spec `tournament-operations`.
+- Mặt công khai đăng ký tự do (hình thức B) → spec `tournament-open-registration`.
+- `app/giai-dau/v2/TournamentWizard.js` ~1035 dòng — nên tách wizard/StepConfig, StepInfo, StepRegister, LivePreview khi có dịp.
+- Engine cần xây: double elimination (loại trực tiếp 2 nhánh), trận đội cấu hình được số ván con.

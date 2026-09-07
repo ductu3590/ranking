@@ -56,6 +56,10 @@ do $$ begin
   end if;
 end $$;
 
+-- Đăng ký công khai (public_self) không thuộc tournament_club nào => bỏ NOT NULL
+-- ở cột tournament_club_id; ràng buộc thực thi bằng public_club_chk bên dưới.
+alter table tournament_registrations alter column tournament_club_id drop not null;
+
 -- tournament_club_id chỉ được null khi origin='public_self'
 do $$ begin
   if not exists (select 1 from pg_constraint where conname = 'tournament_registrations_public_club_chk') then

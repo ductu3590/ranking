@@ -8,10 +8,15 @@ import { isRegistrationOpen, validateSubmission, requiredMemberFields, OpenRegEr
 const db = supabaseAdmin || supabaseServer;
 
 async function resolveContext(slug, divisionId) {
-  const { data: tournament } = await db.from('tournaments')
-    .select('id, group_id, public_slug, name, location, event_date, organizer_mode, open_registration, visibility')
+  const { data: row } = await db.from('tournaments')
+    .select('id, group_id, public_slug, name, location, event_date, organizer_type, settings, visibility')
     .eq('public_slug', slug).in('visibility', ['unlisted', 'public']).maybeSingle();
-  if (!tournament) return { error: NextResponse.json({ error: 'Giải không tồn tại' }, { status: 404 }) };
+  if (!row) return { error: NextResponse.json({ error: 'Giải không tồn tại' }, { status: 404 }) };
+  const tournament = {
+    ...row,
+    organizer_mode: row.organizer_type === 'community' ? 'community' : (row.settings?.organizer_mode || null),
+    open_registration: row.settings?.open_registration === true,
+  };
   const { data: division } = await db.from('tournament_divisions')
     .select('id, tournament_id, name, entrant_type, play_type, registration_open, registration_capacity, registration_deadline, allow_late_registration, gender_mode, age_min, age_max, entry_fee, rating_policy, rating_cap')
     .eq('id', divisionId).eq('tournament_id', tournament.id).maybeSingle();

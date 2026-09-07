@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { getRegistrationStatus } from '@/lib/tournamentV2Client';
 import './../openreg.css';
@@ -14,7 +14,7 @@ const STATUS_LABEL = {
   merged: 'Đã ghép cặp',
 };
 
-export default function TrackRegistrationPage() {
+function TrackRegistrationInner() {
   const searchParams = useSearchParams();
   const initialToken = searchParams.get('token') || '';
 
@@ -89,5 +89,13 @@ export default function TrackRegistrationPage() {
         </div>
       ) : null}
     </div>
+  );
+}
+
+export default function TrackRegistrationPage() {
+  return (
+    <Suspense fallback={<div className="dk-page"><p className="dk-subtitle">Đang tải…</p></div>}>
+      <TrackRegistrationInner />
+    </Suspense>
   );
 }

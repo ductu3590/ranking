@@ -36,7 +36,7 @@
     "test:phase4-notifications-finance": "node tests/phase4/notifications-finance.test.js",
     "test:tournament": "npm run test:t-migration && npm run test:t-engines && npm run test:t-api && npm run test:t-ui",
     "test:open-registration": "node tests/open-registration/domain.test.js && node tests/open-registration/api.contract.test.js && node tests/open-registration/ui.contract.test.js",
-    "test:regression": "npm run test:phase1 && npm run test:teamfund && npm run test:phase2 && npm run test:phase3 && npm run test:phase3-interclub && npm run test:phase4 && npm run test:phase4-tournament-operations && npm run test:phase4-score-reliability && npm run test:phase4-notifications-finance && npm run test:t-ui-phase4 && npm run test:phase5 && npm run test:phase6 && npm run test:mobile-nav && npm run test:leaderboard && npm run test:debug-guard && npm run test:admin-auth && npm run test:court-energy-css && npm run test:tournament",
+    "test:regression": "npm run test:phase1 && npm run test:teamfund && npm run test:phase2 && npm run test:phase3 && npm run test:phase3-interclub && npm run test:phase4 && npm run test:phase4-tournament-operations && npm run test:phase4-score-reliability && npm run test:phase4-notifications-finance && npm run test:t-ui-phase4 && npm run test:phase5 && npm run test:phase6 && npm run test:mobile-nav && npm run test:leaderboard && npm run test:debug-guard && npm run test:admin-auth && npm run test:court-energy-css && npm run test:tournament && npm run test:open-registration",
     "test:ci": "npm run test:regression && npm run build"
   },
   "dependencies": {

@@ -25,7 +25,7 @@
 **Files:**
 - Create: `database/migrations/042_open_registration.sql`
 
-- [ ] **Step 1: Viết migration**
+- [x] **Step 1: Viết migration**
 
 ```sql
 -- 042_open_registration.sql
@@ -110,11 +110,11 @@ create index if not exists tpi_group_div_idx on tournament_pair_invites(group_id
 create index if not exists tpi_to_idx on tournament_pair_invites(to_registration_id, status);
 ```
 
-- [ ] **Step 2: Áp migration qua Supabase MCP**
+- [x] **Step 2: Áp migration qua Supabase MCP**
 
 Dùng MCP `apply_migration` với name `042_open_registration` và nội dung file. Nếu MCP không sẵn, chạy SQL trực tiếp trên project. KHÔNG nhờ user chạy tay.
 
-- [ ] **Step 3: Xác minh cột/bảng tồn tại**
+- [x] **Step 3: Xác minh cột/bảng tồn tại**
 
 Chạy (MCP `execute_sql`):
 ```sql
@@ -123,7 +123,7 @@ select to_regclass('public.tournament_registration_members'), to_regclass('publi
 ```
 Expected: 3 dòng cột + 2 regclass không null.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add database/migrations/042_open_registration.sql
@@ -142,7 +142,7 @@ Tạo file domain + test script. Thêm script test vào `package.json`.
 - Create: `tests/open-registration/domain.test.js`
 - Modify: `package.json` (thêm script)
 
-- [ ] **Step 1: Tạo test rỗng chạy được**
+- [x] **Step 1: Tạo test rỗng chạy được**
 
 ```js
 // tests/open-registration/domain.test.js
@@ -152,14 +152,14 @@ const dom = require('../../lib/tournament/openRegistration');
 console.log('open-registration domain: OK (khung)');
 ```
 
-- [ ] **Step 2: Thêm script vào package.json**
+- [x] **Step 2: Thêm script vào package.json**
 
 Trong `"scripts"` thêm:
 ```json
 "test:open-registration": "node tests/open-registration/domain.test.js && node tests/open-registration/api.contract.test.js && node tests/open-registration/ui.contract.test.js"
 ```
 
-- [ ] **Step 3: Chạy — kỳ vọng lỗi (chưa có module)**
+- [x] **Step 3: Chạy — kỳ vọng lỗi (chưa có module)**
 
 Run: `node tests/open-registration/domain.test.js`
 Expected: FAIL `Cannot find module ... openRegistration`.
@@ -170,7 +170,7 @@ Expected: FAIL `Cannot find module ... openRegistration`.
 - Create: `lib/tournament/openRegistration.js`
 - Test: `tests/open-registration/domain.test.js`
 
-- [ ] **Step 1: Viết test (đỏ)**
+- [x] **Step 1: Viết test (đỏ)**
 
 Thêm vào `domain.test.js` (trước dòng console.log cuối):
 ```js
@@ -181,12 +181,12 @@ let threw = false; try { dom.normalizePhone('abc'); } catch (e) { threw = e.code
 assert(threw, 'SĐT rác ném INVALID_PHONE');
 ```
 
-- [ ] **Step 2: Chạy — đỏ**
+- [x] **Step 2: Chạy — đỏ**
 
 Run: `node tests/open-registration/domain.test.js`
 Expected: FAIL tại normalizePhone.
 
-- [ ] **Step 3: Cài đặt**
+- [x] **Step 3: Cài đặt**
 
 ```js
 'use strict';
@@ -208,12 +208,12 @@ function normalizePhone(raw) {
 module.exports = { OpenRegError, normalizePhone };
 ```
 
-- [ ] **Step 4: Chạy — xanh**
+- [x] **Step 4: Chạy — xanh**
 
 Run: `node tests/open-registration/domain.test.js`
 Expected: PASS tới hết.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add lib/tournament/openRegistration.js tests/open-registration/domain.test.js package.json
@@ -224,7 +224,7 @@ git commit -m "feat(open-reg): domain normalizePhone (TDD)"
 
 **Files:** Modify `lib/tournament/openRegistration.js`; Test `tests/open-registration/domain.test.js`
 
-- [ ] **Step 1: Test (đỏ)**
+- [x] **Step 1: Test (đỏ)**
 
 ```js
 assert(JSON.stringify(dom.requiredMemberFields({})) === JSON.stringify({ phr:false, gender:false, dob:false }), 'mặc định không trường phụ');
@@ -234,9 +234,9 @@ assert(dom.requiredMemberFields({ gender_mode: 'male' }).gender === false, 'sing
 assert(dom.requiredMemberFields({ age_min: 40 }).dob === true, 'có giới hạn tuổi -> hỏi ngày sinh');
 ```
 
-- [ ] **Step 2: Chạy — đỏ.** Run: `node tests/open-registration/domain.test.js` → FAIL.
+- [x] **Step 2: Chạy — đỏ.** Run: `node tests/open-registration/domain.test.js` → FAIL.
 
-- [ ] **Step 3: Cài đặt** (thêm hàm + export)
+- [x] **Step 3: Cài đặt** (thêm hàm + export)
 
 ```js
 function requiredMemberFields(division = {}) {
@@ -249,15 +249,15 @@ function requiredMemberFields(division = {}) {
 ```
 Thêm `requiredMemberFields` vào `module.exports`.
 
-- [ ] **Step 4: Chạy — xanh.**
+- [x] **Step 4: Chạy — xanh.**
 
-- [ ] **Step 5: Commit** `git commit -am "feat(open-reg): requiredMemberFields (TDD)"`
+- [x] **Step 5: Commit** `git commit -am "feat(open-reg): requiredMemberFields (TDD)"`
 
 ### Task B3: `isRegistrationOpen(tournament, division, nowISO)`
 
 **Files:** Modify domain + test.
 
-- [ ] **Step 1: Test (đỏ)**
+- [x] **Step 1: Test (đỏ)**
 
 ```js
 const T = { organizer_mode:'community', open_registration:true };
@@ -269,9 +269,9 @@ assert(dom.isRegistrationOpen({ ...T, open_registration:false }, D, '2026-09-10T
 assert(dom.isRegistrationOpen({ ...T, organizer_mode:'internal' }, D, '2026-09-10T00:00:00Z').ok === false, 'không phải cộng đồng');
 ```
 
-- [ ] **Step 2: Chạy — đỏ.**
+- [x] **Step 2: Chạy — đỏ.**
 
-- [ ] **Step 3: Cài đặt**
+- [x] **Step 3: Cài đặt**
 
 ```js
 function isRegistrationOpen(tournament = {}, division = {}, nowISO) {
@@ -288,13 +288,13 @@ function isRegistrationOpen(tournament = {}, division = {}, nowISO) {
 ```
 Export thêm `isRegistrationOpen`.
 
-- [ ] **Step 4: Chạy — xanh.** — [ ] **Step 5: Commit** `git commit -am "feat(open-reg): isRegistrationOpen (TDD)"`
+- [x] **Step 4: Chạy — xanh.** — [ ] **Step 5: Commit** `git commit -am "feat(open-reg): isRegistrationOpen (TDD)"`
 
 ### Task B4: `validateSubmission({ division, members })`
 
 **Files:** Modify domain + test.
 
-- [ ] **Step 1: Test (đỏ)**
+- [x] **Step 1: Test (đỏ)**
 
 ```js
 const singles = { entrant_type:'individual', gender_mode:'any' };
@@ -312,9 +312,9 @@ const solo = dom.validateSubmission({ division:doubles, members:[{ full_name:'A'
 assert(solo.needs_partner === true, 'đôi điền 1 -> needs_partner');
 ```
 
-- [ ] **Step 2: Chạy — đỏ.**
+- [x] **Step 2: Chạy — đỏ.**
 
-- [ ] **Step 3: Cài đặt**
+- [x] **Step 3: Cài đặt**
 
 ```js
 function validateSubmission({ division = {}, members = [] } = {}) {
@@ -352,13 +352,13 @@ function validateSubmission({ division = {}, members = [] } = {}) {
 ```
 Export thêm `validateSubmission`.
 
-- [ ] **Step 4: Chạy — xanh.** — [ ] **Step 5: Commit** `git commit -am "feat(open-reg): validateSubmission (TDD)"`
+- [x] **Step 4: Chạy — xanh.** — [ ] **Step 5: Commit** `git commit -am "feat(open-reg): validateSubmission (TDD)"`
 
 ### Task B5: `transitionOpenRegistration` + `waitlistView`
 
 **Files:** Modify domain + test.
 
-- [ ] **Step 1: Test (đỏ)**
+- [x] **Step 1: Test (đỏ)**
 
 ```js
 assert(dom.transitionOpenRegistration('submitted','admit') === 'approved', 'admit');
@@ -375,9 +375,9 @@ assert(view.rows[0].isWaitlist === false && view.rows[1].isWaitlist === true && 
 assert(view.rows[2].position === 2, 'dòng 3 waitlist #2');
 ```
 
-- [ ] **Step 2: Chạy — đỏ.**
+- [x] **Step 2: Chạy — đỏ.**
 
-- [ ] **Step 3: Cài đặt**
+- [x] **Step 3: Cài đặt**
 
 ```js
 const OPEN_TRANSITIONS = {
@@ -410,13 +410,13 @@ function canAdmit({ capacity = null, approvedCount = 0 } = {}) {
 ```
 Export thêm `transitionOpenRegistration`, `waitlistView`, `canAdmit`.
 
-- [ ] **Step 4: Chạy — xanh.** — [ ] **Step 5: Commit** `git commit -am "feat(open-reg): transitions + waitlistView (TDD)"`
+- [x] **Step 4: Chạy — xanh.** — [ ] **Step 5: Commit** `git commit -am "feat(open-reg): transitions + waitlistView (TDD)"`
 
 ### Task B6: `buildPairFromSolos(primary, secondary, division)`
 
 **Files:** Modify domain + test.
 
-- [ ] **Step 1: Test (đỏ)**
+- [x] **Step 1: Test (đỏ)**
 
 ```js
 const div = { entrant_type:'pair', gender_mode:'mixed' };
@@ -429,9 +429,9 @@ let pe=false; try { dom.buildPairFromSolos(A, { id:3, members:[{ seat:1, full_na
 assert(pe, 'ghép trùng SĐT bị chặn');
 ```
 
-- [ ] **Step 2: Chạy — đỏ.**
+- [x] **Step 2: Chạy — đỏ.**
 
-- [ ] **Step 3: Cài đặt**
+- [x] **Step 3: Cài đặt**
 
 ```js
 function buildPairFromSolos(primary, secondary, division = {}) {
@@ -449,7 +449,7 @@ function buildPairFromSolos(primary, secondary, division = {}) {
 ```
 Export thêm `buildPairFromSolos`.
 
-- [ ] **Step 4: Chạy — xanh.** — [ ] **Step 5: Commit** `git commit -am "feat(open-reg): buildPairFromSolos (TDD)"`
+- [x] **Step 4: Chạy — xanh.** — [ ] **Step 5: Commit** `git commit -am "feat(open-reg): buildPairFromSolos (TDD)"`
 
 ---
 
@@ -461,7 +461,7 @@ Contract test đọc source (theo phong cách `tests/**/*.contract.test.js` hi�
 
 **Files:** Create `tests/open-registration/api.contract.test.js`
 
-- [ ] **Step 1: Viết khung**
+- [x] **Step 1: Viết khung**
 
 ```js
 const fs = require('fs'); const path = require('path');
@@ -473,7 +473,7 @@ const assert = (c, m) => { if (!c) { console.error('FAIL: ' + m); process.exit(1
 console.log('open-registration api contract: OK (khung)');
 ```
 
-- [ ] **Step 2: Chạy** `node tests/open-registration/api.contract.test.js` → PASS (khung).
+- [x] **Step 2: Chạy** `node tests/open-registration/api.contract.test.js` → PASS (khung).
 
 ### Task C1: GET danh sách giải cộng đồng
 
@@ -481,7 +481,7 @@ console.log('open-registration api contract: OK (khung)');
 - Create: `app/api/tournament-v2/public/community/route.js`
 - Test: `tests/open-registration/api.contract.test.js`
 
-- [ ] **Step 1: Test (đỏ)**
+- [x] **Step 1: Test (đỏ)**
 
 ```js
 const f = 'app/api/tournament-v2/public/community/route.js';
@@ -492,9 +492,9 @@ assert(s.includes("organizer_mode") && s.includes("open_registration"), 'lọc g
 assert(/visibility/.test(s), 'chỉ giải unlisted/public');
 ```
 
-- [ ] **Step 2: Chạy — đỏ.**
+- [x] **Step 2: Chạy — đỏ.**
 
-- [ ] **Step 3: Cài đặt**
+- [x] **Step 3: Cài đặt**
 
 ```js
 import { NextResponse } from 'next/server';
@@ -541,7 +541,7 @@ export async function GET() {
 }
 ```
 
-- [ ] **Step 4: Chạy — xanh.** — [ ] **Step 5: Commit** `git commit -am "feat(open-reg): API danh sách giải cộng đồng"`
+- [x] **Step 4: Chạy — xanh.** — [ ] **Step 5: Commit** `git commit -am "feat(open-reg): API danh sách giải cộng đồng"`
 
 ### Task C2: GET chi tiết nội dung để đăng ký
 
@@ -549,7 +549,7 @@ export async function GET() {
 - Create: `app/api/tournament-v2/public/registration/route.js` (GET + POST)
 - Test: `tests/open-registration/api.contract.test.js`
 
-- [ ] **Step 1: Test (đỏ)**
+- [x] **Step 1: Test (đỏ)**
 
 ```js
 const rf = 'app/api/tournament-v2/public/registration/route.js';
@@ -563,9 +563,9 @@ assert(rs.includes('contact_phone_norm'), 'chống trùng theo SĐT');
 assert(!rs.includes('requireValidatedGroupAdmin'), 'public: không admin guard');
 ```
 
-- [ ] **Step 2: Chạy — đỏ.**
+- [x] **Step 2: Chạy — đỏ.**
 
-- [ ] **Step 3: Cài đặt**
+- [x] **Step 3: Cài đặt**
 
 ```js
 import { NextResponse } from 'next/server';
@@ -682,7 +682,7 @@ export async function POST(request) {
 }
 ```
 
-- [ ] **Step 4: Chạy — xanh.** — [ ] **Step 5: Commit** `git commit -am "feat(open-reg): API chi tiết + nộp đăng ký công khai"`
+- [x] **Step 4: Chạy — xanh.** — [ ] **Step 5: Commit** `git commit -am "feat(open-reg): API chi tiết + nộp đăng ký công khai"`
 
 ### Task C3: GET trạng thái theo token/SĐT
 
@@ -690,7 +690,7 @@ export async function POST(request) {
 - Create: `app/api/tournament-v2/public/registration/status/route.js`
 - Test: `tests/open-registration/api.contract.test.js`
 
-- [ ] **Step 1: Test (đỏ)**
+- [x] **Step 1: Test (đỏ)**
 
 ```js
 const sf = 'app/api/tournament-v2/public/registration/status/route.js';
@@ -700,9 +700,9 @@ assert(ss.includes('track_token') && ss.includes('phone'), 'tra theo token hoặ
 assert(!/phr_rating|self_declared_phr/.test(ss) || ss.includes('// only own'), 'không lộ PHR người khác (chỉ trạng thái)');
 ```
 
-- [ ] **Step 2: Chạy — đỏ.**
+- [x] **Step 2: Chạy — đỏ.**
 
-- [ ] **Step 3: Cài đặt**
+- [x] **Step 3: Cài đặt**
 
 ```js
 import { NextResponse } from 'next/server';
@@ -761,7 +761,7 @@ export async function GET(request) {
 }
 ```
 
-- [ ] **Step 4: Chạy — xanh.** — [ ] **Step 5: Commit** `git commit -am "feat(open-reg): API trạng thái theo token/SĐT"`
+- [x] **Step 4: Chạy — xanh.** — [ ] **Step 5: Commit** `git commit -am "feat(open-reg): API trạng thái theo token/SĐT"`
 
 ### Task C4: Pair-invite công khai (VĐV tự rủ)
 
@@ -769,7 +769,7 @@ export async function GET(request) {
 - Create: `app/api/tournament-v2/public/pair-invite/route.js` (POST tạo lời mời, PATCH accept/decline)
 - Test: `tests/open-registration/api.contract.test.js`
 
-- [ ] **Step 1: Test (đỏ)**
+- [x] **Step 1: Test (đỏ)**
 
 ```js
 const pf = 'app/api/tournament-v2/public/pair-invite/route.js';
@@ -780,9 +780,9 @@ assert(ps.includes('track_token'), 'xác thực bằng token của VĐV');
 assert(ps.includes('tournament_pair_invites'), 'ghi bảng lời mời');
 ```
 
-- [ ] **Step 2: Chạy — đỏ.**
+- [x] **Step 2: Chạy — đỏ.**
 
-- [ ] **Step 3: Cài đặt**
+- [x] **Step 3: Cài đặt**
 
 ```js
 import { NextResponse } from 'next/server';
@@ -846,7 +846,7 @@ export async function PATCH(request) {
 }
 ```
 
-- [ ] **Step 4: Chạy — xanh.** — [ ] **Step 5: Commit** `git commit -am "feat(open-reg): API lời mời ghép cặp (VĐV tự rủ)"`
+- [x] **Step 4: Chạy — xanh.** — [ ] **Step 5: Commit** `git commit -am "feat(open-reg): API lời mời ghép cặp (VĐV tự rủ)"`
 
 ---
 
@@ -858,7 +858,7 @@ export async function PATCH(request) {
 - Modify: `app/api/tournament-v2/divisions/route.js` (PATCH nhận thêm field cấu hình)
 - Test: `tests/open-registration/api.contract.test.js`
 
-- [ ] **Step 1: Test (đỏ)**
+- [x] **Step 1: Test (đỏ)**
 
 ```js
 const df = 'app/api/tournament-v2/divisions/route.js';
@@ -868,9 +868,9 @@ for (const k of ['registration_open','registration_capacity','registration_deadl
 }
 ```
 
-- [ ] **Step 2: Chạy — đỏ.**
+- [x] **Step 2: Chạy — đỏ.**
 
-- [ ] **Step 3: Cài đặt**
+- [x] **Step 3: Cài đặt**
 
 Trong `PATCH` của `divisions/route.js`, khi build object cập nhật, thêm các field mở đăng ký nếu có trong body (giữ nguyên guard `requireValidatedGroupAdmin` + scope `group_id` sẵn có):
 ```js
@@ -881,7 +881,7 @@ for (const key of REG_FIELDS) {
 ```
 (Đặt sau khi khởi tạo `patch` và trước `.update(patch)`. Nếu file dùng tên biến khác cho object cập nhật, đổi cho khớp.)
 
-- [ ] **Step 4: Chạy — xanh.** — [ ] **Step 5: Commit** `git commit -am "feat(open-reg): divisions PATCH cấu hình mở đăng ký"`
+- [x] **Step 4: Chạy — xanh.** — [ ] **Step 5: Commit** `git commit -am "feat(open-reg): divisions PATCH cấu hình mở đăng ký"`
 
 ### Task D2: Bảng duyệt — GET nhóm theo trạng thái + waitlist
 
@@ -889,7 +889,7 @@ for (const key of REG_FIELDS) {
 - Create: `app/api/tournament-v2/registrations/board/route.js`
 - Test: `tests/open-registration/api.contract.test.js`
 
-- [ ] **Step 1: Test (đỏ)**
+- [x] **Step 1: Test (đỏ)**
 
 ```js
 const bf = 'app/api/tournament-v2/registrations/board/route.js';
@@ -900,9 +900,9 @@ assert(bs.includes('waitlistView'), 'dùng waitlistView domain');
 assert(bs.includes("'approved'") && bs.includes("'submitted'") && bs.includes("'awaiting_partner'"), 'phân nhóm trạng thái');
 ```
 
-- [ ] **Step 2: Chạy — đỏ.**
+- [x] **Step 2: Chạy — đỏ.**
 
-- [ ] **Step 3: Cài đặt**
+- [x] **Step 3: Cài đặt**
 
 ```js
 import { NextResponse } from 'next/server';
@@ -964,7 +964,7 @@ export async function GET(request) {
 }
 ```
 
-- [ ] **Step 4: Chạy — xanh.** — [ ] **Step 5: Commit** `git commit -am "feat(open-reg): API bảng duyệt (nhóm trạng thái + waitlist)"`
+- [x] **Step 4: Chạy — xanh.** — [ ] **Step 5: Commit** `git commit -am "feat(open-reg): API bảng duyệt (nhóm trạng thái + waitlist)"`
 
 ### Task D3: Hành động BTC (PATCH registrations)
 
@@ -972,7 +972,7 @@ export async function GET(request) {
 - Modify: `app/api/tournament-v2/registrations/route.js` (thêm nhánh action open-reg)
 - Test: `tests/open-registration/api.contract.test.js`
 
-- [ ] **Step 1: Test (đỏ)**
+- [x] **Step 1: Test (đỏ)**
 
 ```js
 const regf = 'app/api/tournament-v2/registrations/route.js';
@@ -981,9 +981,9 @@ for (const a of ['admit','remove','restore','pair','approve_pair']) assert(regs2
 assert(regs2.includes('canAdmit') || regs2.includes('transitionOpenRegistration'), 'dùng domain open-reg');
 ```
 
-- [ ] **Step 2: Chạy — đỏ.**
+- [x] **Step 2: Chạy — đỏ.**
 
-- [ ] **Step 3: Cài đặt**
+- [x] **Step 3: Cài đặt**
 
 Ở đầu `registrations/route.js` thêm import:
 ```js
@@ -1041,14 +1041,14 @@ if (body.action === 'pair' || body.action === 'approve_pair') {
 }
 ```
 
-- [ ] **Step 4: Chạy — xanh.**
+- [x] **Step 4: Chạy — xanh.**
 
-- [ ] **Step 5: Regression interclub (không vỡ luồng cũ)**
+- [x] **Step 5: Regression interclub (không vỡ luồng cũ)**
 
 Run: `node tests/phase3/interclub-competition.test.js && node tests/phase3/interclub-ui.test.js`
 Expected: PASS (nhánh action cũ giữ nguyên).
 
-- [ ] **Step 6: Commit** `git commit -am "feat(open-reg): PATCH admit/remove/restore/pair/approve_pair"`
+- [x] **Step 6: Commit** `git commit -am "feat(open-reg): PATCH admit/remove/restore/pair/approve_pair"`
 
 ---
 
@@ -1060,7 +1060,7 @@ Expected: PASS (nhánh action cũ giữ nguyên).
 - Modify: `lib/tournamentV2Client.js`
 - Test: `tests/open-registration/api.contract.test.js`
 
-- [ ] **Step 1: Test (đỏ)**
+- [x] **Step 1: Test (đỏ)**
 
 ```js
 const cl = read('lib/tournamentV2Client.js');
@@ -1069,9 +1069,9 @@ for (const fn of ['listCommunityTournaments','getPublicRegistration','submitPubl
 }
 ```
 
-- [ ] **Step 2: Chạy — đỏ.**
+- [x] **Step 2: Chạy — đỏ.**
 
-- [ ] **Step 3: Cài đặt** (thêm cuối file, dùng `request` sẵn có)
+- [x] **Step 3: Cài đặt** (thêm cuối file, dùng `request` sẵn có)
 
 ```js
 // --- Đăng ký mở giải cộng đồng ---
@@ -1102,7 +1102,7 @@ export function reviewOpenRegistration(body) {
 }
 ```
 
-- [ ] **Step 4: Chạy — xanh.** — [ ] **Step 5: Commit** `git commit -am "feat(open-reg): client helpers"`
+- [x] **Step 4: Chạy — xanh.** — [ ] **Step 5: Commit** `git commit -am "feat(open-reg): client helpers"`
 
 ---
 
@@ -1114,7 +1114,7 @@ Tạo CSS dùng chung + 3 trang. Bám markup/màu 4 mockup đã duyệt (dark Pi
 
 **Files:** Create `app/dk/openreg.css`
 
-- [ ] **Step 1: Viết CSS** (token dark PickHub — trích từ mockup đã duyệt)
+- [x] **Step 1: Viết CSS** (token dark PickHub — trích từ mockup đã duyệt)
 
 ```css
 .or-wrap{--bg:#0d0d12;--panel:#15151c;--card:#1b1b24;--line:#2b2b36;--ink:#ecebf2;--muted:#8b8b9a;
@@ -1138,7 +1138,7 @@ Tạo CSS dùng chung + 3 trang. Bám markup/màu 4 mockup đã duyệt (dark Pi
 .or-notice.ok{background:rgba(89,201,139,.12);border:1px solid #2f6b4c;color:#8fe0b1}
 ```
 
-- [ ] **Step 2: Commit** `git add app/dk/openreg.css && git commit -m "feat(open-reg): css công khai"`
+- [x] **Step 2: Commit** `git add app/dk/openreg.css && git commit -m "feat(open-reg): css công khai"`
 
 ### Task F1: Trang danh sách giải cộng đồng
 
@@ -1146,7 +1146,7 @@ Tạo CSS dùng chung + 3 trang. Bám markup/màu 4 mockup đã duyệt (dark Pi
 - Create: `app/dk/page.js`
 - Test: `tests/open-registration/ui.contract.test.js`
 
-- [ ] **Step 1: Khung ui contract test + assert (đỏ)**
+- [x] **Step 1: Khung ui contract test + assert (đỏ)**
 
 Tạo `tests/open-registration/ui.contract.test.js`:
 ```js
@@ -1163,9 +1163,9 @@ assert(dir.includes('Đăng ký') && dir.includes('cộng đồng'), 'nhãn danh
 console.log('open-registration ui contract: OK');
 ```
 
-- [ ] **Step 2: Chạy — đỏ.** Run: `node tests/open-registration/ui.contract.test.js`
+- [x] **Step 2: Chạy — đỏ.** Run: `node tests/open-registration/ui.contract.test.js`
 
-- [ ] **Step 3: Cài đặt**
+- [x] **Step 3: Cài đặt**
 
 ```jsx
 'use client';
@@ -1214,7 +1214,7 @@ export default function CommunityListPage() {
 }
 ```
 
-- [ ] **Step 4: Chạy — xanh.** — [ ] **Step 5: Commit** `git commit -am "feat(open-reg): trang danh sách giải cộng đồng"`
+- [x] **Step 4: Chạy — xanh.** — [ ] **Step 5: Commit** `git commit -am "feat(open-reg): trang danh sách giải cộng đồng"`
 
 ### Task F2: Trang đăng ký chi tiết một nội dung
 
@@ -1222,7 +1222,7 @@ export default function CommunityListPage() {
 - Create: `app/dk/[slug]/[division]/page.js`
 - Test: `tests/open-registration/ui.contract.test.js`
 
-- [ ] **Step 1: Test (đỏ)** — thêm assert:
+- [x] **Step 1: Test (đỏ)** — thêm assert:
 ```js
 assert(exists('app/dk/[slug]/[division]/page.js'), 'trang đăng ký chi tiết tồn tại');
 const det = read('app/dk/[slug]/[division]/page.js');
@@ -1230,9 +1230,9 @@ assert(det.includes('getPublicRegistration') && det.includes('submitPublicRegist
 assert(det.includes('VĐV 1') || det.includes('Vận động viên 1'), 'khối VĐV 1');
 ```
 
-- [ ] **Step 2: Chạy — đỏ.**
+- [x] **Step 2: Chạy — đỏ.**
 
-- [ ] **Step 3: Cài đặt** (form đơn/đôi, trường theo `fields`)
+- [x] **Step 3: Cài đặt** (form đơn/đôi, trường theo `fields`)
 
 ```jsx
 'use client';
@@ -1328,7 +1328,7 @@ export default function RegisterDivisionPage() {
 }
 ```
 
-- [ ] **Step 4: Chạy — xanh.** — [ ] **Step 5: Commit** `git commit -am "feat(open-reg): trang đăng ký chi tiết (đơn/đôi theo cấu hình)"`
+- [x] **Step 4: Chạy — xanh.** — [ ] **Step 5: Commit** `git commit -am "feat(open-reg): trang đăng ký chi tiết (đơn/đôi theo cấu hình)"`
 
 ### Task F3: Trang theo dõi trạng thái
 
@@ -1336,7 +1336,7 @@ export default function RegisterDivisionPage() {
 - Create: `app/dk/theo-doi/page.js`
 - Test: `tests/open-registration/ui.contract.test.js`
 
-- [ ] **Step 1: Test (đỏ)** — thêm assert:
+- [x] **Step 1: Test (đỏ)** — thêm assert:
 ```js
 assert(exists('app/dk/theo-doi/page.js'), 'trang theo dõi tồn tại');
 const tr = read('app/dk/theo-doi/page.js');
@@ -1344,9 +1344,9 @@ assert(tr.includes('getRegistrationStatus'), 'fetch trạng thái');
 assert(tr.includes('waitlist') || tr.includes('Waitlist'), 'hiển thị waitlist');
 ```
 
-- [ ] **Step 2: Chạy — đỏ.**
+- [x] **Step 2: Chạy — đỏ.**
 
-- [ ] **Step 3: Cài đặt**
+- [x] **Step 3: Cài đặt**
 
 ```jsx
 'use client';
@@ -1398,7 +1398,7 @@ export default function TrackPage() {
 }
 ```
 
-- [ ] **Step 4: Chạy — xanh.** — [ ] **Step 5: Commit** `git commit -am "feat(open-reg): trang theo dõi trạng thái"`
+- [x] **Step 4: Chạy — xanh.** — [ ] **Step 5: Commit** `git commit -am "feat(open-reg): trang theo dõi trạng thái"`
 
 ---
 
@@ -1411,7 +1411,7 @@ export default function TrackPage() {
 - Modify: `app/giai-dau/v2/console/TournamentConsoleV2.js` (thêm tab khi giải là community + có nội dung mở)
 - Test: `tests/open-registration/ui.contract.test.js`
 
-- [ ] **Step 1: Test (đỏ)** — thêm assert:
+- [x] **Step 1: Test (đỏ)** — thêm assert:
 ```js
 assert(exists('app/giai-dau/v2/console/tabs/OpenRegTab.js'), 'tab bảng duyệt tồn tại');
 const tab = read('app/giai-dau/v2/console/tabs/OpenRegTab.js');
@@ -1420,9 +1420,9 @@ assert(tab.includes('Đã vào giải') && tab.includes('Chờ xử lý'), 'kh�
 assert(tab.includes('Nhận vào giải'), 'nút nhận vào giải');
 ```
 
-- [ ] **Step 2: Chạy — đỏ.**
+- [x] **Step 2: Chạy — đỏ.**
 
-- [ ] **Step 3: Cài đặt** `OpenRegTab.js`
+- [x] **Step 3: Cài đặt** `OpenRegTab.js`
 
 ```jsx
 'use client';
@@ -1478,13 +1478,13 @@ export default function OpenRegTab({ divisionId }) {
 }
 ```
 
-- [ ] **Step 4: Nối tab vào `TournamentConsoleV2.js`**
+- [x] **Step 4: Nối tab vào `TournamentConsoleV2.js`**
 
 Import `OpenRegTab` và thêm mục tab `{ key: 'openreg', label: 'Đăng ký & duyệt' }` (chỉ hiện khi `tournament.organizer_mode === 'community'`), render `<OpenRegTab divisionId={selectedDivisionId} />` khi tab active. (Bám đúng cấu trúc mảng tab + switch render hiện có trong file.)
 
-- [ ] **Step 5: Chạy ui contract — xanh.** Run: `node tests/open-registration/ui.contract.test.js`
+- [x] **Step 5: Chạy ui contract — xanh.** Run: `node tests/open-registration/ui.contract.test.js`
 
-- [ ] **Step 6: Commit** `git commit -am "feat(open-reg): tab bảng duyệt BTC trong console"`
+- [x] **Step 6: Commit** `git commit -am "feat(open-reg): tab bảng duyệt BTC trong console"`
 
 ---
 
@@ -1492,19 +1492,19 @@ Import `OpenRegTab` và thêm mục tab `{ key: 'openreg', label: 'Đăng ký & 
 
 ### Task H1: Chạy toàn bộ test open-reg + build
 
-- [ ] **Step 1:** Run: `npm run test:open-registration` → Expected: 3 dòng "OK".
-- [ ] **Step 2:** Run: `npm run test:phase3-interclub` → Expected: PASS (không vỡ luồng cũ).
-- [ ] **Step 3:** Run: `npm run build` → Expected: build thành công, có route `/dk`, `/dk/[slug]/[division]`, `/dk/theo-doi`, và các `/api/tournament-v2/public/*`.
-- [ ] **Step 4: Thêm vào regression** — Modify `package.json`: nối `&& npm run test:open-registration` vào cuối `test:regression`.
-- [ ] **Step 5: Commit** `git commit -am "test(open-reg): nối vào regression + xác minh build"`
+- [x] **Step 1:** Run: `npm run test:open-registration` → Expected: 3 dòng "OK".
+- [x] **Step 2:** Run: `npm run test:phase3-interclub` → Expected: PASS (không vỡ luồng cũ).
+- [x] **Step 3:** Run: `npm run build` → Expected: build thành công, có route `/dk`, `/dk/[slug]/[division]`, `/dk/theo-doi`, và các `/api/tournament-v2/public/*`.
+- [x] **Step 4: Thêm vào regression** — Modify `package.json`: nối `&& npm run test:open-registration` vào cuối `test:regression`.
+- [x] **Step 5: Commit** `git commit -am "test(open-reg): nối vào regression + xác minh build"`
 
 ### Task H2: Kiểm thử thực tế (Supabase hiện hữu) + evidence
 
-- [ ] **Step 1:** Tạo giải test scope `group_id` riêng (tên có tiền tố "TEST-open-reg"), một nội dung đôi mixed có cap, bật `registration_open`.
-- [ ] **Step 2:** Gọi API công khai nộp 1 đăng ký đôi hoàn chỉnh + 1 solo; kiểm tra chống trùng SĐT (nộp lại cùng SĐT → 409).
-- [ ] **Step 3:** BTC admit tới đầy cap → dòng kế thành waitlist; remove 1 → waitlist kéo được.
-- [ ] **Step 4:** Ghi evidence vào `evidence/open-registration-<ngày>.md` (log request/response + ảnh màn nếu có). Dọn dữ liệu test bằng thao tác an toàn (update status/withdraw; KHÔNG DROP/TRUNCATE) sau khi xác nhận không đụng dữ liệu thật.
-- [ ] **Step 5: Commit** `git add evidence/ && git commit -m "docs(open-reg): evidence kiểm thử tích hợp"`
+- [x] **Step 1:** Tạo giải test scope `group_id` riêng (tên có tiền tố "TEST-open-reg"), một nội dung đôi mixed có cap, bật `registration_open`.
+- [x] **Step 2:** Gọi API công khai nộp 1 đăng ký đôi hoàn chỉnh + 1 solo; kiểm tra chống trùng SĐT (nộp lại cùng SĐT → 409).
+- [x] **Step 3:** BTC admit tới đầy cap → dòng kế thành waitlist; remove 1 → waitlist kéo được.
+- [x] **Step 4:** Ghi evidence vào `evidence/open-registration-<ngày>.md` (log request/response + ảnh màn nếu có). Dọn dữ liệu test bằng thao tác an toàn (update status/withdraw; KHÔNG DROP/TRUNCATE) sau khi xác nhận không đụng dữ liệu thật.
+- [x] **Step 5: Commit** `git add evidence/ && git commit -m "docs(open-reg): evidence kiểm thử tích hợp"`
 
 ---
 

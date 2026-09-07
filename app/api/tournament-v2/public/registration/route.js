@@ -4,6 +4,7 @@ import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { normalizePublicSlug } from '@/lib/tournament/publicSnapshot';
 import { isRegistrationOpen, validateSubmission, requiredMemberFields, OpenRegError, resolveOrganizerMode } from '@/lib/tournament/openRegistration';
+import { consumeRateLimit, getClientIdentifier, rateLimitResponse } from '@/lib/rateLimit';
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -59,6 +60,8 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
+    const rate = consumeRateLimit(`public-registration:${getClientIdentifier(request)}`, { limit: 10, windowMs: 60_000 });
+    if (!rate.allowed) return rateLimitResponse(rate);
     const body = await request.json().catch(() => ({}));
     if (body && body.company) return NextResponse.json({ error: 'invalid' }, { status: 400 }); // honeypot
     const slug = normalizePublicSlug(body.slug);

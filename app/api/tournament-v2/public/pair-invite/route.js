@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
+import { consumeRateLimit, getClientIdentifier, rateLimitResponse } from '@/lib/rateLimit';
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -16,6 +17,8 @@ async function authByToken(token) {
 // POST: một VĐV solo mời một VĐV solo khác trong cùng nội dung ghép cặp.
 export async function POST(request) {
   try {
+    const rate = consumeRateLimit(`public-pair-invite:${getClientIdentifier(request)}`, { limit: 20, windowMs: 60_000 });
+    if (!rate.allowed) return rateLimitResponse(rate);
     const body = await request.json().catch(() => ({}));
     const from = await authByToken(body.track_token);
     if (!from) return NextResponse.json({ error: 'Token không hợp lệ' }, { status: 401 });

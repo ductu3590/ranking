@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
+import { isPubliclyOpen, resolveOrganizerMode } from '@/lib/tournament/openRegistration';
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -10,11 +11,10 @@ export async function GET() {
     const { data: tournaments, error } = await db
       .from('tournaments')
       .select('id, public_slug, name, location, event_date, organizer_type, settings, visibility')
-      .eq('organizer_type', 'community')
       .in('visibility', ['unlisted', 'public'])
       .order('event_date', { ascending: true });
     if (error) throw error;
-    const openTournaments = (tournaments || []).filter((t) => t?.settings?.open_registration === true);
+    const openTournaments = (tournaments || []).filter((t) => isPubliclyOpen(t));
     const ids = openTournaments.map((t) => t.id);
     let divisions = [];
     if (ids.length) {
@@ -34,7 +34,7 @@ export async function GET() {
     const list = openTournaments
       .map((t) => {
         const { settings, ...rest } = t;
-        return { ...rest, organizer_mode: settings?.organizer_mode || null, open_registration: settings?.open_registration === true, divisions: byT.get(t.id) || [] };
+        return { ...rest, organizer_mode: resolveOrganizerMode(t), open_registration: settings?.open_registration === true, divisions: byT.get(t.id) || [] };
       })
       .filter((t) => t.divisions.length > 0);
     return NextResponse.json({ tournaments: list });

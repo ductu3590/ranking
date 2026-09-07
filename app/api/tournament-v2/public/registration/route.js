@@ -3,7 +3,7 @@ import { randomUUID } from 'crypto';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { normalizePublicSlug } from '@/lib/tournament/publicSnapshot';
-import { isRegistrationOpen, validateSubmission, requiredMemberFields, OpenRegError } from '@/lib/tournament/openRegistration';
+import { isRegistrationOpen, validateSubmission, requiredMemberFields, OpenRegError, resolveOrganizerMode } from '@/lib/tournament/openRegistration';
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -14,7 +14,7 @@ async function resolveContext(slug, divisionId) {
   if (!row) return { error: NextResponse.json({ error: 'Giải không tồn tại' }, { status: 404 }) };
   const tournament = {
     ...row,
-    organizer_mode: row.organizer_type === 'community' ? 'community' : (row.settings?.organizer_mode || null),
+    organizer_mode: resolveOrganizerMode(row),
     open_registration: row.settings?.open_registration === true,
   };
   const { data: division } = await db.from('tournament_divisions')

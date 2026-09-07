@@ -62,4 +62,20 @@ assert(pair.members.length === 2 && pair.members[1].seat === 2, 'B thành seat 2
 let pe = false; try { dom.buildPairFromSolos(A, { id: 3, members: [{ seat: 1, full_name: 'C', phone_norm: '0912345678', gender: 'female' }] }, div); } catch (e) { pe = e.code === 'DUPLICATE_IN_PAIR'; }
 assert(pe, 'ghép trùng SĐT bị chặn');
 
+// B7: resolveOrganizerMode — chế độ cộng đồng nằm ở settings.organizer_mode,
+// cột organizer_type chỉ nhận 'platform' | 'club'.
+assert(dom.resolveOrganizerMode({ organizer_type: 'community' }) === 'community', 'organizer_type community -> community');
+assert(dom.resolveOrganizerMode({ organizer_type: 'club', settings: { organizer_mode: 'community' } }) === 'community', 'club + settings.community -> community');
+assert(dom.resolveOrganizerMode({ organizer_type: 'club', settings: { organizer_mode: 'friendly' } }) === 'friendly', 'settings.friendly -> friendly');
+assert(dom.resolveOrganizerMode({ organizer_type: 'club' }) === null, 'settings rỗng -> null');
+assert(dom.resolveOrganizerMode({}) === null, 'row rỗng -> null');
+
+// B8: isPubliclyOpen — community + open_registration=true trong settings
+assert(dom.isPubliclyOpen({ organizer_type: 'club', settings: { organizer_mode: 'community', open_registration: true } }) === true, 'club community + open -> true');
+assert(dom.isPubliclyOpen({ organizer_type: 'community', settings: { open_registration: true } }) === true, 'organizer_type community + open -> true');
+assert(dom.isPubliclyOpen({ organizer_type: 'club', settings: { organizer_mode: 'friendly', open_registration: true } }) === false, 'friendly -> false');
+assert(dom.isPubliclyOpen({ organizer_type: 'club', settings: { organizer_mode: 'community', open_registration: false } }) === false, 'community nhưng chưa mở -> false');
+assert(dom.isPubliclyOpen({ organizer_type: 'club', settings: {} }) === false, 'settings rỗng -> false');
+assert(dom.isPubliclyOpen({ organizer_type: 'club' }) === false, 'không settings -> false');
+
 console.log('open-registration domain: OK');

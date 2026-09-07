@@ -1,10 +1,11 @@
 'use client';
 
 // Wizard tạo giải — luồng 3 bước (Thể thức · Thông tin giải · Đăng ký).
-// Port từ mockup đã được duyệt sang React idiomatic (state + JSX), mobile-first
-// ~380px rồi mở rộng lên desktop khung rộng. Chỉ fetch qua tournamentV2Client,
-// KHÔNG gọi Supabase trực tiếp. Quyền admin lấy từ /api/groups/session (server),
-// KHÔNG tin role trong localStorage.
+// Component này điều phối state + hiệu ứng + tạo giải; phần trình bày từng bước
+// nằm ở app/giai-dau/v2/wizard/{StepConfig,StepInfo,StepRegister,LivePreview}.
+// Mobile-first ~380px rồi mở rộng lên desktop khung rộng. Chỉ fetch qua
+// tournamentV2Client, KHÔNG gọi Supabase trực tiếp. Quyền admin lấy từ
+// /api/groups/session (server), KHÔNG tin role trong localStorage.
 
 import { useState, useEffect, useMemo } from 'react';
 import {
@@ -16,8 +17,14 @@ import {
     inviteTournamentClub,
     inviteExternalClub,
     updateTournamentClub,
+    listClubRoster,
+    listAvailableTournamentClubs,
 } from '@/lib/tournamentV2Client';
 import { resolveCompetition, describeCombo, effectiveScoring, defaultConfigForScope } from '@/lib/tournament/wizardConfig';
+import { shuffle, chunkPairs, splitTeams } from './wizard/utils';
+import StepConfig from './wizard/StepConfig';
+import StepInfo from './wizard/StepInfo';
+import StepRegister from './wizard/StepRegister';
 import './v2.css';
 import './wizard.css';
 
@@ -33,76 +40,6 @@ const STEPS = [
 const UNIT_TO_PLAY = { don: 'singles', doi: 'doubles', team: 'team' };
 // Nhãn hiển thị của schedule_format engine trả về.
 const SCHEDULE_LABELS = { round_robin: 'Vòng tròn', knockout: 'Loại trực tiếp' };
-
-const SCOPE_OPTIONS = [
-    { id: 'internal', label: 'Nội bộ CLB' },
-    { id: 'friendly', label: 'Giao hữu (mời CLB)' },
-    { id: 'community', label: 'Cộng đồng 🔒', locked: true },
-];
-
-const UNIT_OPTIONS = [
-    { id: 'don', title: 'Cá nhân', desc: 'Đánh đơn, mỗi người một suất' },
-    { id: 'doi', title: 'Cặp đôi', desc: 'Ghép cặp, hai người một suất' },
-    { id: 'team', title: 'Đội (MLP)', desc: 'Đội gặp đội, nhiều ván con' },
-];
-
-const SCORING_OPTIONS = [
-    { id: 'individual', title: 'Cá nhân', desc: 'Xếp hạng từng người/cặp' },
-    { id: 'club', title: 'Cộng điểm về CLB', desc: 'Vô địch đồng đội kiểu tổng sắp' },
-];
-
-const FORMAT_OPTIONS = [
-    { id: 'rr', title: 'Vòng tròn', desc: 'Ai cũng gặp ai, xếp theo tổng thành tích' },
-    { id: 'se', title: 'Loại trực tiếp 1 nhánh', desc: 'Thua một trận là loại, nhanh gọn' },
-    { id: 'de', title: 'Loại trực tiếp 2 nhánh', desc: 'Thua có nhánh vớt, cạnh tranh hơn', badge: 'engine đang xây' },
-    { id: 'mix', title: 'Vòng bảng + CK', desc: 'Đấu bảng rồi chọn đội vào playoff' },
-];
-
-const CLUB_STATUS_LABELS = {
-    invited: 'Đã mời',
-    roster_submitted: 'Đã nộp danh sách',
-    approved: 'Đã duyệt',
-    pending: 'Chờ duyệt',
-};
-
-/* ==================== Tiện ích thuần ==================== */
-
-// Slug bỏ dấu tiếng Việt, đ→d, ký tự lạ thành '-'.
-function slugify(value) {
-    return String(value || '')
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[̀-ͯ]/g, '')
-        .replace(/đ/g, 'd')
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-|-$/g, '');
-}
-
-function shuffle(list) {
-    const a = list.slice();
-    for (let i = a.length - 1; i > 0; i -= 1) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-}
-
-function chunkPairs(list) {
-    const out = [];
-    for (let i = 0; i < list.length; i += 2) out.push([list[i], list[i + 1] || null]);
-    return out;
-}
-
-function splitTeams(list, count) {
-    const teams = Array.from({ length: count }, () => []);
-    list.forEach((name, index) => { teams[index % count].push(name); });
-    return teams;
-}
-
-// PHR mẫu để minh họa xem trước (chưa nối hồ sơ thật).
-function samplePhr() {
-    return (4.4 + Math.random() * 1.4).toFixed(1);
-}
 
 /* ==================== Component ==================== */
 
@@ -128,14 +65,15 @@ export default function TournamentWizard({ onDone }) {
     const [info, setInfo] = useState({ name: 'Giải CLB mùa hè 2026', slug: 'giai-clb-mua-he-2026', description: '' });
 
     /* --- Đăng ký (bước 3) --- */
-    const [players, setPlayers] = useState(['Hoàng Em', 'Trần Bình', 'Lê Chi', 'Nguyễn An', 'Phạm Dũng', 'Vũ Hà']);
-    const [pairs, setPairs] = useState(() => chunkPairs(['Hoàng Em', 'Trần Bình', 'Lê Chi', 'Nguyễn An', 'Phạm Dũng', 'Vũ Hà']));
+    const [players, setPlayers] = useState([]);
+    const [pairs, setPairs] = useState([]);
     const [sel, setSel] = useState(null); // {p, k} thành viên đang chọn để đổi chỗ
     const [playerInput, setPlayerInput] = useState('');
-    const [inviteClubs, setInviteClubs] = useState([
-        { name: 'CLB Yên Bái', status: 'roster_submitted', n: 8, ext: false },
-        { name: 'CLB Nghĩa Lộ', status: 'invited', n: 0, ext: true },
-    ]);
+    const [roster, setRoster] = useState([]); // roster CLB thật: {member_id, full_name, is_active, athlete_id}
+    const [pickhubClubs, setPickhubClubs] = useState([]); // CLB PickHub mời được: {id, name}
+    const [inviteClubs, setInviteClubs] = useState([]); // {club_id?, name, status, n, ext}
+    // CLB đã đăng ký ở phạm vi cộng đồng — mặt công khai thuộc spec
+    // tournament-open-registration; ở đây chỉ minh hoạ thiết lập (community bị khoá).
     const [regClubs] = useState([
         { name: 'CLB Trấn Yên', status: 'approved', n: 6 },
         { name: 'CLB Văn Chấn', status: 'pending', n: 8 },
@@ -151,10 +89,6 @@ export default function TournamentWizard({ onDone }) {
     const [previewError, setPreviewError] = useState('');
 
     const isAdmin = group.role === 'admin';
-
-    // clubPool: gợi ý chọn nhanh thành viên CLB (mẫu; phần nối API roster thật ở
-    // bước sau của lộ trình).
-    const clubPool = useMemo(() => ['Đỗ Minh', 'Bùi Sơn', 'Ngô Lan', 'Đặng Tú'], []);
 
     /* ==================== Quyền từ session server ==================== */
 
@@ -175,6 +109,26 @@ export default function TournamentWizard({ onDone }) {
             .catch(() => { if (alive) setGroup((current) => ({ ...current, role: 'member' })); });
         return () => { alive = false; };
     }, []);
+
+    /* ==================== Dữ liệu thật: roster CLB + CLB PickHub mời được ==================== */
+
+    useEffect(() => {
+        if (!isAdmin) return undefined;
+        let alive = true;
+        listClubRoster()
+            .then((rows) => { if (alive) setRoster(Array.isArray(rows) ? rows : []); })
+            .catch(() => { if (alive) setRoster([]); });
+        return () => { alive = false; };
+    }, [isAdmin]);
+
+    useEffect(() => {
+        if (!isAdmin) return undefined;
+        let alive = true;
+        listAvailableTournamentClubs()
+            .then((rows) => { if (alive) setPickhubClubs(Array.isArray(rows) ? rows : []); })
+            .catch(() => { if (alive) setPickhubClubs([]); });
+        return () => { alive = false; };
+    }, [isAdmin]);
 
     /* ==================== Cấu hình dẫn xuất ==================== */
 
@@ -258,9 +212,10 @@ export default function TournamentWizard({ onDone }) {
         setSel(null);
     }
 
-    function addFromClub() {
-        const next = players.slice();
-        clubPool.forEach((name) => { if (!next.includes(name)) next.push(name); });
+    // Thêm một thành viên CLB thật (từ roster) vào danh sách chơi.
+    function addRosterMember(fullName) {
+        if (players.includes(fullName)) return;
+        const next = [...players, fullName];
         setPlayers(next);
         setPairs(chunkPairs(next));
     }
@@ -289,18 +244,29 @@ export default function TournamentWizard({ onDone }) {
     }
 
     function changeTeamCount(delta) {
-        setTeamCount((current) => Math.min(Math.max(2, players.length), Math.max(2, current + delta)));
+        setTeamCount((current) => Math.min(Math.max(2, players.length || 2), Math.max(2, current + delta)));
     }
 
     function randomTeams() {
         setPlayers((current) => shuffle(current));
     }
 
-    function addInviteClub() {
-        setInviteClubs((current) => [
-            ...current,
-            { name: `CLB mới #${current.length + 1}`, status: 'invited', n: 0, ext: false },
-        ]);
+    /* ==================== Thao tác mời CLB (giao hữu) ==================== */
+
+    function addPickhubClub(club) {
+        setInviteClubs((current) => {
+            if (current.some((c) => String(c.club_id) === String(club.id))) return current;
+            return [...current, { club_id: club.id, name: club.name, status: 'invited', n: 0, ext: false }];
+        });
+    }
+
+    function addExternalClub(name) {
+        const trimmed = String(name || '').trim();
+        if (!trimmed) return;
+        setInviteClubs((current) => {
+            if (current.some((c) => c.ext && c.name.toLowerCase() === trimmed.toLowerCase())) return current;
+            return [...current, { name: trimmed, status: 'invited', n: 0, ext: true }];
+        });
     }
 
     /* ==================== Tạo giải ==================== */
@@ -399,12 +365,15 @@ export default function TournamentWizard({ onDone }) {
                 }
             }
 
-            // 5b. Giao hữu: mời các CLB ngoài hệ thống đã liệt kê.
+            // 5b. Giao hữu: mời CLB PickHub (club_id) và CLB ngoài hệ thống (theo tên).
             if (scope === 'friendly') {
                 for (const club of inviteClubs) {
-                    if (!club.ext) continue; // CLB PickHub cần chọn từ danh sách thật ở console
                     try {
-                        await inviteExternalClub({ tournament_id: tournamentId, external_club_name: club.name });
+                        if (club.ext) {
+                            await inviteExternalClub({ tournament_id: tournamentId, external_club_name: club.name });
+                        } else if (club.club_id != null) {
+                            await inviteTournamentClub({ tournament_id: tournamentId, club_id: Number(club.club_id) });
+                        }
                     } catch (_) { /* bỏ qua lỗi mời lẻ */ }
                 }
             }
@@ -429,7 +398,7 @@ export default function TournamentWizard({ onDone }) {
             } finally { setBusy(false); }
             return;
         }
-        // CLB mẫu chưa có id — chỉ đổi trạng thái hiển thị.
+        // CLB chưa lưu (chưa tạo giải) — chỉ đổi trạng thái hiển thị.
         setInviteClubs((current) => current.map((row, i) => (
             i === index ? { ...row, status: action === 'approve' ? 'approved' : row.status } : row
         )));
@@ -478,181 +447,40 @@ export default function TournamentWizard({ onDone }) {
 
             {/* ===================== BƯỚC 1: THỂ THỨC ===================== */}
             {step === 1 && (
-                <>
-                    <div className="w3-mtabs">
-                        <button type="button" aria-pressed={mView === 'setup'} onClick={() => setMView('setup')}>Cấu hình</button>
-                        <button type="button" aria-pressed={mView === 'preview'} onClick={() => setMView('preview')}>Xem trước</button>
-                    </div>
-                    <div className="w3-work" data-view={mView}>
-                        <div className="w3-setup">
-                            {/* Phạm vi */}
-                            <div className="w3-block">
-                                <p className="w3-cflbl">Phạm vi</p>
-                                <div className="w3-seg">
-                                    {SCOPE_OPTIONS.map((option) => (
-                                        <button
-                                            key={option.id}
-                                            type="button"
-                                            aria-pressed={scope === option.id}
-                                            disabled={option.locked}
-                                            title={option.locked ? 'Cần tài khoản quản trị cộng đồng' : undefined}
-                                            onClick={() => pickScope(option.id)}
-                                        >
-                                            {option.label}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Đơn vị vào sân */}
-                            <div className="w3-block">
-                                <p className="w3-cflbl">Đơn vị vào sân — ai đấu một trận</p>
-                                <div className="w3-selgrid c3">
-                                    {UNIT_OPTIONS.map((option) => (
-                                        <button key={option.id} type="button" className="w3-selcard" aria-pressed={unit === option.id} onClick={() => pickUnit(option.id)}>
-                                            <span className="w3-chk">✓</span>
-                                            <span className="w3-st">{option.title}</span>
-                                            <span className="w3-sd">{option.desc}</span>
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Tính thành tích — chỉ khi không nội bộ và không đội */}
-                            {scope !== 'internal' && unit !== 'team' && (
-                                <div className="w3-block">
-                                    <p className="w3-cflbl">Tính thành tích — ai được xếp hạng</p>
-                                    <div className="w3-selgrid c2">
-                                        {SCORING_OPTIONS.map((option) => (
-                                            <button key={option.id} type="button" className="w3-selcard" aria-pressed={userScoring === option.id} onClick={() => setUserScoring(option.id)}>
-                                                <span className="w3-chk">✓</span>
-                                                <span className="w3-st">{option.title}</span>
-                                                <span className="w3-sd">{option.desc}</span>
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Thể thức */}
-                            <div className="w3-block">
-                                <p className="w3-cflbl">Thể thức</p>
-                                <div className="w3-selgrid c2">
-                                    {FORMAT_OPTIONS.map((option) => (
-                                        <button key={option.id} type="button" className="w3-selcard" aria-pressed={fmt === option.id} onClick={() => setFmt(option.id)}>
-                                            <span className="w3-chk">✓</span>
-                                            <span className="w3-st">
-                                                {option.title}
-                                                {option.badge ? <span className="w3-mini-badge">{option.badge}</span> : null}
-                                            </span>
-                                            <span className="w3-sd">{option.desc}</span>
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Số ván mỗi trận (không phải đội) */}
-                            {unit !== 'team' && (
-                                <div className="w3-block">
-                                    <p className="w3-cflbl">Số ván mỗi trận</p>
-                                    <div className="w3-seg">
-                                        {[1, 3, 5].map((value) => (
-                                            <button key={value} type="button" aria-pressed={bestOf === value} onClick={() => setBestOf(value)}>
-                                                {value === 1 ? '1 ván' : `${value} ván (BO${value})`}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Cấu hình trận đội (đội/MLP) */}
-                            {unit === 'team' && (
-                                <div className="w3-block">
-                                    <p className="w3-cflbl">Cấu hình trận đội</p>
-                                    <div className="w3-teamcfg">
-                                        <div className="w3-tc">
-                                            <span>Số người mỗi đội</span>
-                                            <div className="w3-stepcnt">
-                                                <button type="button" onClick={() => setTeamSize((v) => Math.max(1, v - 1))}>−</button>
-                                                <span>{teamSize} người</span>
-                                                <button type="button" onClick={() => setTeamSize((v) => Math.min(10, v + 1))}>+</button>
-                                            </div>
-                                        </div>
-                                        <div className="w3-tc">
-                                            <span>Số ván con mỗi trận đội</span>
-                                            <div className="w3-stepcnt">
-                                                <button type="button" onClick={() => setSubGames((v) => Math.max(1, v - 1))}>−</button>
-                                                <span>{subGames} ván</span>
-                                                <button type="button" onClick={() => setSubGames((v) => Math.min(9, v + 1))}>+</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <p className="w3-softnote"><span>ⓘ</span> <span>Cần khoảng {teamCount * teamSize} VĐV cho {teamCount} đội. Số ván con theo điều lệ giải.</span></p>
-                                </div>
-                            )}
-
-                            <div className="w3-cross">{comboText}</div>
-                            <p className="w3-softnote"><span>ⓘ</span> <span>Luật điểm và tie-break là điều lệ của giải, đặt theo từng vòng khi bốc thăm. Không cố định ở đây.</span></p>
-                        </div>
-
-                        {/* Xem trước sống */}
-                        <div className="w3-preview-pane">
-                            <p className="w3-ph">Xem trước sống</p>
-                            <p className="w3-ph-sub">Cập nhật theo cấu hình bên trái</p>
-                            <LivePreview
-                                fmt={fmt}
-                                unit={unit}
-                                scope={scope}
-                                eff={eff}
-                                bestOf={bestOf}
-                                subGames={subGames}
-                                labels={previewLabels}
-                                preview={preview}
-                                loading={previewLoading}
-                                error={previewError}
-                            />
-                        </div>
-                    </div>
-                </>
+                <StepConfig
+                    scope={scope}
+                    unit={unit}
+                    userScoring={userScoring}
+                    fmt={fmt}
+                    bestOf={bestOf}
+                    teamSize={teamSize}
+                    subGames={subGames}
+                    teamCount={teamCount}
+                    pickScope={pickScope}
+                    pickUnit={pickUnit}
+                    setUserScoring={setUserScoring}
+                    setFmt={setFmt}
+                    setBestOf={setBestOf}
+                    setTeamSize={setTeamSize}
+                    setSubGames={setSubGames}
+                    mView={mView}
+                    setMView={setMView}
+                    comboText={comboText}
+                    eff={eff}
+                    previewLabels={previewLabels}
+                    preview={preview}
+                    previewLoading={previewLoading}
+                    previewError={previewError}
+                />
             )}
 
             {/* ===================== BƯỚC 2: THÔNG TIN GIẢI ===================== */}
-            {step === 2 && (
-                <div className="w3-formwrap">
-                    <div className="v2-field">
-                        <label htmlFor="w3-tname">Tên giải</label>
-                        <input
-                            id="w3-tname"
-                            value={info.name}
-                            onChange={(e) => setInfo((c) => ({ ...c, name: e.target.value, slug: slugify(e.target.value) }))}
-                            placeholder="Giải CLB mùa hè 2026"
-                        />
-                    </div>
-                    <div className="w3-block">
-                        <p className="v2-field-label" style={{ fontSize: '0.72rem', color: 'var(--w3-muted)', fontWeight: 700, margin: '0 0 6px' }}>Link chia sẻ riêng</p>
-                        <div className="w3-urlrow">
-                            <span className="w3-pfx">pickhub.vn/giai/</span>
-                            <input value={info.slug} onChange={(e) => setInfo((c) => ({ ...c, slug: e.target.value }))} aria-label="Slug link chia sẻ" />
-                        </div>
-                        <p className="w3-hint" style={{ marginTop: 8 }}>Link gọn để dán vào nhóm Zalo. Đổi được, phải là duy nhất.</p>
-                    </div>
-                    <div className="w3-block">
-                        <div className="v2-field">
-                            <label htmlFor="w3-desc">Mô tả</label>
-                            <textarea id="w3-desc" value={info.description} onChange={(e) => setInfo((c) => ({ ...c, description: e.target.value }))} placeholder="Thể lệ ngắn, giải thưởng, liên hệ BTC…" rows={3} />
-                        </div>
-                    </div>
-                    <div className="w3-block">
-                        <p className="v2-field-label" style={{ fontSize: '0.72rem', color: 'var(--w3-muted)', fontWeight: 700, margin: '0 0 6px' }}>Poster giải</p>
-                        <div className="w3-banner">📷 Bấm để tải poster · gợi ý 1200×630 · dùng làm ảnh khi chia sẻ Zalo</div>
-                    </div>
-                </div>
-            )}
+            {step === 2 && <StepInfo info={info} setInfo={setInfo} />}
 
             {/* ===================== BƯỚC 3: ĐĂNG KÝ ===================== */}
             {step === 3 && (
                 <div className="w3-formwrap">
-                    <RegisterStep
+                    <StepRegister
                         scope={scope}
                         unit={unit}
                         players={players}
@@ -662,15 +490,18 @@ export default function TournamentWizard({ onDone }) {
                         setPlayerInput={setPlayerInput}
                         addPlayers={addPlayers}
                         removePlayer={removePlayer}
-                        addFromClub={addFromClub}
                         randomPairs={randomPairs}
                         tapMember={tapMember}
+                        roster={roster}
+                        addRosterMember={addRosterMember}
                         teamCount={teamCount}
                         changeTeamCount={changeTeamCount}
                         randomTeams={randomTeams}
                         teams={splitTeams(players, teamCount)}
                         inviteClubs={inviteClubs}
-                        addInviteClub={addInviteClub}
+                        pickhubClubs={pickhubClubs}
+                        addPickhubClub={addPickhubClub}
+                        addExternalClub={addExternalClub}
                         reviewInviteClub={reviewInviteClub}
                         regClubs={regClubs}
                         friendlyDeadline={friendlyDeadline}
@@ -712,324 +543,4 @@ function ToastBubble({ text, onDone }) {
         return () => clearTimeout(timer);
     }, [onDone]);
     return <div className="w3-toast" role="status">{text}</div>;
-}
-
-/* ==================== Bước 3: rẽ theo phạm vi ==================== */
-
-function RegisterStep(props) {
-    const {
-        scope, unit, players, pairs, sel, playerInput, setPlayerInput,
-        addPlayers, removePlayer, addFromClub, randomPairs, tapMember,
-        teamCount, changeTeamCount, randomTeams, teams,
-        inviteClubs, addInviteClub, reviewInviteClub, regClubs,
-        friendlyDeadline, setFriendlyDeadline, communityDeadline, setCommunityDeadline,
-        communityWho, setCommunityWho, slug, busy, onToast,
-    } = props;
-
-    const note = {
-        internal: 'Hình thức A · Tự nhập — BTC nắm danh sách, nhập trực tiếp.',
-        friendly: 'Hình thức A · Tự nhập — mời đích danh CLB, họ nộp danh sách trước hạn.',
-        community: 'Hình thức B · Mở đăng ký — mở link có hạn cho CLB/VĐV tự đăng ký. Đây là thiết lập; mặt công khai thuộc spec khác.',
-    }[scope];
-
-    return (
-        <>
-            <div className="w3-banner-info">{note}</div>
-
-            {/* A. Nội bộ, đơn/đôi */}
-            {scope === 'internal' && unit !== 'team' && (
-                <div>
-                    <p className="w3-cflbl" style={{ textTransform: 'none' }}>Người chơi <span className="w3-count">· {players.length}</span></p>
-                    <div className="w3-chips">
-                        {players.map((name, index) => (
-                            <span key={`${name}-${index}`} className="w3-chip">
-                                {name}
-                                <button type="button" aria-label={`Bỏ ${name}`} onClick={() => removePlayer(index)}>×</button>
-                            </span>
-                        ))}
-                    </div>
-                    <div className="w3-addrow">
-                        <input
-                            className="v2-input"
-                            value={playerInput}
-                            onChange={(e) => setPlayerInput(e.target.value)}
-                            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addPlayers(); } }}
-                            placeholder="Nhập tên rồi Enter"
-                        />
-                        <button type="button" className="w3-btn" onClick={addPlayers}>Thêm</button>
-                    </div>
-                    <div className="w3-roster">Hoặc <button type="button" onClick={addFromClub}>chọn nhanh từ thành viên CLB</button> · gắn hồ sơ PHR thật</div>
-
-                    {unit === 'doi' && (
-                        <div>
-                            <div className="w3-subhead">
-                                <h3>Ghép cặp</h3>
-                                <span className="w3-count" style={{ fontSize: '0.76rem' }}>· {Math.ceil(players.length / 2)} cặp</span>
-                                <button type="button" className="w3-pill" onClick={randomPairs}>⚁ Ghép ngẫu nhiên</button>
-                            </div>
-                            <div className="w3-pairs">
-                                {pairs.map((pr, pi) => {
-                                    const miss = !pr[1];
-                                    return (
-                                        <div key={pi} className={`w3-pair ${miss ? 'is-warn' : ''}`}>
-                                            <span className="w3-pn">Cặp {pi + 1}</span>
-                                            <button type="button" className={`w3-mem ${sel && sel.p === pi && sel.k === 0 ? 'is-sel' : ''}`} onClick={() => tapMember(pi, 0)}>{pr[0]}</button>
-                                            <span className="w3-plus">+</span>
-                                            {miss ? (
-                                                <span className="w3-mem is-empty">chọn người…</span>
-                                            ) : (
-                                                <button type="button" className={`w3-mem ${sel && sel.p === pi && sel.k === 1 ? 'is-sel' : ''}`} onClick={() => tapMember(pi, 1)}>{pr[1]}</button>
-                                            )}
-                                            {miss ? <span className="w3-tag w3-tag-warn">thiếu 1</span> : <span className="w3-tag w3-tag-ok">PHR {samplePhr()}</span>}
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                            <p className="w3-hint" style={{ marginTop: 10 }}>Chạm hai người để đổi chỗ. Ghép ngẫu nhiên bấm lại tùy ý.</p>
-                        </div>
-                    )}
-                </div>
-            )}
-
-            {/* A. Nội bộ, đội */}
-            {scope === 'internal' && unit === 'team' && (
-                <div>
-                    <p className="w3-hint" style={{ marginTop: 0 }}>Chia thành viên CLB thành nhiều đội đấu với nhau.</p>
-                    <div className="w3-subhead">
-                        <h3>Các đội</h3>
-                        <div className="w3-stepcnt">
-                            <button type="button" onClick={() => changeTeamCount(-1)}>−</button>
-                            <span>{teamCount} đội</span>
-                            <button type="button" onClick={() => changeTeamCount(1)}>+</button>
-                        </div>
-                        <button type="button" className="w3-pill" style={{ marginLeft: 8 }} onClick={randomTeams}>⚁ Chia ngẫu nhiên</button>
-                    </div>
-                    <div className="w3-teams">
-                        {teams.map((members, i) => (
-                            <div key={i} className="w3-team">
-                                <h4>Đội {i + 1} · {members.length}</h4>
-                                {members.map((name, j) => <div key={j} className="w3-m">{name}</div>)}
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            {/* A. Giao hữu, mời CLB */}
-            {scope === 'friendly' && (
-                <div>
-                    <div className="w3-block" style={{ marginTop: 0 }}>
-                        <div className="v2-field">
-                            <label htmlFor="w3-friendly-deadline">Hạn nộp danh sách</label>
-                            <input id="w3-friendly-deadline" type="date" style={{ maxWidth: 220 }} value={friendlyDeadline} onChange={(e) => setFriendlyDeadline(e.target.value)} />
-                        </div>
-                    </div>
-                    <div className="w3-subhead">
-                        <h3>CLB được mời</h3>
-                        <button type="button" className="w3-pill" onClick={addInviteClub}>+ Mời CLB</button>
-                    </div>
-                    <div className="w3-clubs">
-                        {inviteClubs.map((club, index) => (
-                            <ClubRow key={index} club={club} busy={busy}>
-                                {club.status === 'roster_submitted' ? (
-                                    <div className="w3-club-act">
-                                        <button type="button" className="w3-sbtn">Xem</button>
-                                        <button type="button" className="w3-sbtn" onClick={() => reviewInviteClub(club, 'approve', index)} disabled={busy}>Duyệt</button>
-                                        <button type="button" className="w3-sbtn" onClick={() => reviewInviteClub(club, 'request_changes', index)} disabled={busy}>Yêu cầu sửa</button>
-                                    </div>
-                                ) : (
-                                    <div className="w3-club-act">
-                                        <button type="button" className="w3-sbtn">Nhập hộ</button>
-                                        <button type="button" className="w3-sbtn">Huỷ mời</button>
-                                    </div>
-                                )}
-                            </ClubRow>
-                        ))}
-                    </div>
-                    <p className="w3-hint" style={{ marginTop: 10 }}>Mời đích danh. Mỗi CLB tự nộp danh sách trước hạn; BTC duyệt rồi bốc thăm.</p>
-                </div>
-            )}
-
-            {/* B. Cộng đồng, mở link đăng ký */}
-            {scope === 'community' && (
-                <div>
-                    <div className="w3-reglink">
-                        <div className="w3-reglink-title">Link đăng ký mở</div>
-                        <div className="w3-reglink-sub">Chia sẻ link này để CLB/VĐV tự đăng ký</div>
-                        <div className="w3-reglink-u">
-                            <code>pickhub.vn/dk/{slug}</code>
-                            <button type="button" className="w3-sbtn" onClick={() => { navigator.clipboard?.writeText(`pickhub.vn/dk/${slug}`); onToast('✓ Đã sao chép link'); }}>Sao chép</button>
-                        </div>
-                    </div>
-                    <div className="w3-two" style={{ marginTop: 14 }}>
-                        <div className="v2-field">
-                            <label htmlFor="w3-community-deadline">Hạn đăng ký</label>
-                            <input id="w3-community-deadline" type="date" value={communityDeadline} onChange={(e) => setCommunityDeadline(e.target.value)} />
-                        </div>
-                        <div className="v2-field">
-                            <label htmlFor="w3-community-who">Ai được đăng ký</label>
-                            <select id="w3-community-who" value={communityWho} onChange={(e) => setCommunityWho(e.target.value)}>
-                                <option value="club">CLB đăng ký theo đoàn</option>
-                                <option value="athlete">VĐV tự do đăng ký</option>
-                                <option value="both">Cả hai</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div className="w3-subhead">
-                        <h3>CLB đã đăng ký</h3>
-                        <span className="w3-count" style={{ fontSize: '0.76rem' }}>· chờ duyệt</span>
-                    </div>
-                    <div className="w3-clubs">
-                        {regClubs.map((club, index) => (
-                            <ClubRow key={index} club={club} busy={busy}>
-                                {club.status === 'pending' ? (
-                                    <div className="w3-club-act">
-                                        <button type="button" className="w3-sbtn">Duyệt</button>
-                                        <button type="button" className="w3-sbtn">Chờ</button>
-                                        <button type="button" className="w3-sbtn">Từ chối</button>
-                                    </div>
-                                ) : null}
-                            </ClubRow>
-                        ))}
-                    </div>
-                    <p className="w3-hint" style={{ marginTop: 10 }}>Đăng ký tự do có hạn. BTC duyệt từng CLB/VĐV, có thể giới hạn tổng PHR hoặc để Open.</p>
-                </div>
-            )}
-        </>
-    );
-}
-
-function ClubRow({ club, children }) {
-    const tag = club.status === 'approved' ? 'w3-tag-ok' : '';
-    const meta = `${club.ext ? 'CLB ngoài hệ thống' : 'CLB PickHub'} · ${club.n ? `${club.n} VĐV` : 'chưa nộp'}`;
-    return (
-        <div className="w3-club">
-            <div className="w3-club-top">
-                <span className="w3-club-name">{club.name}</span>
-                <span className={`w3-tag ${tag}`}>{CLUB_STATUS_LABELS[club.status] || club.status}</span>
-            </div>
-            <p className="w3-club-meta">{meta}</p>
-            {children}
-        </div>
-    );
-}
-
-/* ==================== Xem trước sống ==================== */
-
-function LivePreview({ fmt, unit, scope, eff, bestOf, subGames, labels, preview, loading, error }) {
-    const uw = unit === 'team' ? 'đội' : scope !== 'internal' ? 'CLB' : unit === 'don' ? 'người' : 'cặp';
-    const labelFor = (id) => (id ? (labels[id - 1] || `#${id}`) : '—');
-    const scopeNote = eff === 'team' ? '◈ BXH theo đội' : eff === 'club' ? '◈ BXH theo CLB' : '◈ BXH cá nhân';
-
-    if (error) {
-        return <div className="w3-state w3-state-error">{error}</div>;
-    }
-    if (loading && !preview) {
-        return <div className="w3-state">Đang dựng xem trước lịch…</div>;
-    }
-    if (!preview) {
-        return <div className="w3-state">Chưa có dữ liệu xem trước.</div>;
-    }
-
-    const matches = preview.matches || [];
-    const n = labels.length;
-
-    // Ghi chú MLP / cộng điểm CLB.
-    const topNote = unit === 'team' ? (
-        <div className="w3-mlpnote">Mỗi trận là <b style={{ fontWeight: 600 }}>trận đội {subGames} ván con</b>{subGames === 5 ? ' — MLP: đôi nữ, đôi nam, 2 mix, DreamBreaker.' : '.'}</div>
-    ) : eff === 'club' ? (
-        <div className="w3-mlpnote">Trận thường ({bestOf === 1 ? '1 ván' : `BO${bestOf}`}); điểm dồn về CLB.</div>
-    ) : null;
-
-    let title;
-    let body;
-
-    if (fmt === 'rr') {
-        title = `Vòng tròn · ${n} ${uw} · ${matches.length} trận`;
-        body = (
-            <>
-                {topNote}
-                {matches.slice(0, 6).map((m, i) => (
-                    <div key={i} className="w3-match">
-                        <span className="w3-r">{i + 1}</span>
-                        {labelFor(m.a)} <span className="w3-vs">vs</span> {labelFor(m.b)}
-                    </div>
-                ))}
-                {matches.length > 6 ? <div className="w3-match" style={{ color: 'var(--w3-muted)' }}>+{matches.length - 6} trận…</div> : null}
-            </>
-        );
-    } else if (fmt === 'se' || fmt === 'de') {
-        title = `${fmt === 'de' ? 'Loại trực tiếp 2 nhánh' : 'Loại trực tiếp 1 nhánh'} · ${n} ${uw}`;
-        const round1 = matches.filter((m) => Number(m.round) === 1);
-        const seeds = round1.length ? round1 : chunkPairs(labels.map((_, i) => i + 1)).map(([a, b]) => ({ a, b: b || null }));
-        body = (
-            <>
-                {topNote}
-                <div className="w3-bracket">
-                    <div className="w3-col">
-                        <div className="w3-clbl">Nhánh thắng · V1</div>
-                        {seeds.map((m, i) => (
-                            <div key={i} className="w3-slot">{labelFor(m.a)}<br />{m.b ? labelFor(m.b) : '(bye)'}</div>
-                        ))}
-                    </div>
-                    <div className="w3-col">
-                        <div className="w3-clbl">Bán kết</div>
-                        <div className="w3-slot">—</div>
-                        {seeds.length > 2 ? <div className="w3-slot">—</div> : null}
-                    </div>
-                    <div className="w3-col">
-                        <div className="w3-clbl">Chung kết</div>
-                        <div className="w3-slot">—</div>
-                    </div>
-                </div>
-                {fmt === 'de' ? (
-                    <div className="w3-lower">
-                        <div className="w3-clbl">Nhánh thua</div>
-                        <div className="w3-bracket">
-                            <div className="w3-col">
-                                <div className="w3-slot">Thua V1</div>
-                                <div className="w3-slot">Thua V1</div>
-                            </div>
-                            <div className="w3-col"><div className="w3-slot">—</div></div>
-                        </div>
-                    </div>
-                ) : null}
-            </>
-        );
-    } else {
-        title = `Vòng bảng + CK · ${n} ${uw} · 2 bảng`;
-        const groupA = labels.filter((_, i) => i % 2 === 0);
-        const groupB = labels.filter((_, i) => i % 2 === 1);
-        body = (
-            <>
-                {topNote}
-                <div className="w3-bracket">
-                    <div className="w3-col">
-                        <div className="w3-clbl">Bảng A</div>
-                        {groupA.map((name, i) => <div key={i} className="w3-slot">{name}</div>)}
-                    </div>
-                    <div className="w3-col">
-                        <div className="w3-clbl">Bảng B</div>
-                        {groupB.map((name, i) => <div key={i} className="w3-slot">{name}</div>)}
-                    </div>
-                    <div className="w3-col">
-                        <div className="w3-clbl">Playoff</div>
-                        <div className="w3-slot">Nhất A vs Nhì B</div>
-                        <div className="w3-slot">Nhất B vs Nhì A</div>
-                    </div>
-                </div>
-            </>
-        );
-    }
-
-    return (
-        <>
-            <p className="w3-prev-title">{title}</p>
-            <div>{body}</div>
-            <div className="w3-prules">
-                <span>◷ Luật theo điều lệ, đặt từng vòng</span>
-                <span>{scopeNote}</span>
-            </div>
-        </>
-    );
 }

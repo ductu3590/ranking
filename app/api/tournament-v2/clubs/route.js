@@ -39,14 +39,18 @@ export async function GET(request) {
         const adminCheck = await requireValidatedGroupAdmin();
         if (!adminCheck.ok) return adminCheck.response;
         const { searchParams } = new URL(request.url);
-        const tournamentId = searchParams.get('tournamentId');
-        if (!tournamentId) return NextResponse.json({ error: 'tournamentId is required' }, { status: 400 });
 
+        // Danh sách CLB PickHub mời được: các CLB khác trong hệ thống. Không phụ
+        // thuộc một giải cụ thể (wizard gọi trước khi giải tồn tại), nên không
+        // đòi tournamentId ở chế độ này.
         if (searchParams.get('mode') === 'available') {
             const { data, error } = await db.from('groups').select('id, name').neq('id', adminCheck.groupId).order('name');
             if (error) throw error;
             return NextResponse.json({ clubs: data || [] });
         }
+
+        const tournamentId = searchParams.get('tournamentId');
+        if (!tournamentId) return NextResponse.json({ error: 'tournamentId is required' }, { status: 400 });
 
         const { data, error } = await db.from('tournament_clubs')
             .select(SELECT_FIELDS)

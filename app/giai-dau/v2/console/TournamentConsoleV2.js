@@ -10,6 +10,7 @@ import StandingsTab from './tabs/StandingsTab';
 import BracketTab from './tabs/BracketTab';
 import TeamsTab from './tabs/TeamsTab';
 import SettingsTab from './tabs/SettingsTab';
+import OpenRegTab from './tabs/OpenRegTab';
 import './console.css';
 
 const TABS = [
@@ -21,14 +22,13 @@ const TABS = [
     { key: 'settings', label: 'Cài đặt' },
 ];
 
-const VALID_TABS = TABS.map((t) => t.key);
+const OPEN_REG_TAB = { key: 'openreg', label: 'Đăng ký & duyệt' };
 
 export default function TournamentConsoleV2({ tournamentId }) {
     const searchParams = useSearchParams();
     const router = useRouter();
 
     const tabParam = searchParams.get('tab');
-    const activeTab = VALID_TABS.includes(tabParam) ? tabParam : 'overview';
 
     const [tournament, setTournament] = useState(null);
     const [stages, setStages] = useState([]);
@@ -76,6 +76,11 @@ export default function TournamentConsoleV2({ tournamentId }) {
 
     const activeStage = stages.find((s) => String(s.id) === String(activeStageId)) || null;
 
+    const isCommunity = tournament?.organizer_mode === 'community';
+    const visibleTabs = isCommunity ? [...TABS, OPEN_REG_TAB] : TABS;
+    const validTabKeys = visibleTabs.map((t) => t.key);
+    const activeTab = validTabKeys.includes(tabParam) ? tabParam : 'overview';
+
     if (loading) {
         return (
             <div className="v2-state v2-loading">
@@ -110,10 +115,13 @@ export default function TournamentConsoleV2({ tournamentId }) {
         <div className="v2-console">
             <header className="v2-console-head">
                 <h1 className="v2-console-title">{tournament ? tournament.name : 'Giải đấu'}</h1>
+                <button type="button" className="v2-btn-primary v2-operations-link" onClick={() => router.push(`/giai-dau/v2/operations?t=${tournamentId}${activeStageId ? `&stage=${activeStageId}` : ''}`)}>
+                    Bàn điều hành
+                </button>
             </header>
 
             <nav className="v2-tabbar" aria-label="Mục console">
-                {TABS.map((t) => (
+                {visibleTabs.map((t) => (
                     <button
                         key={t.key}
                         type="button"
@@ -147,6 +155,7 @@ export default function TournamentConsoleV2({ tournamentId }) {
                 {activeTab === 'bracket' ? <BracketTab {...tabProps} /> : null}
                 {activeTab === 'teams' ? <TeamsTab {...tabProps} /> : null}
                 {activeTab === 'settings' ? <SettingsTab {...tabProps} /> : null}
+                {activeTab === 'openreg' ? <OpenRegTab {...tabProps} /> : null}
             </div>
         </div>
     );

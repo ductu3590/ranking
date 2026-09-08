@@ -10,7 +10,7 @@ export default function ClubSettings() {
     const [notice, setNotice] = useState('');
     const [group, setGroup] = useState(null);
     const [qr, setQr] = useState({ joinUrl: '', qrCodeDataUrl: '' });
-    const [form, setForm] = useState({ name: '', description: '', memberPassword: '' });
+    const [form, setForm] = useState({ name: '', description: '', memberPassword: '', shameBadgesEnabled: true });
     const [logoUrl, setLogoUrl] = useState(null);
     const [passwordForm, setPasswordForm] = useState({ next: '', confirm: '' });
     const [changingPassword, setChangingPassword] = useState(false);
@@ -34,7 +34,12 @@ export default function ClubSettings() {
         if (res.ok) {
             setGroup(data.group);
             setQr({ joinUrl: data.joinUrl, qrCodeDataUrl: data.qrCodeDataUrl });
-            setForm({ name: data.group.name || '', description: data.group.description || '', memberPassword: '' });
+            setForm({
+                name: data.group.name || '',
+                description: data.group.description || '',
+                memberPassword: '',
+                shameBadgesEnabled: data.group.shame_badges_enabled !== false,
+            });
             setLogoUrl(data.group.logo_url || null);
             setSepayForm({ sepayWebhookSecret: '' });
         } else {
@@ -48,7 +53,12 @@ export default function ClubSettings() {
         setSaving(true);
         setError('');
         setNotice('');
-        const payload = { name: form.name, description: form.description, logoUrl };
+        const payload = {
+            name: form.name,
+            description: form.description,
+            logoUrl,
+            shameBadgesEnabled: form.shameBadgesEnabled,
+        };
         if (form.memberPassword) payload.memberPassword = form.memberPassword;
         const res = await fetch('/api/club/settings', {
             method: 'PATCH',
@@ -261,6 +271,17 @@ export default function ClubSettings() {
                         value={form.description}
                         onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
                     />
+                </label>
+                <label className="ph-field">
+                    <span className="ph-field__label">Huy hiệu &quot;Trắng tay&quot; trên BXH</span>
+                    <select
+                        className="ph-field__control"
+                        value={form.shameBadgesEnabled ? 'on' : 'off'}
+                        onChange={(e) => setForm((p) => ({ ...p, shameBadgesEnabled: e.target.value === 'on' }))}
+                    >
+                        <option value="on">Bật — nêu tên người chưa đóng nhiều kỳ liền</option>
+                        <option value="off">Tắt — không nêu tên ai</option>
+                    </select>
                 </label>
                 <label>
                     Đổi mật khẩu thành viên (để trống nếu không đổi)

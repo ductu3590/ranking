@@ -7,16 +7,20 @@ import { getEffectiveGroupContext } from '@/lib/groupSession';
 export async function GET() {
     const context = getEffectiveGroupContext();
     if (context.is_default) {
-        return NextResponse.json({ name: 'Pickhub', logoUrl: null });
+        return NextResponse.json({ name: 'Pickhub', logoUrl: null, shameBadgesEnabled: true });
     }
 
     const { data: group, error } = await supabaseAdmin
         .from('groups')
-        .select('id, name, logo_url')
+        .select('id, name, logo_url, shame_badges_enabled')
         .eq('id', context.group_id)
         .single();
     if (error) {
-        return NextResponse.json({ name: context.group_name || null, logoUrl: null });
+        return NextResponse.json({ name: context.group_name || null, logoUrl: null, shameBadgesEnabled: true });
     }
-    return NextResponse.json({ name: group.name, logoUrl: group.logo_url || null });
+    return NextResponse.json({
+        name: group.name,
+        logoUrl: group.logo_url || null,
+        shameBadgesEnabled: group.shame_badges_enabled !== false,
+    });
 }

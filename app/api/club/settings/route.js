@@ -30,7 +30,7 @@ export async function GET(request) {
 
     const { data: group, error } = await supabaseAdmin
         .from('groups')
-        .select('id, code, name, description, logo_url, sepay_webhook_secret, access_version')
+        .select('id, code, name, description, logo_url, shame_badges_enabled, sepay_webhook_secret, access_version')
         .eq('id', adminCheck.groupId)
         .single();
     if (error) {
@@ -77,6 +77,9 @@ export async function PATCH(request) {
             updates.logo_url = logoUrl;
         }
     }
+    if (typeof body?.shameBadgesEnabled === 'boolean') {
+        updates.shame_badges_enabled = body.shameBadgesEnabled;
+    }
     if (body?.clearSepayWebhookSecret === true) {
         updates.sepay_webhook_secret = null;
     } else if (typeof body?.sepayWebhookSecret === 'string' && body.sepayWebhookSecret.trim()) {
@@ -99,7 +102,7 @@ export async function PATCH(request) {
         .from('groups')
         .update(updates)
         .eq('id', adminCheck.groupId)
-        .select('id, code, name, description, logo_url, sepay_webhook_secret, access_version')
+        .select('id, code, name, description, logo_url, shame_badges_enabled, sepay_webhook_secret, access_version')
         .single();
     if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });

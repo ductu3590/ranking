@@ -11,6 +11,7 @@ const PERIODS = [
     { value: 'year', label: 'Năm nay' },
     { value: 'all', label: 'Tất cả' },
 ];
+const MEDALS = ['🏆 Dẫn đầu', '🥈 Á quân', '🥉 Hạng ba'];
 const money = new Intl.NumberFormat('vi-VN');
 const date = new Intl.DateTimeFormat('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
@@ -98,32 +99,34 @@ export default function FundLeaderboardPage() {
     }
 
     if (loading) {
-        return <main className="ph-bxh-page"><div className="ph-bxh-shell"><div className="ph-skeleton ph-skeleton--card" /><div className="ph-bxh-skeleton-row"><div className="ph-skeleton ph-skeleton--card" /><div className="ph-skeleton ph-skeleton--card" /><div className="ph-skeleton ph-skeleton--card" /></div><div className="ph-skeleton ph-skeleton--row" /><div className="ph-skeleton ph-skeleton--row" /></div></main>;
+        return <div className="ph-bxh-page"><div className="ph-bxh-shell"><div className="ph-skeleton ph-skeleton--card" /><div className="ph-bxh-skeleton-row"><div className="ph-skeleton ph-skeleton--card" /><div className="ph-skeleton ph-skeleton--card" /><div className="ph-skeleton ph-skeleton--card" /></div><div className="ph-skeleton ph-skeleton--row" /><div className="ph-skeleton ph-skeleton--row" /></div></div>;
     }
     if (accessState === 'forbidden') {
-        return <main className="ph-bxh-page"><div className="ph-bxh-shell"><section className="ph-state"><h1 className="ph-state__title">Không có quyền xem BXH</h1><p className="ph-state__text">Phiên CLB không hợp lệ hoặc đã hết hạn.</p><a className="ph-btn ph-btn--primary" href="/">Nhập lại mã CLB</a></section></div></main>;
+        return <div className="ph-bxh-page"><div className="ph-bxh-shell"><section className="ph-state"><h1 className="ph-state__title">Không có quyền xem BXH</h1><p className="ph-state__text">Phiên CLB không hợp lệ hoặc đã hết hạn.</p><a className="ph-btn ph-btn--primary" href="/">Nhập lại mã CLB</a></section></div></div>;
     }
     if (error) {
-        return <main className="ph-bxh-page"><div className="ph-bxh-shell"><section className="ph-state"><h1 className="ph-state__title">Chưa tải được BXH</h1><p className="ph-state__text">{error}</p><button className="ph-btn ph-btn--primary" type="button" onClick={() => setRetry((value) => value + 1)}>Thử lại</button></section></div></main>;
+        return <div className="ph-bxh-page"><div className="ph-bxh-shell"><section className="ph-state"><h1 className="ph-state__title">Chưa tải được BXH</h1><p className="ph-state__text">{error}</p><button className="ph-btn ph-btn--primary" type="button" onClick={() => setRetry((value) => value + 1)}>Thử lại</button></section></div></div>;
     }
 
     const rows = result.rows;
     const podium = rows.slice(0, 3);
-    const scale = rows[1]?.amount || rows[0]?.amount || 1;
+    const scale = rows[0]?.amount || 1;
 
     return (
-        <main className="ph-bxh-page">
+        <div className="ph-bxh-page">
             <div className="ph-bxh-shell">
-                <header className="ph-bxh-header">
-                    <div>
-                        <p className="ph-bxh-kicker">Minh bạch và cùng tiến bộ</p>
-                        <h1>BXH đóng góp</h1>
-                        <p className="ph-bxh-period">{periodText(result.period)}</p>
+                <section className="ph-bxh-hero">
+                    <span className="ph-bxh-hero__glow ph-bxh-hero__glow--a" aria-hidden="true" />
+                    <span className="ph-bxh-hero__glow ph-bxh-hero__glow--b" aria-hidden="true" />
+                    <div className="ph-bxh-hero__inner">
+                        <span className="ph-bxh-hero__tag"><span className="ph-bxh-hero__ping" aria-hidden="true" />Minh bạch và cùng tiến bộ</span>
+                        <h1 className="ph-bxh-hero__title">BXH đóng góp</h1>
+                        <p className="ph-bxh-hero__date"><span aria-hidden="true">📅</span>{periodText(result.period)}</p>
+                        <button className="ph-bxh-hero__share" type="button" onClick={shareBoard} disabled={sharing}>
+                            <span aria-hidden="true">🔗</span>{sharing ? 'Đang tạo ảnh…' : 'Chia sẻ BXH'}
+                        </button>
                     </div>
-                    <button className="ph-btn ph-btn--outline" type="button" onClick={shareBoard} disabled={sharing}>
-                        {sharing ? 'Đang tạo ảnh...' : 'Chia sẻ BXH'}
-                    </button>
-                </header>
+                </section>
 
                 <div className="ph-bxh-controls"><PhSeg items={PERIODS} value={period} onChange={setPeriod} label="Chọn kỳ xem" /></div>
 
@@ -131,24 +134,106 @@ export default function FundLeaderboardPage() {
                     <section className="ph-panel"><div className="ph-state"><h2 className="ph-state__title">Chưa có đóng góp trong kỳ này</h2><p className="ph-state__text">Khi có thành viên đóng quỹ, bảng xếp hạng sẽ xuất hiện tại đây.</p></div></section>
                 ) : (
                     <>
-                        <section className="ph-bxh-metrics" aria-label="Tổng quan đóng góp">
-                            <div className="ph-metric ph-metric--indigo"><span className="ph-metric__label">Tổng đóng góp</span><strong className="ph-metric__value">{amountText(result.summary.totalAmount)}</strong></div>
-                            <div className="ph-metric ph-metric--gold"><span className="ph-metric__label">Số người góp</span><strong className="ph-metric__value">{result.summary.memberCount}</strong></div>
-                            <div className="ph-metric ph-metric--cyan"><span className="ph-metric__label">Số lượt góp</span><strong className="ph-metric__value">{result.summary.transactionCount}</strong></div>
+                        <section className="ph-bxh-kpi" aria-label="Tổng quan đóng góp">
+                            <div className="ph-bxh-kpi__hero">
+                                <div>
+                                    <p className="ph-bxh-kpi__label"><span className="ph-bxh-kpi__dot" aria-hidden="true" />Tổng đóng góp quỹ</p>
+                                    <p className="ph-bxh-kpi__value">{money.format(result.summary.totalAmount)}<span>đ</span></p>
+                                </div>
+                                <span className="ph-bxh-kpi__badge" aria-hidden="true">💰</span>
+                            </div>
+                            <div className="ph-bxh-kpi__small ph-bxh-kpi__small--gold">
+                                <p className="ph-bxh-kpi__mini"><span aria-hidden="true">👥</span>Số người góp</p>
+                                <p className="ph-bxh-kpi__mini-value">{result.summary.memberCount}<small>thành viên</small></p>
+                            </div>
+                            <div className="ph-bxh-kpi__small ph-bxh-kpi__small--cyan">
+                                <p className="ph-bxh-kpi__mini"><span aria-hidden="true">📈</span>Số lượt góp</p>
+                                <p className="ph-bxh-kpi__mini-value">{result.summary.transactionCount}<small>giao dịch</small></p>
+                            </div>
                         </section>
+
                         <section className="ph-bxh-podium" aria-label="Ba hạng đầu">
-                            {podium.map((row) => <article className={`ph-bxh-podium-card ph-bxh-podium-card--${row.rank}`} key={row.key}><span className="ph-bxh-rank">Hạng {row.rank}</span><span className="ph-bxh-avatar" aria-hidden="true">{initials(row.name)}</span><h2>{row.name}</h2><strong>{amountText(row.amount)}</strong><span>{row.transactionCount} lượt góp</span></article>)}
+                            <div className="ph-bxh-section-heading">
+                                <h2 className="ph-bxh-podium__heading"><span aria-hidden="true">🏆</span>Top đầu bảng</h2>
+                                <span className="ph-badge ph-badge--muted">Top {podium.length}</span>
+                            </div>
+                            {podium.map((row) => (
+                                <article className={`ph-bxh-pod ph-bxh-pod--${row.rank}`} key={row.key}>
+                                    <div className="ph-bxh-pod__left">
+                                        <span className="ph-bxh-pod__avatar" aria-hidden="true">{initials(row.name)}<span className="ph-bxh-pod__num">{row.rank}</span></span>
+                                        <div className="ph-bxh-pod__info">
+                                            <div className="ph-bxh-pod__meta"><span className="ph-bxh-pod__rank">Hạng {row.rank}</span><span className="ph-bxh-pod__count">{row.transactionCount} lượt góp</span></div>
+                                            <h3>{row.name}</h3>
+                                        </div>
+                                    </div>
+                                    <div className="ph-bxh-pod__right">
+                                        <strong>{amountText(row.amount)}</strong>
+                                        <span className="ph-bxh-pod__medal">{MEDALS[row.rank - 1]}</span>
+                                    </div>
+                                </article>
+                            ))}
                             {rows.length === 1 && <p className="ph-bxh-only">Người duy nhất góp quỹ kỳ này</p>}
                         </section>
+
                         {result.unassigned.count > 0 && <p className="ph-bxh-note">{amountText(result.unassigned.amount)} từ {result.unassigned.count} giao dịch chưa vào bảng. <a href="/admin?section=fund">Mở sổ quỹ để xử lý</a>.</p>}
-                        <section className="ph-card ph-card--flat ph-bxh-table-card">
-                            <div className="ph-bxh-section-heading"><div><p className="ph-bxh-kicker">Xếp hạng theo tổng tiền</p><h2>Tất cả thứ hạng</h2></div><span className="ph-badge ph-badge--muted">{rows.length} người</span></div>
-                            <table className="ph-table"><thead><tr><th>Hạng</th><th>Thành viên</th><th>Lượt góp</th><th>Tổng đóng góp</th></tr></thead><tbody>{rows.map((row) => { const multiple = row.rank === 1 && rows[1] && row.amount > rows[1].amount * 1.5; const width = Math.min(100, (row.amount / scale) * 100); return <tr key={row.key}><td data-label="Hạng"><strong>{row.rank}</strong></td><td data-label="Thành viên"><div className="ph-bxh-person"><span className="ph-bxh-avatar ph-bxh-avatar--small" aria-hidden="true">{initials(row.name)}</span><span><strong>{row.name}</strong><span className="ph-bxh-badges">{row.streak >= 2 && <span className="ph-badge">Chuỗi {row.streak}</span>}{row.badges.map((badge) => <span className="ph-badge ph-badge--gold" key={badge.kind}>{badge.label}</span>)}</span></span></div></td><td data-label="Lượt góp">{row.transactionCount}</td><td data-label="Tổng đóng góp"><strong>{amountText(row.amount)}</strong><div className="ph-bxh-bar"><span style={{ width: `${width}%` }} /></div>{multiple && <small>gấp {(row.amount / rows[1].amount).toFixed(1).replace('.', ',')} lần hạng 2</small>}</td></tr>; })}</tbody></table>
+
+                        <section className="ph-bxh-list-wrap" aria-label="Tất cả thứ hạng">
+                            <div className="ph-bxh-section-heading">
+                                <div><p className="ph-bxh-kicker">Xếp hạng theo tổng tiền</p><h2>Tất cả thứ hạng</h2></div>
+                                <span className="ph-badge ph-badge--muted">{rows.length} người</span>
+                            </div>
+                            <div className="ph-bxh-list">
+                                {rows.map((row) => {
+                                    const multiple = row.rank === 1 && rows[1] && row.amount > rows[1].amount * 1.5;
+                                    const width = Math.min(100, (row.amount / scale) * 100);
+                                    return (
+                                        <article className="ph-bxh-item" key={row.key}>
+                                            <div className="ph-bxh-item__top">
+                                                <div className="ph-bxh-person">
+                                                    <span className="ph-bxh-avatar ph-bxh-avatar--small" aria-hidden="true">{initials(row.name)}</span>
+                                                    <div className="ph-bxh-person__body">
+                                                        <h4>{row.name}</h4>
+                                                        <span className="ph-bxh-badges">
+                                                            {row.streak >= 2 && <span className="ph-badge">Chuỗi {row.streak}</span>}
+                                                            {row.badges.map((badge) => <span className="ph-badge ph-badge--gold" key={badge.kind}>{badge.label}</span>)}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <span className="ph-bxh-item__rank">#{row.rank}</span>
+                                            </div>
+                                            <div className="ph-bxh-item__bottom">
+                                                <span className="ph-bxh-item__count">Lượt góp: <strong>{row.transactionCount}</strong></span>
+                                                <div className="ph-bxh-item__amount">
+                                                    <strong>{amountText(row.amount)}</strong>
+                                                    <div className="ph-bxh-bar"><span style={{ width: `${width}%` }} /></div>
+                                                </div>
+                                            </div>
+                                            {multiple && <small className="ph-bxh-item__multi">gấp {(row.amount / rows[1].amount).toFixed(1).replace('.', ',')} lần hạng 2</small>}
+                                        </article>
+                                    );
+                                })}
+                            </div>
                         </section>
-                        {result.idle.length > 0 && <section className="ph-card ph-card--flat ph-bxh-idle"><div className="ph-bxh-section-heading"><div><p className="ph-bxh-kicker">Cần một lời nhắc nhẹ</p><h2>Chưa góp quỹ kỳ này</h2></div></div><ul>{result.idle.map((item) => <li key={item.name}><strong>{item.name}</strong><span>{item.description}</span></li>)}</ul></section>}
+
+                        {result.idle.length > 0 && (
+                            <section className="ph-bxh-reminder" aria-label="Chưa góp quỹ kỳ này">
+                                <div className="ph-bxh-reminder__head">
+                                    <span className="ph-bxh-reminder__icon" aria-hidden="true">🔔</span>
+                                    <div><p className="ph-bxh-kicker ph-bxh-kicker--rose">Cần một lời nhắc nhẹ</p><h2>Chưa góp quỹ kỳ này</h2></div>
+                                </div>
+                                <ul className="ph-bxh-reminder__list">
+                                    {result.idle.map((item) => (
+                                        <li key={item.name}>
+                                            <strong>{item.name}</strong>
+                                            <span>{item.description}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </section>
+                        )}
                     </>
                 )}
             </div>
-        </main>
+        </div>
     );
 }

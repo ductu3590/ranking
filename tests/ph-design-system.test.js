@@ -85,7 +85,7 @@ console.log(`[ph-design-system] tham chieu token khai tu con lai: ${remaining}`)
 
 // Khong hardcode #rrggbb trong CSS moi - moi mau phai di qua token.
 const HEX_COLOR = /#[0-9a-fA-F]{3,8}\b/g;
-const NEW_CSS_FILES = ['app/styles/primitives.css', 'components/pickhub/AppShell.css'];
+const NEW_CSS_FILES = ['app/styles/primitives.css', 'components/pickhub/AppShell.css', 'app/quy/bxh/page.css'];
 for (const file of NEW_CSS_FILES) {
     const fullPath = path.join(root, file);
     if (!fs.existsSync(fullPath)) continue;

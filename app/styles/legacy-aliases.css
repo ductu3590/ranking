@@ -1,0 +1,66 @@
+/* TANG KHAI TU - khong them gi moi vao day.
+   Giu cho cac man hinh chua redesign chay duoc trong luc chuyen doi. */
+:root {
+  /* A - Alias ngu nghia */
+  --primary: var(--ph-indigo);
+  --primary-hover: var(--ph-indigo-hover);
+  --primary-dim: rgba(111, 72, 201, .10);
+  --primary-light: var(--ph-lavender);
+  --bg-primary: var(--ph-surface);
+  --bg-secondary: var(--ph-surface);
+  --bg-card: var(--ph-card);
+  --bg-card-hover: #FBFBFE;
+  --border-color: var(--ph-line);
+  --border-strong: #CFD6E4;
+  --text-primary: var(--ph-text);
+  --text-secondary: var(--ph-ink-2);
+  --text-muted: var(--ph-muted);
+  --success: var(--ph-positive);
+  --success-dim: rgba(31, 122, 82, .12);
+  --success-light: #E8F5EE;
+  --danger: var(--ph-negative);
+  --danger-dim: rgba(194, 69, 58, .12);
+  --danger-light: #FDECEA;
+  --warning: #B8860B;
+  --warning-dim: rgba(184, 134, 11, .14);
+  --dark: var(--ph-ink);
+  --light: #FFFFFF;
+  --secondary: var(--ph-indigo);
+  --accent: var(--ph-gold);
+  --font-family: var(--ph-font);
+  --border-radius-sm: var(--ph-radius-sm);
+  --border-radius-md: var(--ph-radius-sm);
+  --border-radius-lg: var(--ph-radius-md);
+  --border-radius-xl: var(--ph-radius-lg);
+  --shadow-sm: var(--ph-shadow-soft);
+  --shadow-md: var(--ph-shadow);
+  --shadow-lg: var(--ph-shadow);
+  --focus-ring: var(--ph-focus-ring);
+  --mobile-bottom-nav-height: var(--ph-bottom-nav-height);
+
+  /* B - Mau san xanh */
+  --court-midnight: var(--ph-ink);
+  --court-green: var(--ph-indigo);
+  --court-green-strong: var(--ph-indigo-hover);
+  --court-green-soft: var(--ph-lavender);
+  --pickle-lime: var(--ph-gold);
+  --pickle-lime-soft: #FFF4DC;
+  --live-cyan: var(--ph-cyan);
+  --live-cyan-soft: #EFFAFD;
+  --rally-coral: var(--ph-coral);
+  --rally-coral-soft: #FFF0EE;
+  --surface-court: var(--ph-surface);
+  --surface-court-soft: #EFF0F7;
+
+  /* C - Gradient cu */
+  --gradient-court-hero: linear-gradient(135deg, #6F48C9 0%, #8A63E0 60%, #A8DFE9 140%);
+  --gradient-court-action: linear-gradient(135deg, #FFC95E 0%, #FFB627 100%);
+  --gradient-court-green: linear-gradient(135deg, #6F48C9 0%, #8A63E0 100%);
+  --gradient-live: linear-gradient(135deg, #A8DFE9 0%, #6F48C9 100%);
+  --gradient-danger: linear-gradient(135deg, #C2453A 0%, #A5372E 100%);
+  --gradient-primary: var(--gradient-court-green);
+  --gradient-success: var(--gradient-court-green);
+  --gradient-team-blue: linear-gradient(135deg, #6F48C9 0%, #A8DFE9 100%);
+  --gradient-team-red: linear-gradient(135deg, #FF8B83 0%, #C2453A 100%);
+  --gradient-badge: var(--gradient-court-action);
+}

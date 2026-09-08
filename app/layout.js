@@ -1,4 +1,12 @@
+import { Montserrat } from 'next/font/google'
 import './globals.css'
+
+const montserrat = Montserrat({
+    subsets: ['latin', 'vietnamese'],
+    weight: ['400', '500', '600', '700', '800'],
+    display: 'swap',
+    variable: '--ph-font-loaded',
+})
 
 export const metadata = {
     title: 'Pickhub',
@@ -14,8 +22,8 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
     return (
-        <html lang="vi">
-            <body>{children}</body>
+        <html lang="vi" className={montserrat.variable}>
+            <body style={{ fontFamily: 'var(--ph-font-loaded), var(--ph-font)' }}>{children}</body>
         </html>
     )
 }

@@ -105,7 +105,7 @@ assert(
 );
 
 assert(
-    globalsCss.includes('--mobile-bottom-nav-height') && globalsCss.includes('safe-area-inset-bottom'),
+    globalsCss.includes('--ph-bottom-nav-height') && globalsCss.includes('safe-area-inset-bottom'),
     'Global CSS should reserve mobile safe-area space for the fixed bottom nav.'
 );
 

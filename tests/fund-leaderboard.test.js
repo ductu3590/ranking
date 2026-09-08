@@ -141,4 +141,51 @@ const newcomer = buildContributionLeaderboard({
 assert(!newcomer.idle.some((p) => p.name === 'TRẦN THỊ B'));
 assert.strictEqual(normalizeName('  nguyễn   văn a '), 'NGUYỄN VĂN A');
 
+// nudge: có người thực sự chưa góp gần đây (bỏ current + previous) → nhắc họ
+const nudgeBehind = buildContributionLeaderboard({
+    transactions: [
+        tx('NGUYỄN VĂN A', 10000, '2026-09-08T02:00:00.000Z'),
+        tx('TRẦN THỊ B', 10000, '2026-08-04T02:00:00.000Z'),
+    ],
+    members, period: 'week', now, shameBadgesEnabled: true,
+});
+assert.strictEqual(nudgeBehind.nudge.mode, 'behind');
+assert(nudgeBehind.nudge.items.some((p) => p.name === 'TRẦN THỊ B'));
+assert(!nudgeBehind.nudge.items.some((p) => p.name === 'NGUYỄN VĂN A'), 'người vừa góp tuần này không bị nhắc');
+
+// nudge: cả CLB đã góp tuần này → chuyển sang nhắc người góp ít nhất
+const membersLow = [
+    { full_name: 'NGUYỄN VĂN A', is_active: true },
+    { full_name: 'TRẦN THỊ B', is_active: true },
+    { full_name: 'PHẠM VĂN D', is_active: true },
+];
+const nudgeLow = buildContributionLeaderboard({
+    transactions: [
+        tx('NGUYỄN VĂN A', 30000, '2026-09-08T02:00:00.000Z'),
+        tx('TRẦN THỊ B', 20000, '2026-09-08T02:00:00.000Z'),
+        tx('PHẠM VĂN D', 10000, '2026-09-08T02:00:00.000Z'),
+    ],
+    members: membersLow, period: 'week', now, shameBadgesEnabled: true,
+});
+assert.strictEqual(nudgeLow.nudge.mode, 'low');
+assert(nudgeLow.nudge.items.some((p) => p.name === 'PHẠM VĂN D'), 'người góp ít nhất được nhắc');
+assert(!nudgeLow.nudge.items.some((p) => p.name === 'NGUYỄN VĂN A'), 'người góp nhiều không bị nhắc');
+
+// nudge: mọi người góp đều nhau → không nhắc ai
+const nudgeEqual = buildContributionLeaderboard({
+    transactions: [
+        tx('NGUYỄN VĂN A', 20000, '2026-09-08T02:00:00.000Z'),
+        tx('TRẦN THỊ B', 20000, '2026-09-08T02:00:00.000Z'),
+        tx('PHẠM VĂN D', 20000, '2026-09-08T02:00:00.000Z'),
+    ],
+    members: membersLow, period: 'week', now, shameBadgesEnabled: true,
+});
+assert.strictEqual(nudgeEqual.nudge.mode, null);
+
+const nudgeOff = buildContributionLeaderboard({
+    transactions: [tx('NGUYỄN VĂN A', 30000, '2026-09-08T02:00:00.000Z')],
+    members: membersLow, period: 'week', now, shameBadgesEnabled: false,
+});
+assert.strictEqual(nudgeOff.nudge.mode, null);
+
 console.log('fund-leaderboard: PASS');

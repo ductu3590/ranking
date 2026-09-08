@@ -17,8 +17,10 @@
 .ph-bxh-hero__share:hover { background: var(--ph-lavender); }
 .ph-bxh-hero__share:active { transform: scale(.98); }
 .ph-bxh-hero__share:disabled { opacity: .7; cursor: default; }
+.ph-bxh-hero__actions { width: 100%; display: flex; flex-direction: column; gap: var(--ph-space-3); }
+.ph-bxh-hero__filter { display: none; }
 
-/* Controls */
+/* Controls (timeframe filter shown below hero on mobile/tablet) */
 .ph-bxh-controls { display: flex; justify-content: center; }
 .ph-bxh-controls .ph-seg { width: 100%; max-width: 560px; }
 
@@ -108,6 +110,12 @@
 .ph-bxh-reminder__list li:last-child { border-bottom: 0; }
 .ph-bxh-reminder__list strong { font-size: 13px; font-weight: 700; color: var(--ph-ink); }
 .ph-bxh-reminder__list span { font-size: 11px; font-weight: 600; color: #C05564; }
+/* "Góp ít" mode: khích lệ góp thêm, tông thân thiện (không mang tính trách móc) */
+.ph-bxh-reminder--low { border-color: var(--ph-tint-indigo-line); background: linear-gradient(135deg, var(--ph-tint-indigo), var(--ph-card) 55%, var(--ph-tint-gold)); }
+.ph-bxh-reminder--low .ph-bxh-reminder__icon { background: var(--ph-lavender); }
+.ph-bxh-reminder--low .ph-bxh-kicker--rose { color: var(--ph-indigo); }
+.ph-bxh-reminder--low .ph-bxh-reminder__list li { border-bottom-color: var(--ph-tint-indigo-line); }
+.ph-bxh-reminder--low .ph-bxh-reminder__list span { color: var(--ph-ink-2); }
 
 /* Recent activity card */
 .ph-bxh-recent { padding: var(--ph-space-4); border: 1px solid var(--ph-line); border-radius: var(--ph-radius-md); background: var(--ph-card); box-shadow: var(--ph-shadow-soft); }
@@ -138,6 +146,7 @@
     .ph-bxh-hero__inner { flex-direction: row; align-items: center; justify-content: space-between; text-align: left; gap: var(--ph-space-6); }
     .ph-bxh-hero__text { justify-items: start; }
     .ph-bxh-hero__desc { display: block; }
+    .ph-bxh-hero__actions { width: auto; flex: 0 0 auto; align-items: stretch; }
     .ph-bxh-hero__share { width: auto; min-width: 168px; margin-top: 0; flex: 0 0 auto; padding: 0 22px; }
 
     /* KPI becomes a tidy 2x2 with all four cards */
@@ -153,6 +162,15 @@
 /* ===== Desktop (>= 1024px) ===== */
 @media (min-width: 1024px) {
     .ph-bxh-shell { max-width: 1120px; }
+
+    /* Timeframe filter moves into the hero; drop the standalone row (removes the empty side gaps) */
+    .ph-bxh-hero__actions { min-width: 380px; gap: var(--ph-space-3); }
+    .ph-bxh-hero__filter { display: block; }
+    .ph-bxh-hero__filter .ph-seg { width: 100%; background: rgba(20, 10, 45, .28); border-color: rgba(255, 255, 255, .2); }
+    .ph-bxh-hero__filter .ph-seg__item { color: rgba(255, 255, 255, .82); white-space: nowrap; }
+    .ph-bxh-hero__filter .ph-seg__item[aria-selected="true"] { background: #fff; color: var(--ph-indigo); }
+    .ph-bxh-hero__actions .ph-bxh-hero__share { width: 100%; min-width: 0; }
+    .ph-bxh-controls { display: none; }
 
     .ph-bxh-kpi { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 

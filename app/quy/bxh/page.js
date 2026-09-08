@@ -121,7 +121,8 @@ export default function FundLeaderboardPage() {
     const podium = rows.slice(0, 3);
     const scale = rows[0]?.amount || 1;
     const average = result.summary.memberCount > 0 ? Math.round(result.summary.totalAmount / result.summary.memberCount) : 0;
-    const hasAside = result.idle.length > 0 || recent.length > 0;
+    const nudge = result.nudge;
+    const hasAside = nudge.items.length > 0 || recent.length > 0;
 
     return (
         <div className="ph-bxh-page">
@@ -136,9 +137,12 @@ export default function FundLeaderboardPage() {
                             <p className="ph-bxh-hero__date"><span aria-hidden="true">📅</span>{periodText(result.period)}</p>
                             <p className="ph-bxh-hero__desc">Theo dõi tiến độ đóng góp quỹ sinh hoạt của CLB theo từng chu kỳ.</p>
                         </div>
-                        <button className="ph-bxh-hero__share" type="button" onClick={shareBoard} disabled={sharing}>
-                            <span aria-hidden="true">🔗</span>{sharing ? 'Đang tạo ảnh…' : 'Chia sẻ BXH'}
-                        </button>
+                        <div className="ph-bxh-hero__actions">
+                            <div className="ph-bxh-hero__filter"><PhSeg items={PERIODS} value={period} onChange={setPeriod} label="Chọn kỳ xem" /></div>
+                            <button className="ph-bxh-hero__share" type="button" onClick={shareBoard} disabled={sharing}>
+                                <span aria-hidden="true">🔗</span>{sharing ? 'Đang tạo ảnh…' : 'Chia sẻ BXH'}
+                            </button>
+                        </div>
                     </div>
                 </section>
 
@@ -240,14 +244,14 @@ export default function FundLeaderboardPage() {
 
                             {hasAside && (
                                 <aside className="ph-bxh-side" aria-label="Nhắc nhở và hoạt động">
-                                    {result.idle.length > 0 && (
-                                        <section className="ph-bxh-reminder" aria-label="Chưa góp quỹ kỳ này">
+                                    {nudge.items.length > 0 && (
+                                        <section className={`ph-bxh-reminder ph-bxh-reminder--${nudge.mode}`} aria-label={nudge.title}>
                                             <div className="ph-bxh-reminder__head">
-                                                <span className="ph-bxh-reminder__icon" aria-hidden="true">🔔</span>
-                                                <div><p className="ph-bxh-kicker ph-bxh-kicker--rose">Cần một lời nhắc nhẹ</p><h2>Chưa góp quỹ kỳ này</h2></div>
+                                                <span className="ph-bxh-reminder__icon" aria-hidden="true">{nudge.mode === 'low' ? '💡' : '🔔'}</span>
+                                                <div><p className="ph-bxh-kicker ph-bxh-kicker--rose">{nudge.kicker}</p><h2>{nudge.title}</h2></div>
                                             </div>
                                             <ul className="ph-bxh-reminder__list">
-                                                {result.idle.map((item) => (
+                                                {nudge.items.map((item) => (
                                                     <li key={item.name}>
                                                         <strong>{item.name}</strong>
                                                         <span>{item.description}</span>

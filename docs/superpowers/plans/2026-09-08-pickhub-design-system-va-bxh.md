@@ -9,7 +9,7 @@ dựng lớp primitive dùng chung, viết lại BXH thành một bảng tổng 
 và thêm chuông thông báo để trưởng nhóm gán thủ công các giao dịch không nhận diện được.
 
 **Kiến trúc:** Ba file CSS phân tầng (`tokens` → `primitives` → `legacy-aliases`) nạp một
-lần trong `globals.css`; một tầng alias khai tử giữ 291 tham chiếu token cũ sống sót trong
+lần trong `globals.css`; một tầng alias khai tử giữ 301 tham chiếu token cũ sống sót trong
 lúc chuyển đổi. Logic BXH là hàm thuần trong `lib/fundLeaderboard.js`, không I/O. Thông báo
 là bảng `club_notifications` cấp CLB, sinh từ webhook và từ đối soát bù.
 
@@ -106,7 +106,10 @@ Vi phạm bất kỳ điểm nào là lệch hướng, phải sửa chứ không
 grep -rho "var(--\(court\|pickle\|live-cyan\|rally\|surface-court\|gradient-court\|gradient-live\)[a-z-]*)" app components --include=*.css --include=*.js | sort | uniq -c | sort -rn
 ```
 
-Ghi tổng số vào báo cáo. Con số kỳ vọng khoảng 291.
+Ghi tổng số vào báo cáo. Con số kỳ vọng là **301** (đo ngày 2026-09-08):
+`app/quy` 196 · `app/admin` 36 · `components` 26 · `app/page.css` 24 · `app/globals.css` 16
+· `app/giai-dau` 3. Lệch vài đơn vị là bình thường nếu session khác vừa sửa CSS;
+lệch hàng chục thì dừng và báo cáo.
 
 - [ ] **Bước 2: Xác nhận 5 rule class trong globals.css là rule chết**
 

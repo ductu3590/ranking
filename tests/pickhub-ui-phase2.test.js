@@ -79,9 +79,12 @@ for (const file of [
 
 const rosterPage = read('app/quy/members/page.js');
 assert.match(rosterPage, /\/api\/identity\/roster/, 'roster UI consumes the athlete/membership projection');
-for (const field of ['displayName', 'alias', 'status', 'athleteId']) {
+for (const field of ['displayName', 'alias', 'status', 'effectiveFrom']) {
   assert.match(rosterPage, new RegExp(field), `roster UI renders ${field}`);
 }
+assert.doesNotMatch(rosterPage, /Athlete #|>Membership<|Athlete \/ membership/, 'roster UI drops English labels');
+assert.match(rosterPage, /Mã TV/, 'roster UI shows the membership code as Mã TV');
+assert.match(rosterPage, /Chỉnh sửa/, 'roster UI merges alias and PHR edits into one action');
 assert.match(rosterPage, /RoleActionBar/, 'admin roster actions use server-provided permissions');
 
 const infoPage = read('app/thong-tin/page.js');

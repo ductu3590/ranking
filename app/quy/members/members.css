@@ -23,6 +23,17 @@
 .member-fullname { color: var(--ph-ink); }
 .status-badge { display: inline-flex; padding: 5px 9px; border-radius: 999px; background: var(--ph-lavender); color: var(--ph-indigo); font-size: 11px; font-weight: 850; }
 .status-badge.status-inactive { background: #f0f1f5; color: var(--ph-muted); }
+.members-bulkbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; padding: 10px 13px; border: 1px solid var(--ph-line); border-radius: 13px; background: var(--ph-lavender); color: var(--ph-indigo); font-size: 12px; font-weight: 800; }
+.members-bulkbar > div { display: flex; gap: 8px; }
+.members-bulkbar button { min-height: 44px; padding: 0 13px; border: 1px solid var(--ph-line); border-radius: 11px; background: var(--ph-card); color: var(--ph-indigo); font: inherit; font-weight: 850; cursor: pointer; }
+.members-bulkbar button.is-danger { border-color: #e2b7b3; color: #a83e38; }
+.members-bulkbar button:disabled { opacity: .55; cursor: progress; }
+.members-table th.members-pick-cell, .members-table td.members-pick-cell { width: 44px; padding-right: 0; text-align: center; }
+.members-pick-cell input { width: 18px; height: 18px; accent-color: var(--ph-indigo); cursor: pointer; }
+.member-code { color: var(--ph-ink); font-variant-numeric: tabular-nums; }
+.roster-modal-error { margin: 0; padding: 10px 12px; border-radius: 11px; background: #fdeceb; color: #a83e38; font-size: 12px; font-weight: 750; }
+.roster-modal label small { color: var(--ph-muted); font-size: 11px; font-weight: 600; }
+.roster-modal button:disabled { opacity: .55; cursor: progress; }
 .roster-row-actions { display: flex; gap: 6px; }
 .roster-row-actions button { min-height: 44px; padding: 0 10px; border: 1px solid var(--ph-line); border-radius: 10px; background: var(--ph-card); color: var(--ph-indigo); font: inherit; font-size: 11px; font-weight: 800; cursor: pointer; }
 .roster-row-actions button.is-danger { color: #a83e38; }

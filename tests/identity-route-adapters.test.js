@@ -13,7 +13,7 @@ const routes = {
   'app/api/identity/session/revoke/route.js': ['createRevokeClubSessions'],
   'app/api/identity/roster/route.js': [
     'createCreateUnclaimedAthlete',
-    'createUpdateMembershipAlias',
+    'createUpdateMembershipProfile',
     'createEndClubMembership',
   ],
   'app/api/identity/assessments/route.js': ['createRecordMembershipAssessment'],

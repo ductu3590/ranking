@@ -8,11 +8,11 @@ import {
 
 const {
     createCreateUnclaimedAthlete,
-    createUpdateMembershipAlias,
+    createUpdateMembershipProfile,
     createEndClubMembership,
 } = rosterModule;
 const createUnclaimedAthlete = createCreateUnclaimedAthlete({ repository: identityRepository });
-const updateMembershipAlias = createUpdateMembershipAlias({ repository: identityRepository });
+const updateMembershipProfile = createUpdateMembershipProfile({ repository: identityRepository });
 const endClubMembership = createEndClubMembership({ repository: identityRepository });
 
 export async function GET() {
@@ -45,12 +45,13 @@ export async function POST(request) {
 export async function PATCH(request) {
     try {
         const session = readSignedClubSession();
-        enforceIdentityMutationRateLimit(request, 'roster-alias', session?.group_id);
+        enforceIdentityMutationRateLimit(request, 'roster-profile', session?.group_id);
         const body = await request.json();
-        const result = await updateMembershipAlias({
+        const result = await updateMembershipProfile({
             session,
             membershipId: body?.membershipId,
             alias: body?.alias,
+            displayName: body?.displayName,
             expectedVersion: body?.expectedVersion,
             correlationId: correlationIdFrom(request),
         });

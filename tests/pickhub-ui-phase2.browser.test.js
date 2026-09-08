@@ -96,15 +96,19 @@ async function waitForServer() {
 
     await page.goto(`${baseUrl}/quy/members`, { waitUntil: 'networkidle' });
     await page.getByRole('heading', { name: 'Thành viên CLB' }).waitFor();
-    assert.equal(await page.getByRole('button', { name: 'Cập nhật PHR' }).count(), 0, 'member cannot see PHR management controls');
-    assert.match(await page.locator('.members-table').innerText(), /Athlete #901/, 'roster exposes athlete identity');
+    assert.equal(await page.getByRole('button', { name: 'Chỉnh sửa' }).count(), 0, 'member cannot see roster edit controls');
+    assert.equal(await page.locator('.members-filter .filter-btn').count(), 2, 'roster shows only the two sinh hoạt filters');
+    const memberRoster = await page.locator('.members-table').innerText();
+    assert.match(memberRoster, /mã tv/i, 'roster leads with the membership code column');
+    assert.doesNotMatch(memberRoster, /athlete|unclaimed|membership/i, 'roster labels stay in Vietnamese');
 
     role = 'admin';
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto(`${baseUrl}/admin?section=roster`, { waitUntil: 'networkidle' });
     await page.getByRole('heading', { name: 'Trung tâm quản trị CLB' }).waitFor();
     assert.equal(await page.getByRole('button', { name: '+ Thêm VĐV' }).count(), 1, 'leader sees roster create control');
-    assert.equal(await page.getByRole('button', { name: 'Cập nhật PHR' }).count(), 2, 'leader sees scoped PHR controls');
+    assert.equal(await page.getByRole('button', { name: 'Chỉnh sửa' }).count(), 1, 'leader sees one edit control per active member');
+    assert.equal(await page.locator('.members-pick-cell input').count(), 2, 'leader can pick members for a bulk end');
     assert.match(await page.locator('.header-nav .nav-link').nth(4).innerText(), /Cấu hình/, 'leader fifth tab stays Cấu hình');
     assert.equal(browserErrors.length, 0, `browser errors: ${browserErrors.join(' | ')}`);
 

@@ -11,7 +11,7 @@ const {
 const { createClubSessionIssuer } = require('../lib/application/identity/sessionIssuer');
 const {
   createCreateUnclaimedAthlete,
-  createUpdateMembershipAlias,
+  createUpdateMembershipProfile,
   createEndClubMembership,
 } = require('../lib/application/identity/roster');
 const { createRecordMembershipAssessment } = require('../lib/application/identity/assessments');
@@ -191,9 +191,11 @@ async function testRosterMutationsAreAdminOnlyScopedAndVersioned() {
       calls.push(['create', input]);
       return { athlete: { id: 31, status: 'unclaimed' }, membership: { id: 41, version: 1 } };
     },
-    async updateMembershipAlias(input) {
-      calls.push(['alias', input]);
-      return input.expectedVersion === 1 ? { id: input.membershipId, club_alias: input.alias, version: 2 } : null;
+    async updateMembershipProfile(input) {
+      calls.push(['profile', input]);
+      return input.expectedVersion === 1
+        ? { id: input.membershipId, club_alias: input.alias, version: 2 }
+        : null;
     },
     async endMembership(input) {
       calls.push(['end', input]);
@@ -214,17 +216,19 @@ async function testRosterMutationsAreAdminOnlyScopedAndVersioned() {
   assert.equal(calls[0][1].displayName, 'Nguyễn Văn An');
   assert.equal(calls[0][1].actorType, 'club_admin_session');
 
-  const updateAlias = createUpdateMembershipAlias({ repository, now: () => now });
-  const updated = await updateAlias({
+  const updateProfile = createUpdateMembershipProfile({ repository, now: () => now });
+  const updated = await updateProfile({
     session: adminSession,
     membershipId: 41,
     alias: 'An mới',
+    displayName: ' Nguyễn Văn Ân ',
     expectedVersion: 1,
-    correlationId: 'req-alias',
+    correlationId: 'req-profile',
   });
   assert.equal(updated.version, 2);
+  assert.equal(calls[1][1].displayName, 'Nguyễn Văn Ân', 'profile update forwards the cleaned athlete name');
   await assert.rejects(
-    updateAlias({ session: adminSession, membershipId: 41, alias: 'An', expectedVersion: 9 }),
+    updateProfile({ session: adminSession, membershipId: 41, alias: 'An', expectedVersion: 9 }),
     expectCode('VERSION_CONFLICT')
   );
 

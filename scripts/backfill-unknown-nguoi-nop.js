@@ -13,6 +13,7 @@ from quy_pickleball q
 where q.group_id = ${groupId}
   and q.huong_giao_dich = 'in'
   and q.nguoi_nop <> 'Unknown'
+  and upper(q.nguoi_nop) <> 'THỦ QUỸ'
   and not exists (
     select 1 from club_members m
     where m.group_id = q.group_id and upper(m.full_name) = upper(q.nguoi_nop)
@@ -24,6 +25,7 @@ set nguoi_nop = 'Unknown'
 where q.group_id = ${groupId}
   and q.huong_giao_dich = 'in'
   and q.nguoi_nop <> 'Unknown'
+  and upper(q.nguoi_nop) <> 'THỦ QUỸ'
   and not exists (
     select 1 from club_members m
     where m.group_id = q.group_id and upper(m.full_name) = upper(q.nguoi_nop)
@@ -35,6 +37,7 @@ from quy_pickleball q
 where q.group_id = ${groupId}
   and q.huong_giao_dich = 'in'
   and q.nguoi_nop <> 'Unknown'
+  and upper(q.nguoi_nop) <> 'THỦ QUỸ'
   and not exists (
     select 1 from club_members m
     where m.group_id = q.group_id and upper(m.full_name) = upper(q.nguoi_nop)

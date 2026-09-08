@@ -35,10 +35,18 @@ se_doi: 31
 so_chuoi_rac: 17
 ```
 
-So `31` nam trong khoang du kien `28–36` va duoi nguong an toan `100`.
+Sau khi bo sung dieu kien loai `THỦ QUỸ`, so `30` nam trong khoang du kien `28–36` va duoi nguong an toan `100`.
 
-**Chua chay UPDATE. Chua co count sau.**
+## Ket qua sau khi duoc xac nhan
+
+```text
+se_doi truoc: 30
+so_chuoi_rac truoc: 16
+con_lai sau UPDATE: 0
+```
+
+Dieu kien `upper(q.nguoi_nop) <> 'THỦ QUỸ'` duoc ap dung trong ca ba cau SQL. Nhan `THỦ QUỸ` duoc giu nguyen.
 
 ## Lech so voi ke hoach
 
-Khong co ve implementation. Theo yeu cau van hanh, chi chay cau dem truoc qua kenh read-only va dung truoc UPDATE.
+Bo sung dieu kien loai `THỦ QUỸ` theo yeu cau van hanh truoc khi chay backfill.

@@ -140,7 +140,8 @@ Dừng ngay, đừng tự quyết, trong các trường hợp sau:
 |---|---|
 | Task 1 — Preflight | ✅ Xong, duyệt. Evidence: `docs/pickhub-core/evidence/design-system-bxh-task-1-preflight-2026-09-08.md` |
 | Task 2 — Token + Montserrat | ✅ Xong, duyệt độc lập (đọc code + tự chạy lại test/build/regression). Commit `4b97122`. Evidence: `docs/pickhub-core/evidence/design-system-bxh-task-2-token-font-2026-09-08.md` |
-| Task 3 trở đi | Chưa làm |
+| Task 3 — Primitive CSS | 🔧 Kế hoạch đã sửa (xem đính chính bên dưới), chưa thực thi lại |
+| Task 4 trở đi | Chưa làm |
 
 **Đính chính từ Task 1, đã sửa trong kế hoạch:**
 
@@ -150,6 +151,27 @@ Dừng ngay, đừng tự quyết, trong các trường hợp sau:
   trần 1.000 hàng chưa bị chạm; **Task 8 giữ nguyên vị trí**, không cần đảo lên trước.
 - `npm run test:regression` **PASS** trước khi sửa gì. Đây là mốc so sánh: mọi lỗi đỏ
   từ Task 2 trở đi là do đợt này gây ra.
+
+**Sửa lỗi trong kế hoạch — Task 3, phát hiện khi bạn dừng lại đúng lúc hỏi:**
+
+`primitives.css` bản đầu của Task 3 dùng hex hardcode (`#fff`, `#F4F2FE`, `#FFF8E9`,
+`#EEF0F5`, `rgba(40,36,61,.45)`…) cho tint nền của metric/badge/skeleton/backdrop —
+vi phạm thẳng ràng buộc "không hardcode #rrggbb" ở mục 2. Đây là lỗi tôi viết sai khi
+soạn kế hoạch, không phải bạn hiểu nhầm.
+
+**Đã sửa, không phải ngoại lệ:** thêm 13 token tint mới vào `tokens.css`
+(`--ph-tint-indigo`, `--ph-tint-gold`, `--ph-tint-gold-text`, `--ph-tint-cyan`,
+`--ph-tint-coral`, `--ph-tint-positive`, `--ph-tint-negative`, `--ph-tint-neutral`,
+`--ph-tint-neutral-strong`, cùng các `-line` tương ứng) và `--ph-backdrop`. Đây là
+mở rộng baseline đúng cách — cùng kiểu với `--ph-positive`/`--ph-negative` đã làm ở
+Task 2 — không phải hardcode lách luật. `primitives.css` giờ chỉ dùng `var(--ph-*)`,
+kể cả `#fff` cũng đổi thành `var(--ph-card)`.
+
+Task 3 trong kế hoạch giờ có 7 bước thay vì 3: thêm token trước (TDD — mở rộng
+`REQUIRED_TOKENS` trong test, chạy fail, rồi thêm token cho pass), sau đó mới viết
+`primitives.css`, và cuối cùng thêm **test chặn hardcode tự động**
+(`NEW_CSS_FILES` trong `ph-design-system.test.js`) để lỗi này không lặp lại ở các
+task CSS sau — Task 11 (trang BXH) đã được nối vào cùng danh sách kiểm đó.
 
 **Ghi nhận từ review Task 2 — áp dụng cho mọi task sau:**
 
@@ -163,6 +185,12 @@ Dừng ngay, đừng tự quyết, trong các trường hợp sau:
 
 ## 8. Task cần làm lần này
 
-**Task 3.**
+**Task 3 — làm lại từ đầu theo kế hoạch đã sửa (`git pull` trước).**
+
+Kế hoạch Task 3 giờ có 7 bước: mở rộng test token (bước 1) → thêm token tint vào
+`tokens.css` (bước 2) → chạy test xác nhận phần token pass (bước 3) → viết
+`primitives.css` chỉ dùng `var(--ph-*)` (bước 4) → mở rộng test chặn hardcode tự động
+(bước 5) → chạy test toàn bộ (bước 6) → build và commit (bước 7). Đọc lại nguyên
+văn trong kế hoạch, đừng dùng bản primitives.css cũ trong bộ nhớ của bạn.
 
 Chỉ làm task này. Làm xong thì báo cáo theo mẫu mục 5 và dừng lại chờ xác nhận.

@@ -504,12 +504,92 @@ git commit -m "feat(ui): hop nhat token ve --ph-*, nap font Montserrat, thay tes
 
 ## Task 3: Primitive CSS
 
-**Files:** Sửa `app/styles/primitives.css`
+**Files:**
+- Sửa: `app/styles/tokens.css` (mở rộng thêm token tint)
+- Sửa: `app/styles/primitives.css`
+- Sửa test: `tests/ph-design-system.test.js`
 
-- [ ] **Bước 1: Viết nội dung primitives.css**
+> **Vì sao có bước mở rộng token ở đây:** primitive cần vài sắc nền nhạt (tint) cho
+> metric card, badge và hiệu ứng skeleton — những màu này **không có sẵn** trong
+> bảng token của `UI-BRAND-SYSTEM.md`. Ràng buộc tuyệt đối cấm hardcode `#rrggbb`
+> trong CSS mới, nên các sắc đó phải trở thành token trước, đúng cách "mở rộng
+> baseline" mà `--ph-positive`/`--ph-negative` đã làm ở Task 2 — không phải ngoại lệ,
+> không phải hardcode lách luật.
 
-Toàn bộ class dùng token, không hardcode màu. Bắt buộc có đủ các họ sau; mỗi họ chỉ một
-hiện thực:
+- [ ] **Bước 1: Mở rộng test token, xác nhận fail**
+
+Thêm vào mảng `REQUIRED_TOKENS` trong `tests/ph-design-system.test.js`, ngay sau dòng
+`['--ph-radius-lg', '28px'],`:
+
+```js
+    ['--ph-tint-indigo', '#F4F2FE'],
+    ['--ph-tint-indigo-line', '#DED6FA'],
+    ['--ph-tint-gold', '#FFF4DC'],
+    ['--ph-tint-gold-line', '#F5E2B8'],
+    ['--ph-tint-gold-text', '#8A5B00'],
+    ['--ph-tint-cyan', '#EFFAFD'],
+    ['--ph-tint-cyan-line', '#C9EDF6'],
+    ['--ph-tint-coral', '#FFF1EF'],
+    ['--ph-tint-coral-line', '#FBD8D3'],
+    ['--ph-tint-positive', '#E8F5EE'],
+    ['--ph-tint-negative', '#FDECEA'],
+    ['--ph-tint-neutral', '#EEF0F5'],
+    ['--ph-tint-neutral-strong', '#F7F8FB'],
+```
+
+Và thêm một assert riêng cho `--ph-backdrop` (giá trị là `rgba(...)`, không khớp
+regex hex nên kiểm bằng chuỗi):
+
+```js
+assert(/--ph-backdrop\s*:\s*rgba\(40,\s*36,\s*61,\s*\.45\)/.test(tokens),
+    'tokens.css phải khai --ph-backdrop: rgba(40, 36, 61, .45)');
+```
+
+Chạy:
+
+```bash
+node tests/ph-design-system.test.js
+```
+
+Kỳ vọng: FAIL — `tokens.css phải khai --ph-tint-indigo: #F4F2FE`.
+
+- [ ] **Bước 2: Thêm token tint vào `app/styles/tokens.css`**
+
+Thêm khối này vào cuối `:root` trong `app/styles/tokens.css`, trước dấu `}` đóng:
+
+```css
+
+  /* Mở rộng: nền nhạt (tint) cho metric, badge, skeleton, backdrop modal.
+     Không có trong bảng màu baseline — phái sinh từ 4 màu accent đã duyệt. */
+  --ph-tint-indigo: #F4F2FE;
+  --ph-tint-indigo-line: #DED6FA;
+  --ph-tint-gold: #FFF4DC;
+  --ph-tint-gold-line: #F5E2B8;
+  --ph-tint-gold-text: #8A5B00;
+  --ph-tint-cyan: #EFFAFD;
+  --ph-tint-cyan-line: #C9EDF6;
+  --ph-tint-coral: #FFF1EF;
+  --ph-tint-coral-line: #FBD8D3;
+  --ph-tint-positive: #E8F5EE;
+  --ph-tint-negative: #FDECEA;
+  --ph-tint-neutral: #EEF0F5;
+  --ph-tint-neutral-strong: #F7F8FB;
+  --ph-backdrop: rgba(40, 36, 61, .45); /* --ph-ink ở 45% alpha, dùng cho nền modal */
+```
+
+- [ ] **Bước 3: Chạy lại test, xác nhận phần token đã pass**
+
+```bash
+node tests/ph-design-system.test.js
+```
+
+Kỳ vọng: PASS (primitives.css vẫn còn là placeholder nên chưa có gì để kiểm hardcode,
+nhưng toàn bộ assertion token phải xanh).
+
+- [ ] **Bước 4: Viết nội dung `primitives.css`**
+
+Toàn bộ class dùng token, **không hardcode màu dưới bất kỳ hình thức nào** — kể cả
+`#fff` tiện tay. Bắt buộc có đủ các họ sau; mỗi họ chỉ một hiện thực:
 
 ```css
 /* ─── Nút ─── */
@@ -520,13 +600,13 @@ hiện thực:
   text-decoration: none; transition: background .16s ease, border-color .16s ease;
 }
 .ph-btn:disabled { opacity: .55; cursor: not-allowed; }
-.ph-btn--primary { background: var(--ph-indigo); color: #fff; }
+.ph-btn--primary { background: var(--ph-indigo); color: var(--ph-card); }
 .ph-btn--primary:hover:not(:disabled) { background: var(--ph-indigo-hover); }
 .ph-btn--outline { background: var(--ph-card); color: var(--ph-ink); border: 1px solid var(--ph-line); }
 .ph-btn--outline:hover:not(:disabled) { border-color: var(--ph-ink-2); }
 .ph-btn--ghost { background: transparent; color: var(--ph-indigo); }
 .ph-btn--ghost:hover:not(:disabled) { background: var(--ph-lavender); }
-.ph-btn--danger { background: var(--ph-negative); color: #fff; }
+.ph-btn--danger { background: var(--ph-negative); color: var(--ph-card); }
 .ph-btn--sm { min-height: 36px; padding: 0 12px; font-size: 12px; }
 .ph-btn--block { width: 100%; }
 
@@ -543,10 +623,10 @@ hiện thực:
 .ph-metric { padding: var(--ph-space-4); border-radius: var(--ph-radius-sm); border: 1px solid var(--ph-line); background: var(--ph-card); }
 .ph-metric__label { display: block; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ph-muted); }
 .ph-metric__value { display: block; margin-top: 6px; font-size: 20px; font-weight: 800; letter-spacing: -.03em; color: var(--ph-ink); font-variant-numeric: tabular-nums; }
-.ph-metric--indigo { background: #F4F2FE; border-color: #DED6FA; }
-.ph-metric--gold { background: #FFF8E9; border-color: #F5E2B8; }
-.ph-metric--cyan { background: #EFFAFD; border-color: #C9EDF6; }
-.ph-metric--coral { background: #FFF1EF; border-color: #FBD8D3; }
+.ph-metric--indigo { background: var(--ph-tint-indigo); border-color: var(--ph-tint-indigo-line); }
+.ph-metric--gold { background: var(--ph-tint-gold); border-color: var(--ph-tint-gold-line); }
+.ph-metric--cyan { background: var(--ph-tint-cyan); border-color: var(--ph-tint-cyan-line); }
+.ph-metric--coral { background: var(--ph-tint-coral); border-color: var(--ph-tint-coral-line); }
 
 /* ─── Badge / chip ─── */
 .ph-badge, .ph-chip {
@@ -555,15 +635,15 @@ hiện thực:
   font-size: 11px; font-weight: 700; line-height: 1.5;
 }
 .ph-badge { background: var(--ph-lavender); color: var(--ph-indigo); }
-.ph-badge--gold { background: #FFF4DC; color: #8A5B00; }
-.ph-badge--positive { background: #E8F5EE; color: var(--ph-positive); }
-.ph-badge--negative { background: #FDECEA; color: var(--ph-negative); }
-.ph-badge--muted { background: #EEF0F5; color: var(--ph-muted); }
+.ph-badge--gold { background: var(--ph-tint-gold); color: var(--ph-tint-gold-text); }
+.ph-badge--positive { background: var(--ph-tint-positive); color: var(--ph-positive); }
+.ph-badge--negative { background: var(--ph-tint-negative); color: var(--ph-negative); }
+.ph-badge--muted { background: var(--ph-tint-neutral); color: var(--ph-muted); }
 
 /* ─── Segmented control ─── */
 .ph-seg { display: flex; gap: 3px; padding: 3px; background: var(--ph-card); border: 1px solid var(--ph-line); border-radius: var(--ph-radius-sm); }
 .ph-seg__item { flex: 1; min-height: 38px; border: 0; border-radius: 9px; background: transparent; color: var(--ph-muted); font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
-.ph-seg__item[aria-selected="true"] { background: var(--ph-indigo); color: #fff; }
+.ph-seg__item[aria-selected="true"] { background: var(--ph-indigo); color: var(--ph-card); }
 
 /* ─── Bảng: desktop dày, mobile thành card ─── */
 .ph-table { width: 100%; border-collapse: collapse; }
@@ -577,7 +657,7 @@ hiện thực:
 }
 
 /* ─── Modal ─── */
-.ph-modal__backdrop { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 16px; background: rgba(40, 36, 61, .45); }
+.ph-modal__backdrop { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 16px; background: var(--ph-backdrop); }
 .ph-modal { width: min(520px, 100%); max-height: 85vh; overflow: auto; padding: var(--ph-space-6); background: var(--ph-card); border-radius: var(--ph-radius-md); box-shadow: var(--ph-shadow); }
 .ph-modal__title { margin: 0 0 8px; font-size: 17px; font-weight: 800; letter-spacing: -.02em; color: var(--ph-ink); }
 .ph-modal__actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: var(--ph-space-6); }
@@ -595,7 +675,7 @@ hiện thực:
 
 /* ─── Skeleton ─── */
 @keyframes ph-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
-.ph-skeleton { border-radius: var(--ph-radius-sm); background: linear-gradient(90deg, #EEF0F5 25%, #F7F8FB 37%, #EEF0F5 63%); background-size: 200% 100%; animation: ph-shimmer 1.4s ease infinite; }
+.ph-skeleton { border-radius: var(--ph-radius-sm); background: linear-gradient(90deg, var(--ph-tint-neutral) 25%, var(--ph-tint-neutral-strong) 37%, var(--ph-tint-neutral) 63%); background-size: 200% 100%; animation: ph-shimmer 1.4s ease infinite; }
 .ph-skeleton--text { height: 12px; }
 .ph-skeleton--line { height: 16px; }
 .ph-skeleton--row { height: 46px; margin-bottom: 8px; }
@@ -603,19 +683,38 @@ hiện thực:
 @media (prefers-reduced-motion: reduce) { .ph-skeleton { animation: none; } }
 ```
 
-- [ ] **Bước 2: Chạy test design system**
+- [ ] **Bước 5: Mở rộng test chặn hardcode hex trong CSS mới**
+
+Thêm vào cuối `tests/ph-design-system.test.js`, trước dòng `console.log('ph-design-system: PASS');`:
+
+```js
+// Không hardcode #rrggbb trong CSS mới — mọi màu phải đi qua token.
+// tokens.css và legacy-aliases.css là hai file DUY NHẤT được phép chứa giá trị hex thô,
+// vì đó chính là tầng định nghĩa token.
+const HEX_COLOR = /#[0-9a-fA-F]{3,8}\b/g;
+const NEW_CSS_FILES = ['app/styles/primitives.css', 'components/pickhub/AppShell.css'];
+for (const file of NEW_CSS_FILES) {
+    const fullPath = path.join(root, file);
+    if (!fs.existsSync(fullPath)) continue; // AppShell.css chưa tồn tại trước Task 5
+    const hits = read(file).match(HEX_COLOR) || [];
+    assert.strictEqual(hits.length, 0, `${file} không được hardcode màu (thấy: ${hits.join(', ')}); dùng var(--ph-*)`);
+}
+```
+
+- [ ] **Bước 6: Chạy test, xác nhận toàn bộ pass**
 
 ```bash
 node tests/ph-design-system.test.js
 ```
 
-Kỳ vọng: PASS (test đã kiểm không có hardcode token cũ).
+Kỳ vọng: PASS, không còn dòng nào trong `primitives.css` bị bắt lỗi hardcode.
 
-- [ ] **Bước 3: Commit**
+- [ ] **Bước 7: Build và commit**
 
 ```bash
-git add app/styles/primitives.css
-git commit -m "feat(ui): them lop primitive ph-* dung chung"
+npm run build
+git add app/styles/tokens.css app/styles/primitives.css tests/ph-design-system.test.js
+git commit -m "feat(ui): mo rong token tint, them lop primitive ph-* khong hardcode mau"
 ```
 
 ---
@@ -1941,13 +2040,17 @@ rồi gọi `buildContributionLeaderboard({ transactions, members, period, shame
 
 Chỉ chứa layout riêng của trang. Mọi màu qua token `--ph-*`. Không hardcode `#rrggbb`.
 
-- [ ] **Bước 3: Kiểm không còn hardcode màu**
+- [ ] **Bước 3: Đưa file vào danh sách kiểm hardcode tự động**
+
+Trong `tests/ph-design-system.test.js`, thêm `'app/quy/bxh/page.css'` vào mảng
+`NEW_CSS_FILES` (mảng đã tạo ở Task 3 bước 5) thay vì chỉ kiểm thủ công một lần —
+từ nay mọi lần chạy `ph-design-system` đều tự chặn nếu file này hồi quy về hardcode.
 
 ```bash
-grep -n "#[0-9a-fA-F]\{3,8\}" app/quy/bxh/page.css || echo "sach"
+node tests/ph-design-system.test.js
 ```
 
-Kỳ vọng: `sach`.
+Kỳ vọng: PASS.
 
 - [ ] **Bước 4: Build và commit**
 
@@ -2364,6 +2467,17 @@ export async function GET(request) {
 đóng góp, và dấu hiệu PickHub. Nền gradient indigo `#6F48C9 → #8A63E0`, huy hiệu `#FFC95E`,
 chữ trắng. Xử lý được trường hợp < 3 người.
 
+> **Ngoại lệ hex hợp lệ, không phải vi phạm ràng buộc "không hardcode #rrggbb":** SVG
+> ở đây được ghép chuỗi phía server (Node.js), không chạy trong trình duyệt nên
+> **không có CSS cascade và không resolve được `var(--ph-*)`**. Giá trị hex trong hàm
+> này là bắt buộc phải viết trực tiếp. Điều kiện: mỗi giá trị hex trong
+> `renderShareCardSvg` phải **trùng khớp chính xác** với một token trong `tokens.css`
+> (`#6F48C9` = `--ph-indigo`, `#8A63E0` là sắc sáng hơn dùng riêng cho gradient — thêm
+> làm hằng số `SHARE_CARD_GRADIENT_END` ngay trong file route, không thêm vào
+> `tokens.css` vì nó không dùng ở đâu khác) và phải có comment nêu tên token tương ứng.
+> Đây **không** áp dụng cho bất kỳ file `.css` nào — `NEW_CSS_FILES` trong
+> `tests/ph-design-system.test.js` chỉ quét file CSS thật.
+
 - [ ] **Bước 4: Chạy test, build và commit**
 
 ```bash
@@ -2398,6 +2512,12 @@ Trong `docs/pickhub-core/UI-BRAND-SYSTEM.md` mục 2, thêm vào bảng token:
 `--ph-ink-2 #514A72` (chữ cấp hai), `--ph-positive #1F7A52` (số dương, 5.30:1 trên trắng),
 `--ph-negative #C2453A` (số âm, 5.08:1 trên trắng). Ghi rõ `--ph-cyan` và `--ph-coral` chỉ
 dùng làm nền/accent.
+
+Thêm một dòng riêng ghi nhận nhóm token tint bổ sung ở Task 3 (`--ph-tint-indigo`,
+`--ph-tint-gold`, `--ph-tint-gold-text`, `--ph-tint-cyan`, `--ph-tint-coral`,
+`--ph-tint-positive`, `--ph-tint-negative`, `--ph-tint-neutral`, `--ph-tint-neutral-strong`,
+`--ph-backdrop`): đây là nền nhạt phái sinh từ 4 màu accent đã duyệt, dùng cho metric
+card, badge và skeleton — không phải màu mới, không đổi hệ màu.
 
 - [ ] **Bước 4: Smoke thủ công**
 

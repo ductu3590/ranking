@@ -1,16 +1,11 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
-import navigation from '@/lib/globalNavigation';
 import UserStatusBadge from './UserStatusBadge';
 import ClubSwitcher from './pickhub/ClubSwitcher';
 import { readClubAccessContexts, readDefaultClubId } from '@/lib/clubAccessClient';
 import './HomeHeader.css';
 
-const { isGlobalNavActive } = navigation;
-
-export default function HomeHeader() {
-    const pathname = usePathname();
+export default function HomeHeader({ trailing = null }) {
     const [branding, setBranding] = useState({ name: 'Pickhub', logoUrl: null });
     const [sessionView, setSessionView] = useState({ session: null, permissions: {}, loading: true });
     const [clubContexts, setClubContexts] = useState([]);
@@ -46,9 +41,6 @@ export default function HomeHeader() {
         };
     }, []);
 
-    const role = sessionView.permissions?.canViewClub ? sessionView.session?.role : 'member';
-    const navLinks = navigation.getGlobalNavLinksForRole(role);
-
     return (
         <header className="home-header">
             <div className="header-container">
@@ -67,24 +59,8 @@ export default function HomeHeader() {
                     currentSession={sessionView.permissions?.canViewClub ? sessionView.session : null}
                 />
 
-                <nav className="header-nav">
-                    {navLinks.map((link) => {
-                        const isActive = isGlobalNavActive(pathname, link.href);
-                        return (
-                            <a
-                                key={link.href}
-                                href={link.href}
-                                className={`nav-link ${isActive ? 'active' : ''} ${link.featured ? 'featured' : ''}`}
-                                aria-current={isActive ? 'page' : undefined}
-                            >
-                                <span className="nav-link-icon" aria-hidden="true">{link.icon}</span>
-                                <span>{link.label}</span>
-                            </a>
-                        );
-                    })}
-                </nav>
-
                 <div className="header-right">
+                    {trailing}
                     <UserStatusBadge sessionView={sessionView} />
                 </div>
             </div>

@@ -1,0 +1,19 @@
+.ph-shell { min-height: 100vh; background: var(--ph-surface); }
+.ph-shell__body { display: block; }
+
+.ph-rail { display: none; }
+.ph-rail__label { display: block; padding: 0 12px 10px; font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--ph-muted); }
+.ph-rail__link { display: flex; align-items: center; gap: 11px; min-height: 44px; padding: 0 12px; border-radius: var(--ph-radius-sm); color: var(--ph-ink-2); font-size: 13px; font-weight: 700; text-decoration: none; }
+.ph-rail__link:hover, .ph-rail__link.is-active { background: var(--ph-lavender); color: var(--ph-indigo); }
+
+.ph-shell__main { width: min(1160px, 100%); margin: 0 auto; padding: 24px 16px 48px; }
+
+@media (min-width: 768px) {
+  .ph-shell__main { padding: 32px 24px 56px; }
+}
+
+@media (min-width: 1120px) {
+  .ph-shell__body { display: grid; grid-template-columns: var(--ph-rail-width) minmax(0, 1fr); }
+  .ph-rail { display: flex; flex-direction: column; gap: 4px; padding: 28px 16px; background: var(--ph-card); border-right: 1px solid var(--ph-line); }
+  .ph-shell__main { padding: 40px 40px 64px; }
+}

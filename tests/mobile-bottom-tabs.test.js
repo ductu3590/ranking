@@ -7,6 +7,7 @@ const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 
 const homeHeaderJs = read('components/HomeHeader.js');
 const homeHeaderCss = read('components/HomeHeader.css');
+const sideRailJs = read('components/pickhub/SideRail.js');
 const globalNavigation = require('../lib/globalNavigation');
 const quyLayoutJs = read('app/quy/layout.js');
 const giaiDauLayoutJs = read('app/giai-dau/layout.js');
@@ -28,18 +29,18 @@ const mobileBottomNavCss = fs.existsSync(path.join(root, 'components/MobileBotto
     : '';
 
 assert(
-    quyLayoutJs.includes('MobileBottomNav') && !quyLayoutJs.includes('area='),
-    'Fund layout should mount MobileBottomNav for every /quy page.'
+    quyLayoutJs.includes('AppShell') && !quyLayoutJs.includes('area='),
+    'Fund layout should mount AppShell for every /quy page.'
 );
 
 assert(
-    giaiDauLayoutJs.includes('MobileBottomNav') && !giaiDauLayoutJs.includes('area='),
-    'Tournament layout should mount MobileBottomNav for every /giai-dau page.'
+    giaiDauLayoutJs.includes('AppShell') && !giaiDauLayoutJs.includes('area='),
+    'Tournament layout should mount AppShell for every /giai-dau page.'
 );
 
 assert(
-    quyLayoutJs.includes('HomeHeader') && giaiDauLayoutJs.includes('HomeHeader'),
-    'Fund and Tournament layouts should share the same HomeHeader app shell.'
+    !quyLayoutJs.includes('HomeHeader') && !giaiDauLayoutJs.includes('HomeHeader'),
+    'Fund and Tournament layouts should delegate HomeHeader to AppShell.'
 );
 
 assert(
@@ -54,9 +55,9 @@ assert(
 );
 
 assert(
-    homeHeaderJs.includes('getGlobalNavLinksForRole') &&
+    sideRailJs.includes('getGlobalNavLinksForRole') &&
     mobileBottomNavJs.includes('getGlobalNavLinksForRole'),
-    'Desktop and mobile navigation should derive their links from the shared server-role menu function.'
+    'Rail and mobile navigation should derive their links from the shared server-role menu function.'
 );
 
 assert(
@@ -81,8 +82,8 @@ assert(
 );
 
 assert(
-    homeHeaderJs.includes('isGlobalNavActive') && mobileBottomNavJs.includes('isGlobalNavActive'),
-    'Desktop and mobile navigation should share nested-route active state behavior.'
+    sideRailJs.includes('isGlobalNavActive') && mobileBottomNavJs.includes('isGlobalNavActive'),
+    'Rail and mobile navigation should share nested-route active state behavior.'
 );
 
 assert(
@@ -107,6 +108,15 @@ assert(
 assert(
     globalsCss.includes('--ph-bottom-nav-height') && globalsCss.includes('safe-area-inset-bottom'),
     'Global CSS should reserve mobile safe-area space for the fixed bottom nav.'
+);
+
+assert(
+    /max-width:\s*1119px/.test(mobileBottomNavCss),
+    'Bottom nav phai hien thi toi < 1120px vi side rail chi bat dau tu 1120px'
+);
+assert(
+    !/max-width:\s*768px/.test(mobileBottomNavCss),
+    'Khong duoc de bottom nav dung o 768px - dai 768-1119px se mat dieu huong'
 );
 
 console.log('mobile bottom tabs contract ok');

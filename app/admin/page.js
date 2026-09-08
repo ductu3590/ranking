@@ -2,8 +2,7 @@
 
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import HomeHeader from '@/components/HomeHeader';
-import MobileBottomNav from '@/components/MobileBottomNav';
+import AppShell from '@/components/pickhub/AppShell';
 import FundAdminPage from '@/app/quy/admin/page';
 import ClubSettings from '@/app/admin/ClubSettings';
 import MembersPage from '@/app/quy/members/page';
@@ -41,10 +40,9 @@ function UnifiedAdminCenterContent() {
     }
 
     return (
-        <div className="admin-center-shell">
-            <HomeHeader />
-
-            <main className="admin-center">
+        <AppShell>
+            <div className="admin-center-shell">
+                <main className="admin-center">
                 <section className="admin-center-heading">
                     <div>
                         <p className="admin-center-eyebrow">Quản trị</p>
@@ -87,10 +85,9 @@ function UnifiedAdminCenterContent() {
                         <ClubSettings />
                     </section>
                 )}
-            </main>
-
-            <MobileBottomNav />
-        </div>
+                </main>
+            </div>
+        </AppShell>
     );
 }
 

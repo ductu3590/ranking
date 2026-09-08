@@ -1,12 +1,5 @@
-import MobileBottomNav from '@/components/MobileBottomNav';
-import HomeHeader from '@/components/HomeHeader';
+import AppShell from '@/components/pickhub/AppShell';
 
 export default function GiaiDauLayout({ children }) {
-    return (
-        <>
-            <HomeHeader />
-            {children}
-            <MobileBottomNav />
-        </>
-    );
+    return <AppShell>{children}</AppShell>;
 }

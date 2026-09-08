@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import HomeHeader from '@/components/HomeHeader';
-import MobileBottomNav from '@/components/MobileBottomNav';
+import AppShell from '@/components/pickhub/AppShell';
 import MemberInfoPanel from '@/components/pickhub/MemberInfoPanel';
 import './page.css';
 
@@ -63,9 +62,9 @@ export default function MemberInformationPage() {
     const membership = useMemo(() => roster.find((item) => String(item.id) === selectedId) || null, [roster, selectedId]);
 
     return (
-        <div className="member-info-page-shell">
-            <HomeHeader />
-            <main className="member-info-page">
+        <AppShell>
+            <div className="member-info-page-shell">
+                <main className="member-info-page">
                 <header className="member-info-heading">
                     <div><span>Hồ sơ athlete / membership</span><h1>Thông tin thành viên</h1><p>Phiên dùng chung không xác nhận bạn là VĐV nào. Hãy chọn đúng hồ sơ trong CLB để xem dữ liệu công khai phù hợp.</p></div>
                     {roster.length > 0 && <label>Hồ sơ đang xem<select value={selectedId} onChange={(event) => setSelectedId(event.target.value)}>{roster.map((item) => <option key={item.id} value={item.id}>{item.alias || item.athlete?.displayName}</option>)}</select></label>}
@@ -76,9 +75,9 @@ export default function MemberInformationPage() {
                     : state.kind === 'error' ? <StatePanel kind="error" title="Chưa tải được thông tin" message={state.message} action="Tải lại trang" />
                     : state.kind === 'empty' ? <StatePanel kind="empty" title="Chưa có hồ sơ" message={state.message} />
                     : <MemberInfoPanel athleteMembership={membership} phrSnapshot={assessments[0] || null} assessmentHistory={assessments} privacyFlags={{ sharedSession: true }} />}
-            </main>
-            <MobileBottomNav />
-        </div>
+                </main>
+            </div>
+        </AppShell>
     );
 }
 

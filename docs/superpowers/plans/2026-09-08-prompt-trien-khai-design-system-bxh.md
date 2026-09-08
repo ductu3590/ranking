@@ -139,9 +139,10 @@ Dừng ngay, đừng tự quyết, trong các trường hợp sau:
 | Task | Trạng thái |
 |---|---|
 | Task 1 — Preflight | ✅ Xong, duyệt. Evidence: `docs/pickhub-core/evidence/design-system-bxh-task-1-preflight-2026-09-08.md` |
-| Task 2 trở đi | Chưa làm |
+| Task 2 — Token + Montserrat | ✅ Xong, duyệt độc lập (đọc code + tự chạy lại test/build/regression). Commit `4b97122`. Evidence: `docs/pickhub-core/evidence/design-system-bxh-task-2-token-font-2026-09-08.md` |
+| Task 3 trở đi | Chưa làm |
 
-**Đính chính từ Task 1, đã sửa trong kế hoạch — `git pull` trước khi bắt đầu:**
+**Đính chính từ Task 1, đã sửa trong kế hoạch:**
 
 - Tham chiếu token khai tử là **301**, không phải 291. Con số cũ là lỗi cộng nhẩm khi
   soạn kế hoạch, không phải codebase thay đổi.
@@ -150,8 +151,18 @@ Dừng ngay, đừng tự quyết, trong các trường hợp sau:
 - `npm run test:regression` **PASS** trước khi sửa gì. Đây là mốc so sánh: mọi lỗi đỏ
   từ Task 2 trở đi là do đợt này gây ra.
 
+**Ghi nhận từ review Task 2 — áp dụng cho mọi task sau:**
+
+- Trong file evidence, chỉ điền hash commit **sau khi đã commit xong**. Task 2 tự ghi
+  một hash không khớp commit thật vì viết evidence trước — không sai nghiêm trọng,
+  nhưng đừng đoán trước hash.
+- Khi một token trong `globals.css`/CSS công khai đổi tên (ví dụ
+  `--mobile-bottom-nav-height` → `--ph-bottom-nav-height`), giữ tên cũ làm **alias**
+  trong `legacy-aliases.css` trỏ sang tên mới — đừng đổi tên tại chỗ dùng. Task 2 đã
+  làm đúng cách này, tiếp tục theo mẫu đó ở các task sau.
+
 ## 8. Task cần làm lần này
 
-**Task 2.**
+**Task 3.**
 
 Chỉ làm task này. Làm xong thì báo cáo theo mẫu mục 5 và dừng lại chờ xác nhận.

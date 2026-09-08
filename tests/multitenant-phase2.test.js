@@ -46,8 +46,11 @@ for (const route of [
     'app/api/club/events/route.js',
 ]) {
     const src = read(route);
+    const scopeSource = route === 'app/api/club/transactions/route.js'
+        ? read('lib/fundContributions.js')
+        : src;
     assert(
-        src.includes('getGroupIdForDatabase') && src.includes(".eq('group_id', groupId)"),
+        src.includes('getGroupIdForDatabase') && scopeSource.includes(".eq('group_id', groupId)"),
         `${route} should scope reads to the current group via the signed cookie.`
     );
 }

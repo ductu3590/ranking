@@ -44,4 +44,20 @@
   /* Bo cuc */
   --ph-bottom-nav-height: 78px;
   --ph-rail-width: 232px;
+
+  /* Mo rong: nen nhat cho metric, badge, skeleton, backdrop modal. */
+  --ph-tint-indigo: #F4F2FE;
+  --ph-tint-indigo-line: #DED6FA;
+  --ph-tint-gold: #FFF4DC;
+  --ph-tint-gold-line: #F5E2B8;
+  --ph-tint-gold-text: #8A5B00;
+  --ph-tint-cyan: #EFFAFD;
+  --ph-tint-cyan-line: #C9EDF6;
+  --ph-tint-coral: #FFF1EF;
+  --ph-tint-coral-line: #FBD8D3;
+  --ph-tint-positive: #E8F5EE;
+  --ph-tint-negative: #FDECEA;
+  --ph-tint-neutral: #EEF0F5;
+  --ph-tint-neutral-strong: #F7F8FB;
+  --ph-backdrop: rgba(40, 36, 61, .45);
 }

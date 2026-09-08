@@ -1,1 +1,89 @@
-/* Primitive dung chung - noi dung o Task 3. */
+/* Nut */
+.ph-btn {
+	display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+	min-height: 44px; padding: 0 16px; border: 0; border-radius: var(--ph-radius-sm);
+	font: inherit; font-size: 13px; font-weight: 700; cursor: pointer;
+	text-decoration: none; transition: background .16s ease, border-color .16s ease;
+}
+.ph-btn:disabled { opacity: .55; cursor: not-allowed; }
+.ph-btn--primary { background: var(--ph-indigo); color: var(--ph-card); }
+.ph-btn--primary:hover:not(:disabled) { background: var(--ph-indigo-hover); }
+.ph-btn--outline { background: var(--ph-card); color: var(--ph-ink); border: 1px solid var(--ph-line); }
+.ph-btn--outline:hover:not(:disabled) { border-color: var(--ph-ink-2); }
+.ph-btn--ghost { background: transparent; color: var(--ph-indigo); }
+.ph-btn--ghost:hover:not(:disabled) { background: var(--ph-lavender); }
+.ph-btn--danger { background: var(--ph-negative); color: var(--ph-card); }
+.ph-btn--sm { min-height: 36px; padding: 0 12px; font-size: 12px; }
+.ph-btn--block { width: 100%; }
+
+/* Be mat */
+.ph-card, .ph-panel {
+	background: var(--ph-card); border: 1px solid var(--ph-line);
+	border-radius: var(--ph-radius-md); box-shadow: var(--ph-shadow-soft);
+}
+.ph-panel { padding: var(--ph-space-6); }
+.ph-card--flat { box-shadow: none; }
+.ph-card--raised { box-shadow: var(--ph-shadow); }
+
+/* Metric */
+.ph-metric { padding: var(--ph-space-4); border-radius: var(--ph-radius-sm); border: 1px solid var(--ph-line); background: var(--ph-card); }
+.ph-metric__label { display: block; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ph-muted); }
+.ph-metric__value { display: block; margin-top: 6px; font-size: 20px; font-weight: 800; letter-spacing: -.03em; color: var(--ph-ink); font-variant-numeric: tabular-nums; }
+.ph-metric--indigo { background: var(--ph-tint-indigo); border-color: var(--ph-tint-indigo-line); }
+.ph-metric--gold { background: var(--ph-tint-gold); border-color: var(--ph-tint-gold-line); }
+.ph-metric--cyan { background: var(--ph-tint-cyan); border-color: var(--ph-tint-cyan-line); }
+.ph-metric--coral { background: var(--ph-tint-coral); border-color: var(--ph-tint-coral-line); }
+
+/* Badge / chip */
+.ph-badge, .ph-chip {
+	display: inline-flex; align-items: center; gap: 4px;
+	padding: 3px 9px; border-radius: 999px;
+	font-size: 11px; font-weight: 700; line-height: 1.5;
+}
+.ph-badge { background: var(--ph-lavender); color: var(--ph-indigo); }
+.ph-badge--gold { background: var(--ph-tint-gold); color: var(--ph-tint-gold-text); }
+.ph-badge--positive { background: var(--ph-tint-positive); color: var(--ph-positive); }
+.ph-badge--negative { background: var(--ph-tint-negative); color: var(--ph-negative); }
+.ph-badge--muted { background: var(--ph-tint-neutral); color: var(--ph-muted); }
+
+/* Segmented control */
+.ph-seg { display: flex; gap: 3px; padding: 3px; background: var(--ph-card); border: 1px solid var(--ph-line); border-radius: var(--ph-radius-sm); }
+.ph-seg__item { flex: 1; min-height: 38px; border: 0; border-radius: 9px; background: transparent; color: var(--ph-muted); font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+.ph-seg__item[aria-selected="true"] { background: var(--ph-indigo); color: var(--ph-card); }
+
+/* Bang: desktop day, mobile thanh card */
+.ph-table { width: 100%; border-collapse: collapse; }
+.ph-table th { text-align: left; font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--ph-muted); padding: 10px 12px; border-bottom: 1px solid var(--ph-line); }
+.ph-table td { padding: 12px; border-bottom: 1px solid var(--ph-line); font-size: 13px; color: var(--ph-text); }
+@media (max-width: 767px) {
+	.ph-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+	.ph-table tr { display: block; margin-bottom: 10px; padding: 12px; border: 1px solid var(--ph-line); border-radius: var(--ph-radius-sm); background: var(--ph-card); }
+	.ph-table td { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border: 0; }
+	.ph-table td::before { content: attr(data-label); font-size: 11px; font-weight: 700; color: var(--ph-muted); }
+}
+
+/* Modal */
+.ph-modal__backdrop { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 16px; background: var(--ph-backdrop); }
+.ph-modal { width: min(520px, 100%); max-height: 85vh; overflow: auto; padding: var(--ph-space-6); background: var(--ph-card); border-radius: var(--ph-radius-md); box-shadow: var(--ph-shadow); }
+.ph-modal__title { margin: 0 0 8px; font-size: 17px; font-weight: 800; letter-spacing: -.02em; color: var(--ph-ink); }
+.ph-modal__actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: var(--ph-space-6); }
+
+/* Truong nhap */
+.ph-field { display: grid; gap: 6px; margin-bottom: var(--ph-space-4); }
+.ph-field__label { font-size: 12px; font-weight: 700; color: var(--ph-ink); }
+.ph-field__control { min-height: 44px; padding: 0 12px; border: 1px solid var(--ph-line); border-radius: var(--ph-radius-sm); background: var(--ph-card); font: inherit; font-size: 14px; color: var(--ph-text); }
+.ph-field__error { font-size: 12px; font-weight: 600; color: var(--ph-negative); }
+
+/* Trang thai */
+.ph-state { display: grid; justify-items: center; gap: 8px; padding: 40px 20px; text-align: center; color: var(--ph-muted); }
+.ph-state__title { margin: 0; font-size: 15px; font-weight: 800; color: var(--ph-ink); }
+.ph-state__text { margin: 0; font-size: 13px; max-width: 42ch; }
+
+/* Skeleton */
+@keyframes ph-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+.ph-skeleton { border-radius: var(--ph-radius-sm); background: linear-gradient(90deg, var(--ph-tint-neutral) 25%, var(--ph-tint-neutral-strong) 37%, var(--ph-tint-neutral) 63%); background-size: 200% 100%; animation: ph-shimmer 1.4s ease infinite; }
+.ph-skeleton--text { height: 12px; }
+.ph-skeleton--line { height: 16px; }
+.ph-skeleton--row { height: 46px; margin-bottom: 8px; }
+.ph-skeleton--card { height: 140px; }
+@media (prefers-reduced-motion: reduce) { .ph-skeleton { animation: none; } }

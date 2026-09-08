@@ -1,69 +1,144 @@
 const assert = require('assert');
-
 const {
-    buildPenaltyLeaderboard,
-    getPenaltyPeriodBounds,
-    summarizePenaltyLeaderboard,
-} = require('../lib/fundLeaderboard');
+    getPeriodBounds,
+    buildContributionLeaderboard,
+    normalizeName,
+} = require('../lib/fundLeaderboard.js');
 
-const now = new Date(2026, 8, 1, 15, 30, 0);
-
-const week = getPenaltyPeriodBounds('week', now);
-assert.strictEqual(
-    week.start.getTime(),
-    new Date(2026, 7, 31, 0, 0, 0, 0).getTime(),
-    'Tuần hiện tại phải bắt đầu lúc 00:00 thứ Hai.'
-);
-assert.strictEqual(
-    week.end.getTime(),
-    now.getTime(),
-    'Khoảng thời gian tuần phải kết thúc tại thời điểm hiện tại.'
-);
-
-const month = getPenaltyPeriodBounds('month', now);
-assert.strictEqual(
-    month.start.getTime(),
-    new Date(2026, 8, 1, 0, 0, 0, 0).getTime(),
-    'Tháng hiện tại phải bắt đầu lúc 00:00 ngày đầu tháng.'
-);
-assert.strictEqual(
-    month.end.getTime(),
-    now.getTime(),
-    'Khoảng thời gian tháng phải kết thúc tại thời điểm hiện tại.'
-);
-
-const transactions = [
-    { id: 1, nguoi_nop: 'An', so_tien: 100000, huong_giao_dich: 'in', loai_giao_dich: 'nop_phat', created_at: '2026-08-31T03:00:00.000Z' },
-    { id: 2, nguoi_nop: 'An', so_tien: 50000, huong_giao_dich: 'in', loai_giao_dich: 'nop_phat', created_at: '2026-09-01T05:00:00.000Z' },
-    { id: 3, nguoi_nop: 'Bình', so_tien: 200000, huong_giao_dich: 'in', loai_giao_dich: 'nop_phat', created_at: '2026-09-01T04:00:00.000Z' },
-    { id: 4, nguoi_nop: 'Chi', so_tien: 500000, huong_giao_dich: 'in', loai_giao_dich: 'nop_quy', created_at: '2026-09-01T04:00:00.000Z' },
-    { id: 5, nguoi_nop: 'Dũng', so_tien: -300000, huong_giao_dich: 'out', loai_giao_dich: 'nop_phat', created_at: '2026-09-01T04:00:00.000Z' },
-    { id: 6, nguoi_nop: 'Unknown', so_tien: 900000, huong_giao_dich: 'in', loai_giao_dich: 'nop_phat', created_at: '2026-09-01T04:00:00.000Z' },
-    { id: 7, nguoi_nop: 'Bình', so_tien: 100000, huong_giao_dich: 'in', loai_giao_dich: 'nop_phat', created_at: '2026-09-01T09:00:00.000Z' },
+const members = [
+    { full_name: 'NGUYỄN VĂN A', is_active: true },
+    { full_name: 'TRẦN THỊ B', is_active: true },
+    { full_name: 'LÊ VĂN C', is_active: false },
 ];
 
-assert.deepStrictEqual(
-    buildPenaltyLeaderboard(transactions, 'week', now),
-    [
-        { rank: 1, name: 'Bình', amount: 200000, transactionCount: 1 },
-        { rank: 2, name: 'An', amount: 150000, transactionCount: 2 },
+function tx(name, amount, iso, loai = 'nop_phat') {
+    return { nguoi_nop: name, so_tien: amount, created_at: iso, huong_giao_dich: 'in', loai_giao_dich: loai };
+}
+
+const now = new Date('2026-09-08T05:00:00.000Z');
+
+const week = getPeriodBounds('week', now);
+assert.strictEqual(week.start.toISOString(), '2026-09-06T17:00:00.000Z');
+const month = getPeriodBounds('month', now);
+assert.strictEqual(month.start.toISOString(), '2026-08-31T17:00:00.000Z');
+const year = getPeriodBounds('year', now);
+assert.strictEqual(year.start.toISOString(), '2025-12-31T17:00:00.000Z');
+assert.strictEqual(getPeriodBounds('all', now).start, null);
+
+const board = buildContributionLeaderboard({
+    transactions: [
+        tx('NGUYỄN VĂN A', 100000, '2026-09-08T02:00:00.000Z', 'nop_phat'),
+        tx('NGUYỄN VĂN A', 500000, '2026-09-08T03:00:00.000Z', 'khac'),
+        tx('TRẦN THỊ B', 200000, '2026-09-08T02:00:00.000Z', 'nop_quy'),
     ],
-    'BXH tuần phải cộng đúng tiền phạt, sắp xếp giảm dần và loại giao dịch không hợp lệ.'
-);
+    members, period: 'week', now,
+});
+assert.strictEqual(board.rows[0].name, 'NGUYỄN VĂN A');
+assert.strictEqual(board.rows[0].amount, 600000);
+assert.strictEqual(board.summary.totalAmount, 800000);
 
-assert.deepStrictEqual(
-    buildPenaltyLeaderboard(transactions, 'month', now),
-    [
-        { rank: 1, name: 'Bình', amount: 200000, transactionCount: 1 },
-        { rank: 2, name: 'An', amount: 50000, transactionCount: 1 },
+const withJunk = buildContributionLeaderboard({
+    transactions: [
+        tx('NGUYỄN VĂN A', 100000, '2026-09-08T02:00:00.000Z'),
+        tx('BANKAPINOTIFY NOP TIEN QUY 3', 1560000, '2026-09-08T02:00:00.000Z'),
+        tx('Unknown', 50000, '2026-09-08T02:00:00.000Z'),
+        tx('THỦ QUỸ', 6240000, '2026-09-08T02:00:00.000Z'),
+        tx('TAI KHOAN GOC', 1544000, '2026-09-08T02:00:00.000Z'),
     ],
-    'BXH tháng chỉ tính giao dịch từ đầu tháng hiện tại.'
-);
+    members, period: 'week', now,
+});
+assert.strictEqual(withJunk.rows.length, 1);
+assert.strictEqual(withJunk.unassigned.amount, 9394000);
+assert.strictEqual(withJunk.unassigned.count, 4);
 
-assert.deepStrictEqual(
-    summarizePenaltyLeaderboard(buildPenaltyLeaderboard(transactions, 'week', now)),
-    { memberCount: 2, totalAmount: 350000, transactionCount: 3 },
-    'Phần tổng quan phải phản ánh đúng số thành viên, tổng tiền và số lượt nộp phạt.'
-);
+const tie = buildContributionLeaderboard({
+    transactions: [
+        tx('TRẦN THỊ B', 100000, '2026-09-08T02:00:00.000Z'),
+        tx('NGUYỄN VĂN A', 50000, '2026-09-08T02:00:00.000Z'),
+        tx('NGUYỄN VĂN A', 50000, '2026-09-08T03:00:00.000Z'),
+    ],
+    members, period: 'week', now,
+});
+assert.strictEqual(tie.rows[0].name, 'NGUYỄN VĂN A');
 
-console.log('fund leaderboard logic ok');
+const invalid = buildContributionLeaderboard({
+    transactions: [
+        tx('NGUYỄN VĂN A', 0, '2026-09-08T02:00:00.000Z'),
+        tx('NGUYỄN VĂN A', -5000, '2026-09-08T02:00:00.000Z'),
+        tx('NGUYỄN VĂN A', 10000, 'ngay-khong-hop-le'),
+    ],
+    members, period: 'week', now,
+});
+assert.strictEqual(invalid.rows.length, 0);
+
+const streak = buildContributionLeaderboard({
+    transactions: [
+        tx('NGUYỄN VĂN A', 10000, '2026-09-08T02:00:00.000Z'),
+        tx('NGUYỄN VĂN A', 10000, '2026-09-01T02:00:00.000Z'),
+        tx('NGUYỄN VĂN A', 10000, '2026-08-25T02:00:00.000Z'),
+    ],
+    members, period: 'week', now,
+});
+assert.strictEqual(streak.rows[0].streak, 3);
+
+const broken = buildContributionLeaderboard({
+    transactions: [
+        tx('NGUYỄN VĂN A', 10000, '2026-09-08T02:00:00.000Z'),
+        tx('NGUYỄN VĂN A', 10000, '2026-08-25T02:00:00.000Z'),
+    ],
+    members, period: 'week', now,
+});
+assert.strictEqual(broken.rows[0].streak, 1);
+
+const noStreak = buildContributionLeaderboard({
+    transactions: [tx('NGUYỄN VĂN A', 10000, '2026-09-08T02:00:00.000Z')],
+    members, period: 'all', now,
+});
+assert.strictEqual(noStreak.rows[0].streak, 0);
+
+const badges = buildContributionLeaderboard({
+    transactions: [
+        tx('NGUYỄN VĂN A', 10000, '2026-09-08T02:00:00.000Z'),
+        tx('NGUYỄN VĂN A', 10000, '2026-09-01T02:00:00.000Z'),
+        tx('NGUYỄN VĂN A', 10000, '2026-08-25T02:00:00.000Z'),
+        tx('TRẦN THỊ B', 1000, '2026-09-08T02:00:00.000Z'),
+        tx('TRẦN THỊ B', 90000, '2026-09-01T02:00:00.000Z'),
+    ],
+    members, period: 'week', now,
+});
+assert(badges.rows.find((r) => r.name === 'NGUYỄN VĂN A').badges.some((b) => b.kind === 'streak'));
+assert.strictEqual(badges.rows.find((r) => r.badges.some((b) => b.kind === 'champion')).name, 'TRẦN THỊ B');
+
+const first = buildContributionLeaderboard({
+    transactions: [tx('TRẦN THỊ B', 20000, '2026-09-08T02:00:00.000Z')],
+    members, period: 'week', now,
+});
+assert(first.rows[0].badges.some((b) => b.kind === 'first_time'));
+
+const idle = buildContributionLeaderboard({
+    transactions: [
+        tx('NGUYỄN VĂN A', 10000, '2026-09-08T02:00:00.000Z'),
+        tx('TRẦN THỊ B', 10000, '2026-08-04T02:00:00.000Z'),
+    ],
+    members, period: 'week', now, shameBadgesEnabled: true,
+});
+assert(idle.idle.some((p) => p.name === 'TRẦN THỊ B'));
+assert(!idle.idle.some((p) => p.name === 'LÊ VĂN C'));
+
+const idleOff = buildContributionLeaderboard({
+    transactions: [
+        tx('NGUYỄN VĂN A', 10000, '2026-09-08T02:00:00.000Z'),
+        tx('TRẦN THỊ B', 10000, '2026-08-04T02:00:00.000Z'),
+    ],
+    members, period: 'week', now, shameBadgesEnabled: false,
+});
+assert.deepStrictEqual(idleOff.idle, []);
+
+const newcomer = buildContributionLeaderboard({
+    transactions: [tx('NGUYỄN VĂN A', 10000, '2026-09-08T02:00:00.000Z')],
+    members, period: 'week', now, shameBadgesEnabled: true,
+});
+assert(!newcomer.idle.some((p) => p.name === 'TRẦN THỊ B'));
+assert.strictEqual(normalizeName('  nguyễn   văn a '), 'NGUYỄN VĂN A');
+
+console.log('fund-leaderboard: PASS');

@@ -606,9 +606,11 @@ export default function AdminPage({ embedded = false }) {
                                 value={editForm.nguoi_nop}
                                 onChange={(e) => setEditForm({ ...editForm, nguoi_nop: e.target.value })}
                             >
-                                {members.map(m => (
-                                    <option key={m.id} value={m.full_name}>{m.full_name}</option>
-                                ))}
+                                {members
+                                    .filter(m => m.is_active === true || m.full_name === editForm.nguoi_nop)
+                                    .map(m => (
+                                        <option key={m.id} value={m.full_name}>{m.full_name}</option>
+                                    ))}
                             </select>
                         </div>
 

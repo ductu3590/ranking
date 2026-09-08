@@ -10,8 +10,8 @@ const executablePath = process.env.CHROME_EXECUTABLE || 'C:\\Program Files\\Goog
 const nextBin = require.resolve('next/dist/bin/next');
 
 const roster = [
-  { id: 51, clubId: 7, athleteId: 901, status: 'active', effectiveFrom: '2026-03-01', effectiveTo: null, alias: 'Minh Smash', version: 2, athlete: { id: 901, displayName: 'Trần Anh Minh', status: 'unclaimed' } },
-  { id: 52, clubId: 7, athleteId: 902, status: 'ended', effectiveFrom: '2025-05-12', effectiveTo: '2026-07-30', alias: 'Hà Volley', version: 4, athlete: { id: 902, displayName: 'Nguyễn Thu Hà', status: 'unclaimed' } },
+  { id: 51, clubId: 7, athleteId: 901, status: 'active', effectiveFrom: '2026-03-01', effectiveTo: null, alias: 'Minh Smash', transferKeywords: ['TRAN ANH MINH', 'ANH MINH'], legacyMemberId: 11, version: 2, athlete: { id: 901, displayName: 'Trần Anh Minh', status: 'unclaimed' } },
+  { id: 52, clubId: 7, athleteId: 902, status: 'ended', effectiveFrom: '2025-05-12', effectiveTo: '2026-07-30', alias: 'Hà Volley', transferKeywords: [], legacyMemberId: 12, version: 4, athlete: { id: 902, displayName: 'Nguyễn Thu Hà', status: 'unclaimed' } },
 ];
 const assessments = [
   { id: 81, clubId: 7, membershipId: 51, athleteId: 901, assessedAt: '2026-09-02T08:00:00Z', effectiveFrom: '2026-09-02', skillLevel: 3.2, source: 'club_admin', notes: null, actorType: 'club_admin_session' },
@@ -109,6 +109,19 @@ async function waitForServer() {
     assert.equal(await page.getByRole('button', { name: '+ Thêm VĐV' }).count(), 1, 'leader sees roster create control');
     assert.equal(await page.getByRole('button', { name: 'Chỉnh sửa' }).count(), 1, 'leader sees one edit control per active member');
     assert.equal(await page.locator('.members-pick-cell input').count(), 2, 'leader can pick members for a bulk end');
+    await page.getByRole('button', { name: 'Chỉnh sửa' }).first().click();
+    await page.getByRole('dialog').waitFor();
+    assert.equal(
+      await page.getByRole('textbox', { name: 'Từ khoá nhận diện chuyển khoản' }).inputValue(),
+      roster[0].transferKeywords.join(String.fromCharCode(10)),
+      'the edit dialog loads the bank keywords, one per line',
+    );
+    assert.equal(
+      await page.getByRole('textbox', { name: 'Biệt danh trong CLB' }).inputValue(),
+      'Minh Smash',
+      'the display nickname stays separate from the bank keywords',
+    );
+    await page.getByRole('button', { name: 'Hủy' }).click();
     assert.match(await page.locator('.header-nav .nav-link').nth(4).innerText(), /Cấu hình/, 'leader fifth tab stays Cấu hình');
     assert.equal(browserErrors.length, 0, `browser errors: ${browserErrors.join(' | ')}`);
 

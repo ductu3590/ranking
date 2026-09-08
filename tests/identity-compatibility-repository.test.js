@@ -29,7 +29,7 @@ assert.deepEqual(toRosterProjection({
     status: 'unclaimed',
     legacy_club_member_id: 9,
   },
-}), {
+}, { legacyMemberId: 9, transferKeywords: ['NGUYEN VAN AN', 'VAN AN'] }), {
   id: 41,
   clubId: 7,
   athleteId: 31,
@@ -37,6 +37,8 @@ assert.deepEqual(toRosterProjection({
   effectiveFrom: '2026-01-01',
   effectiveTo: null,
   alias: 'An',
+  transferKeywords: ['NGUYEN VAN AN', 'VAN AN'],
+  legacyMemberId: 9,
   version: 2,
   athlete: {
     id: 31,
@@ -157,6 +159,58 @@ const legacyWrites = (writes) => writes.filter((write) => write.table === 'club_
   const aliasPatch = aliasOnly.writes.find((write) => write.table === 'club_memberships' && write.op === 'update').payload;
   assert.equal(aliasPatch.version, 4, 'a nickname-only edit bumps the version exactly once');
   assert.equal(aliasPatch.club_alias, 'An nhỏ');
+
+  const keywordsOnly = createFakeDb();
+  await createSupabaseIdentityRepository(keywordsOnly.db).updateMembershipProfile({
+    clubId: 7,
+    membershipId: 41,
+    alias: 'An',
+    displayName: null,
+    transferKeywords: ['NGUYEN VAN AN', 'VAN AN'],
+    status: 'active',
+    expectedVersion: 3,
+  });
+  assert.deepEqual(
+    legacyWrites(keywordsOnly.writes).map((write) => write.payload),
+    [{ aliases: ['NGUYEN VAN AN', 'VAN AN'] }],
+    'a keyword edit writes only aliases, leaving full_name alone',
+  );
+  assert.equal(
+    keywordsOnly.writes.find((write) => write.table === 'club_memberships' && write.op === 'update').payload.version,
+    4,
+    'writing aliases alone does not fire the compatibility trigger',
+  );
+
+  const cleared = createFakeDb();
+  await createSupabaseIdentityRepository(cleared.db).updateMembershipProfile({
+    clubId: 7, membershipId: 41, alias: 'An', displayName: null, transferKeywords: [], status: 'active', expectedVersion: 3,
+  });
+  assert.deepEqual(
+    legacyWrites(cleared.writes).map((write) => write.payload),
+    [{ aliases: null }],
+    'clearing every keyword stores null rather than an empty array',
+  );
+
+  const both = createFakeDb();
+  await createSupabaseIdentityRepository(both.db).updateMembershipProfile({
+    clubId: 7,
+    membershipId: 41,
+    alias: 'An',
+    displayName: 'Nguyễn Văn Ân',
+    transferKeywords: ['NGUYEN VAN AN'],
+    status: 'active',
+    expectedVersion: 3,
+  });
+  assert.deepEqual(
+    legacyWrites(both.writes).map((write) => write.payload),
+    [{ full_name: 'NGUYỄN VĂN ÂN', aliases: ['NGUYEN VAN AN'] }],
+    'renaming and re-keywording share a single legacy write',
+  );
+  assert.equal(
+    both.writes.find((write) => write.table === 'club_memberships' && write.op === 'update').payload.version,
+    5,
+    'the shared legacy write still fires the trigger exactly once',
+  );
 
   console.log('identity compatibility repository tests ok');
 })().catch((error) => { console.error(error); process.exit(1); });

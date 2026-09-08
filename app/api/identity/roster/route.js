@@ -52,6 +52,7 @@ export async function PATCH(request) {
             membershipId: body?.membershipId,
             alias: body?.alias,
             displayName: body?.displayName,
+            transferKeywords: body?.transferKeywords,
             expectedVersion: body?.expectedVersion,
             correlationId: correlationIdFrom(request),
         });

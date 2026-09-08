@@ -20,6 +20,10 @@ function formatPhr(value) {
     return Number.isFinite(value) ? value.toFixed(1).replace('.', ',') : '';
 }
 
+function parseKeywords(text) {
+    return text.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+}
+
 export default function MembersPage({ embedded = false }) {
     const [sessionView, setSessionView] = useState({ session: null, permissions: {} });
     const [members, setMembers] = useState([]);
@@ -103,7 +107,12 @@ export default function MembersPage({ embedded = false }) {
     }
 
     async function openEditor(member) {
-        const initial = { displayName: member.athlete?.displayName || '', alias: member.alias || '', skillLevel: '' };
+        const initial = {
+            displayName: member.athlete?.displayName || '',
+            alias: member.alias || '',
+            transferKeywords: (member.transferKeywords || []).join('\n'),
+            skillLevel: '',
+        };
         setEditing({ member, initial, form: initial, loadingPhr: true, saving: false, error: '' });
         try {
             const response = await fetch(`/api/identity/assessments?membershipId=${member.id}`, { cache: 'no-store' });
@@ -144,9 +153,11 @@ export default function MembersPage({ embedded = false }) {
                 return;
             }
         }
+        const keywords = parseKeywords(form.transferKeywords);
         const nameChanged = displayName !== initial.displayName;
         const aliasChanged = alias !== initial.alias;
-        if (!nameChanged && !aliasChanged && skillLevel === null) {
+        const keywordsChanged = keywords.join('\n') !== parseKeywords(initial.transferKeywords).join('\n');
+        if (!nameChanged && !aliasChanged && !keywordsChanged && skillLevel === null) {
             setEditing(null);
             setMutationMessage('Không có thay đổi nào cần lưu.');
             return;
@@ -155,7 +166,7 @@ export default function MembersPage({ embedded = false }) {
         setEditing((current) => ({ ...current, saving: true, error: '' }));
         setMutationMessage('Đang lưu thay đổi…');
         try {
-            if (nameChanged || aliasChanged) {
+            if (nameChanged || aliasChanged || keywordsChanged) {
                 const response = await fetch('/api/identity/roster', {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
@@ -163,6 +174,7 @@ export default function MembersPage({ embedded = false }) {
                         membershipId: member.id,
                         alias: alias || displayName,
                         displayName: nameChanged ? displayName : null,
+                        transferKeywords: keywordsChanged ? keywords : null,
                         expectedVersion: member.version,
                     }),
                 });
@@ -285,6 +297,7 @@ export default function MembersPage({ embedded = false }) {
                         <label>Họ và tên<input required value={editing.form.displayName} onChange={(event) => updateEditForm('displayName', event.target.value)} /></label>
                         <label>Biệt danh trong CLB<input value={editing.form.alias} onChange={(event) => updateEditForm('alias', event.target.value)} placeholder="Để trống sẽ dùng họ và tên" /></label>
                         <label>PHR (1,0 – 5,0)<input inputMode="decimal" value={editing.form.skillLevel} onChange={(event) => updateEditForm('skillLevel', event.target.value)} placeholder={editing.loadingPhr ? 'Đang tải PHR hiện tại…' : 'Chưa có PHR'} /><small>Nhập giá trị mới sẽ ghi thêm một mốc PHR và giữ nguyên lịch sử cũ.</small></label>
+                        <label>Từ khoá nhận diện chuyển khoản<textarea rows={4} value={editing.form.transferKeywords} onChange={(event) => updateEditForm('transferKeywords', event.target.value)} placeholder={'Mỗi từ khoá một dòng, VD:\nNGUYEN VAN A\nVAN A\nNV A'} /><small>Dùng để tự động khớp tên trong nội dung chuyển khoản, không phải biệt danh hiển thị. Để trống nếu không cần.</small></label>
                         {editing.error && <p className="roster-modal-error" role="alert">{editing.error}</p>}
                         <div>
                             <button type="button" onClick={() => setEditing(null)} disabled={editing.saving}>Hủy</button>

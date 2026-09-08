@@ -85,6 +85,8 @@ for (const field of ['displayName', 'alias', 'status', 'effectiveFrom']) {
 assert.doesNotMatch(rosterPage, /Athlete #|>Membership<|Athlete \/ membership/, 'roster UI drops English labels');
 assert.match(rosterPage, /Mã TV/, 'roster UI shows the membership code as Mã TV');
 assert.match(rosterPage, /Chỉnh sửa/, 'roster UI merges alias and PHR edits into one action');
+assert.match(rosterPage, /transferKeywords/, 'roster edit dialog also manages the bank-transfer keywords');
+assert.match(rosterPage, /Từ khoá nhận diện chuyển khoản/, 'bank keywords are labelled apart from the display nickname');
 assert.match(rosterPage, /RoleActionBar/, 'admin roster actions use server-provided permissions');
 
 const infoPage = read('app/thong-tin/page.js');

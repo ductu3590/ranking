@@ -47,6 +47,8 @@
 .roster-modal h2 { margin: 0; color: var(--ph-ink); }.roster-modal > p { margin: 7px 0 18px; color: var(--ph-muted); font-size: 12px; }
 .roster-modal form, .roster-modal label { display: grid; gap: 8px; }.roster-modal form { gap: 14px; }.roster-modal label { color: var(--ph-text); font-size: 12px; font-weight: 800; }
 .roster-modal input { min-height: 44px; padding: 0 12px; border: 1px solid var(--ph-line); border-radius: 11px; background: var(--ph-surface); color: var(--ph-text); font: inherit; }
+.roster-modal { max-height: min(88vh, 780px); overflow-y: auto; }
+.roster-modal textarea { min-height: 96px; padding: 10px 12px; border: 1px solid var(--ph-line); border-radius: 11px; background: var(--ph-surface); color: var(--ph-text); font: inherit; line-height: 1.45; resize: vertical; }
 .roster-modal form > div { display: flex; justify-content: flex-end; gap: 8px; }.roster-modal button { min-height: 44px; padding: 0 15px; border: 1px solid var(--ph-line); border-radius: 11px; background: var(--ph-card); color: var(--ph-text); font: inherit; font-weight: 850; cursor: pointer; }.roster-modal button[type='submit'] { border-color: var(--ph-indigo); background: var(--ph-indigo); color: #fff; }
-.members-page button:focus-visible, .members-page input:focus-visible, .members-page a:focus-visible { outline: 3px solid var(--ph-gold); outline-offset: 2px; }
+.members-page button:focus-visible, .members-page input:focus-visible, .members-page textarea:focus-visible, .members-page a:focus-visible { outline: 3px solid var(--ph-gold); outline-offset: 2px; }
 @media (max-width: 720px) { .members-main { width: min(100% - 24px, 1180px); padding-top: 19px; } .members-header { align-items: stretch; flex-direction: column; gap: 14px; } }

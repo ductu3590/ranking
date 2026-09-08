@@ -222,11 +222,39 @@ async function testRosterMutationsAreAdminOnlyScopedAndVersioned() {
     membershipId: 41,
     alias: 'An mới',
     displayName: ' Nguyễn Văn Ân ',
+    transferKeywords: ['  NGUYEN   VAN AN ', '', 'VAN AN', 'van an', null],
     expectedVersion: 1,
     correlationId: 'req-profile',
   });
   assert.equal(updated.version, 2);
   assert.equal(calls[1][1].displayName, 'Nguyễn Văn Ân', 'profile update forwards the cleaned athlete name');
+  assert.deepEqual(
+    calls[1][1].transferKeywords,
+    ['NGUYEN VAN AN', 'VAN AN'],
+    'transfer keywords are trimmed, collapsed and de-duplicated case-insensitively'
+  );
+
+  await updateProfile({ session: adminSession, membershipId: 41, alias: 'An', expectedVersion: 1 });
+  assert.equal(
+    calls[2][1].transferKeywords,
+    null,
+    'omitting transferKeywords leaves the bank keyword list untouched'
+  );
+
+  await assert.rejects(
+    updateProfile({ session: adminSession, membershipId: 41, alias: 'An', transferKeywords: 'VAN AN', expectedVersion: 1 }),
+    expectCode('INVALID_INPUT')
+  );
+  await assert.rejects(
+    updateProfile({
+      session: adminSession,
+      membershipId: 41,
+      alias: 'An',
+      transferKeywords: Array.from({ length: 31 }, (item, index) => `KEYWORD ${index}`),
+      expectedVersion: 1,
+    }),
+    expectCode('INVALID_INPUT')
+  );
   await assert.rejects(
     updateProfile({ session: adminSession, membershipId: 41, alias: 'An', expectedVersion: 9 }),
     expectCode('VERSION_CONFLICT')

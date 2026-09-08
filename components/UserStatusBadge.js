@@ -53,9 +53,11 @@ export default function UserStatusBadge({ sessionView: providedSessionView = nul
                 <summary
                     className={`user-badge group-badge ${isAdmin ? 'admin-badge' : 'member-badge'}`}
                     title={`${state.name} · ${roleLabel}`}
+                    aria-label={`${roleLabel} — ${state.name}`}
                 >
-                    <span className="user-badge-group">{state.name}</span>
-                    <span className="user-badge-role">{isAdmin ? '🔐' : '👤'} {roleLabel}</span>
+                    <span className="user-badge-icon" aria-hidden="true">{isAdmin ? '🔐' : '👤'}</span>
+                    <span className="user-badge-role">{roleLabel}</span>
+                    <span className="user-badge-caret" aria-hidden="true">▾</span>
                 </summary>
                 <div className="user-account-dropdown">
                     <button type="button" className="user-badge-logout" onClick={handleLogout}>

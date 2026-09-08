@@ -45,7 +45,7 @@
     border: 0;
     border-radius: 6px;
     background: transparent;
-    color: #dc2626;
+    color: var(--ph-negative);
     cursor: pointer;
     font-weight: 800;
     padding: 9px 10px;
@@ -54,7 +54,7 @@
 
 .user-badge-logout:hover,
 .user-badge-logout:focus-visible {
-    background: #fee2e2;
+    background: var(--ph-tint-negative);
     outline: none;
 }
 
@@ -83,29 +83,30 @@
     box-shadow: var(--shadow-sm);
 }
 
-/* Two-line layout: group name on top, role below */
+/* Single-line pill: icon + role + caret */
 .group-badge {
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 1px;
-    line-height: 1.15;
-    padding-top: 6px;
-    padding-bottom: 6px;
+    gap: 6px;
+    padding: 7px 12px;
 }
 
-.user-badge-group {
-    font-size: 0.78rem;
-    font-weight: 800;
-    max-width: 150px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+.user-badge-icon {
+    font-size: 0.9rem;
+    line-height: 1;
 }
 
 .user-badge-role {
-    font-size: 0.68rem;
-    font-weight: 600;
-    opacity: 0.92;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.user-badge-caret {
+    font-size: 0.7rem;
+    opacity: 0.6;
+    transition: transform 0.18s ease;
+}
+
+.user-account-menu[open] .user-badge-caret {
+    transform: rotate(180deg);
 }
 
 .captain-badge {

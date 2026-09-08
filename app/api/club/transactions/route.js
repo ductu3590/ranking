@@ -1,18 +1,16 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { getGroupIdForDatabase, requireValidatedGroupAdmin } from '@/lib/groupSession';
+import { loadContributionInputs } from '@/lib/fundContributions';
 
 export async function GET() {
     const groupId = getGroupIdForDatabase();
-    const { data, error } = await supabaseAdmin
-        .from('quy_pickleball')
-        .select('*')
-        .eq('group_id', groupId)
-        .order('created_at', { ascending: false });
-    if (error) {
+    try {
+        const { transactions } = await loadContributionInputs(supabaseAdmin, groupId);
+        return NextResponse.json({ transactions });
+    } catch (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
-    return NextResponse.json({ transactions: data || [] });
 }
 
 const ALLOWED_UPDATE_FIELDS = [

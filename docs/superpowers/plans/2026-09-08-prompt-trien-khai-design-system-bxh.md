@@ -140,8 +140,9 @@ Dừng ngay, đừng tự quyết, trong các trường hợp sau:
 |---|---|
 | Task 1 — Preflight | ✅ Xong, duyệt. Evidence: `docs/pickhub-core/evidence/design-system-bxh-task-1-preflight-2026-09-08.md` |
 | Task 2 — Token + Montserrat | ✅ Xong, duyệt độc lập (đọc code + tự chạy lại test/build/regression). Commit `4b97122`. Evidence: `docs/pickhub-core/evidence/design-system-bxh-task-2-token-font-2026-09-08.md` |
-| Task 3 — Primitive CSS | ✅ Xong, duyệt độc lập (đọc code + tự chạy lại token/hardcode-guard/build). Commit `8edb8ce`. Evidence: `docs/pickhub-core/evidence/design-system-bxh-task-3-primitives-2026-09-08.md` |
-| Task 4 trở đi | Chưa làm |
+| Task 3 — Primitive CSS | ✅ Xong, duyệt độc lập. Commit `8edb8ce`. |
+| Task 4 — PhModal/PhConfirm/PhSeg | ✅ Xong, duyệt độc lập (đọc cả 3 component + tự chạy lại ph-components/ph-design-system/build). Commit `424f723`. |
+| Task 5 trở đi | Chưa làm |
 
 **Đính chính từ Task 1, đã sửa trong kế hoạch:**
 
@@ -180,18 +181,24 @@ task CSS sau — Task 11 (trang BXH) đã được nối vào cùng danh sách k
   trong `legacy-aliases.css` trỏ sang tên mới — đừng đổi tên tại chỗ dùng. Task 2 đã
   làm đúng cách này, tiếp tục theo mẫu đó ở các task sau.
 
-**Quy tắc bắt buộc, không phải gợi ý — vi phạm hai lần liên tiếp (Task 2, Task 3):**
-Không được điền hash commit vào file evidence trước khi commit tồn tại — làm vậy chỉ
-ra một hash bịa (Task 2 ghi `1ecdf61` thay vì `4b97122`; Task 3 ghi `6d2cbfb` thay vì
-`8edb8ce`). Thứ tự bắt buộc là: **commit trước, rồi mới điền dòng Commit trong evidence
-bằng hash thật của chính commit đó** — nếu cần, dùng `git commit` xong rồi
-`git log -1 --format=%h` để lấy hash chính xác, sau đó `git add` lại file evidence và
-gộp vào **cùng commit** (amend trước khi push, không tạo commit thứ hai chỉ để sửa một
-dòng). Task 4 trở đi mà evidence vẫn ghi hash sai sẽ bị trả lại yêu cầu sửa.
+**File evidence KHÔNG được chứa hash commit.** Đã sai ba lần liên tiếp (Task 2 ghi
+`1ecdf61`, Task 3 `6d2cbfb`, Task 4 `52f582a` — đều là hash bịa). Nguyên nhân gốc:
+mỗi task chỉ một commit và file evidence nằm *trong* commit đó, nên hash của commit
+không thể có mặt bên trong chính nó. Đừng cố amend cho khớp — **bỏ hẳn phần hash khỏi
+file evidence.** File evidence được commit cùng code, nên `git log` của file đó chính
+là nguồn hash thật, không cần chép lại. Trong file evidence, thay mục "## Commit" bằng
+một dòng mô tả **message** commit (không kèm hash), ví dụ:
+`Message: feat(ui): them PhModal, PhConfirm, PhSeg ...`. Hash vẫn ghi bình thường
+trong **báo cáo chat** trả về (mục 5), vì báo cáo được viết *sau* khi commit xong.
 
 ## 8. Task cần làm lần này
 
-**Task 4 — PhModal, PhConfirm, PhSeg.**
+**Task 5 — AppShell, side rail, breakpoint điều hướng.**
 
-Chỉ làm task này. Làm xong thì báo cáo theo mẫu mục 5 và dừng lại chờ xác nhận. Nhớ
-quy tắc mới ở mục 7: commit trước, điền hash evidence sau, gộp vào cùng commit.
+Đây là task đầu tiên chạm `app/giai-dau/layout.js` — **chỉ đổi import + JSX của shell
+ở đúng file đó, không đụng file nào khác trong `app/giai-dau/`**. Cũng là task tạo
+`PhNotificationBell` placeholder trả `null` (bước 5) — nếu bỏ, build gãy ở Task 12.
+Đọc kỹ bước 6 (cho `HomeHeader` nhận prop `trailing`) và bước 7 (gỡ header lặp ở
+`app/admin/page.js`, `app/thong-tin/page.js`).
+
+Chỉ làm task này. Làm xong thì báo cáo theo mẫu mục 5 và dừng lại chờ xác nhận.

@@ -21,6 +21,7 @@ PickHub là không gian giúp các CLB pickleball vận hành minh bạch, kết
 | Token | Giá trị | Vai trò |
 |---|---|---|
 | `--ph-ink` | `#28243D` | Mực tím than cho chữ và icon; không dùng làm nền đặc |
+| `--ph-ink-2` | `#514A72` | Chữ cấp hai và nội dung phụ cần độ tương phản |
 | `--ph-indigo` | `#6F48C9` | Hành động chính, liên kết, trạng thái đang chọn |
 | `--ph-lavender` | `#EEE9FF` | Accent nhẹ cho tab, hồ sơ và trạng thái nổi bật |
 | `--ph-gold` | `#FFC95E` | Accent ấm cho huy hiệu, thành tích và dữ liệu nổi bật |
@@ -30,8 +31,12 @@ PickHub là không gian giúp các CLB pickleball vận hành minh bạch, kết
 | `--ph-card` | `#FFFFFF` | Bề mặt card |
 | `--ph-line` | `#E4E9F2` | Viền và phân tách |
 | `--ph-muted` | `#667085` | Chữ phụ |
+| `--ph-positive` | `#1F7A52` | Số dương và trạng thái tích cực, tương phản 5.30:1 trên nền trắng |
+| `--ph-negative` | `#C2453A` | Số âm và trạng thái lỗi, tương phản 5.08:1 trên nền trắng |
 
 Màu CLB và màu giải được map vào các token accent, không được thay thế màu chữ, màu cảnh báo hoặc màu focus. Hệ thống kiểm tra tương phản trước khi lưu theme. Không dùng nền đen hoặc navy đặc trong các màn hình vận hành; `--ph-ink` chỉ dành cho chữ/icon cần độ tương phản.
+
+Các token `--ph-cyan` và `--ph-coral` chỉ dùng làm nền/accent, không dùng làm chữ. Nhóm tint bổ sung (`--ph-tint-indigo`, `--ph-tint-gold`, `--ph-tint-gold-text`, `--ph-tint-cyan`, `--ph-tint-coral`, `--ph-tint-positive`, `--ph-tint-negative`, `--ph-tint-neutral`, `--ph-tint-neutral-strong`, `--ph-backdrop`) là nền nhạt phái sinh từ bốn màu accent đã duyệt, dùng cho metric card, badge và skeleton; đây không phải màu mới và không đổi hệ màu.
 
 ### Typography
 

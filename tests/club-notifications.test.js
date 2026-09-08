@@ -19,3 +19,18 @@ assert(
 );
 
 console.log('club-notifications (parser): PASS');
+
+const webhook = fs.readFileSync(path.join(root, 'app/api/webhook/route.js'), 'utf8');
+assert(/club_notifications/.test(webhook), 'Webhook phải sinh thông báo khi không khớp roster');
+assert(/try\s*\{[\s\S]*club_notifications[\s\S]*catch/.test(webhook),
+    'Việc ghi thông báo phải nằm trong try/catch để không làm hỏng việc ghi giao dịch');
+
+const route = fs.readFileSync(path.join(root, 'app/api/club/notifications/route.js'), 'utf8');
+assert(/requireValidatedGroupAdmin/.test(route), 'Route thông báo phải yêu cầu quyền admin');
+assert(/\.eq\('group_id'/.test(route), 'Route thông báo phải scope theo group_id');
+
+const bell = fs.readFileSync(path.join(root, 'components/pickhub/PhNotificationBell.js'), 'utf8');
+assert(/aria-label/.test(bell), 'Chuông phải có aria-label');
+assert(/PhModal/.test(bell) || /role="dialog"/.test(bell), 'Panel chuông phải dùng contract dialog');
+
+console.log('club-notifications: PASS');

@@ -49,7 +49,9 @@ export async function POST(req) {
                 loai_giao_dich: parseResult.loaiGiaoDich,
                 huong_giao_dich: huongGiaoDich,
                 is_manually_categorized: false,
-            });
+            })
+                .select('id, nguoi_nop, so_tien, noi_dung_goc, ma_giao_dich, created_at')
+                .single();
 
         if (error) {
             if (error.code === '23505') {
@@ -58,6 +60,25 @@ export async function POST(req) {
             }
             console.error('Supabase Error:', JSON.stringify(error, null, 2));
             return NextResponse.json({ message: 'Error saving', error: error.message }, { status: 500 });
+        }
+
+        try {
+            if (huongGiaoDich === 'in' && amount > 0 && parseResult.memberName === 'Unknown') {
+                await supabaseServer.from('club_notifications').upsert({
+                    group_id: groupRouting.groupId,
+                    kind: 'unassigned_transaction',
+                    subject_type: 'quy_pickleball',
+                    subject_id: insertedData.id,
+                    payload: {
+                        so_tien: insertedData.so_tien,
+                        noi_dung_goc: insertedData.noi_dung_goc,
+                        ma_giao_dich: insertedData.ma_giao_dich,
+                        created_at: insertedData.created_at,
+                    },
+                }, { onConflict: 'group_id,kind,subject_type,subject_id', ignoreDuplicates: true });
+            }
+        } catch (notifyError) {
+            console.error('Không tạo được thông báo giao dịch chưa gán:', notifyError);
         }
 
         console.log('Successfully inserted:', insertedData);

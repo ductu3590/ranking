@@ -141,8 +141,9 @@ Dừng ngay, đừng tự quyết, trong các trường hợp sau:
 | Task 1 — Preflight | ✅ Xong, duyệt. Evidence: `docs/pickhub-core/evidence/design-system-bxh-task-1-preflight-2026-09-08.md` |
 | Task 2 — Token + Montserrat | ✅ Xong, duyệt độc lập (đọc code + tự chạy lại test/build/regression). Commit `4b97122`. Evidence: `docs/pickhub-core/evidence/design-system-bxh-task-2-token-font-2026-09-08.md` |
 | Task 3 — Primitive CSS | ✅ Xong, duyệt độc lập. Commit `8edb8ce`. |
-| Task 4 — PhModal/PhConfirm/PhSeg | ✅ Xong, duyệt độc lập (đọc cả 3 component + tự chạy lại ph-components/ph-design-system/build). Commit `424f723`. |
-| Task 5 trở đi | Chưa làm |
+| Task 4 — PhModal/PhConfirm/PhSeg | ✅ Xong, duyệt độc lập. Commit `424f723`. |
+| Task 5 — AppShell/SideRail | ✅ Xong, duyệt độc lập (chỉ đổi 3 dòng giai-dau/layout.js, không lặp header, regression xanh). Commit `8a0dd88`. |
+| Task 6 → 14 | Chạy chế độ batch — xem `2026-09-08-prompt-batch-task-6-14.md` |
 
 **Đính chính từ Task 1, đã sửa trong kế hoạch:**
 

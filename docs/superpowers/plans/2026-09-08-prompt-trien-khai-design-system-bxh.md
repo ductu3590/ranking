@@ -134,8 +134,24 @@ Dừng ngay, đừng tự quyết, trong các trường hợp sau:
 - Bạn thấy mình sắp viết một họ class mới không bắt đầu bằng `ph-`.
 - Bạn thấy mình sắp sửa test cho khớp code thay vì sửa code cho khớp test.
 
-## 7. Task cần làm lần này
+## 7. Trạng thái các task
 
-**Task 1.**
+| Task | Trạng thái |
+|---|---|
+| Task 1 — Preflight | ✅ Xong, duyệt. Evidence: `docs/pickhub-core/evidence/design-system-bxh-task-1-preflight-2026-09-08.md` |
+| Task 2 trở đi | Chưa làm |
+
+**Đính chính từ Task 1, đã sửa trong kế hoạch — `git pull` trước khi bắt đầu:**
+
+- Tham chiếu token khai tử là **301**, không phải 291. Con số cũ là lỗi cộng nhẩm khi
+  soạn kế hoạch, không phải codebase thay đổi.
+- Số giao dịch thật là **688** (spec ghi 686 vì đo sớm hơn một ngày). SQL bằng API nên
+  trần 1.000 hàng chưa bị chạm; **Task 8 giữ nguyên vị trí**, không cần đảo lên trước.
+- `npm run test:regression` **PASS** trước khi sửa gì. Đây là mốc so sánh: mọi lỗi đỏ
+  từ Task 2 trở đi là do đợt này gây ra.
+
+## 8. Task cần làm lần này
+
+**Task 2.**
 
 Chỉ làm task này. Làm xong thì báo cáo theo mẫu mục 5 và dừng lại chờ xác nhận.

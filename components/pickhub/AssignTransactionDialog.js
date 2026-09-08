@@ -13,7 +13,7 @@ export default function AssignTransactionDialog({ open, notification, onClose, o
         if (!open) return;
         fetch('/api/club/members')
             .then((response) => response.json())
-            .then((data) => setMembers((data.members || []).filter((member) => member.is_active !== false)))
+            .then((data) => setMembers((data.members || []).filter((member) => member.is_active === true)))
             .catch(() => setMembers([]));
     }, [open]);
 

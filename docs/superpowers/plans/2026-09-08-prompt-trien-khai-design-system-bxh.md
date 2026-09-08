@@ -140,7 +140,7 @@ Dừng ngay, đừng tự quyết, trong các trường hợp sau:
 |---|---|
 | Task 1 — Preflight | ✅ Xong, duyệt. Evidence: `docs/pickhub-core/evidence/design-system-bxh-task-1-preflight-2026-09-08.md` |
 | Task 2 — Token + Montserrat | ✅ Xong, duyệt độc lập (đọc code + tự chạy lại test/build/regression). Commit `4b97122`. Evidence: `docs/pickhub-core/evidence/design-system-bxh-task-2-token-font-2026-09-08.md` |
-| Task 3 — Primitive CSS | 🔧 Kế hoạch đã sửa (xem đính chính bên dưới), chưa thực thi lại |
+| Task 3 — Primitive CSS | ✅ Xong, duyệt độc lập (đọc code + tự chạy lại token/hardcode-guard/build). Commit `8edb8ce`. Evidence: `docs/pickhub-core/evidence/design-system-bxh-task-3-primitives-2026-09-08.md` |
 | Task 4 trở đi | Chưa làm |
 
 **Đính chính từ Task 1, đã sửa trong kế hoạch:**
@@ -175,22 +175,23 @@ task CSS sau — Task 11 (trang BXH) đã được nối vào cùng danh sách k
 
 **Ghi nhận từ review Task 2 — áp dụng cho mọi task sau:**
 
-- Trong file evidence, chỉ điền hash commit **sau khi đã commit xong**. Task 2 tự ghi
-  một hash không khớp commit thật vì viết evidence trước — không sai nghiêm trọng,
-  nhưng đừng đoán trước hash.
 - Khi một token trong `globals.css`/CSS công khai đổi tên (ví dụ
   `--mobile-bottom-nav-height` → `--ph-bottom-nav-height`), giữ tên cũ làm **alias**
   trong `legacy-aliases.css` trỏ sang tên mới — đừng đổi tên tại chỗ dùng. Task 2 đã
   làm đúng cách này, tiếp tục theo mẫu đó ở các task sau.
 
+**Quy tắc bắt buộc, không phải gợi ý — vi phạm hai lần liên tiếp (Task 2, Task 3):**
+Không được điền hash commit vào file evidence trước khi commit tồn tại — làm vậy chỉ
+ra một hash bịa (Task 2 ghi `1ecdf61` thay vì `4b97122`; Task 3 ghi `6d2cbfb` thay vì
+`8edb8ce`). Thứ tự bắt buộc là: **commit trước, rồi mới điền dòng Commit trong evidence
+bằng hash thật của chính commit đó** — nếu cần, dùng `git commit` xong rồi
+`git log -1 --format=%h` để lấy hash chính xác, sau đó `git add` lại file evidence và
+gộp vào **cùng commit** (amend trước khi push, không tạo commit thứ hai chỉ để sửa một
+dòng). Task 4 trở đi mà evidence vẫn ghi hash sai sẽ bị trả lại yêu cầu sửa.
+
 ## 8. Task cần làm lần này
 
-**Task 3 — làm lại từ đầu theo kế hoạch đã sửa (`git pull` trước).**
+**Task 4 — PhModal, PhConfirm, PhSeg.**
 
-Kế hoạch Task 3 giờ có 7 bước: mở rộng test token (bước 1) → thêm token tint vào
-`tokens.css` (bước 2) → chạy test xác nhận phần token pass (bước 3) → viết
-`primitives.css` chỉ dùng `var(--ph-*)` (bước 4) → mở rộng test chặn hardcode tự động
-(bước 5) → chạy test toàn bộ (bước 6) → build và commit (bước 7). Đọc lại nguyên
-văn trong kế hoạch, đừng dùng bản primitives.css cũ trong bộ nhớ của bạn.
-
-Chỉ làm task này. Làm xong thì báo cáo theo mẫu mục 5 và dừng lại chờ xác nhận.
+Chỉ làm task này. Làm xong thì báo cáo theo mẫu mục 5 và dừng lại chờ xác nhận. Nhớ
+quy tắc mới ở mục 7: commit trước, điền hash evidence sau, gộp vào cùng commit.

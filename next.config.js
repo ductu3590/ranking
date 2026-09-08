@@ -1,5 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    // Vercel/Next tracing không phát hiện fs.readFileSync đường dẫn động, nên
+    // font .ttf của route sinh ảnh BXH không được đóng gói vào serverless function
+    // → ENOENT → 500. Khai báo tường minh để hai file font đi kèm lambda.
+    experimental: {
+        outputFileTracingIncludes: {
+            '/api/club/bxh/share-image': ['./app/api/club/bxh/share-image/*.ttf'],
+        },
+    },
     async redirects() {
         return [
             // Trang chủ → Quỹ (module chính)

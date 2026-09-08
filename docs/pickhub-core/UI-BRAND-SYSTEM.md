@@ -119,7 +119,7 @@ Logo prototype dùng chữ **P** cách điệu bằng một quỹ đạo cong v�
 - **Streak** hiển thị dưới dạng badge phụ cạnh tên (số kỳ liên tiếp có đóng), không
   thay thế số tiền. Streak chỉ hiện khi ≥ 2 kỳ liên tiếp để tránh nhiễu khi dữ liệu thưa.
 - **Huy hiệu** là nhãn có chữ, không phải chỉ icon hay chỉ màu; luôn nêu kỳ áp dụng
-  (ví dụ “Vua nộp phạt · tháng 9”).
+  (ví dụ “Quán quân tháng trước”). Không dùng từ “phạt” trong bất kỳ nhãn huy hiệu nào.
 - Bảng phải có nút chia sẻ tạo ảnh theo quy tắc **Share card** ở mục 5.
 - Tuân thủ mục 7: BXH luôn có bảng dữ liệu đọc được, không dùng màu làm tín hiệu duy nhất.
 

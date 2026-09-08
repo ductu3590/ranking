@@ -22,6 +22,17 @@ Bộ token, typography, component principles và quy tắc theme chuẩn nằm t
 [`UI-BRAND-SYSTEM.md`](./UI-BRAND-SYSTEM.md). Prototype duyệt hướng được lưu
 trong [`ui-preview/`](./ui-preview/) và không thay đổi route hay dữ liệu thật.
 
+## Sửa đổi 2026-09-07 — xem [`ADR-006`](./decisions/ADR-006-montserrat-va-hop-nhat-token-ui.md)
+
+- Font chính là `Montserrat`, không phải `Inter`.
+- Code production đang chạy một bảng màu thứ hai (sân xanh `--court-*` /
+  `--pickle-*`, font `Outfit`) không thuộc baseline. Đây là vi phạm nguyên tắc
+  “không duy trì hai design system song song” ở cuối tài liệu này và phải được gỡ.
+- Cụm CLB core (Quỹ, Thu chi/SePay, BXH đóng quỹ, Thành viên, Quản trị) được
+  redesign **trước** Phase 3, đảo so với thứ tự trong `ADR-004`. Lý do và ràng
+  buộc kèm theo nằm trong ADR-006.
+- Thứ tự lát cắt UI của Phase 3–6 trong bảng bên dưới giữ nguyên.
+
 ## Cách đưa UI vào sáu phase
 
 Không tạo một nhánh redesign dài hạn tách khỏi roadmap. Sau khi design baseline

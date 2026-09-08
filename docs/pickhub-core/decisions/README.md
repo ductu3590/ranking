@@ -16,3 +16,5 @@ ADR ghi lại quyết định làm thay đổi hoặc diễn giải kiến trúc
 - [ADR-003 — Truy cập PickHub bằng Mã CLB + mật khẩu trước](./ADR-003-club-code-password-first-access.md)
 - [ADR-003 — Phát triển tuần tự có phase gate](./ADR-003-phase-gated-delivery.md)
 - [ADR-004 — Tách visual redesign khỏi core](./ADR-004-ui-core-separation.md)
+- [ADR-005 — Phạm vi nguồn thành viên trong giải](./ADR-005-tournament-member-origin-scope.md)
+- [ADR-006 — Montserrat và hợp nhất token UI về `--ph-*`](./ADR-006-montserrat-va-hop-nhat-token-ui.md)

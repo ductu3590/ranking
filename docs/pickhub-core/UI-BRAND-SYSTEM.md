@@ -35,10 +35,19 @@ Màu CLB và màu giải được map vào các token accent, không được th
 
 ### Typography
 
-- Font chính: `Inter`, fallback `ui-sans-serif, system-ui, sans-serif`.
-- Tiêu đề: đậm, tracking hơi âm, dùng để tạo nhịp thể thao.
-- Số liệu: tabular numerals để cột tiền, điểm và thứ hạng thẳng hàng.
+- Font chính: `Montserrat`, fallback `ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif`.
+- Trọng lượng dùng trong sản phẩm: `400 / 500 / 600 / 700 / 800`. Không nạp thêm
+  trọng lượng khác để giữ ngân sách font.
+- Tiêu đề: `700–800`, tracking hơi âm (`-0.03em` đến `-0.05em`), dùng để tạo nhịp thể thao.
+- Số liệu: tabular numerals (`font-variant-numeric: tabular-nums`) để cột tiền,
+  điểm và thứ hạng thẳng hàng.
 - Nội dung tiếng Việt: câu ngắn, động từ rõ, tránh thuật ngữ kỹ thuật không cần thiết.
+  Montserrat có đủ dấu tiếng Việt; không được thay bằng biến thể thiếu dấu.
+
+> **Đổi so với baseline 02/09/2026:** font chính chuyển từ `Inter` sang
+> `Montserrat` theo chỉ đạo sản phẩm ngày `2026-09-07`. Lý do và phạm vi ảnh
+> hưởng ghi tại [`ADR-006`](./decisions/ADR-006-montserrat-va-hop-nhat-token-ui.md).
+> Mọi quy tắc màu, nhịp, hình khối và component của baseline giữ nguyên.
 
 ### Nhịp và hình khối
 
@@ -66,6 +75,17 @@ Logo prototype dùng chữ **P** cách điệu bằng một quỹ đạo cong v�
 - **Bracket:** desktop hiển thị toàn cảnh; mobile ưu tiên trận hiện tại và cho phép cuộn ngang.
 - **Toast/notice:** chỉ dùng cho kết quả thao tác; việc cần xử lý lâu dài nằm trong inbox thông báo.
 - **Form:** label luôn hiển thị; lỗi đặt cạnh trường; không dùng placeholder làm label.
+- **Share card:** ảnh chia sẻ ra ngoài sản phẩm (Zalo, Facebook, nhóm chat CLB)
+  dùng nền gradient `--ph-indigo`, huy hiệu `--ph-gold`, chữ trắng. Không dùng
+  nền `--ph-ink` hoặc nền tối đặc — thẻ chia sẻ là bề mặt nhận diện thương hiệu,
+  phải cùng ngôn ngữ màu với sản phẩm. Mỗi thẻ luôn có: tên CLB, kỳ đang xem,
+  top 1 nêu rõ, hai hạng kế tiếp, một chỉ số tổng, và dấu hiệu PickHub.
+- **Skeleton:** mọi vùng tải dữ liệu phải có skeleton theo đúng hình khối của nội
+  dung thật; không dùng chữ “Đang tải…” làm trạng thái tải duy nhất.
+- **Chuông thông báo:** không gian quản trị CLB có một chuông ở header, hiển thị
+  số việc **cần người xử lý** — không dùng cho tin tức hay quảng cáo. Mỗi thông báo
+  phải nêu rõ việc cần làm và dẫn thẳng tới nơi làm được việc đó. Badge số chỉ đếm
+  thông báo chưa xử lý; đã xem không có nghĩa là đã xong.
 
 ## 6. UI content rules
 
@@ -74,6 +94,29 @@ Logo prototype dùng chữ **P** cách điệu bằng một quỹ đạo cong v�
 - Ban tổ chức: “Đăng ký”, “Bốc thăm”, “Lịch thi đấu”, “Kết quả”.
 - Public tournament: ưu tiên biệt danh đã cấu hình; nếu chưa có thì dùng tên trong CLB chủ quản.
 - PHR công khai gồm nhãn và điểm tại thời điểm chốt danh sách; lịch sử cập nhật vẫn thuộc không gian quản trị.
+
+### BXH đóng góp
+
+- **Một bảng duy nhất**, xếp hạng theo **tổng số tiền thành viên đã đóng** vào tài
+  khoản quỹ, không phân biệt loại khoản. Tài khoản quỹ thu mọi loại — quỹ định kỳ,
+  phí sự kiện, tiền phạt — và mỗi CLB một quy chế, nên không bắt CLB cấu hình nhãn
+  cho từng khoản.
+- **Từ vựng bắt buộc: “đóng góp”, “nộp tiền”, “đóng quỹ”.** Không dùng “nộp phạt”
+  ở bất kỳ nhãn, tiêu đề, huy hiệu hay copy nào trong sản phẩm — nó chỉ đúng với
+  quy chế của một số CLB và sai với phần lớn còn lại. Tên trang là **“BXH đóng góp”**.
+- Bốn mốc thời gian, chọn bằng segmented control: **Tuần này**, **Tháng này**,
+  **Năm nay**, **Tất cả**. Kỳ đang xem phải hiện rõ khoảng ngày, không để người đọc
+  tự suy.
+- Chỉ xếp hạng giao dịch **khớp được với thành viên trong roster**. Tiền chưa xác
+  định được người nộp không lên bảng và phải được nêu tường minh, kèm lối xử lý.
+- Podium ba hạng đầu giữ cấu trúc đã duyệt trong prototype; hạng 4 trở đi là danh
+  sách hàng.
+- **Streak** hiển thị dưới dạng badge phụ cạnh tên (số kỳ liên tiếp có đóng), không
+  thay thế số tiền. Streak chỉ hiện khi ≥ 2 kỳ liên tiếp để tránh nhiễu khi dữ liệu thưa.
+- **Huy hiệu** là nhãn có chữ, không phải chỉ icon hay chỉ màu; luôn nêu kỳ áp dụng
+  (ví dụ “Vua nộp phạt · tháng 9”).
+- Bảng phải có nút chia sẻ tạo ảnh theo quy tắc **Share card** ở mục 5.
+- Tuân thủ mục 7: BXH luôn có bảng dữ liệu đọc được, không dùng màu làm tín hiệu duy nhất.
 
 ## 7. Accessibility baseline
 
@@ -88,6 +131,23 @@ Logo prototype dùng chữ **P** cách điệu bằng một quỹ đạo cong v�
 Hướng hình ảnh được người phụ trách sản phẩm xác nhận ngày `2026-09-02` trên
 nhánh `codex/pickhub-ui-brand-preview`, commit `e147885`. Các token và quy tắc
 trong tài liệu này là baseline bắt buộc cho UI production của sáu phase.
+
+### Bản sửa đổi
+
+| Ngày | Nội dung | Nguồn |
+|---|---|---|
+| 2026-09-07 | Font chính `Inter` → `Montserrat`. Bổ sung quy tắc **Share card** (nền indigo, cấm nền tối), quy tắc **Skeleton**, và mục **BXH đóng quỹ** trong UI content rules. | Chỉ đạo sản phẩm; [`ADR-006`](./decisions/ADR-006-montserrat-va-hop-nhat-token-ui.md) |
+
+### Khoảng cách với code production (tính đến 2026-09-07)
+
+`app/globals.css` hiện khai báo bộ token `--ph-*` ở đầu file nhưng ghi đè ngay
+bên dưới bằng một bảng màu khác (`--court-green #0D7565`, `--pickle-lime #CAFF28`,
+nền `--surface-court`) và font `Outfit`. Toàn bộ màn hình production đang chạy
+bảng màu này, tức đang tồn tại hai design system song song — điều mà
+[`UI-STRATEGY.md`](./UI-STRATEGY.md) đã ghi là không được làm.
+
+Bảng màu sân xanh và font `Outfit` phải được gỡ bỏ; `--ph-*` là nguồn duy nhất.
+Việc gỡ bỏ được lập kế hoạch riêng, không thực hiện rải rác từng màn hình.
 
 Prototype trong cùng thư mục là reference artifact đã được kiểm thử; nó không
 phải production route và không được gọi API thật. Mỗi phase sẽ đưa đúng lát

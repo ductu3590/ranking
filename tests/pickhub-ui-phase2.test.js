@@ -72,7 +72,6 @@ for (const file of [
   'components/MobileBottomNav.js',
   'components/UserStatusBadge.js',
   'app/quy/page.js',
-  'app/quy/admin/page.js',
 ]) {
   assert.doesNotMatch(read(file), /getCurrentGroupClient/, `${file} must not infer role from localStorage`);
 }

@@ -16,7 +16,7 @@ function assert(condition, message) {
 
 // Admin pages reached after joining a group must gate on the group session
 // role, not the legacy Supabase Auth session (which bounced users to /login).
-for (const route of ['app/quy/admin/page.js']) {
+for (const route of ['app/quy/page.js']) {
     const src = read(route);
     assert(
         !src.includes("'/login'"),
@@ -79,18 +79,22 @@ assert(
     'UserStatusBadge should label both admin and member group roles.'
 );
 
-const fundAdmin = read('app/quy/admin/page.js');
-const fundLogoutStart = fundAdmin.indexOf('async function handleLogout');
-const fundLogoutEnd = fundAdmin.indexOf('if (loading)', fundLogoutStart);
+// Trang so quy rieng (app/quy/admin) da bi go: thao tac quy chuyen ve /quy,
+// phan quyen bang canManageFund thay vi bang URL rieng.
+const fundEntry = read('components/pickhub/fund/FundEntryForm.js');
 assert(
-    fundLogoutStart >= 0 &&
-    fundLogoutEnd > fundLogoutStart &&
-    !fundAdmin.slice(fundLogoutStart, fundLogoutEnd).includes("removeItem('teamfund-current-group')"),
-    'Fund admin logout should preserve the remembered group for the homepage continuation shortcut.'
+    fundEntry.includes('direction') && fundEntry.includes("'in'"),
+    'Fund entry form should support manual income (Thu) entry, not just expense.'
+);
+
+const fundPage = read('app/quy/page.js');
+assert(
+    fundPage.includes('canManageFund'),
+    'Fund page must gate write actions on the server-provided canManageFund permission.'
 );
 assert(
-    fundAdmin.includes('💰 Thu') && fundAdmin.includes('direction'),
-    'Fund admin should support manual income (Thu) entry, not just expense.'
+    fundPage.includes('FundEntryForm') && fundPage.includes('FundTransactionEditor'),
+    'Fund page must host the manual entry and edit dialogs that replaced the old admin screen.'
 );
 
 console.log('admin auth contract ok');

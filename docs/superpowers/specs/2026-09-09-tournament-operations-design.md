@@ -2,6 +2,7 @@
 
 - Ngày: 2026-09-09
 - Trạng thái: Draft (chờ user duyệt để chuyển sang plan)
+- Thứ tự: **Spec 2 — làm sau Spec 0 và Spec 1**
 - Liên quan: **`2026-09-09-tournament-round-scoring-design.md` (Spec 1 — làm trước)**, `tournament-create-wizard-redesign`, `tournament-open-registration`
 - Mockup đã duyệt: <https://claude.ai/code/artifact/d842724a-10c9-462a-8200-31844fb7d712>
 - Thay thế một phần `docs/pickhub-core/04-phase-tournament-operations.md` — xem mục 11
@@ -243,14 +244,19 @@ Bảng: `Lúc · Người làm · Việc · Trước → Sau · Lý do`. Ghi cho
 
 | `action` | `target_type` | Bắt lý do |
 |---|---|---|
+| `tournament_status_changed` | `tournament` | không |
 | `round_scoring_changed` | `stage` | không |
 | `court_toggled` | `court` | có |
 | `court_count_changed` | `tournament` | không |
 | `match_called` / `match_started` / `match_paused` / `match_finalized` | `match` | không |
 | `match_court_changed` | `match` | có |
 | `match_walkover` | `match` | **có** |
+| `draw_locked` / `draw_unlocked` | `stage` | chỉ khi huỷ chốt |
+| `result_corrected` | `match` | **có** |
 
-Chỉ đọc, không sửa, không xoá. Sửa kết quả đã chốt (correction) sẽ ghi vào chính bảng này ở spec 3.
+Bốn dòng cuối do Spec 0 và Spec 3 ghi vào; bảng này tạo ở Spec 2 nên **Spec 0 làm trước sẽ chưa ghi log được** — plan phải bổ sung phần ghi log của Spec 0 ngay sau khi bảng ra đời.
+
+Chỉ đọc, không sửa, không xoá.
 
 ## 10. Giao diện — token
 

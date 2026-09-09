@@ -2,6 +2,7 @@
 
 - Ngày: 2026-09-09
 - Trạng thái: Draft (chờ user duyệt để chuyển sang plan)
+- Thứ tự: **Spec 1 — làm sau Spec 0, trước Spec 2**
 - Liên quan: module giải đấu v2, `tournament-create-wizard-redesign`, `tournament-open-registration`, và **spec kế tiếp `tournament-operations`** (bàn điều hành ngày thi đấu — mục 12)
 - Mockup đã duyệt: <https://claude.ai/code/artifact/d842724a-10c9-462a-8200-31844fb7d712> — màn **bước 1 · Cấu hình giải & số ván** (bảng chính) và **bước 6 · Lịch thi đấu & kết quả** (chip BO lối tắt)
 

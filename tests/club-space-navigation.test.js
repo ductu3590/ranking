@@ -23,6 +23,12 @@ assert.strictEqual(isGlobalNavActive('/bxh', '/bxh'), true);
 assert.strictEqual(isGlobalNavActive('/thanh-vien', '/quy'), false, 'Quy khong duoc active tren trang Thanh vien.');
 assert.strictEqual(isGlobalNavActive('/bxh', '/quy'), false, 'Quy khong duoc active tren trang BXH.');
 
+// Duong dan chi TRUNG TIEN TO chu khong phai trang con thi khong duoc an theo muc do
+assert.strictEqual(getBreadcrumbLabel('/quy-che'), '', 'Tien to trung khong duoc coi la trang con cua /quy.');
+assert.strictEqual(getBreadcrumbLabel('/bxh-cu'), '', 'Tien to trung khong duoc coi la trang con cua /bxh.');
+assert.strictEqual(getBreadcrumbLabel('/admin-lich-su'), '', 'Tien to trung khong duoc coi la trang con cua /admin.');
+assert.strictEqual(isGlobalNavActive('/thanh-vien-cu', '/thanh-vien'), false, 'Tien to trung khong duoc lam sang muc Thanh vien.');
+
 // Khong con duong dan cu
 for (const links of [getGlobalNavLinksForRole('member'), getGlobalNavLinksForRole('admin')]) {
     for (const link of links) {

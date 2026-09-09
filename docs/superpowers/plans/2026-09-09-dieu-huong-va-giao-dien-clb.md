@@ -13,6 +13,19 @@
 
 ---
 
+## ⚠ Cảnh báo về git — đọc trước khi commit bất cứ thứ gì
+
+Working tree của nhánh này **đang chứa nhiều việc dở dang không liên quan** của chủ
+dự án: 16 file đã sửa và 44 file chưa theo dõi (`_workspace/`, `evidence/`, `.agents/`,
+`app/api/tournament-v2/`, `database/migrations/038–041`, …).
+
+**Tuyệt đối không chạy `git add -A` hoặc `git add .` trần.** Mọi lệnh commit trong plan
+này đều đã giới hạn phạm vi đúng thư mục — giữ nguyên như vậy. Trước mỗi commit, chạy
+`git status --short` và xác nhận danh sách staged chỉ chứa file của task đang làm.
+
+Nếu lỡ stage nhầm: `git restore --staged <đường-dẫn>` để gỡ ra, **không** dùng
+`git reset --hard`.
+
 ## Quy ước bắt buộc
 
 Đọc `.claude/skills/pickhub-engineering` trước khi bắt đầu. Vài điểm hay sai:
@@ -621,7 +634,7 @@ Expected: thành công; bảng route có `/thanh-vien` và `/bxh`, không còn `
 - [ ] **Step 3: Commit nếu có sửa thêm**
 
 ```bash
-git add -A
+git add tests/ lib/ app/ next.config.js
 git commit -m "test: dong bo test sau khi doi duong dan khong gian CLB"
 ```
 

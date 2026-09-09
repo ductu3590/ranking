@@ -117,7 +117,10 @@ Chỉ **thêm** `--ph-radius-xs` và `--ph-radius-card`. Không đổi giá tr�
 - [ ] **Step 2: Chạy test hệ thiết kế**
 
 Run: `npm run test:ph-ui`
-Expected: `ph-design-system: PASS`
+Expected: **KHONG PASS** — `npm run test:ph-ui` da do san tren `main` truoc dot nay,
+do 19 ma mau hex hardcode trong `app/quy/bxh/page.css` (se duoc don o Task 19).
+Dieu can kiem la **khong co loi MOI**: thong bao loi chi duoc nhac toi
+`bxh/page.css`. Neu no nhac toi file ban vua sua thi day la loi cua ban.
 
 - [ ] **Step 3: Commit**
 
@@ -476,7 +479,10 @@ const NEW_CSS_FILES = ['app/styles/primitives.css', 'components/pickhub/AppShell
 - [ ] **Step 6: Chạy test và build**
 
 Run: `npm run test:ph-ui && npm run build`
-Expected: `ph-design-system: PASS`, bảng route có `/bxh`, không còn `/quy/bxh`
+Expected: `test:ph-ui` van bao loi hex o **`app/bxh/page.css`** (file vua chuyen, noi dung
+chua doi — se don o Task 19). Bang route co `/bxh`, khong con `/quy/bxh`.
+Neu `NEW_CSS_FILES` chua duoc sua sang duong dan moi thi test se bao *khong tim thay file*
+va am tham bo qua (`if (!fs.existsSync(fullPath)) continue;`) — phai sua dung.
 
 - [ ] **Step 7: Commit**
 
@@ -624,7 +630,15 @@ git commit -m "refactor(admin): bo tab, chuyen huong section roster va fund"
 - [ ] **Step 1: Chạy hồi quy đầy đủ**
 
 Run: `npm run test:regression`
-Expected: PASS toàn bộ. Nếu đỏ, sửa test tương ứng theo bảng ở mục 13 của spec rồi chạy lại.
+Expected: moi test xanh **tru `test:ph-ui`**, von da do san tren `main` vi 19 hex trong
+`app/bxh/page.css` (Task 19 se don). Vi `test:regression` chay tuan tu va dung o test do,
+hay chay rieng cac nhom con lai de kiem het:
+
+```bash
+npm run test:phase1 && npm run test:teamfund && npm run test:phase2 && npm run test:mobile-nav && npm run test:leaderboard && npm run test:admin-auth
+```
+
+Neu co test nao do vi duong dan cu, sua theo bang o muc 13 cua spec roi chay lai.
 
 - [ ] **Step 2: Build**
 
@@ -870,7 +884,9 @@ Thay toàn bộ nhóm `.ph-rail*` hiện có bằng:
 - [ ] **Step 3: Chạy test cấm hex**
 
 Run: `npm run test:ph-ui`
-Expected: `ph-design-system: PASS`. Nếu đỏ, tìm hex còn sót trong `AppShell.css` và thay bằng token.
+Expected: loi duy nhat van la 19 hex co san o `app/bxh/page.css`.
+**Neu thong bao loi nhac toi `AppShell.css` thi do la loi cua ban** — tim hex con sot
+trong file vua sua va thay bang `var(--ph-*)`.
 
 - [ ] **Step 4: Commit**
 
@@ -1029,7 +1045,8 @@ Mở `/quy` và đổi bề rộng cửa sổ:
 - [ ] **Step 5: Chạy test shell**
 
 Run: `node tests/global-navigation.test.js && npm run test:mobile-nav && npm run test:ph-ui`
-Expected: ba dòng ok
+Expected: hai test dau ok. `test:ph-ui` van do vi 19 hex co san o `app/bxh/page.css`;
+kiem thong bao loi **khong** nhac toi `AppShell.css`.
 
 - [ ] **Step 6: Commit**
 
@@ -1274,7 +1291,10 @@ thiếu chúng thì dòng có nút "Gán người nộp" sẽ đẩy số tiền
 - [ ] **Step 3: Chạy test cấm hex**
 
 Run: `npm run test:ph-ui`
-Expected: PASS
+Expected: loi duy nhat van la 19 hex co san o `app/bxh/page.css`. File CSS moi cua task
+nay khong nam trong `NEW_CSS_FILES` nen khong bi quet, nhung van phai dung token —
+tu kiem bang `grep -nE "#[0-9a-fA-F]{3,8}\b" components/pickhub/fund/FundTransactionList.css`,
+ket qua phai rong.
 
 - [ ] **Step 4: Commit**
 
@@ -2402,10 +2422,43 @@ Thay `.ph-bxh-podium__grid` bằng:
 Khoá cứng 3 cột. Dùng `auto-fit minmax(190px, 1fr)` thì tên dài như "ĐẶNG NGỌC DƯƠNG"
 đẩy thẻ thứ ba xuống hàng riêng.
 
-- [ ] **Step 4: Chạy test cấm hex**
+- [ ] **Step 4: Dọn nốt 19 hex có sẵn trong `app/bxh/page.css`**
+
+File nay mang san **19 ma mau hardcode tu truoc dot nay**, khien `npm run test:ph-ui`
+do lien tuc tu Task 1 den gio. Task nay dang viet lai chinh file do nen la cho dung de don.
+
+Liet ke chung:
+
+```bash
+grep -nE "#[0-9a-fA-F]{3,8}\b" app/bxh/page.css
+```
+
+Thay tung ma bang token gan nhat trong `app/styles/tokens.css`. Bang quy doi cho
+cac ma da biet:
+
+| Hex | Token |
+|---|---|
+| `#7857D6` | `var(--ph-indigo)` |
+| `#3C2470` | `var(--ph-ink)` |
+| `#7BE5B0` | `var(--ph-positive)` |
+| `#C05564` | `var(--ph-negative)` |
+| `#FFFBEF`, `#FFFAF5` | `var(--ph-tint-gold)` |
+| `#FFEBD9`, `#F6C79A`, `#FBD7B4` | `var(--ph-tint-gold-line)` |
+| `#6B4A00`, `#7A4A18` | `var(--ph-tint-gold-text)` |
+| `#FBFCFE` | `var(--ph-tint-neutral-strong)` |
+| `#D7DEEA`, `#DCE3EE` | `var(--ph-line)` |
+| `#7A8699` | `var(--ph-muted)` |
+| `#E0A32B`, `#D9812F` | `var(--ph-gold)` |
+| `#fff` | `var(--ph-card)` |
+
+**Chi doi mau, khong doi bo cuc.** Sau khi doi, mo `/bxh` doi chieu bang mat: mau phai
+gan nhu y het truoc do. Neu mot cho lech ro ret thi token chon sai — bao lai, dung tu
+y doi thiet ke.
+
+- [ ] **Step 4b: Chạy test cấm hex**
 
 Run: `npm run test:ph-ui`
-Expected: PASS. Nếu đỏ, còn hex trong `app/bxh/page.css`.
+Expected: **`ph-design-system: PASS`** — lan dau tien xanh tro lai ke tu dau dot nay.
 
 - [ ] **Step 5: Kiểm mắt**
 
@@ -3014,7 +3067,8 @@ git commit -m "feat(quy): hien thi QR nhan quy o cot phai"
 - [ ] **Step 1: Hồi quy đầy đủ**
 
 Run: `npm run test:regression && node tests/club-space-navigation.test.js && node tests/club-space-roles.test.js`
-Expected: tất cả xanh
+Expected: **tat ca xanh, khong tru cai nao**. Den buoc nay Task 19 da don xong 19 hex
+nen `test:ph-ui` phai `PASS`. Neu no van do thi Task 19 chua hoan tat.
 
 - [ ] **Step 2: Build**
 

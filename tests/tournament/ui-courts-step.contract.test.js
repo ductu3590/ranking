@@ -1,0 +1,10 @@
+const fs = require('fs');
+const path = require('path');
+const source = fs.readFileSync(path.join(__dirname, '..', '..', 'app', 'giai-dau', 'v2', 'console', 'steps', 'CourtsStep.js'), 'utf8');
+const assert = (condition, message) => { if (!condition) { console.error(`FAIL: ${message}`); process.exit(1); } };
+assert(/'use client'|"use client"/.test(source), 'client component');
+assert(/listCourts|getCourtBoard/.test(source), 'gọi client wrapper');
+assert(!/supabase/i.test(source), 'không truy vấn Supabase trực tiếp');
+assert(/Số sân/.test(source) && /ước tính hoàn tất/.test(source) && /Hàng đợi/.test(source) && /Lý do/.test(source), 'đủ nội dung bước sân');
+assert(!/#[0-9a-fA-F]{6}/.test(source), 'không hardcode màu');
+console.log('ui-courts-step contract ok');

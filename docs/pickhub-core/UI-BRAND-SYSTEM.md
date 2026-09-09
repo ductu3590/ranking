@@ -36,6 +36,17 @@ PickHub là không gian giúp các CLB pickleball vận hành minh bạch, kết
 
 Màu CLB và màu giải được map vào các token accent, không được thay thế màu chữ, màu cảnh báo hoặc màu focus. Hệ thống kiểm tra tương phản trước khi lưu theme. Không dùng nền đen hoặc navy đặc trong các màn hình vận hành; `--ph-ink` chỉ dành cho chữ/icon cần độ tương phản.
 
+> **Ngoại lệ đã duyệt — bàn điều hành giải (`.ops-shell`).** Màn hình này dùng
+> nền đen ám tím `#0A0812`, trái với quy tắc không dùng nền đen hoặc navy đặc
+> trong màn hình vận hành. Lý do: BTC nhìn liên tục nhiều giờ trong nhà thi đấu,
+> cần tương phản cao và đọc được từ xa; nền sáng gây chói dưới đèn thi đấu.
+> Ngoại lệ chỉ áp dụng cho console điều hành, không lan sang trang công khai hay
+> các màn quản lý CLB.
+>
+> Trên nền tối, `--ph-cyan` và `--ph-coral` được phép dùng cho chữ vì phép đo
+> khác hẳn nền trắng. Kết quả đo được ghi tại
+> `evidence/spec2-contrast-2026-09-09.md`; mọi màn tối mới phải đo lại.
+
 Các token `--ph-cyan` và `--ph-coral` chỉ dùng làm nền/accent, không dùng làm chữ. Nhóm tint bổ sung (`--ph-tint-indigo`, `--ph-tint-gold`, `--ph-tint-gold-text`, `--ph-tint-cyan`, `--ph-tint-coral`, `--ph-tint-positive`, `--ph-tint-negative`, `--ph-tint-neutral`, `--ph-tint-neutral-strong`, `--ph-backdrop`) là nền nhạt phái sinh từ bốn màu accent đã duyệt, dùng cho metric card, badge và skeleton; đây không phải màu mới và không đổi hệ màu.
 
 ### Typography

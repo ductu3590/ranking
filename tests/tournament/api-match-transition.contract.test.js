@@ -1,0 +1,13 @@
+const fs = require('fs');
+const path = require('path');
+const root = path.join(__dirname, '..', '..');
+const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
+const assert = (condition, message) => { if (!condition) { console.error(`FAIL: ${message}`); process.exit(1); } };
+const source = read('app/api/tournament-v2/match-transition/route.js');
+for (const name of ['canTransitionMatch', 'timestampsFor', 'resultTypeFor', 'REASON_REQUIRED', 'MATCH_VERSION_CONFLICT', 'writeOperationLog']) assert(new RegExp(name).test(source), `route có ${name}`);
+assert(/\.eq\('version'/.test(source), 'ghi có điều kiện version');
+assert(/version:\s*Number\(matchResult\.data\.version\)\s*\+\s*1/.test(source), 'tăng version');
+assert(/\.eq\('group_id'/.test(source), 'scope group_id');
+assert(/requireTournamentAccess|requireValidatedGroupAdmin/.test(source), 'có guard');
+assert(/transitionMatch/.test(read('lib/tournamentV2Client.js')), 'client có transitionMatch');
+console.log('api-match-transition contract ok');

@@ -1,9 +1,12 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
-import { listTournaments, listStages } from '@/lib/tournamentV2Client';
+import { useCallback, useEffect, useState } from 'react';
+import { listTournaments, listStages, getCourtBoard } from '@/lib/tournamentV2Client';
 import { getCurrentGroupClient } from '@/lib/groupClient';
+import ConsoleShell from './ConsoleShell';
+import CourtsStep from './steps/CourtsStep';
+import ControlStep from './steps/ControlStep';
+import LogStep from './steps/LogStep';
 import OverviewTab from './tabs/OverviewTab';
 import ResultsTab from './tabs/ResultsTab';
 import StandingsTab from './tabs/StandingsTab';
@@ -13,147 +16,63 @@ import SettingsTab from './tabs/SettingsTab';
 import OpenRegTab from './tabs/OpenRegTab';
 import './console.css';
 
-const TABS = [
-    { key: 'overview', label: 'Tổng quan' },
-    { key: 'results', label: 'Kết quả' },
-    { key: 'standings', label: 'Bảng xếp hạng' },
-    { key: 'bracket', label: 'Sơ đồ' },
-    { key: 'teams', label: 'Đội' },
-    { key: 'settings', label: 'Cài đặt' },
-];
-
-const OPEN_REG_TAB = { key: 'openreg', label: 'Đăng ký & duyệt' };
-
 export default function TournamentConsoleV2({ tournamentId }) {
-    const searchParams = useSearchParams();
-    const router = useRouter();
+  const [tournament, setTournament] = useState(null);
+  const [stages, setStages] = useState([]);
+  const [board, setBoard] = useState(null);
+  const [activeStageId, setActiveStageId] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-    const tabParam = searchParams.get('tab');
-
-    const [tournament, setTournament] = useState(null);
-    const [stages, setStages] = useState([]);
-    const [activeStageId, setActiveStageId] = useState(null);
-    const [isAdmin, setIsAdmin] = useState(false);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
-
-    const load = useCallback(async () => {
-        setLoading(true);
-        setError('');
-        try {
-            const [list, stageList] = await Promise.all([
-                listTournaments(),
-                listStages(tournamentId),
-            ]);
-            const t = (Array.isArray(list) ? list : []).find(
-                (x) => String(x.id) === String(tournamentId),
-            );
-            setTournament(t || null);
-            const sList = Array.isArray(stageList) ? stageList : [];
-            setStages(sList);
-            setActiveStageId((prev) => {
-                if (prev && sList.some((s) => String(s.id) === String(prev))) return prev;
-                return sList.length ? sList[0].id : null;
-            });
-        } catch (err) {
-            setError(err.message || 'Không tải được dữ liệu giải.');
-        } finally {
-            setLoading(false);
-        }
-    }, [tournamentId]);
-
-    useEffect(() => {
-        const group = getCurrentGroupClient();
-        setIsAdmin(group.role === 'admin');
-        load();
-    }, [load]);
-
-    function selectTab(key) {
-        const params = new URLSearchParams(searchParams.toString());
-        params.set('tab', key);
-        router.push(`/giai-dau/v2?${params.toString()}`);
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const [list, stageList, courtBoard] = await Promise.all([listTournaments(), listStages(tournamentId), getCourtBoard(tournamentId)]);
+      setTournament((Array.isArray(list) ? list : []).find((item) => String(item.id) === String(tournamentId)) || null);
+      const nextStages = Array.isArray(stageList) ? stageList : [];
+      setStages(nextStages);
+      setActiveStageId((previous) => previous && nextStages.some((stage) => String(stage.id) === String(previous)) ? previous : nextStages[0]?.id || null);
+      setBoard(courtBoard || null);
+    } catch (loadError) {
+      setError(loadError.message || 'Không tải được dữ liệu giải.');
+    } finally {
+      setLoading(false);
     }
+  }, [tournamentId]);
 
-    const activeStage = stages.find((s) => String(s.id) === String(activeStageId)) || null;
+  useEffect(() => {
+    setIsAdmin(getCurrentGroupClient().role === 'admin');
+    load();
+  }, [load]);
 
-    const isCommunity = tournament?.organizer_mode === 'community';
-    const visibleTabs = isCommunity ? [...TABS, OPEN_REG_TAB] : TABS;
-    const validTabKeys = visibleTabs.map((t) => t.key);
-    const activeTab = validTabKeys.includes(tabParam) ? tabParam : 'overview';
+  const activeStage = stages.find((stage) => String(stage.id) === String(activeStageId)) || null;
+  const isCommunity = tournament?.organizer_mode === 'community';
+  const readiness = {
+    config: Boolean(tournament) && stages.length > 0,
+    courts: (board?.courts || []).some((court) => court.active),
+    athletes: true,
+    draw: stages.length > 0 && stages.every((stage) => (stage.match_count || 0) > 0),
+  };
+  const stepProps = { tournamentId, tournament, stageId: activeStageId, stage: activeStage, stages, isAdmin, reload: load };
 
-    if (loading) {
-        return (
-            <div className="v2-state v2-loading">
-                <span className="v2-spinner" aria-hidden="true" />
-                <p>Đang tải dữ liệu giải...</p>
-            </div>
-        );
-    }
+  if (loading) return <div className="v2-state v2-loading"><span className="v2-spinner" aria-hidden="true" /><p>Đang tải dữ liệu giải...</p></div>;
+  if (error) return <div className="v2-state v2-error"><p>{error}</p><button type="button" className="v2-btn-secondary" onClick={load}>Thử lại</button></div>;
 
-    if (error) {
-        return (
-            <div className="v2-state v2-error">
-                <p>{error}</p>
-                <button type="button" className="v2-btn-secondary" onClick={load}>
-                    Thử lại
-                </button>
-            </div>
-        );
-    }
-
-    const tabProps = {
-        tournamentId,
-        tournament,
-        stageId: activeStageId,
-        stage: activeStage,
-        stages,
-        isAdmin,
-        reload: load,
-    };
-
-    return (
-        <div className="v2-console">
-            <header className="v2-console-head">
-                <h1 className="v2-console-title">{tournament ? tournament.name : 'Giải đấu'}</h1>
-            </header>
-
-            <nav className="v2-tabbar" aria-label="Mục console">
-                {visibleTabs.map((t) => (
-                    <button
-                        key={t.key}
-                        type="button"
-                        className={`v2-tab ${activeTab === t.key ? 'active' : ''}`}
-                        onClick={() => selectTab(t.key)}
-                    >
-                        {t.label}
-                    </button>
-                ))}
-            </nav>
-
-            {stages.length > 1 ? (
-                <div className="v2-stage-picker" role="tablist" aria-label="Giai đoạn">
-                    {stages.map((s) => (
-                        <button
-                            key={s.id}
-                            type="button"
-                            className={`v2-stage-seg ${String(activeStageId) === String(s.id) ? 'active' : ''}`}
-                            onClick={() => setActiveStageId(s.id)}
-                        >
-                            {s.name}
-                        </button>
-                    ))}
-                </div>
-            ) : null}
-
-            <div className="v2-tab-panel">
-                {activeTab === 'overview' ? <OverviewTab {...tabProps} /> : null}
-                {activeTab === 'results' ? <ResultsTab {...tabProps} /> : null}
-                {activeTab === 'standings' ? <StandingsTab {...tabProps} /> : null}
-                {activeTab === 'bracket' ? <BracketTab {...tabProps} /> : null}
-                {activeTab === 'teams' ? <TeamsTab {...tabProps} /> : null}
-                {activeTab === 'settings' ? <SettingsTab {...tabProps} /> : null}
-                {activeTab === 'openreg' ? <OpenRegTab {...tabProps} /> : null}
-            </div>
-        </div>
-    );
+  return <ConsoleShell tournament={tournament} tournamentId={tournamentId} progress={board?.progress} readiness={readiness}>
+    {(step) => <>
+      {stages.length > 1 && step !== 'control' && step !== 'log' ? <div className="ops-stage-picker" role="tablist" aria-label="Giai đoạn">
+        {stages.map((stage) => <button key={stage.id} type="button" aria-pressed={String(activeStageId) === String(stage.id)} onClick={() => setActiveStageId(stage.id)}>{stage.name}</button>)}
+      </div> : null}
+      {step === 'config' ? <SettingsTab {...stepProps} /> : null}
+      {step === 'courts' ? <CourtsStep {...stepProps} /> : null}
+      {step === 'athletes' ? <><TeamsTab {...stepProps} />{isCommunity ? <OpenRegTab {...stepProps} /> : null}</> : null}
+      {step === 'draw' ? <OverviewTab {...stepProps} /> : null}
+      {step === 'control' ? <ControlStep {...stepProps} /> : null}
+      {step === 'schedule' ? <ResultsTab {...stepProps} /> : null}
+      {step === 'standings' ? <><StandingsTab {...stepProps} /><BracketTab {...stepProps} /></> : null}
+      {step === 'log' ? <LogStep {...stepProps} /> : null}
+    </>}
+  </ConsoleShell>;
 }

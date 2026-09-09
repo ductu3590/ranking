@@ -7,7 +7,7 @@ import ConsoleShell from './ConsoleShell';
 import CourtsStep from './steps/CourtsStep';
 import ControlStep from './steps/ControlStep';
 import LogStep from './steps/LogStep';
-import OverviewTab from './tabs/OverviewTab';
+import DrawStep from './steps/DrawStep';
 import ResultsTab from './tabs/ResultsTab';
 import StandingsTab from './tabs/StandingsTab';
 import BracketTab from './tabs/BracketTab';
@@ -68,7 +68,7 @@ export default function TournamentConsoleV2({ tournamentId }) {
       {step === 'config' ? <SettingsTab {...stepProps} /> : null}
       {step === 'courts' ? <CourtsStep {...stepProps} /> : null}
       {step === 'athletes' ? <><TeamsTab {...stepProps} />{isCommunity ? <OpenRegTab {...stepProps} /> : null}</> : null}
-      {step === 'draw' ? <OverviewTab {...stepProps} /> : null}
+      {step === 'draw' ? <DrawStep {...stepProps} /> : null}
       {step === 'control' ? <ControlStep {...stepProps} /> : null}
       {step === 'schedule' ? <ResultsTab {...stepProps} /> : null}
       {step === 'standings' ? <><StandingsTab {...stepProps} /><BracketTab {...stepProps} /></> : null}

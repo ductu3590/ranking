@@ -1,10 +1,9 @@
-import { randomUUID } from 'crypto';
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { requireValidatedGroupAdmin } from '@/lib/groupSession';
-import { getScheduleEngine } from '@/lib/tournament/engines';
-import { scheduleToInsertRows } from '@/lib/tournament/persistence';
+import { requireTournamentAccess } from '@/lib/tournament/accessRuntime';
+import { generateAndPersistSchedule } from '@/lib/tournament/generateSchedule';
 import { resolveStageScoring } from '@/lib/tournament/rules/scoring';
 import { resolveTiebreak } from '@/lib/tournament/rules/tiebreak';
 
@@ -19,16 +18,15 @@ function rpcErrorResponse(error) {
 
 export async function POST(request) {
     try {
-        const adminCheck = await requireValidatedGroupAdmin();
-        if (!adminCheck.ok) return adminCheck.response;
-        const groupId = adminCheck.groupId;
-
         const body = await request.json();
         const stageId = body?.stageId;
         const seed = body?.seed;
         if (!stageId) {
             return NextResponse.json({ error: 'stageId is required' }, { status: 400 });
         }
+        const access = await requireTournamentAccess({ stageId, need: 'write' });
+        if (!access.ok) return access.response;
+        const groupId = access.groupId;
 
         // 1. Load stage
         const { data: stage, error: stageErr } = await db
@@ -102,49 +100,21 @@ export async function POST(request) {
             return NextResponse.json({ error: 'Cần ít nhất 2 đội' }, { status: 400 });
         }
 
-        // 3. Generate and validate the schedule before entering the database transaction.
-        let engine;
-        try {
-            engine = getScheduleEngine(stage.schedule_format);
-        } catch (e) {
-            return NextResponse.json({ error: e.message }, { status: 400 });
-        }
-
-        let sched;
-        try {
-            sched = engine.generateSchedule(
-                { schedule_format: stage.schedule_format, config: stage.config || {} },
-                entrants,
-                seed || 1,
-            );
-        } catch (e) {
-            console.error('Generate schedule engine error:', e);
-            return NextResponse.json({ error: e.message }, { status: 400 });
-        }
-
-        const entryBased = Boolean(stage.division_id);
-        const rows = scheduleToInsertRows(sched, { stageId, groupId, divisionId: stage.division_id, entryBased });
-        const rpcMatches = rows.map((row, index) => ({
-            ...row,
-            _key: String(sched[index].slot != null ? sched[index].slot : index),
-            _parent_key: sched[index].parent_slot != null ? String(sched[index].parent_slot) : null,
-        }));
-        const idempotencyKey = String(
-            body?.idempotency_key || body?.idempotencyKey || randomUUID(),
-        ).trim();
-        if (!idempotencyKey || idempotencyKey.length > 200) {
-            return NextResponse.json({ error: 'idempotency_key không hợp lệ' }, { status: 400 });
-        }
-
-        // Legacy adapter remains available for pre-Task-3 stages via rpc('replace_tournament_schedule').
-        const { data, error } = await db.rpc(entryBased ? 'replace_tournament_entry_schedule' : 'replace_tournament_schedule', {
-            p_group_id: groupId,
-            p_stage_id: stageId,
-            p_matches: rpcMatches,
-            p_idempotency_key: idempotencyKey,
+        // 3. Sinh lịch và ghi xuống DB. Logic nằm ở lib/tournament/generateSchedule.js
+        // để route này và route `draw` (lúc chốt bốc thăm) dùng chung một bản —
+        // chép hai bản là cách chắc chắn nhất để chúng lệch nhau sau vài tháng.
+        const result = await generateAndPersistSchedule(db, {
+            stage: { ...stage, id: stageId },
+            entrants,
+            groupId,
+            seed: seed || 1,
+            idempotencyKey: body?.idempotency_key || body?.idempotencyKey,
         });
-        if (error) return rpcErrorResponse(error);
-        return NextResponse.json({ ...(data || { success: true }), matchCount: data?.matchCount ?? rows.length });
+        if (!result.ok) {
+            if (result.rpcError) return rpcErrorResponse(result.rpcError);
+            return NextResponse.json({ error: result.error, code: result.code }, { status: 400 });
+        }
+        return NextResponse.json(result.data);
     } catch (err) {
         console.error('Generate v2 POST error:', err);
         return NextResponse.json({ error: err.message }, { status: 500 });

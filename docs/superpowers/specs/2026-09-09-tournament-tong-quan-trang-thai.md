@@ -51,14 +51,14 @@
 | [`2026-09-07-tournament-open-registration`](2026-09-07-tournament-open-registration-design.md) | ✅ **xong** | Plan 99/99 tick. `app/dk/page.js`, `app/dk/[slug]/[division]/page.js`, `app/dk/theo-doi/page.js`, `app/dk/openreg.css` + 4 route `public/*` — **tất cả đã commit** |
 | [`2026-09-08-pickhub-design-system-va-bxh-design`](2026-09-08-pickhub-design-system-va-bxh-design.md) | 📝 **approved, chưa thi công** | Ràng buộc mọi UI mới — xem mục 5 |
 
-### 2.2 Spec viết hôm nay, chưa có dòng code nào
+### 2.2 Spec + plan viết hôm nay, chưa có dòng code nào
 
-| # | Spec | Nội dung | Migration |
-|---|---|---|---|
-| 0 | [`tournament-directory-lifecycle`](2026-09-09-tournament-directory-lifecycle-design.md) | Danh sách Sắp/Đang/Đã · vòng đời 7 trạng thái · chốt giải · **sửa lỗi `active`** | **043** (bảng nhật ký) |
-| 1 | [`tournament-round-scoring`](2026-09-09-tournament-round-scoring-design.md) | Số ván (BO) theo từng vòng | không |
-| 2 | [`tournament-operations`](2026-09-09-tournament-operations-design.md) | Shell 8 bước · sân · trung tâm điều hành · nhập điểm · nhật ký | **044** |
-| 3 | [`tournament-draw-standings-corrections`](2026-09-09-tournament-draw-standings-corrections-design.md) | Bốc thăm chốt lịch · BXH & bracket · sửa kết quả đã chốt | **045** |
+| # | Spec | Plan thi công | Nội dung | Migration |
+|---|---|---|---|---|
+| 0 | [spec](2026-09-09-tournament-directory-lifecycle-design.md) | [plan](../plans/2026-09-09-tournament-directory-lifecycle.md) · 9 task | Danh sách Sắp/Đang/Đã · vòng đời 7 trạng thái · chốt giải · **sửa lỗi `active`** | **043** |
+| 1 | [spec](2026-09-09-tournament-round-scoring-design.md) | [plan](../plans/2026-09-09-tournament-round-scoring.md) · 9 task | Số ván (BO) theo từng vòng · **vá 4 lỗi P0/P1** | không |
+| 2 | [spec](2026-09-09-tournament-operations-design.md) | [plan](../plans/2026-09-09-tournament-operations.md) · 13 task, 4 nhóm | Shell 8 bước · sân · trung tâm điều hành · nhật ký | **044** |
+| 3 | [spec](2026-09-09-tournament-draw-standings-corrections-design.md) | [plan](../plans/2026-09-09-tournament-draw-standings-corrections.md) · 13 task, 2 khối | Bốc thăm chốt lịch · BXH & bracket · sửa kết quả đã chốt | **045** (+046 RPC) |
 
 ### 2.3 Spec đã lỗi thời
 

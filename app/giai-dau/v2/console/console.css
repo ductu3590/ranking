@@ -907,3 +907,22 @@
     padding: 0 0 0 8px;
 }
 
+.v2-round-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+
+.v2-round-group-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 9px 12px;
+    border-radius: var(--border-radius-sm);
+    background: var(--bg-secondary);
+}
+
+.v2-round-group-head b { font-size: 0.92rem; }
+.v2-round-group-head small { font-size: 0.75rem; color: var(--text-muted); }
+.v2-round-group-head .v2-round-bo { margin-left: auto; }
+.v2-round-group-head .v2-round-bo button { padding: 5px 11px; font-size: 0.78rem; }
+.v2-round-group-head .v2-round-readonly { margin-left: auto; }
+
+

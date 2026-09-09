@@ -12,4 +12,8 @@ assert(s.includes('womens') || s.includes('mlp') || s.includes('lineup'), 'hỗ 
 assert(exists('app/giai-dau/v2/console/tabs/SettingsTab.js'), 'SettingsTab tồn tại');
 const st = read('app/giai-dau/v2/console/tabs/SettingsTab.js');
 assert(st.includes('public') || st.includes('slug') || st.includes('QR') || st.includes('qrcode'), 'Settings có link/QR công khai');
+assert(/roundKeyOf|describeRound/.test(s), 'nhóm trận theo vòng bằng module luật vòng');
+assert(/updateRoundRule/.test(s), 'chip BO gọi cùng API với panel Cài đặt');
+assert(/BO1|BO3|BO5/.test(s), 'có ba chip số ván ở header nhóm vòng');
 console.log('ui-results contract ok');
+

@@ -8,7 +8,11 @@ import {
     getPairs,
     generatePairs,
     patchPairs,
+    getRoundRules,
+    updateRoundRule,
 } from '@/lib/tournamentV2Client';
+import { roundKeyOf, describeRound, totalRoundsOf, computeRoundLocks } from '@/lib/tournament/rules/roundScoring';
+
 
 // --- SubKind helpers (hỗ trợ cả format mới round_X_pair_Y lẫn legacy womens/mens/...) ---
 
@@ -511,9 +515,67 @@ function PairScheduleEditor({ pairSchedule, entrantsById, stageId, onSaved }) {
     );
 }
 
+// Gom trận theo vòng để header mỗi nhóm mang được chip số ván.
+function groupMatchesByRound(matches, stage) {
+    const locks = computeRoundLocks(stage, matches);
+    const buckets = new Map();
+    for (const match of matches) {
+        const key = roundKeyOf(match);
+        if (!buckets.has(key)) buckets.set(key, []);
+        buckets.get(key).push(match);
+    }
+    const total = totalRoundsOf(matches);
+    return [...buckets.entries()].map(([key, items]) => ({
+        key,
+        label: describeRound(stage, key, total),
+        matches: items,
+        locked: locks[key] ? locks[key].locked : false,
+    }));
+}
+
+function RoundGroupHead({ group, rule, stageId, isAdmin, onSaved }) {
+    const [busy, setBusy] = useState(false);
+    async function pick(value) {
+        setBusy(true);
+        try {
+            await updateRoundRule({ stage_id: stageId, round_key: group.key, scoring: { best_of: value } });
+            onSaved();
+        } catch (_) { /* thông báo do panel Cài đặt lo; ở đây im lặng để không chắn luồng nhập điểm */ }
+        finally { setBusy(false); }
+    }
+    const bestOf = rule ? rule.scoring.best_of : null;
+    return (
+        <div className="v2-round-group-head">
+            <b>{group.label}</b>
+            <small>{group.matches.length} trận</small>
+            {group.locked || !isAdmin ? (
+                <span className="v2-round-readonly">
+                    {bestOf ? `BO${bestOf}` : ''} {group.locked ? '🔒' : ''}
+                </span>
+            ) : (
+                <div className="v2-round-bo" role="group" aria-label={`Số ván ${group.label}`}>
+                    {/* Ba chip số ván: BO1, BO3, BO5 */}
+                    {[1, 3, 5].map((value) => (
+                        <button
+                            key={value}
+                            type="button"
+                            aria-pressed={bestOf === value}
+                            disabled={busy}
+                            onClick={() => pick(value)}
+                        >
+                            BO{value}
+                        </button>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
+
 // --- Main ResultsTab ---
 
 export default function ResultsTab({ tournamentId, stageId, stage, isAdmin }) {
+
     const [matches, setMatches] = useState([]);
     const [gamesByMatchId, setGamesByMatchId] = useState({});
     const [entrantsById, setEntrantsById] = useState({});
@@ -524,6 +586,18 @@ export default function ResultsTab({ tournamentId, stageId, stage, isAdmin }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [activeRound, setActiveRound] = useState(null);
+
+    const [roundRules, setRoundRules] = useState(null);
+
+    useEffect(() => {
+        if (!stageId) { setRoundRules(null); return; }
+        let alive = true;
+        getRoundRules(stageId)
+            .then((res) => { if (alive) setRoundRules(res); })
+            .catch(() => { if (alive) setRoundRules(null); });
+        return () => { alive = false; };
+    }, [stageId]);
+
 
     const isMlp = stage?.match_format === 'mlp';
 
@@ -609,6 +683,22 @@ export default function ResultsTab({ tournamentId, stageId, stage, isAdmin }) {
         : rounds[0];
     const visibleMatches = matches.filter((m) => m.round === currentRound);
 
+    function renderMatchRow(m) {
+        return (
+            <MatchCard
+                key={m.id}
+                match={m}
+                savedGames={gamesByMatchId[m.id] || []}
+                isMlp={isMlp}
+                entrantsById={entrantsById}
+                isAdmin={isAdmin}
+                onSaved={load}
+                pairSchedule={pairSchedule}
+                gamesPerMatchup={stage?.config?.gamesPerMatchup}
+            />
+        );
+    }
+
     return (
         <div className="v2-results">
             {isMlp && isAdmin ? (
@@ -649,42 +739,19 @@ export default function ResultsTab({ tournamentId, stageId, stage, isAdmin }) {
                 />
             ) : null}
 
-            {/* Tab bar theo vòng */}
-            {rounds.length > 1 ? (
-                <nav className="v2-round-tabbar" aria-label="Vòng đấu">
-                    {rounds.map((r) => {
-                        const roundMatches = matches.filter((m) => m.round === r);
-                        const doneCount = roundMatches.filter((m) => m.status === 'done').length;
-                        const allDone = doneCount === roundMatches.length;
-                        const hasLive = roundMatches.some((m) => m.status === 'live');
-                        return (
-                            <button
-                                key={r}
-                                type="button"
-                                className={`v2-round-tab ${currentRound === r ? 'active' : ''} ${allDone ? 'done' : ''} ${hasLive ? 'live' : ''}`}
-                                onClick={() => setActiveRound(r)}
-                            >
-                                <span className="v2-round-tab-name">Vòng {r}</span>
-                                <span className="v2-round-tab-count">{doneCount}/{roundMatches.length}</span>
-                            </button>
-                        );
-                    })}
-                </nav>
-            ) : null}
-
-            {visibleMatches.map((m) => (
-                <MatchCard
-                    key={m.id}
-                    match={m}
-                    savedGames={gamesByMatchId[m.id] || []}
-                    isMlp={isMlp}
-                    entrantsById={entrantsById}
-                    isAdmin={isAdmin}
-                    onSaved={load}
-                    pairSchedule={pairSchedule}
-                    gamesPerMatchup={stage?.config?.gamesPerMatchup}
-                />
+            {groupMatchesByRound(matches, stage).map((group) => (
+                <div key={group.key} className="v2-round-group">
+                    <RoundGroupHead
+                        group={group}
+                        rule={(roundRules?.rounds || []).find((r) => r.round_key === group.key)}
+                        stageId={stageId}
+                        isAdmin={isAdmin}
+                        onSaved={() => getRoundRules(stageId).then(setRoundRules).catch(() => {})}
+                    />
+                    {group.matches.map((match) => renderMatchRow(match))}
+                </div>
             ))}
         </div>
     );
+
 }

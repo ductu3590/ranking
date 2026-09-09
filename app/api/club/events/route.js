@@ -4,13 +4,13 @@ import { getGroupIdForDatabase, requireValidatedGroupAdmin } from '@/lib/groupSe
 
 const EVENT_SELECT = `
     *,
-    fund_event_participants (
+    fund_event_participants!fund_event_participants_event_id_fkey (
         id,
         member_id,
         has_paid,
         paid_at,
         notes,
-        club_members ( id, full_name, is_active )
+        club_members!fund_event_participants_member_id_fkey ( id, full_name, is_active )
     )
 `;
 

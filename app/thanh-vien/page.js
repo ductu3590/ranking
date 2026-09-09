@@ -20,6 +20,14 @@ function formatPhr(value) {
     return Number.isFinite(value) ? value.toFixed(1).replace('.', ',') : '';
 }
 
+function phrLabel(value) {
+    if (!Number.isFinite(Number(value))) return 'Chưa đánh giá';
+    if (value < 2.5) return 'Tân thủ';
+    if (value < 3.2) return 'Cơ bản';
+    if (value < 4.5) return 'Khá';
+    return 'Nâng cao';
+}
+
 function parseKeywords(text) {
     return text.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
 }
@@ -27,6 +35,7 @@ function parseKeywords(text) {
 export default function MembersPage({ embedded = false }) {
     const [sessionView, setSessionView] = useState({ session: null, permissions: {} });
     const [members, setMembers] = useState([]);
+    const [phrByMembership, setPhrByMembership] = useState({});
     const [state, setState] = useState({ kind: 'loading', message: 'Đang tải danh sách thành viên…' });
     const [filterStatus, setFilterStatus] = useState('active');
     const [showCreate, setShowCreate] = useState(false);
@@ -48,10 +57,22 @@ export default function MembersPage({ embedded = false }) {
                 setState({ kind: 'forbidden', message: 'Phiên CLB không hợp lệ hoặc đã hết hạn.' });
                 return;
             }
-            const response = await fetch('/api/identity/roster', { cache: 'no-store' });
-            const payload = await response.json();
-            if (!response.ok) throw new Error(payload.error || 'Không thể tải danh sách thành viên.');
+            const [rosterResponse, assessmentResponse] = await Promise.all([
+                fetch('/api/identity/roster', { cache: 'no-store' }),
+                fetch('/api/identity/assessments', { cache: 'no-store' }),
+            ]);
+            const payload = await rosterResponse.json();
+            if (!rosterResponse.ok) throw new Error(payload.error || 'Không thể tải danh sách thành viên.');
             setMembers(payload.roster || []);
+
+            // Mot luot goi cho ca CLB. Danh sach da sap effective_from giam dan
+            // nen ban ghi dau tien cua moi membership la ban moi nhat.
+            const assessmentPayload = await assessmentResponse.json().catch(() => ({}));
+            const latest = {};
+            for (const item of assessmentPayload.assessments || []) {
+                if (latest[item.membershipId] === undefined) latest[item.membershipId] = item.skillLevel;
+            }
+            setPhrByMembership(latest);
             setSelectedIds([]);
             setState({ kind: 'ready', message: '' });
         } catch (error) {
@@ -272,13 +293,16 @@ export default function MembersPage({ embedded = false }) {
                         <table className="members-table">
                             <thead><tr>
                                 {showBulkColumn && <th className="members-pick-cell"><input type="checkbox" checked={allSelected} onChange={toggleSelectAll} aria-label="Chọn tất cả thành viên đang hiển thị" /></th>}
-                                <th>Mã TV</th><th>VĐV</th><th>Biệt danh</th><th>Trạng thái</th>{canManageRoster && <th>Quản lý</th>}
+                                <th>Mã TV</th><th>VĐV</th><th>Biệt danh</th><th>Trình độ PHR</th><th>Trạng thái</th>{canManageRoster && <th>Quản lý</th>}
                             </tr></thead>
                             <tbody>{filtered.map((member) => <tr key={member.id} className={member.status !== 'active' ? 'inactive-row' : ''}>
                                 {showBulkColumn && <td className="members-pick-cell"><input type="checkbox" checked={selectedIds.includes(member.id)} onChange={() => toggleSelected(member.id)} aria-label={`Chọn ${member.alias || member.athlete?.displayName || 'thành viên'}`} /></td>}
                                 <td><strong className="member-code">#{member.id}</strong></td>
                                 <td><div className="member-name-wrap"><span className="member-avatar" aria-hidden="true">{(member.athlete?.displayName || member.alias || '?').slice(0, 1)}</span><span><strong className="member-fullname">{member.athlete?.displayName || 'VĐV chưa đặt tên'}</strong><small>{linkStatusLabel(member.athlete?.status)}</small></span></div></td>
                                 <td><strong>{member.alias || 'Chưa đặt'}</strong></td>
+                                <td>{Number.isFinite(Number(phrByMembership[member.id]))
+                                    ? <span className="phr-chip">{formatPhr(Number(phrByMembership[member.id]))} · {phrLabel(Number(phrByMembership[member.id]))}</span>
+                                    : <span className="phr-chip is-empty">Chưa đánh giá</span>}</td>
                                 <td><span><span className={`status-badge status-${member.status === 'active' ? 'active' : 'inactive'}`}>{member.status === 'active' ? 'Đang sinh hoạt' : 'Đã kết thúc'}</span><small>Từ {member.effectiveFrom || 'chưa rõ'}</small></span></td>
                                 {canManageRoster && <td><div className="roster-row-actions"><button type="button" onClick={() => openEditor(member)}>Chỉnh sửa</button>{member.status === 'active' && <button type="button" className="is-danger" onClick={() => endMembership(member)}>Kết thúc</button>}</div></td>}
                             </tr>)}</tbody>

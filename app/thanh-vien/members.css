@@ -31,6 +31,8 @@
 .members-table th.members-pick-cell, .members-table td.members-pick-cell { width: 44px; padding-right: 0; text-align: center; }
 .members-pick-cell input { width: 18px; height: 18px; accent-color: var(--ph-indigo); cursor: pointer; }
 .member-code { color: var(--ph-ink); font-variant-numeric: tabular-nums; }
+.phr-chip { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 999px; background: var(--ph-tint-indigo); color: var(--ph-indigo); font-size: 11px; font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.phr-chip.is-empty { background: var(--ph-tint-neutral); color: var(--ph-muted); }
 .roster-modal-error { margin: 0; padding: 10px 12px; border-radius: 11px; background: #fdeceb; color: #a83e38; font-size: 12px; font-weight: 750; }
 .roster-modal label small { color: var(--ph-muted); font-size: 11px; font-weight: 600; }
 .roster-modal button:disabled { opacity: .55; cursor: progress; }

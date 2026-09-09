@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import QRCode from 'qrcode';
 import { generateSchedule, saveStage, updateTournament } from '@/lib/tournamentV2Client';
+import RoundScoringPanel from '../RoundScoringPanel';
+
 
 export default function SettingsTab({ tournament, stage, stageId, stages, isAdmin, reload }) {
     const [qrDataUrl, setQrDataUrl] = useState('');
@@ -223,7 +225,17 @@ export default function SettingsTab({ tournament, stage, stageId, stages, isAdmi
                 </section>
             ) : null}
 
+            {/* Số ván theo vòng */}
+            <section className="v2-settings-block">
+                <div className="v2-settings-block-head">
+                    <h3>Số ván theo vòng</h3>
+                    <p>Vòng đã có trận đang đấu hoặc đã xong sẽ bị khoá.</p>
+                </div>
+                <RoundScoringPanel stageId={stageId} isAdmin={isAdmin} />
+            </section>
+
             {/* Điều lệ MLP */}
+
             {isAdmin && isMlpStage && stage ? (
                 <section className="v2-settings-block">
                     <div className="v2-settings-block-head">

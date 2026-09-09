@@ -9,7 +9,13 @@
 
 .v2-console-head {
     margin-top: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
 }
+
+.v2-operations-link { flex: 0 0 auto; padding: 8px 10px; font-size: .78rem; }
 
 .v2-console-title {
     margin: 0;
@@ -822,3 +828,82 @@
     border-color: var(--primary);
     box-shadow: var(--focus-ring);
 }
+
+/* --- Số ván theo vòng --- */
+.v2-rounds { display: flex; flex-direction: column; gap: 9px; }
+
+.v2-rounds-inherit {
+    margin: 0;
+    padding: 9px 12px;
+    border-radius: var(--border-radius-sm);
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+}
+
+.v2-round {
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.v2-round.is-locked { border-style: dashed; }
+
+.v2-round-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.v2-round-head b { font-size: 0.95rem; display: block; }
+.v2-round-meta { display: block; font-size: 0.76rem; color: var(--text-muted); }
+
+.v2-round-bo { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.v2-round-bo button {
+    border: 1px solid var(--border-strong);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    border-radius: var(--border-radius-sm);
+    padding: 7px 14px;
+    font-family: var(--font-family);
+    font-size: 0.84rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.v2-round-bo button[aria-pressed='true'] {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+}
+
+.v2-round-bo button:disabled { opacity: 0.5; cursor: default; }
+
+.v2-round-readonly,
+.v2-round-rule,
+.v2-round-lock {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.v2-round-lock { color: var(--text-muted); }
+.v2-round-source { color: var(--text-muted); }
+
+.v2-link-btn {
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-family: var(--font-family);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0 0 0 8px;
+}
+

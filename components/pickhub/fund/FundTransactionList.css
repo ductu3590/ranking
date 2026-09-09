@@ -1,0 +1,28 @@
+.fund-tx__empty { padding: 32px 20px; text-align: center; font-size: 13px; font-weight: 600; color: var(--ph-muted); }
+.fund-tx { padding: 4px 20px 2px; }
+.fund-tx__row { display: flex; align-items: center; gap: 13px; padding: 14px 0; border-bottom: 1px solid var(--ph-line); }
+.fund-tx__row:last-child { border-bottom: 0; }
+.fund-tx__pick { width: 16px; height: 16px; flex: 0 0 16px; accent-color: var(--ph-indigo); }
+.fund-tx__ico { display: grid; place-items: center; width: 34px; height: 34px; flex: 0 0 34px; border-radius: 999px; background: var(--ph-tint-positive); color: var(--ph-positive); font-size: 12px; font-weight: 800; }
+.fund-tx__ico--out { background: var(--ph-tint-negative); color: var(--ph-negative); }
+.fund-tx__ico--wait { background: var(--ph-tint-gold); color: var(--ph-tint-gold-text); }
+.fund-tx__body { flex: 1; min-width: 0; }
+.fund-tx__name { display: block; font-size: 13px; font-weight: 800; line-height: 1.3; }
+.fund-tx__name.is-muted { color: var(--ph-muted); }
+.fund-tx__desc { margin: 3px 0 0; font-size: 12px; font-weight: 600; color: var(--ph-ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px; }
+.fund-tx__meta { display: block; margin-top: 3px; font-size: 11px; font-weight: 600; color: var(--ph-muted); font-variant-numeric: tabular-nums; }
+.fund-tx__right { flex: 0 0 118px; display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+.fund-tx__amt { font-size: 14px; font-weight: 800; letter-spacing: -.02em; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.fund-tx__amt.is-in { color: var(--ph-positive); }
+.fund-tx__amt.is-out { color: var(--ph-negative); }
+.fund-tx__acts { flex: 0 0 116px; display: flex; flex-direction: column; gap: 5px; }
+.fund-tx__acts .ph-btn { justify-content: center; min-height: 44px; }
+.fund-tx__acts .ph-btn:focus-visible { outline: 2px solid var(--ph-indigo); outline-offset: 2px; }
+
+@media (max-width: 719px) {
+  .fund-tx__row { flex-wrap: wrap; }
+  .fund-tx__body { flex: 1 1 100%; order: 3; }
+  .fund-tx__desc { max-width: none; }
+  .fund-tx__right { flex: 0 0 auto; }
+  .fund-tx__acts { flex: 1 1 100%; order: 4; flex-direction: row; }
+}

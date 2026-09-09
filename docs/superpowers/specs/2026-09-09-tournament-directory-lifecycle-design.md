@@ -64,9 +64,11 @@ Giữ nguyên 7 giá trị DB đã có, **không migration**. Định nghĩa rõ
 | 6 | `live` → `completed` | BTC | **mọi trận `finalized`** — xem mục 6 |
 | 7 | `completed` → `archived` | BTC | — |
 | 8 | `registration_closed` → `registration_open` | BTC | mở lại đăng ký muộn |
-| 9 | `scheduled` → `draft` | BTC | chưa có trận nào `live`/`finalized` **và** chưa có đăng ký nào ở `approved`/`checked_in`; dùng khi phải làm lại từ đầu |
+| 9 | `scheduled` → `draft` | BTC | chưa có trận nào `live`/`finalized` **và** chưa có đăng ký nào ở `approved`; dùng khi phải làm lại từ đầu |
 | 10 | `live` → `scheduled` | BTC | chưa có trận nào `finalized`; dùng khi bấm nhầm |
-| 11 | `registration_open` → `draft` | BTC | **chưa có đăng ký nào ở `approved`/`checked_in`**; dùng khi mở đăng ký nhầm |
+| 11 | `registration_open` → `draft` | BTC | **chưa có đăng ký nào ở `approved`**; dùng khi mở đăng ký nhầm |
+
+> `tournament_registrations.status` không có giá trị `checked_in` (CHECK cho: `draft, submitted, approved, changes_requested, rejected, withdrawn, awaiting_partner, merged`). Guard chỉ đếm `approved`.
 
 Cạnh 9 và 11 bị chặn khi đã có đăng ký được duyệt → **409 `TOURNAMENT_HAS_APPROVED_REGISTRATIONS`**, kèm số lượng. Lý do: quay về `draft` là ẩn giải khỏi trang công khai — VĐV đã được duyệt sẽ mất chỗ mà không biết.
 

@@ -14,4 +14,11 @@ assert(s.includes('randomBytes') && !s.includes('body.public_slug'), 'slug do se
 assert(s.includes(".eq('group_id'"), 'scope group_id');
 assert(!/\.eq\('id',\s*1\)/.test(s) && !s.includes('tournament_id = 1'), 'không hardcode id');
 assert(s.includes('tournaments'), 'thao tác bảng tournaments');
+assert(!/status:\s*body\.status\s*\|\|\s*'draft'/.test(s) && /status:\s*'draft'/.test(s), 'POST ép trạng thái draft');
+assert(/from '@\/lib\/tournament\/lifecycle'/.test(s) && /canTransition\(/.test(s), 'PATCH kiểm lifecycle');
+assert(/INVALID_STATUS_TRANSITION/.test(s) && /TOURNAMENT_HAS_APPROVED_REGISTRATIONS/.test(s), 'PATCH trả lỗi rõ ràng');
+assert(/canDelete\(/.test(s), 'DELETE gọi canDelete');
+assert(/groupOf\(/.test(s) && /match_progress/.test(s), 'GET trả nhóm và tiến độ');
+assert(/finalStandingsFrom/.test(s), 'chốt giải ghim hạng chung cuộc');
+assert(/final_standings/.test(s), 'ghi vào cột final_standings');
 console.log('api-tournaments contract ok');

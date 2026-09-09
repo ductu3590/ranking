@@ -6,6 +6,10 @@ import { requireValidatedGroupAdmin, getClubScope } from '@/lib/groupSession';
 import { requirePlatformAdmin } from '@/lib/platformSession';
 import { assertTournamentOrganizer } from '@/lib/tournament/interclub';
 import { resolveOrganizerPayload } from '@/lib/tournament/wizardModel';
+import { canTransition, isStatus, canDelete, groupOf } from '@/lib/tournament/lifecycle';
+import { writeOperationLog } from '@/lib/tournament/operationLog';
+import { finalStandingsFrom } from '@/lib/tournament/qualification';
+import { computeStageStandings } from '@/lib/tournament/standingsService';
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -101,6 +105,109 @@ function buildOrganizerFields(body, clubId) {
     };
 }
 
+async function countMatchesByStatus(tournamentId, groupId) {
+    const { data: stages, error: stageErr } = await db
+        .from('tournament_stages')
+        .select('id')
+        .eq('group_id', groupId)
+        .eq('tournament_id', tournamentId);
+    if (stageErr) throw stageErr;
+    const stageIds = (stages || []).map((s) => s.id);
+    if (stageIds.length === 0) return { total: 0, finalized: 0, played: 0 };
+
+    const { data: matches, error: matchErr } = await db
+        .from('tournament_matches')
+        .select('status')
+        .eq('group_id', groupId)
+        .in('stage_id', stageIds);
+    if (matchErr) throw matchErr;
+
+    const rows = matches || [];
+    return {
+        total: rows.length,
+        finalized: rows.filter((m) => m.status === 'finalized').length,
+        played: rows.filter((m) => m.status === 'live' || m.status === 'finalized').length,
+    };
+}
+
+async function countApprovedRegistrations(tournamentId, groupId) {
+    const { data: divisions, error: divErr } = await db
+        .from('tournament_divisions')
+        .select('id')
+        .eq('group_id', groupId)
+        .eq('tournament_id', tournamentId);
+    if (divErr) throw divErr;
+    const divisionIds = (divisions || []).map((d) => d.id);
+    if (divisionIds.length === 0) return 0;
+
+    const { count, error } = await db
+        .from('tournament_registrations')
+        .select('id', { count: 'exact', head: true })
+        .eq('group_id', groupId)
+        .in('division_id', divisionIds)
+        .eq('status', 'approved');
+    if (error) throw error;
+    return Number(count || 0);
+}
+
+async function checkTransitionGuards(guards, tournamentId, groupId) {
+    if (guards.length === 0) return null;
+    const counts = await countMatchesByStatus(tournamentId, groupId);
+
+    if (guards.includes('all_matches_finalized') && counts.total !== counts.finalized) {
+        const open = counts.total - counts.finalized;
+        return NextResponse.json({
+            error: `Còn ${open} trận chưa chốt kết quả. Chốt hết rồi mới kết thúc giải được.`,
+            code: 'TOURNAMENT_HAS_OPEN_MATCHES',
+            open_matches: open,
+        }, { status: 409 });
+    }
+    if (guards.includes('no_played_matches') && counts.played > 0) {
+        return NextResponse.json({
+            error: `Giải đã có ${counts.played} trận đang đấu hoặc đã đấu xong, không quay về Nháp được.`,
+            code: 'TOURNAMENT_HAS_PLAYED_MATCHES',
+        }, { status: 409 });
+    }
+    if (guards.includes('no_finalized_matches') && counts.finalized > 0) {
+        return NextResponse.json({
+            error: `Giải đã có ${counts.finalized} trận chốt kết quả, không quay về Đã chốt lịch được.`,
+            code: 'TOURNAMENT_HAS_FINALIZED_MATCHES',
+        }, { status: 409 });
+    }
+    if (guards.includes('no_approved_registrations')) {
+        const approved = await countApprovedRegistrations(tournamentId, groupId);
+        if (approved > 0) {
+            return NextResponse.json({
+                error: `Giải đã có ${approved} đăng ký được duyệt. Quay về Nháp sẽ ẩn giải khỏi trang công khai và các VĐV này mất chỗ.`,
+                code: 'TOURNAMENT_HAS_APPROVED_REGISTRATIONS',
+                approved_registrations: approved,
+            }, { status: 409 });
+        }
+    }
+    return null;
+}
+
+// Hạng chung cuộc là dữ kiện lịch sử: ghi sau khi chốt giải, nhưng lỗi ghi hạng
+// không được đảo ngược trạng thái completed đã lưu thành công.
+async function writeFinalStandings(tournamentId, groupId) {
+    const { data: divisions, error: divErr } = await db
+        .from('tournament_divisions').select('id').eq('group_id', groupId).eq('tournament_id', tournamentId);
+    if (divErr) throw divErr;
+    for (const division of divisions || []) {
+        const { data: stages, error: stageErr } = await db
+            .from('tournament_stages').select('*').eq('group_id', groupId).eq('division_id', division.id)
+            .order('stage_order', { ascending: false }).limit(1);
+        if (stageErr) throw stageErr;
+        const stage = stages?.[0];
+        if (!stage) continue;
+        const result = await computeStageStandings(db, stage, groupId);
+        const final_standings = finalStandingsFrom(stage, result.standings, result.matches);
+        const { error: updateErr } = await db.from('tournament_divisions')
+            .update({ final_standings }).eq('id', division.id).eq('group_id', groupId);
+        if (updateErr) throw updateErr;
+    }
+}
+
 function normalizeVisibility(value, fallback) {
     const visibility = value == null || value === '' ? fallback : String(value).trim().toLowerCase();
     return VISIBILITIES.has(visibility) ? visibility : null;
@@ -132,7 +239,75 @@ export async function GET() {
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
 
-        return NextResponse.json({ tournaments: data || [] });
+        const tournaments = (data || []).map((t) => ({
+            ...t,
+            group: groupOf(t.status),
+            match_progress: null,
+        }));
+
+        if (tournaments.length === 0) {
+            return NextResponse.json({ tournaments: [] });
+        }
+
+        const ids = tournaments.map((t) => t.id);
+        const { data: stages, error: stageErr } = await db
+            .from('tournament_stages')
+            .select('id, tournament_id')
+            .eq('group_id', groupId)
+            .in('tournament_id', ids);
+        if (stageErr) {
+            return NextResponse.json({ error: stageErr.message }, { status: 500 });
+        }
+
+        const stageIds = (stages || []).map((s) => s.id);
+        const byTournament = new Map();
+        for (const stage of stages || []) {
+            const current = byTournament.get(stage.tournament_id) || [];
+            current.push(stage.id);
+            byTournament.set(stage.tournament_id, current);
+        }
+
+        let matches = [];
+        if (stageIds.length > 0) {
+            const { data: rowMatches, error: matchErr } = await db
+                .from('tournament_matches')
+                .select('stage_id, status')
+                .eq('group_id', groupId)
+                .in('stage_id', stageIds);
+            if (matchErr) {
+                return NextResponse.json({ error: matchErr.message }, { status: 500 });
+            }
+            matches = rowMatches || [];
+        }
+
+        const countsByTournament = new Map();
+        for (const match of matches) {
+            const tournamentId = (stages || []).find((s) => s.id === match.stage_id)?.tournament_id;
+            if (tournamentId == null) continue;
+            const current = countsByTournament.get(tournamentId) || { total: 0, finalized: 0 };
+            current.total += 1;
+            if (match.status === 'finalized') current.finalized += 1;
+            countsByTournament.set(tournamentId, current);
+        }
+
+        const enriched = tournaments.map((t) => {
+            const value = countsByTournament.get(t.id);
+            if (!value || value.total === 0) {
+                return { ...t, match_progress: null };
+            }
+            const total = value.total;
+            const finalized = value.finalized;
+            return {
+                ...t,
+                match_progress: {
+                    total,
+                    finalized,
+                    percent: Math.round((finalized / total) * 100),
+                },
+            };
+        });
+
+        return NextResponse.json({ tournaments: enriched });
     } catch (err) {
         console.error('Tournaments v2 GET error:', err);
         return NextResponse.json({ error: err.message }, { status: 500 });
@@ -194,7 +369,7 @@ export async function POST(request) {
         const payload = buildTournamentPayload({
             ...body,
             name,
-            status: body.status || 'draft',
+            status: 'draft',
             entrant_type: body.entrant_type || 'pair',
             settings: organizerFields.settings,
             visibility,
@@ -231,6 +406,40 @@ export async function PATCH(request) {
             return NextResponse.json({ error: 'Invalid tournament visibility' }, { status: 400 });
         }
 
+        let statusChange = null;
+        if ('status' in body && body.status != null) {
+            const nextStatus = String(body.status);
+            const { data: current, error: currentErr } = await db
+                .from('tournaments')
+                .select('id, status')
+                .eq('id', id)
+                .eq('group_id', adminCheck.groupId)
+                .maybeSingle();
+            if (currentErr) {
+                return NextResponse.json({ error: currentErr.message }, { status: 500 });
+            }
+            if (!current) {
+                return NextResponse.json({ error: 'Không tìm thấy giải' }, { status: 404 });
+            }
+
+            if (nextStatus !== current.status) {
+                if (!isStatus(nextStatus)) {
+                    return NextResponse.json({
+                        error: `Trạng thái "${nextStatus}" không hợp lệ.`,
+                        code: 'INVALID_STATUS',
+                    }, { status: 400 });
+                }
+                const verdict = canTransition(current.status, nextStatus);
+                if (!verdict.ok) {
+                    // INVALID_STATUS_TRANSITION trả 400 bằng tiếng Việt, không để CHECK của Postgres thành 500.
+                    return NextResponse.json({ error: verdict.message, code: verdict.code }, { status: 400 });
+                }
+                const blocked = await checkTransitionGuards(verdict.guards, id, adminCheck.groupId);
+                if (blocked) return blocked;
+                statusChange = { from: current.status, to: nextStatus };
+            }
+        }
+
         const payload = buildTournamentPayload(body);
         delete payload.group_id;
         if (payload.name === null) {
@@ -249,7 +458,31 @@ export async function PATCH(request) {
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
 
-        return NextResponse.json({ success: true, tournament: data });
+        let finalStandingsWritten = true;
+        if (statusChange) {
+            const actorName = adminCheck.actor?.groupName || adminCheck.actor?.groupCode || adminCheck.actor?.role || 'admin';
+            const logged = await writeOperationLog(db, {
+                groupId: adminCheck.groupId,
+                tournamentId: Number(id),
+                actor: actorName,
+                action: 'tournament_status_changed',
+                targetType: 'tournament',
+                targetId: Number(id),
+                before: { status: statusChange.from },
+                after: { status: statusChange.to },
+            });
+            if (!logged.ok) console.error('Ghi nhật ký đổi trạng thái giải lỗi:', logged.error);
+            if (statusChange.to === 'completed') {
+                try {
+                    await writeFinalStandings(Number(id), adminCheck.groupId);
+                } catch (finalErr) {
+                    finalStandingsWritten = false;
+                    console.error('Ghim final_standings lỗi:', finalErr);
+                }
+            }
+        }
+
+        return NextResponse.json({ success: true, tournament: data, final_standings_written: finalStandingsWritten });
     } catch (err) {
         console.error('Tournaments v2 PATCH error:', err);
         return NextResponse.json({ error: err.message }, { status: 500 });
@@ -265,6 +498,25 @@ export async function DELETE(request) {
         const id = searchParams.get('id');
         if (!id) {
             return NextResponse.json({ error: 'Tournament id is required' }, { status: 400 });
+        }
+
+        const { data: target, error: targetErr } = await db
+            .from('tournaments')
+            .select('id, status')
+            .eq('id', id)
+            .eq('group_id', adminCheck.groupId)
+            .maybeSingle();
+        if (targetErr) {
+            return NextResponse.json({ error: targetErr.message }, { status: 500 });
+        }
+        if (!target) {
+            return NextResponse.json({ error: 'Không tìm thấy giải' }, { status: 404 });
+        }
+
+        const counts = await countMatchesByStatus(id, adminCheck.groupId);
+        const verdict = canDelete(target, counts.total);
+        if (!verdict.ok) {
+            return NextResponse.json({ error: verdict.message, code: verdict.code }, { status: 409 });
         }
 
         const { error } = await db

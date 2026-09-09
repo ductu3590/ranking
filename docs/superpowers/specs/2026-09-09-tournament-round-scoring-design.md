@@ -35,7 +35,7 @@ Yêu cầu gốc của user: *"luật/BO là điều lệ theo vòng, không c�
 | Preset luật + resolve 3 tầng | `lib/tournament/rules/scoring.js` | `SCORING_PRESETS`, `resolveStageScoring(tournament, division, stage)`, `validateGameScore(game, scoring, i)` |
 | Khoá luật theo giai đoạn | `app/api/tournament-v2/rules/route.js:11` | `LOCKED_STAGE_STATUSES = new Set(['active','completed'])` → 409 `RULES_LOCKED` |
 | Số vòng của trận | `tournament_matches.round` (`database/migrations/015_tournament_module_v2.sql`) | integer, mặc định 1 |
-| Trạng thái trận | `tournament_matches.status` | `pending` / `live` / `done` |
+| Trạng thái trận | `tournament_matches.status` | `pending` / `live` / `finalized` — theo constraint `tournament_matches_status_phase3_ck` **đang có trên DB thật**; migration 015 ghi `done` nhưng đã bị Phase 3 thay |
 | Cấu hình giai đoạn | `tournament_stages.config` | đã là `jsonb`, đang giữ `config.scoring` (snapshot lúc bốc thăm) |
 | Số ván cần thắng | `lib/tournament/match/simple.js:3` | `const bestOf = config.bestOf \|\| 3` |
 | Console BTC | `app/giai-dau/v2/console/` | 7 tab ngang; `SettingsTab.js`, `ResultsTab.js` |
@@ -98,9 +98,9 @@ describeRound(stage, roundKey, totalRounds) -> string
    // Nhãn tiếng Việt, xem mục 7.
 
 computeRoundLocks(stage, matches) -> { [roundKey]: RoundLock }
-   // RoundLock = { locked, reason, counts: { pending, live, done, total } }
-   // locked = counts.live > 0 || counts.done > 0
-   // reason ∈ 'ROUND_LIVE' | 'ROUND_DONE' | null
+   // RoundLock = { locked, reason, counts: { pending, live, finalized, total } }
+   // locked = counts.live > 0 || counts.finalized > 0
+   // reason ∈ 'ROUND_LIVE' | 'ROUND_FINALIZED' | null
 
 validateRoundScoringPatch(patch) -> { ok, code, message }
 ```
@@ -153,7 +153,7 @@ Theo đúng khuôn các route v2 hiện có: `requireTournamentAccess`, `supabas
       "round_key": "3",
       "label": "Chung kết",
       "match_count": 1,
-      "counts": { "pending": 1, "live": 0, "done": 0, "total": 1 },
+      "counts": { "pending": 1, "live": 0, "finalized": 0, "total": 1 },
       "locked": false,
       "lock_reason": null,
       "scoring": { /* luật đang áp dụng cho vòng này, đã merge */ },
@@ -234,7 +234,7 @@ Bản sắc chuẩn là **tím `--ph-indigo #6F48C9` + mực `--ph-ink #28243D` 
 3. Override `points_to` + `cap` → `validateGameScore` với luật trả về chấp nhận `15–13`, từ chối `12–10`.
 4. `roundKeyOf`: trận thường → `"1"`; có `bracket:'W', round:3` → `"W:3"`; `bracket:'GF'` → `"GF"`; thiếu `round` → `"1"`.
 5. `describeRound`: knockout 3 vòng → `Tứ kết / Bán kết / Chung kết`; knockout 1 vòng → `Chung kết`; round-robin 5 vòng → `Vòng 1..5`; `"L:2"` → `Nhánh thua · vòng 2`.
-6. `computeRoundLocks`: vòng toàn `pending` → mở; có 1 `live` → khoá `ROUND_LIVE`; toàn `done` → khoá `ROUND_DONE`; đếm đúng.
+6. `computeRoundLocks`: vòng toàn `pending` → mở; có 1 `live` → khoá `ROUND_LIVE`; toàn `finalized` → khoá `ROUND_FINALIZED`; đếm đúng.
 7. `validateRoundScoringPatch`: chặn `best_of: 2`, `best_of: 4`, `cap: 9` khi `points_to: 11`, `points_to: 0`, `win_points: 3` (→ `FORBIDDEN_ROUND_FIELD`); chấp nhận `{}` và `null`.
 8. Giai đoạn `match_format: 'mlp'`: patch `{ best_of: 3 }` → `BEST_OF_NOT_ALLOWED_FOR_FORMAT`; patch `{ points_to: 21 }` → hợp lệ.
 
@@ -259,7 +259,7 @@ Quyết định đã chốt trong phiên brainstorm này:
 | Bốc thăm | Máy bốc → BTC sửa tay → **chốt** mới sinh lịch; chốt xong khoá |
 | Sân & giờ | Bảng sân thời gian thực + giờ dự kiến tự dịch theo giờ thực tế |
 | Nhập điểm | **Tỉ số từng ván** (không live scoring từng điểm); chừa chỗ mô hình cho live sau |
-| Trạng thái trận | Mở rộng ngoài `pending/live/done`: khởi động, trống-cần-gọi, tạm dừng, bỏ cuộc/walkover |
+| Trạng thái trận | Mở rộng ngoài `pending/live/finalized`: khởi động, tạm dừng, bỏ cuộc/walkover |
 | Correction | Sửa trực tiếp + bắt lý do + nhật ký; BXH và nhánh loại trực tiếp tự tính lại |
 | Loa gọi VĐV | **Thẻ chữ to để BTC đọc mic** — không giọng đọc máy, không đẩy thông báo |
 | Biên bản | Chỉ là **nhật ký thao tác trên màn hình**, không in giấy |

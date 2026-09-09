@@ -264,7 +264,158 @@ TEST: chỉ chạy từng file `node tests/tournament/<tên>.js`.
 XONG MỖI NHÓM THÌ BÁO. Dừng sau nhóm nào cũng để lại hệ chạy được.
 ````
 
-## → IDE 1 (Claude Code, luồng 1) — sau khi xong Task 0
+## → IDE làm Task 0 (làm TRƯỚC, hai IDE kia chờ)
+
+````
+Dự án PickHub, nhánh `main`. Bạn làm TASK 0 — task chặn hai IDE khác đang chờ.
+Làm xong phải push và báo ngay.
+
+ĐỌC TRƯỚC:
+1. docs/superpowers/plans/2026-09-09-tournament-phan-cong-3-ide.md — bản phân công
+2. docs/superpowers/plans/2026-09-09-tournament-directory-lifecycle.md — Task 1, 2, 3
+3. docs/superpowers/plans/2026-09-09-tournament-operations.md — Task A1
+4. Skill `pickhub-engineering`
+
+Task 0 gồm 6 việc. Làm đúng thứ tự, commit riêng từng việc.
+
+── VIỆC 1: lib/tournament/lifecycle.js ──
+Làm đúng Task 1 của plan Spec 0 (đã có sẵn code đầy đủ + test).
+Gồm cả Step 1: sửa spec, thay `approved`/`checked_in` thành `approved`
+(tournament_registrations không có giá trị checked_in).
+
+── VIỆC 2: migration 045 ──
+Làm đúng Task 2 của plan Spec 0. Tên file: 045_tournament_operation_logs.sql
+(KHÔNG phải 043 — số đó đã bị club_notifications chiếm và đã apply rồi).
+Bạn là người DUY NHẤT được apply migration trong cả đợt này. Apply bằng
+Supabase MCP, project uhhlelemewilgsdijwja, rồi chạy npm run migration:ledger.
+
+── VIỆC 3: lib/tournament/operationLog.js ──
+Làm đúng Task 3 của plan Spec 0.
+
+── VIỆC 4: xoá bản nháp Phase 4 ──
+Làm đúng Task A1 của plan Spec 2. Step 1 bắt buộc chạy trước: xác nhận cả 8
+đường dẫn đều untracked. Nếu có dòng nào in TRACKED thì DỪNG và báo.
+
+THÊM một việc mà plan A1 chưa ghi: bốn hàm client trỏ vào route vừa xoá cũng
+phải xoá khỏi lib/tournamentV2Client.js — listCheckIns, updateCheckIn,
+createScoreCorrection, listScoreCorrections (khoảng dòng 285-305).
+Chỉ hai nơi dùng chúng, và cả hai đều bị xoá trong việc này:
+app/giai-dau/v2/operations/page.js và
+tests/tournament/ui-phase4-operations.contract.test.js.
+Hàm correction sẽ được viết lại ở Spec 3 Task A8, đừng giữ bản cũ.
+
+── VIỆC 5: viết TRỌN 17 hàm client, một lần rồi khoá ──
+Ba plan sau này đều cần, nên viết hết bây giờ để không ai tranh file này.
+Thêm vào cuối lib/tournamentV2Client.js:
+
+// --- So van theo vong (Spec 1) ---
+export async function getRoundRules(stageId) {
+    return request('/round-rules', { query: { stageId } });
+}
+export function updateRoundRule(body) {
+    return request('/round-rules', { method: 'PATCH', body });
+}
+
+// --- Dia diem va san (Spec 2) ---
+export async function listVenues(tournamentId) {
+    const data = await request('/venues', { query: { tournamentId } });
+    return data.venues;
+}
+export function saveVenue(body) {
+    return request('/venues', { method: 'POST', body });
+}
+export async function listCourts(tournamentId) {
+    const data = await request('/courts', { query: { tournamentId } });
+    return data.courts;
+}
+export function saveCourt(body) {
+    return request('/courts', { method: 'POST', body });
+}
+export function setCourtActive(body) {
+    return request('/courts', { method: 'PATCH', body });
+}
+export function deleteCourt(tournamentId, id) {
+    return request('/courts', { method: 'DELETE', query: { tournamentId, id } });
+}
+
+// --- Vong doi tran va bang san (Spec 2) ---
+export function transitionMatch(body) {
+    return request('/match-transition', { method: 'POST', body });
+}
+export async function getCourtBoard(tournamentId) {
+    return request('/assignments', { query: { tournamentId } });
+}
+export function assignMatchCourt(body) {
+    return request('/assignments', { method: 'PATCH', body });
+}
+export async function listOperationLogs(tournamentId, limit) {
+    const data = await request('/operation-logs', { query: { tournamentId, limit } });
+    return data.logs;
+}
+
+// --- Boc tham (Spec 3) ---
+export async function getDraw(stageId) {
+    return request('/draw', { query: { stageId } });
+}
+export function rollDraw(body) {
+    return request('/draw', { method: 'POST', body: { ...body, action: 'roll' } });
+}
+export function swapDrawEntries(body) {
+    return request('/draw', { method: 'POST', body: { ...body, action: 'swap' } });
+}
+export function lockDraw(body) {
+    return request('/draw', { method: 'POST', body: { ...body, action: 'lock' } });
+}
+export function unlockDraw(body) {
+    return request('/draw', { method: 'POST', body: { ...body, action: 'unlock' } });
+}
+
+Kiểm: listCourts có thể đã tồn tại sẵn trong file (bản nháp Phase 4). Nếu có,
+THAY bản cũ bằng bản trên, đừng để hai bản trùng tên.
+
+── VIỆC 6: viết TRỌN script test, một lần rồi khoá ──
+Trong package.json:
+
+XOÁ bốn script trỏ vào test đã xoá ở việc 4:
+  test:phase4-tournament-operations, test:phase4-score-reliability,
+  test:phase4-notifications-finance, test:t-ui-phase4
+và xoá bốn lời gọi tương ứng khỏi test:regression.
+GIỮ test:phase4 — đó là Phase 4 của multi-tenant, việc khác hoàn toàn.
+
+THÊM năm script:
+"test:t-lifecycle": "node tests/tournament/lifecycle.test.js && node tests/tournament/migration-045.test.js",
+"test:t-round-scoring": "node tests/tournament/round-scoring.test.js && node tests/tournament/api-round-rules.contract.test.js && node tests/tournament/ui-round-scoring.contract.test.js",
+"test:t-operations": "node tests/tournament/operations.test.js && node tests/tournament/migration-046.test.js",
+"test:t-ops-ui": "node tests/tournament/ui-shell.contract.test.js && node tests/tournament/ui-courts-step.contract.test.js && node tests/tournament/ui-control-step.contract.test.js && node tests/tournament/api-courts.contract.test.js && node tests/tournament/api-match-transition.contract.test.js",
+"test:t-draw": "node tests/tournament/draw.test.js && node tests/tournament/qualification.test.js && node tests/tournament/correction.test.js && node tests/tournament/migration-047.test.js && node tests/tournament/api-draw.contract.test.js && node tests/tournament/ui-draw-step.contract.test.js",
+
+SỬA test:tournament thành:
+"test:tournament": "npm run test:t-migration && npm run test:t-lifecycle && npm run test:t-round-scoring && npm run test:t-operations && npm run test:t-ops-ui && npm run test:t-draw && npm run test:t-engines && npm run test:t-api && npm run test:t-ui",
+
+QUAN TRỌNG: bốn script mới trỏ vào file test CHƯA TỒN TẠI, nên
+npm run test:tournament sẽ đỏ cho tới khi cả ba luồng hợp long. ĐÓ LÀ CHỦ Ý.
+Ghi rõ điều này vào commit message để hai IDE kia không hoảng và tự sửa
+package.json cho nó xanh.
+
+── KIỂM CUỐI ──
+node tests/tournament/lifecycle.test.js     -> in "lifecycle ok"
+node tests/tournament/migration-045.test.js -> in "migration-045 ok"
+npm run build                               -> Compiled successfully
+
+npm run test:regression sẽ đỏ ở test:tournament (lý do trên). Chạy riêng các bộ
+khác để chắc việc 4 không làm gãy gì:
+npm run test:phase3-interclub && npm run test:open-registration && npm run test:t-engines
+
+BỐN LUẬT:
+- Không git add -A. Working tree có 67 file của việc khác.
+- Không đụng lib/tournament/engines/* — IDE khác đang làm ở đó.
+- Không tạo file nào của Luồng 2 hay Luồng 3. Task 0 chỉ có 6 việc trên.
+- Số migration là 045, không phải 043.
+
+XONG THÌ PUSH VÀ BÁO NGAY — hai IDE khác đang chờ commit này để bắt đầu.
+````
+
+## → IDE 1 (luồng 1) — sau khi Task 0 đã push
 
 ````
 Tiếp tục Luồng 1 của bản phân công 3 IDE.

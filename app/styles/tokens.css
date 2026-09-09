@@ -30,7 +30,7 @@
   --ph-space-6: 24px;
   --ph-space-8: 32px;
 
-  /* Hinh khoi */
+  /* Hinh khoi: xs (nut), sm (control), card (16px the moi: stat, bang), md (20px the cu), lg (hero) */
   --ph-radius-xs: 8px;
   --ph-radius-sm: 12px;
   --ph-radius-card: 16px;

@@ -103,7 +103,7 @@ Dùng `computeStageStandings` đang có. Bổ sung ba thứ:
 
 **Dòng tiêu chí.** Hiện dưới bảng: `Điểm → Hiệu số → Đối đầu trực tiếp → PHR`, lấy từ `tiebreak_policy` đang áp dụng chứ không viết cứng.
 
-**Hạng chung cuộc.** Khi giải chuyển `completed` (Spec 0 mục 6), tính hạng cuối từng nội dung rồi **ghim** vào cột mới `tournament_divisions.final_standings jsonb` (migration 044):
+**Hạng chung cuộc.** Khi giải chuyển `completed` (Spec 0 mục 6), tính hạng cuối từng nội dung rồi **ghim** vào cột mới `tournament_divisions.final_standings jsonb` (migration 045):
 
 ```jsonc
 [
@@ -122,10 +122,24 @@ Nguồn hạng: nội dung có giai đoạn loại trực tiếp → lấy từ 
 `BracketTab` hiện vẽ được knockout một nhánh. Bổ sung:
 
 - **Double elimination**: vẽ ba cụm `Nhánh thắng` / `Nhánh thua` / `Chung kết tổng` theo `match.bracket`. Cuộn ngang trong khung riêng.
-- **Định tuyến kẻ thua**: `persistence.js` phải lưu `loser_to_slot` → thêm cột `tournament_matches.loser_match_id bigint` (migration 044) và `resolveParentLinks` nối cả hai đường. `results.js` khi chốt trận đẩy **kẻ thắng** vào `parent_match_id` và **kẻ thua** vào `loser_match_id`.
+- **Định tuyến kẻ thua**: `persistence.js` phải lưu `loser_to_slot` → thêm cột `tournament_matches.loser_match_id bigint` (migration 045) và `resolveParentLinks` nối cả hai đường. `results.js` khi chốt trận đẩy **kẻ thắng** vào `parent_match_id` và **kẻ thua** vào `loser_match_id`.
 - Trận chưa có đội hiện `Thắng BK1` / `Thua TK2` thay vì để trống.
 
-> **Phụ thuộc.** Phần double-elim chỉ làm được sau khi engine của IDE khác xong và shape `bracket` / `loser_to_slot` đã chốt. Plan phải để nó thành **nhóm task cuối, có thể cắt ra** nếu engine chưa sẵn sàng — phần knockout một nhánh và vòng tròn không phụ thuộc gì.
+### 4.3 Cắt ở đâu khi engine chưa xong
+
+Toàn bộ spec này chia làm hai khối. **Khối A làm được ngay hôm nay**; khối B chỉ bắt đầu khi engine của IDE khác đã commit và shape `bracket` / `loser_to_slot` đã chốt.
+
+| | Khối A — làm ngay, không phụ thuộc engine | Khối B — phải đợi engine |
+|---|---|---|
+| Bốc thăm | Nháp / sửa tay / bốc lại / chốt / huỷ chốt cho **round-robin và knockout một nhánh** | Bốc thăm cho nhánh W/L của double-elim |
+| BXH | `qualificationOutlook`, cột suất đi tiếp, dòng tiêu chí | — |
+| Hạng chung cuộc | `final_standings` cho vòng tròn và knockout một nhánh | Hạng lấy từ nhánh double-elim |
+| Sơ đồ nhánh | Giữ `BracketTab` hiện có, đổi theme | Vẽ 3 cụm W / L / GF |
+| Định tuyến | `parent_match_id` như hiện tại | `loser_match_id` + `resolveParentLinks` hai đường |
+| Correction | Đủ, cho mọi loại trận | — |
+| Migration 045 | `final_standings`, CHECK trên corrections | `loser_match_id` |
+
+Khối A **phải chạy được và giao được một mình**. Nếu engine trễ, cắt khối B ra thành đợt riêng, không để plan treo giữa chừng. Cột `loser_match_id` có thể thêm sẵn ở migration 045 (rẻ, `NULL` cho mọi trận hiện có) mà không cần khối B, để sau này không phải chạy migration lần nữa.
 
 ## 5. Sửa kết quả đã chốt (correction)
 
@@ -134,6 +148,8 @@ Nguồn hạng: nội dung có giai đoạn loại trực tiếp → lấy từ 
 Đã chốt với user: **sửa trực tiếp, bắt lý do, ghi nhật ký** — không có luồng đề xuất → duyệt hai bước, vì mô hình vận hành chỉ có một BTC.
 
 Bảng `tournament_result_corrections` đã có cột `requester`/`approver`/`status`/`approved_at` cho luồng hai bước. Spec này **dùng bảng đó nhưng ghi thẳng** `status = 'applied'`, `requester = approver = actor`, `approved_at = applied_at = now()`. Không tạo bảng mới, không bỏ cột — để dành nếu sau này có giải lớn cần duyệt hai bước.
+
+> **Nợ kỹ thuật ghi nhận.** Vì `requester` và `approver` luôn bằng nhau, dữ liệu correction hiện tại **không phân biệt được ai đề nghị và ai duyệt**. Nếu về sau bật luồng hai bước, các bản ghi cũ sẽ trông như đã tự duyệt. Chấp nhận được với mô hình một BTC; nếu đổi mô hình thì phải thêm cột `single_actor boolean` để phân biệt bản ghi cũ, không được diễn giải ngược dữ liệu cũ.
 
 ### 5.2 Luồng
 
@@ -146,14 +162,22 @@ Bảng `tournament_result_corrections` đã có cột `requester`/`approver`/`st
 ### 5.3 Tính lại tới đâu
 
 - **BXH**: tính lại toàn bộ giai đoạn chứa trận. Rẻ, `computeStageStandings` vốn tính từ đầu.
-- **Nhánh loại trực tiếp**: nếu đổi đội thắng, đội ở trận sau phải đổi theo. Chỉ làm được khi **trận sau chưa `finalized`**. Trận sau đã đấu xong → **409 `CORRECTION_BLOCKED_DOWNSTREAM`**, kèm danh sách trận phải huỷ chốt trước. Máy **không tự dây chuyền huỷ kết quả** — quá nguy hiểm, để BTC quyết từng bước.
+- **Nhánh loại trực tiếp**: nếu đổi đội thắng, đội ở trận sau phải đổi theo. Trạng thái trận sau quyết định:
+
+  | Trận vòng sau đang ở | Xử lý |
+  |---|---|
+  | `pending` (chưa gọi sân) | **Cho sửa** — thay đội vào ô, không cần hỏi |
+  | `warmup` / `live` / `paused` | **Chặn 409 `CORRECTION_BLOCKED_DOWNSTREAM`** — đang có người trên sân đấu dưới danh nghĩa một suất mà ta sắp lấy đi. BTC phải đưa trận đó về `pending` trước |
+  | `finalized` | **Chặn 409 `CORRECTION_BLOCKED_DOWNSTREAM`** — kèm danh sách trận phải huỷ chốt trước |
+
+  Máy **không tự dây chuyền huỷ kết quả** — quá nguy hiểm, để BTC quyết từng bước.
 - **Hạng chung cuộc**: giải đã `completed` mà sửa kết quả → xoá `final_standings`, buộc BTC chốt giải lại.
 
 ### 5.4 Giao diện
 
 Nằm ở **bước 6 · Lịch thi đấu & kết quả**: mỗi trận `finalized` có nút **Sửa kết quả**. Lịch sử sửa của một trận hiện ngay dưới trận đó. Toàn bộ bản ghi correction cũng đổ vào **bước 8 · Nhật ký thao tác**.
 
-## 6. Migration `044_tournament_draw_and_results.sql`
+## 6. Migration `045_tournament_draw_and_results.sql`
 
 Chỉ thêm cột, không xoá.
 
@@ -183,17 +207,18 @@ Bảng correction đang rỗng nên thêm CHECK an toàn; plan vẫn phải ch�
 2. `swapDrawSlots`: đổi chỗ hai đội giữ nguyên tổng số đội và không tạo trùng.
 3. `qualificationOutlook`: đội dẫn đầu còn 0 trận và cách đội thứ 3 nhiều hơn số điểm tối đa còn lại → `Nhất bảng A`; đội cùng điểm còn trận → `Tạm nhất`; đội không thể đuổi kịp → `Đã loại`.
 4. `finalStandingsFrom`: nội dung có knockout → vô địch/á quân/hạng ba lấy từ nhánh; nội dung chỉ vòng tròn → lấy BXH giai đoạn cuối.
-5. `resolveParentLinks` với trận có `loser_to_slot` → nối đúng cả `parent_match_id` lẫn `loser_match_id`; trận knockout thường → `loser_match_id` là `null`.
-6. `correctionImpact`: trả đúng danh sách trận vòng sau bị ảnh hưởng; trận sau đã `finalized` → cờ `blocked = true`.
+5. **Test hồi quy chốt trước khi sửa `persistence.js`** — `resolveParentLinks` là code lõi đang chạy cho mọi knockout. Trình tự bắt buộc trong plan: (a) viết test đóng đinh hành vi **hiện tại** với lịch knockout 8 đội và 5 đội (có bye), chạy thấy **xanh**; (b) mới sửa để thêm đường thứ hai; (c) chạy lại, test cũ vẫn xanh. Không được sửa trước rồi viết test sau.
+6. `resolveParentLinks` với trận có `loser_to_slot` → nối đúng cả `parent_match_id` lẫn `loser_match_id`; trận knockout thường → `loser_match_id` là `null`.
+7. `correctionImpact`: trận sau `pending` → `blocked = false`; trận sau `live` hoặc `finalized` → `blocked = true` kèm lý do khác nhau.
 
 **Hợp đồng API**:
 
-7. Chốt bốc thăm hai lần liên tiếp → lần hai 409 `DRAW_ALREADY_LOCKED`.
-8. Huỷ chốt khi có trận `finalized` → 409 `DRAW_HAS_PLAYED_MATCHES`.
-9. Correction thiếu `reason` → 400.
-10. Correction làm đổi đội thắng trong khi trận vòng sau đã `finalized` → 409 `CORRECTION_BLOCKED_DOWNSTREAM`.
-11. Mỗi correction sinh đúng một dòng `tournament_result_corrections` và một dòng `tournament_operation_logs`.
-12. Mọi truy vấn có `.eq('group_id', ...)`; mọi ghi qua guard admin.
+8. Chốt bốc thăm hai lần liên tiếp → lần hai 409 `DRAW_ALREADY_LOCKED`.
+9. Huỷ chốt khi có trận `finalized` → 409 `DRAW_HAS_PLAYED_MATCHES`.
+10. Correction thiếu `reason` → 400.
+11. Correction làm đổi đội thắng trong khi trận vòng sau đã `finalized` → 409 `CORRECTION_BLOCKED_DOWNSTREAM`.
+12. Mỗi correction sinh đúng một dòng `tournament_result_corrections` và một dòng `tournament_operation_logs`.
+13. Mọi truy vấn có `.eq('group_id', ...)`; mọi ghi qua guard admin.
 
 **Kiểm tay**: chạy trọn một nội dung 8 đội — bốc thăm, đổi chỗ, bốc lại, chốt, đấu hết vòng bảng, xem cột suất đi tiếp đổi theo từng trận, sửa một kết quả đã chốt rồi xác nhận BXH và nhánh cập nhật đúng.
 

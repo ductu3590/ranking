@@ -55,10 +55,10 @@
 
 | # | Spec | Nội dung | Migration |
 |---|---|---|---|
-| 0 | [`tournament-directory-lifecycle`](2026-09-09-tournament-directory-lifecycle-design.md) | Danh sách Sắp/Đang/Đã · vòng đời 7 trạng thái · chốt giải · **sửa lỗi `active`** | không |
+| 0 | [`tournament-directory-lifecycle`](2026-09-09-tournament-directory-lifecycle-design.md) | Danh sách Sắp/Đang/Đã · vòng đời 7 trạng thái · chốt giải · **sửa lỗi `active`** | **043** (bảng nhật ký) |
 | 1 | [`tournament-round-scoring`](2026-09-09-tournament-round-scoring-design.md) | Số ván (BO) theo từng vòng | không |
-| 2 | [`tournament-operations`](2026-09-09-tournament-operations-design.md) | Shell 8 bước · sân · trung tâm điều hành · nhập điểm · nhật ký | **043** |
-| 3 | [`tournament-draw-standings-corrections`](2026-09-09-tournament-draw-standings-corrections-design.md) | Bốc thăm chốt lịch · BXH & bracket · sửa kết quả đã chốt | **044** |
+| 2 | [`tournament-operations`](2026-09-09-tournament-operations-design.md) | Shell 8 bước · sân · trung tâm điều hành · nhập điểm · nhật ký | **044** |
+| 3 | [`tournament-draw-standings-corrections`](2026-09-09-tournament-draw-standings-corrections-design.md) | Bốc thăm chốt lịch · BXH & bracket · sửa kết quả đã chốt | **045** |
 
 ### 2.3 Spec đã lỗi thời
 
@@ -186,6 +186,9 @@ Ngoài ra `UI-BRAND-SYSTEM.md` dòng 34 viết *"Không dùng nền đen hoặc 
 
 | Nợ | Chi tiết | Định xử ở đâu |
 |---|---|---|
+| **P0 — chốt trận luôn vỡ** | `games/route.js:121` và `score-submissions/route.js:20` ghi `status = 'done'`; RPC `replace_tournament_games` làm `SET status = p_status` không map; CHECK chỉ nhận `pending\|live\|finalized` → **mọi lần chốt trận trả 500**. Chưa ai gặp vì `tournament_matches` có 0 dòng | **Spec 1** mục 9.3 |
+| **P0 — kiểm tỉ số bị bỏ qua** | `games/route.js:80` bọc trong `if (scoring)`; giai đoạn chưa qua `generate` thì không có `config.scoring` → nhập `99–0` cũng lưu được | **Spec 1** mục 9.1 |
+| **P1 — BXH tính `bestOf` sai** | `standingsService.js:86` truyền `stage.config` gốc, nhưng `bestOf` nằm ở `config.scoring.engine.bestOf` → `simple.js` rơi về mặc định 3; giai đoạn BO1 không bao giờ ghi nhận đội thắng | **Spec 1** mục 9.2 |
 | `tournaments.status` lệch UI | UI biết 3 giá trị, DB cho 7, `active` không hợp lệ → 500 | **Spec 0** |
 | 4 cột trạng thái chồng nhau | `tournament_divisions` có `registration_status`, `scheduling_status`, `competition_status`, `schedule_publication_status` | chưa xếp lịch — cần một đợt dọn riêng |
 | `matches.court` là `text` | Di sản; nguồn sự thật mới là `match_assignments.court_id` | Spec 2 ghi kèm nhãn để không vỡ; gỡ ở spec sau |
@@ -202,8 +205,8 @@ Ngoài ra `UI-BRAND-SYSTEM.md` dòng 34 viết *"Không dùng nền đen hoặc 
 |---|---|---|
 | **0** | Spec 0 — danh sách & vòng đời | Cửa vào module, và vá lỗi 500 đang chờ nổ. Không migration, rẻ |
 | **1** | Spec 1 — số ván theo vòng | Nhỏ, đúng yêu cầu bắt buộc. Spec 2 mục 7 phụ thuộc `resolveMatchScoring` |
-| **2** | Spec 2 — bàn điều hành | Khối lớn nhất. Migration 043. Bắt đầu bằng lớp thuần + test đỏ trước, rồi API, rồi shell, rồi từng bước |
-| **3** | Spec 3 — bốc thăm, BXH, correction | Migration 044. Phần double-elim để cuối, cắt ra được nếu engine chưa xong |
+| **2** | Spec 2 — bàn điều hành | Khối lớn nhất. Migration 044. Bắt đầu bằng lớp thuần + test đỏ trước, rồi API, rồi shell, rồi từng bước |
+| **3** | Spec 3 — bốc thăm, BXH, correction | Migration 045. Phần double-elim để cuối, cắt ra được nếu engine chưa xong |
 
 Trước đợt 0 nên chốt xong **spec design system 2026-09-08** (tokens.css / primitives.css / Montserrat), nếu không mọi UI mới của Spec 0–3 sẽ phải sơn lại một lần nữa.
 

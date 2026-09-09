@@ -62,6 +62,7 @@ Thêm một khoá vào `tournament_stages.config`:
 - Key là **round key** dạng chuỗi. Vòng nào BTC không đụng thì **không có key** → kế thừa nguyên luật giai đoạn.
 - Value là **partial**: chỉ chứa các trường BTC thực sự đổi. Không sao chép cả bộ luật xuống.
 - Trường hợp lệ trong value: `best_of`, `points_to`, `win_by`, `cap`, `deciding_game`. Trường lạ bị **loại bỏ khi ghi**, không báo lỗi (giữ API dễ dùng), trừ khi là trường bị cấm ở mục 5 thì trả 400.
+- `round_scoring` và `scoring` là **hai khoá anh em** trong `config`, không lồng nhau. Merge diễn ra trong bộ nhớ lúc resolve, không ghi đè `config.scoring` — snapshot luật giai đoạn giữ nguyên vĩnh viễn.
 
 **Round key**
 
@@ -70,6 +71,8 @@ Thêm một khoá vào `tournament_stages.config`:
 | `round_robin`, `knockout` | `String(match.round)` | `"1"`, `"2"`, `"3"` |
 | Engine phát trận có `match.bracket` (double-elim của IDE khác) | `` `${match.bracket}:${match.round}` `` | `"W:3"`, `"L:2"` |
 | `match.bracket === 'GF'` | `"GF"` (bỏ số vòng, vì grand final chỉ có một) | `"GF"` |
+
+`bracket` rỗng/`null`/`undefined` → **luôn dùng `String(match.round)`**. Đây là đường đi bình thường của knockout một nhánh và round-robin, không phải trường hợp lỗi: engine cũ không phát trường `bracket` nào cả.
 
 Hàm `roundKeyOf(match)` là **nơi duy nhất** biết quy tắc này. Nếu engine mới đổi shape, chỉ sửa một chỗ.
 
@@ -183,15 +186,52 @@ Body: `{ stage_id, round_key, scoring }`. `scoring: null` hoặc `{}` = xoá ove
 
 **Không ghi nhật ký.** Chỉ sửa được vòng chưa đấu nên không kết quả nào bị ảnh hưởng. Nhật ký thao tác là hạng mục của `tournament-operations`.
 
-## 9. Điểm nối — dùng luật vòng ở đâu
+## 9. Điểm nối — đã grep, đây là danh sách đầy đủ
 
-Hôm nay `resolveStageScoring` được gọi cho cả giai đoạn. Mọi chỗ xử lý **một trận cụ thể** phải đổi sang `resolveMatchScoring`:
+`grep -rn "resolveStageScoring|validateGameScore|bestOf" lib app` cho ra **6 nơi**. Phân loại:
 
-1. **Kiểm tỉ số ván** — chỗ đang gọi `validateGameScore` khi lưu điểm. Luật đem ra kiểm phải là luật của vòng chứa trận đó.
-2. **Kết luận đội thắng trận** — `lib/tournament/match/simple.js` nhận `config.bestOf`; nơi gọi nó phải truyền `bestOf` từ `resolveMatchScoring(...).engine.bestOf`, không phải từ luật giai đoạn.
-3. **Hiển thị luật** trên thẻ sân, thẻ trận, panel playoff, thẻ đọc mic.
+| # | Nơi gọi | Cấp | Xử lý |
+|---|---|---|---|
+| 1 | `lib/tournament/wizardModel.js:238` | giai đoạn | **giữ nguyên** — xem trước luật trong wizard |
+| 2 | `app/api/tournament-v2/generate/route.js:56` | giai đoạn | **giữ nguyên** — chốt snapshot luật lúc sinh lịch |
+| 3 | `app/api/tournament-v2/rules/route.js:125` | giai đoạn | **giữ nguyên** — xem trước sau khi đổi luật |
+| 4 | `app/api/tournament-v2/games/route.js:79-86` | **trận** | **đổi** — xem 9.1 |
+| 5 | `app/api/tournament-v2/games/route.js:88-92` | **trận** | **đổi** — xem 9.1 |
+| 6 | `lib/tournament/standingsService.js:86` | **trận** | **đổi** — xem 9.2 |
 
-Bước đầu của plan là **liệt kê đầy đủ nơi gọi** bằng `grep -rn "resolveStageScoring\|bestOf" lib app` rồi phân loại từng chỗ là "theo giai đoạn" hay "theo trận"; chỉ đổi nhóm thứ hai. Ghi kết quả phân loại vào plan trước khi sửa.
+### 9.1 Đường nhập điểm không hề gọi `resolveStageScoring`
+
+Giả định ban đầu của spec này sai: `games/route.js` **không** dùng `resolveStageScoring`. Nó đọc thẳng:
+
+```js
+const scoring = stage.config?.scoring;          // dòng 79
+if (scoring) { ... validateGameScore(...) }     // dòng 80-86  ← bỏ qua kiểm nếu không có
+engine.resolveMatch(match, games,
+  { ...(stage.config || {}), ...(scoring?.engine || {}) });  // dòng 88-92
+```
+
+Hai hệ quả:
+
+- **Giai đoạn chưa từng qua `generate`** thì `config.scoring` không tồn tại → `if (scoring)` false → **kiểm tỉ số bị bỏ qua hoàn toàn**, nhập `99–0` cũng lưu được.
+- Luật dùng để chốt trận là snapshot giai đoạn, không phải luật vòng.
+
+Sửa: nạp thêm `tournament` + `division`, gọi `resolveMatchScoring(tournament, division, stage, match)`, dùng kết quả cho **cả** `validateGameScore` **và** config engine. Bỏ nhánh `if (scoring)` — luật luôn resolve được vì có tầng mặc định.
+
+### 9.2 BXH đang tính `bestOf` sai
+
+`standingsService.js:86` truyền `stage.config` (gốc) làm `config` cho `buildResolvedMatches` → `lib/tournament/match/simple.js:3` đọc `config.bestOf`. Nhưng `bestOf` nằm ở `config.scoring.engine.bestOf`, **không** ở gốc → `config.bestOf` là `undefined` → rơi về mặc định `3`.
+
+Hậu quả với giai đoạn **BO1**: `needed = 2`, trận một ván không bao giờ `complete` → BXH không ghi nhận đội thắng nào. Đây là **lỗi có thật đang tồn tại**, không phải rủi ro giả định.
+
+Sửa: `standingsService` resolve luật **theo từng trận** (`resolveMatchScoring`) rồi truyền `scoring.engine` cho từng trận, thay vì truyền một `config` chung cho cả giai đoạn. `buildResolvedMatches` nhận thêm tham số `configOf(match)`.
+
+### 9.3 Lỗi chặn hoàn toàn việc chốt trận — phải sửa trong spec này
+
+`games/route.js:121` gửi `p_status: resolved.complete ? 'done' : 'live'` vào RPC `replace_tournament_games`. RPC làm `SET status = p_status` **không map gì** (đã đọc định nghĩa hàm trên DB thật). Nhưng `tournament_matches_status_phase3_ck` chỉ nhận `pending | live | finalized`.
+
+→ **Mọi lần chốt trận đều vi phạm CHECK và trả 500.** `score-submissions/route.js:20` mắc đúng lỗi này. Chưa ai gặp vì `tournament_matches` có **0 dòng** — chưa từng có trận nào được nhập điểm trên DB này.
+
+Sửa: hai chỗ đó ghi `'finalized'`. **Không đụng `lib/tournament/engines/*`** — các engine dùng `'done'` như từ vựng nội bộ và đã có tầng dịch ở `standingsService.js:63` (`finalized → done`); tầng dịch đó giữ nguyên.
 
 **Trận đã đấu xong không tính lại.** Vì luật vòng bị khoá ngay khi có trận `live`, luật áp dụng cho một trận không đổi được sau khi trận bắt đầu. Nhờ vậy **không cần cột snapshot trên `tournament_matches`**.
 
@@ -238,6 +278,8 @@ Bản sắc chuẩn là **tím `--ph-indigo #6F48C9` + mực `--ph-ink #28243D` 
 6. `computeRoundLocks`: vòng toàn `pending` → mở; có 1 `live` → khoá `ROUND_LIVE`; toàn `finalized` → khoá `ROUND_FINALIZED`; đếm đúng.
 7. `validateRoundScoringPatch`: chặn `best_of: 2`, `best_of: 4`, `cap: 9` khi `points_to: 11`, `points_to: 0`, `win_points: 3` (→ `FORBIDDEN_ROUND_FIELD`); chấp nhận `{}` và `null`.
 8. Giai đoạn `match_format: 'mlp'`: patch `{ best_of: 3 }` → `BEST_OF_NOT_ALLOWED_FOR_FORMAT`; patch `{ points_to: 21 }` → hợp lệ.
+9. **BO5**: vòng đặt `best_of: 5` → `needed = 3`; trận 3–2 ván `complete`, trận 2–2 ván chưa `complete`.
+10. **Hồi quy 9.2**: giai đoạn BO1, trận một ván 11–9 → BXH ghi nhận đội thắng (trước khi sửa thì không).
 
 **Hợp đồng API** (theo kiểu `tests/phase3/*-contract.test.js`)
 9. GET trả `rounds[]` sắp đúng thứ tự, `inherited` không rỗng, giai đoạn chưa sinh lịch → `rounds: []`.

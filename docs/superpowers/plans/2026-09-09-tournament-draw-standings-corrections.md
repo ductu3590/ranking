@@ -42,7 +42,7 @@ Spec mục 4.3 đã chia. Plan này giữ nguyên ranh giới đó.
 | `lib/tournament/draw.js` (mới) | Thuần. `buildDrawSlots`, `swapDrawSlots`, `validateDraw`. |
 | `lib/tournament/qualification.js` (mới) | Thuần. `qualificationOutlook`, `finalStandingsFrom`. |
 | `lib/tournament/correction.js` (mới) | Thuần. `correctionImpact`, `buildCorrectionRow`. |
-| `database/migrations/045_tournament_draw_and_results.sql` (mới) | `final_standings`, CHECK corrections, `loser_match_id`. |
+| `database/migrations/047_tournament_draw_and_results.sql` (mới) | `final_standings`, CHECK corrections, `loser_match_id`. |
 | `app/api/tournament-v2/draw/route.js` (mới) | Bốc / sửa tay / chốt / huỷ chốt. |
 | `app/api/tournament-v2/corrections/route.js` (viết lại) | Xem trước hệ quả + áp dụng. |
 | `app/giai-dau/v2/console/steps/DrawStep.js` (mới) | Bước 4. |
@@ -280,11 +280,11 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 
 ---
 
-## Task A2: Migration 045
+## Task A2: Migration 047
 
 **Files:**
-- Create: `database/migrations/045_tournament_draw_and_results.sql`
-- Test: `tests/tournament/migration-045.test.js`
+- Create: `database/migrations/047_tournament_draw_and_results.sql`
+- Test: `tests/tournament/migration-047.test.js`
 
 - [ ] **Step 1: Kiểm dữ liệu trước khi thêm CHECK**
 
@@ -298,15 +298,15 @@ Expected: **0 dòng**. Nếu có giá trị lạ, mở rộng CHECK cho khớp t
 
 - [ ] **Step 2: Viết test thất bại**
 
-Create `tests/tournament/migration-045.test.js`:
+Create `tests/tournament/migration-047.test.js`:
 
 ```js
 const fs = require('fs');
 const path = require('path');
 const assert = (c, m) => { if (!c) { console.error(`FAIL: ${m}`); process.exit(1); } };
-const file = path.join(__dirname, '..', '..', 'database', 'migrations', '045_tournament_draw_and_results.sql');
+const file = path.join(__dirname, '..', '..', 'database', 'migrations', '047_tournament_draw_and_results.sql');
 
-assert(fs.existsSync(file), 'migration 045 tồn tại');
+assert(fs.existsSync(file), 'migration 047 tồn tại');
 const sql = fs.readFileSync(file, 'utf8');
 
 assert(/ADD COLUMN IF NOT EXISTS loser_match_id bigint/.test(sql), 'thêm loser_match_id');
@@ -318,18 +318,18 @@ for (const st of ['requested', 'approved', 'applied', 'rejected']) {
 assert(!/DROP\s+TABLE/i.test(sql), 'không DROP TABLE');
 assert(!/TRUNCATE/i.test(sql), 'không TRUNCATE');
 
-console.log('migration-045 ok');
+console.log('migration-047 ok');
 ```
 
 - [ ] **Step 3: Chạy test để thấy nó đỏ**
 
-Run: `node tests/tournament/migration-045.test.js`
+Run: `node tests/tournament/migration-047.test.js`
 Expected: FAIL
 
 - [ ] **Step 4: Viết migration**
 
 ```sql
--- 045_tournament_draw_and_results.sql
+-- 047_tournament_draw_and_results.sql
 -- Dinh tuyen ke thua cho double elimination, hang chung cuoc ghim khi chot giai,
 -- va siet trang thai correction. Idempotent; chi them cot, khong DROP/TRUNCATE.
 
@@ -359,8 +359,8 @@ COMMENT ON COLUMN public.tournament_divisions.final_standings IS 'Hang chung cuo
 
 - [ ] **Step 5: Chạy test, apply, xác nhận, commit**
 
-Run: `node tests/tournament/migration-045.test.js`
-Expected: `migration-045 ok`
+Run: `node tests/tournament/migration-047.test.js`
+Expected: `migration-047 ok`
 
 Apply bằng Supabase MCP, rồi xác nhận:
 
@@ -373,8 +373,8 @@ where table_schema='public' and table_name='tournament_divisions' and column_nam
 
 ```bash
 npm run migration:ledger
-git add database/migrations/045_tournament_draw_and_results.sql tests/tournament/migration-045.test.js
-git commit -m "feat(db): loser_match_id, final_standings, CHECK correction (migration 045)
+git add database/migrations/047_tournament_draw_and_results.sql tests/tournament/migration-047.test.js
+git commit -m "feat(db): loser_match_id, final_standings, CHECK correction (migration 047)
 
 loser_match_id them san du khoi B chua lam - cot NULL khong ton gi va sau nay
 khong phai chay migration lan nua.
@@ -867,7 +867,7 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 - [ ] **Step 1: Thêm script**
 
 ```json
-    "test:t-draw": "node tests/tournament/draw.test.js && node tests/tournament/qualification.test.js && node tests/tournament/correction.test.js && node tests/tournament/migration-045.test.js && node tests/tournament/api-draw.contract.test.js && node tests/tournament/ui-draw-step.contract.test.js",
+    "test:t-draw": "node tests/tournament/draw.test.js && node tests/tournament/qualification.test.js && node tests/tournament/correction.test.js && node tests/tournament/migration-047.test.js && node tests/tournament/api-draw.contract.test.js && node tests/tournament/ui-draw-step.contract.test.js",
 ```
 
 Thêm vào `test:tournament`.
@@ -1049,7 +1049,7 @@ Xuất thêm `advanceLoser` và gọi nó trong `games/route.js` cạnh `advance
 
 RPC `replace_tournament_entry_schedule` hiện nhận `_key` và `_parent_key`. Thêm `_loser_key` và một lượt update thứ hai cho `loser_match_id`.
 
-Viết bản mới của hàm vào một migration `046_schedule_rpc_loser_routing.sql` với `CREATE OR REPLACE FUNCTION` — **không** `DROP FUNCTION`, để không có khoảng thời gian route gọi vào hàm không tồn tại.
+Viết bản mới của hàm vào một migration `048_schedule_rpc_loser_routing.sql` với `CREATE OR REPLACE FUNCTION` — **không** `DROP FUNCTION`, để không có khoảng thời gian route gọi vào hàm không tồn tại.
 
 Trước khi viết, đọc bản hiện tại:
 
@@ -1062,7 +1062,7 @@ where n.nspname='public' and p.proname='replace_tournament_entry_schedule';
 - [ ] **Step 7: Commit**
 
 ```bash
-git add lib/tournament/persistence.js lib/tournament/results.js tests/tournament/persistence.test.js database/migrations/046_schedule_rpc_loser_routing.sql
+git add lib/tournament/persistence.js lib/tournament/results.js tests/tournament/persistence.test.js database/migrations/048_schedule_rpc_loser_routing.sql
 git commit -m "feat(giai-dau): dinh tuyen ke thua cho double elimination
 
 Khoa cua resolveParentLinks doi tu (round, bracket_slot) sang
@@ -1161,7 +1161,7 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 | 4.3 · Cắt khối A / khối B | Cấu trúc plan; B1 Step 1 là cổng chặn |
 | 5 · Correction: lý do, xem trước, chặn downstream | A8 |
 | 5.3 · Chặn cả khi trận sau `live` | A8 (test 3 trạng thái) |
-| 6 · Migration 045 | A2 |
+| 6 · Migration 047 | A2 |
 | 7 · Kiểm thử 1–13 | A1 (1–2), A5 (3–4), B1–B2 (5–6), A8 (7), A3 (8–9), A8 (10–11) |
 
 **Cố ý chưa làm:**

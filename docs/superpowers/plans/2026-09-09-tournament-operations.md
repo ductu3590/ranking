@@ -10,7 +10,7 @@
 
 **Spec:** [`docs/superpowers/specs/2026-09-09-tournament-operations-design.md`](../specs/2026-09-09-tournament-operations-design.md)
 
-**Phụ thuộc bắt buộc:** Plan Spec 0 (bảng `tournament_operation_logs`, migration 043) và Plan Spec 1 (`resolveMatchScoring`) phải xong trước.
+**Phụ thuộc bắt buộc:** Plan Spec 0 (bảng `tournament_operation_logs`, migration 045) và Plan Spec 1 (`resolveMatchScoring`) phải xong trước.
 
 ---
 
@@ -18,7 +18,7 @@
 
 | Nhóm | Nội dung | Giao được gì |
 |---|---|---|
-| **A** | Dọn code nháp · migration 044 · 4 hàm thuần | Nền tảng, chưa nhìn thấy gì |
+| **A** | Dọn code nháp · migration 046 · 4 hàm thuần | Nền tảng, chưa nhìn thấy gì |
 | **B** | API `venues`, `courts`, `assignments`, `match-transition` | Chạy được bằng curl |
 | **C** | Shell sidebar 8 bước + theme tối + chuyển 7 tab cũ | Console mới thay console cũ |
 | **D** | Bước 2 (sân) · bước 5 (điều hành) · bước 8 (nhật ký) | Bàn điều hành hoàn chỉnh |
@@ -51,7 +51,7 @@ Dừng sau bất kỳ nhóm nào cũng để lại một hệ chạy được. �
 |---|---|
 | `lib/tournament/matchLifecycle.js` (mới) | Thuần. 5 trạng thái trận, 8 cạnh, `transitionMatch`, `matchElapsed`. |
 | `lib/tournament/courtBoard.js` (mới) | Thuần. `computeCourtState`, `projectSchedule`, `averageMatchMinutes`. |
-| `database/migrations/044_tournament_operations.sql` (mới) | 3 cột thời gian, mở rộng CHECK trạng thái, CHECK `result_type`. |
+| `database/migrations/046_tournament_operations.sql` (mới) | 3 cột thời gian, mở rộng CHECK trạng thái, CHECK `result_type`. |
 | `app/api/tournament-v2/venues/route.js` (viết lại) | CRUD địa điểm. |
 | `app/api/tournament-v2/courts/route.js` (viết lại) | CRUD sân + bật/tắt + guard xoá. |
 | `app/api/tournament-v2/assignments/route.js` (viết lại) | Gán/gỡ trận khỏi sân. |
@@ -144,11 +144,11 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 
 ---
 
-## Task A2: Migration 044
+## Task A2: Migration 046
 
 **Files:**
-- Create: `database/migrations/044_tournament_operations.sql`
-- Test: `tests/tournament/migration-044.test.js`
+- Create: `database/migrations/046_tournament_operations.sql`
+- Test: `tests/tournament/migration-046.test.js`
 
 - [ ] **Step 1: Kiểm dữ liệu trước khi thêm CHECK**
 
@@ -163,15 +163,15 @@ Expected: **cả hai trả 0 dòng** (bảng rỗng). Nếu có giá trị nằm
 
 - [ ] **Step 2: Viết test thất bại**
 
-Create `tests/tournament/migration-044.test.js`:
+Create `tests/tournament/migration-046.test.js`:
 
 ```js
 const fs = require('fs');
 const path = require('path');
 const assert = (c, m) => { if (!c) { console.error(`FAIL: ${m}`); process.exit(1); } };
-const file = path.join(__dirname, '..', '..', 'database', 'migrations', '044_tournament_operations.sql');
+const file = path.join(__dirname, '..', '..', 'database', 'migrations', '046_tournament_operations.sql');
 
-assert(fs.existsSync(file), 'migration 044 tồn tại');
+assert(fs.existsSync(file), 'migration 046 tồn tại');
 const sql = fs.readFileSync(file, 'utf8');
 
 for (const col of ['warmup_started_at', 'started_at', 'ended_at']) {
@@ -189,25 +189,25 @@ for (const rt of ['simple', 'mlp', 'team', 'walkover', 'retired']) {
 }
 assert(!/DROP\s+TABLE/i.test(sql), 'không DROP TABLE');
 assert(!/TRUNCATE/i.test(sql), 'không TRUNCATE');
-assert(!/tournament_operation_logs/.test(sql), 'bảng nhật ký thuộc migration 043, không lặp ở đây');
+assert(!/tournament_operation_logs/.test(sql), 'bảng nhật ký thuộc migration 045, không lặp ở đây');
 
-console.log('migration-044 ok');
+console.log('migration-046 ok');
 ```
 
 - [ ] **Step 3: Chạy test để thấy nó đỏ**
 
-Run: `node tests/tournament/migration-044.test.js`
-Expected: FAIL — `migration 044 tồn tại`
+Run: `node tests/tournament/migration-046.test.js`
+Expected: FAIL — `migration 046 tồn tại`
 
 - [ ] **Step 4: Viết migration**
 
-Create `database/migrations/044_tournament_operations.sql`:
+Create `database/migrations/046_tournament_operations.sql`:
 
 ```sql
--- 044_tournament_operations.sql
+-- 046_tournament_operations.sql
 -- Ban dieu hanh giai: moc thoi gian tran, mo rong trang thai tran, sieu chat
 -- kieu ket qua. Idempotent; chi them cot va doi CHECK, khong DROP/TRUNCATE du lieu.
--- Bang tournament_operation_logs nam o migration 043.
+-- Bang tournament_operation_logs nam o migration 045.
 
 -- 1. Moc thoi gian de chay dong ho tran va uoc tinh gio hoan tat.
 ALTER TABLE public.tournament_matches ADD COLUMN IF NOT EXISTS warmup_started_at timestamptz;
@@ -238,12 +238,12 @@ COMMENT ON COLUMN public.tournament_matches.court IS 'DI SAN - nguon su that la 
 
 - [ ] **Step 5: Chạy test để thấy nó xanh**
 
-Run: `node tests/tournament/migration-044.test.js`
-Expected: `migration-044 ok`
+Run: `node tests/tournament/migration-046.test.js`
+Expected: `migration-046 ok`
 
 - [ ] **Step 6: Apply và xác nhận**
 
-Apply bằng Supabase MCP `apply_migration`, tên `044_tournament_operations`.
+Apply bằng Supabase MCP `apply_migration`, tên `046_tournament_operations`.
 
 Xác nhận:
 
@@ -258,8 +258,8 @@ Expected: thấy `tournament_matches_status_phase4_ck` với 5 giá trị, và `
 
 ```bash
 npm run migration:ledger
-git add database/migrations/044_tournament_operations.sql tests/tournament/migration-044.test.js
-git commit -m "feat(db): moc thoi gian tran va mo rong trang thai (migration 044)
+git add database/migrations/046_tournament_operations.sql tests/tournament/migration-046.test.js
+git commit -m "feat(db): moc thoi gian tran va mo rong trang thai (migration 046)
 
 Them warmup_started_at/started_at/ended_at; trang thai tran thanh
 pending|warmup|live|paused|finalized; them CHECK cho result_type (truoc day
@@ -692,7 +692,7 @@ Expected: `operations ok`
 Thêm vào `package.json`:
 
 ```json
-    "test:t-operations": "node tests/tournament/operations.test.js && node tests/tournament/migration-044.test.js",
+    "test:t-operations": "node tests/tournament/operations.test.js && node tests/tournament/migration-046.test.js",
 ```
 
 Thêm `npm run test:t-operations` vào `test:tournament` trước `npm run test:t-engines`.
@@ -1282,7 +1282,7 @@ export async function POST(request) {
 > select indexname, indexdef from pg_indexes
 > where schemaname='public' and tablename='tournament_match_assignments';
 > ```
-> Nếu **không có** unique trên `match_id`, thêm vào migration 044 dòng:
+> Nếu **không có** unique trên `match_id`, thêm vào migration 046 dòng:
 > `CREATE UNIQUE INDEX IF NOT EXISTS uq_tournament_match_assignments_match ON public.tournament_match_assignments(match_id);`
 > rồi apply lại. Bảng đang rỗng nên an toàn.
 
@@ -2603,7 +2603,7 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 | 6.2 · Trạng thái sân suy ra | A4, D2 |
 | 6.3 · 8 cạnh, lý do bắt buộc | A3, B2 |
 | 7 · Cạnh tranh ghi bằng `version` | B2 |
-| 8 · Migration 044 | A2 |
+| 8 · Migration 046 | A2 |
 | 10 · Montserrat, token `--ph-*`, đo tương phản, ghi ngoại lệ | C1, C4 |
 | 11 · Dọn code Phase 4 | A1 |
 

@@ -205,7 +205,7 @@ Chốt trận khi một bên đạt `ceil(best_of / 2)` ván thắng. Ghi đủ 
 
 **Cạnh tranh ghi.** `tournament_matches.version` đã có sẵn — mọi lệnh đổi trạng thái/ghi điểm gửi kèm `version` đang thấy, ghi bằng `WHERE id = ? AND version = ?` rồi `version + 1`; không khớp trả 409 `MATCH_VERSION_CONFLICT`, UI tải lại. Áp dụng tương tự cho `tournament_match_assignments.version`.
 
-## 8. Migration `044_tournament_operations.sql`
+## 8. Migration `046_tournament_operations.sql`
 
 Chỉ thêm, không xoá dữ liệu. Không `DROP TABLE`, không `TRUNCATE`.
 
@@ -226,7 +226,7 @@ ALTER TABLE public.tournament_matches ADD CONSTRAINT tournament_matches_result_t
 
 ```
 
-Bảng `tournament_operation_logs` **do Spec 0 tạo** (migration 043), không nằm ở đây.
+Bảng `tournament_operation_logs` **do Spec 0 tạo** (migration 045), không nằm ở đây.
 
 **Rủi ro của mục 3.** `result_type` hiện `NOT NULL DEFAULT 'simple'` và chưa có CHECK — phải chạy `SELECT DISTINCT result_type FROM tournament_matches` trước để xác nhận không có giá trị lạ, rồi mới thêm constraint. Hôm nay bảng có 0 dòng nên an toàn, nhưng plan vẫn phải có bước kiểm này.
 
@@ -246,7 +246,7 @@ Bảng: `Lúc · Người làm · Việc · Trước → Sau · Lý do`. Ghi cho
 | `draw_locked` / `draw_unlocked` | `stage` | chỉ khi huỷ chốt |
 | `result_corrected` | `match` | **có** |
 
-Bảng do **Spec 0** tạo (migration 043) nên thứ tự 0 → 2 → 3 không có khoảng mất dấu vết nào.
+Bảng do **Spec 0** tạo (migration 045) nên thứ tự 0 → 2 → 3 không có khoảng mất dấu vết nào.
 
 Chỉ đọc, không sửa, không xoá.
 
@@ -314,7 +314,7 @@ Doc Phase 4 cũ (199 dòng) viết theo góc state-machine/backend và **rộng 
 ## 13. Thứ tự thực thi
 
 1. **Spec 1** (số ván theo vòng) — làm trước, vì mục 7 phụ thuộc `resolveMatchScoring`.
-2. Migration 044 + lớp thuần (`computeCourtState`, `projectSchedule`, `transitionMatch`, `matchElapsed`) + test đỏ trước.
+2. Migration 046 + lớp thuần (`computeCourtState`, `projectSchedule`, `transitionMatch`, `matchElapsed`) + test đỏ trước.
 3. API: `courts`, `venues`, `assignments`, `matches/transition`, `operation-logs`.
 4. Shell sidebar + ánh xạ `?tab=` → `?step=`, chuyển 7 tab cũ vào bước.
 5. Bước 2 (sân), rồi bước 5 (điều hành), rồi bước 8 (nhật ký).

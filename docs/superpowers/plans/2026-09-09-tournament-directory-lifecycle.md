@@ -36,12 +36,12 @@
 |---|---|
 | `lib/tournament/lifecycle.js` (mới) | Thuần. 7 trạng thái, bảng cạnh, `canTransition`, `groupOf`, `sortForGroup`, `canDelete`. Không I/O. |
 | `lib/tournament/operationLog.js` (mới) | Thuần + một hàm ghi. Dựng payload dòng nhật ký; hàm ghi nhận `db` từ ngoài để test được. |
-| `database/migrations/043_tournament_operation_logs.sql` (mới) | Tạo bảng nhật ký. Idempotent. |
+| `database/migrations/045_tournament_operation_logs.sql` (mới) | Tạo bảng nhật ký. Idempotent. |
 | `app/api/tournament-v2/tournaments/route.js` (sửa) | GET làm giàu, POST ép `draft`, PATCH kiểm cạnh, DELETE kiểm điều kiện. |
 | `app/giai-dau/v2/page.js` (sửa) | Nhóm Sắp/Đang/Đã, ô tìm, thẻ giải giàu thông tin hơn. |
 | `app/giai-dau/v2/v2.css` (sửa) | Lớp cho nhóm và thẻ mới. |
 | `tests/tournament/lifecycle.test.js` (mới) | Test thuần cho `lifecycle.js` + `operationLog.js`. |
-| `tests/tournament/migration-043.test.js` (mới) | Kiểm nội dung file migration. |
+| `tests/tournament/migration-045.test.js` (mới) | Kiểm nội dung file migration. |
 | `tests/tournament/api-tournaments.contract.test.js` (sửa) | Thêm khẳng định cho 4 handler. |
 | `tests/tournament/ui-list.contract.test.js` (sửa) | Thêm khẳng định cho nhóm và ô tìm. |
 | `package.json` (sửa) | Thêm `test:t-lifecycle` vào `test:tournament`. |
@@ -338,23 +338,23 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 
 ---
 
-## Task 2: Migration 043 — bảng nhật ký thao tác
+## Task 2: Migration 045 — bảng nhật ký thao tác
 
 **Files:**
-- Create: `database/migrations/043_tournament_operation_logs.sql`
-- Test: `tests/tournament/migration-043.test.js`
+- Create: `database/migrations/045_tournament_operation_logs.sql`
+- Test: `tests/tournament/migration-045.test.js`
 
 - [ ] **Step 1: Viết test thất bại**
 
-Create `tests/tournament/migration-043.test.js`:
+Create `tests/tournament/migration-045.test.js`:
 
 ```js
 const fs = require('fs');
 const path = require('path');
 const assert = (c, m) => { if (!c) { console.error(`FAIL: ${m}`); process.exit(1); } };
-const file = path.join(__dirname, '..', '..', 'database', 'migrations', '043_tournament_operation_logs.sql');
+const file = path.join(__dirname, '..', '..', 'database', 'migrations', '045_tournament_operation_logs.sql');
 
-assert(fs.existsSync(file), 'migration 043 tồn tại');
+assert(fs.existsSync(file), 'migration 045 tồn tại');
 const sql = fs.readFileSync(file, 'utf8');
 
 assert(/CREATE TABLE IF NOT EXISTS public\.tournament_operation_logs/.test(sql), 'tạo bảng idempotent');
@@ -367,20 +367,20 @@ assert(/CREATE INDEX IF NOT EXISTS idx_tournament_operation_logs_tournament/.tes
 assert(!/DROP\s+TABLE/i.test(sql), 'không DROP TABLE');
 assert(!/TRUNCATE/i.test(sql), 'không TRUNCATE');
 
-console.log('migration-043 ok');
+console.log('migration-045 ok');
 ```
 
 - [ ] **Step 2: Chạy test để thấy nó đỏ**
 
-Run: `node tests/tournament/migration-043.test.js`
-Expected: FAIL — `migration 043 tồn tại`
+Run: `node tests/tournament/migration-045.test.js`
+Expected: FAIL — `migration 045 tồn tại`
 
 - [ ] **Step 3: Viết migration**
 
-Create `database/migrations/043_tournament_operation_logs.sql`:
+Create `database/migrations/045_tournament_operation_logs.sql`:
 
 ```sql
--- 043_tournament_operation_logs.sql
+-- 045_tournament_operation_logs.sql
 -- Nhật ký thao tác điều hành giải. Dùng chung cho vòng đời giải (Spec 0),
 -- bàn điều hành (Spec 2) và sửa kết quả (Spec 3).
 -- Idempotent; chỉ thêm bảng mới, không DROP/TRUNCATE gì.
@@ -411,12 +411,12 @@ COMMENT ON COLUMN public.tournament_operation_logs.action IS 'tournament_status_
 
 - [ ] **Step 4: Chạy test để thấy nó xanh**
 
-Run: `node tests/tournament/migration-043.test.js`
-Expected: `migration-043 ok`
+Run: `node tests/tournament/migration-045.test.js`
+Expected: `migration-045 ok`
 
 - [ ] **Step 5: Apply lên Supabase**
 
-Dùng Supabase MCP `apply_migration` với project `uhhlelemewilgsdijwja`, tên `043_tournament_operation_logs`, nội dung đúng file trên.
+Dùng Supabase MCP `apply_migration` với project `uhhlelemewilgsdijwja`, tên `045_tournament_operation_logs`, nội dung đúng file trên.
 
 Xác nhận bằng `execute_sql`:
 
@@ -435,8 +435,8 @@ Expected: chạy xong không lỗi, `043` xuất hiện trong sổ.
 - [ ] **Step 7: Commit**
 
 ```bash
-git add database/migrations/043_tournament_operation_logs.sql tests/tournament/migration-043.test.js
-git commit -m "feat(db): bang tournament_operation_logs (migration 043)
+git add database/migrations/045_tournament_operation_logs.sql tests/tournament/migration-045.test.js
+git commit -m "feat(db): bang tournament_operation_logs (migration 045)
 
 Nhat ky thao tac dung chung cho Spec 0/2/3. Chi them bang moi, idempotent.
 Da apply len project uhhlelemewilgsdijwja va xac nhan 12 cot.
@@ -1331,7 +1331,7 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 Trong `package.json`, thêm sau dòng `"test:t-migration"`:
 
 ```json
-    "test:t-lifecycle": "node tests/tournament/lifecycle.test.js && node tests/tournament/migration-043.test.js",
+    "test:t-lifecycle": "node tests/tournament/lifecycle.test.js && node tests/tournament/migration-045.test.js",
 ```
 
 Và sửa `test:tournament` thành:
@@ -1391,7 +1391,7 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 | 5 · API validate status, POST ép draft, GET làm giàu | Task 4, 5, 7 |
 | 5 · Ghi nhật ký khi đổi trạng thái | Task 3 (helper), Task 5 (nơi gọi) |
 | 6 · Chốt giải khi mọi trận `finalized` | Task 5 (guard `all_matches_finalized`) |
-| 7 · Migration 043 | Task 2 |
+| 7 · Migration 045 | Task 2 |
 | 8 · Kiểm thử 1–10 | Task 1 (1–5), Task 4–7 (6–10) |
 | 8 · Kiểm tay ba bề rộng | Task 8 Step 6 |
 

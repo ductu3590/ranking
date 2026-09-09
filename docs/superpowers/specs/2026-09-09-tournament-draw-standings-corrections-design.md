@@ -103,7 +103,7 @@ Dùng `computeStageStandings` đang có. Bổ sung ba thứ:
 
 **Dòng tiêu chí.** Hiện dưới bảng: `Điểm → Hiệu số → Đối đầu trực tiếp → PHR`, lấy từ `tiebreak_policy` đang áp dụng chứ không viết cứng.
 
-**Hạng chung cuộc.** Khi giải chuyển `completed` (Spec 0 mục 6), tính hạng cuối từng nội dung rồi **ghim** vào cột mới `tournament_divisions.final_standings jsonb` (migration 045):
+**Hạng chung cuộc.** Khi giải chuyển `completed` (Spec 0 mục 6), tính hạng cuối từng nội dung rồi **ghim** vào cột mới `tournament_divisions.final_standings jsonb` (migration 047):
 
 ```jsonc
 [
@@ -122,7 +122,7 @@ Nguồn hạng: nội dung có giai đoạn loại trực tiếp → lấy từ 
 `BracketTab` hiện vẽ được knockout một nhánh. Bổ sung:
 
 - **Double elimination**: vẽ ba cụm `Nhánh thắng` / `Nhánh thua` / `Chung kết tổng` theo `match.bracket`. Cuộn ngang trong khung riêng.
-- **Định tuyến kẻ thua**: `persistence.js` phải lưu `loser_to_slot` → thêm cột `tournament_matches.loser_match_id bigint` (migration 045) và `resolveParentLinks` nối cả hai đường. `results.js` khi chốt trận đẩy **kẻ thắng** vào `parent_match_id` và **kẻ thua** vào `loser_match_id`.
+- **Định tuyến kẻ thua**: `persistence.js` phải lưu `loser_to_slot` → thêm cột `tournament_matches.loser_match_id bigint` (migration 047) và `resolveParentLinks` nối cả hai đường. `results.js` khi chốt trận đẩy **kẻ thắng** vào `parent_match_id` và **kẻ thua** vào `loser_match_id`.
 - Trận chưa có đội hiện `Thắng BK1` / `Thua TK2` thay vì để trống.
 
 ### 4.3 Cắt ở đâu khi engine chưa xong
@@ -137,9 +137,9 @@ Toàn bộ spec này chia làm hai khối. **Khối A làm được ngay hôm na
 | Sơ đồ nhánh | Giữ `BracketTab` hiện có, đổi theme | Vẽ 3 cụm W / L / GF |
 | Định tuyến | `parent_match_id` như hiện tại | `loser_match_id` + `resolveParentLinks` hai đường |
 | Correction | Đủ, cho mọi loại trận | — |
-| Migration 045 | `final_standings`, CHECK trên corrections | `loser_match_id` |
+| Migration 047 | `final_standings`, CHECK trên corrections | `loser_match_id` |
 
-Khối A **phải chạy được và giao được một mình**. Nếu engine trễ, cắt khối B ra thành đợt riêng, không để plan treo giữa chừng. Cột `loser_match_id` có thể thêm sẵn ở migration 045 (rẻ, `NULL` cho mọi trận hiện có) mà không cần khối B, để sau này không phải chạy migration lần nữa.
+Khối A **phải chạy được và giao được một mình**. Nếu engine trễ, cắt khối B ra thành đợt riêng, không để plan treo giữa chừng. Cột `loser_match_id` có thể thêm sẵn ở migration 047 (rẻ, `NULL` cho mọi trận hiện có) mà không cần khối B, để sau này không phải chạy migration lần nữa.
 
 ## 5. Sửa kết quả đã chốt (correction)
 
@@ -177,7 +177,7 @@ Bảng `tournament_result_corrections` đã có cột `requester`/`approver`/`st
 
 Nằm ở **bước 6 · Lịch thi đấu & kết quả**: mỗi trận `finalized` có nút **Sửa kết quả**. Lịch sử sửa của một trận hiện ngay dưới trận đó. Toàn bộ bản ghi correction cũng đổ vào **bước 8 · Nhật ký thao tác**.
 
-## 6. Migration `045_tournament_draw_and_results.sql`
+## 6. Migration `047_tournament_draw_and_results.sql`
 
 Chỉ thêm cột, không xoá.
 

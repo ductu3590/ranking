@@ -117,7 +117,7 @@ Chốt xong:
 
 Trường hợp giải bỏ dở giữa chừng (mưa, huỷ): **không có trạng thái `cancelled`** trong 7 giá trị DB. BTC dùng `archived` và ghi lý do vào mô tả giải. Ghi nhận đây là giải pháp tạm; thêm `cancelled` cần migration, để dành khi có nhu cầu thật.
 
-## 7. Migration `043_tournament_operation_logs.sql`
+## 7. Migration `045_tournament_operation_logs.sql`
 
 `tournaments.status` **không cần migration** — 7 giá trị đã có sẵn, và `select status, count(*) from tournaments` cho thấy cả 4 giải đều ở `draft`, không có dữ liệu `active` hỏng cần vá.
 

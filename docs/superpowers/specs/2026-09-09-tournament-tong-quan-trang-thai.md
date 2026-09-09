@@ -55,10 +55,10 @@
 
 | # | Spec | Plan thi công | Nội dung | Migration |
 |---|---|---|---|---|
-| 0 | [spec](2026-09-09-tournament-directory-lifecycle-design.md) | [plan](../plans/2026-09-09-tournament-directory-lifecycle.md) · 9 task | Danh sách Sắp/Đang/Đã · vòng đời 7 trạng thái · chốt giải · **sửa lỗi `active`** | **043** |
+| 0 | [spec](2026-09-09-tournament-directory-lifecycle-design.md) | [plan](../plans/2026-09-09-tournament-directory-lifecycle.md) · 9 task | Danh sách Sắp/Đang/Đã · vòng đời 7 trạng thái · chốt giải · **sửa lỗi `active`** | **045** (bảng nhật ký) |
 | 1 | [spec](2026-09-09-tournament-round-scoring-design.md) | [plan](../plans/2026-09-09-tournament-round-scoring.md) · 9 task | Số ván (BO) theo từng vòng · **vá 4 lỗi P0/P1** | không |
-| 2 | [spec](2026-09-09-tournament-operations-design.md) | [plan](../plans/2026-09-09-tournament-operations.md) · 13 task, 4 nhóm | Shell 8 bước · sân · trung tâm điều hành · nhật ký | **044** |
-| 3 | [spec](2026-09-09-tournament-draw-standings-corrections-design.md) | [plan](../plans/2026-09-09-tournament-draw-standings-corrections.md) · 13 task, 2 khối | Bốc thăm chốt lịch · BXH & bracket · sửa kết quả đã chốt | **045** (+046 RPC) |
+| 2 | [spec](2026-09-09-tournament-operations-design.md) | [plan](../plans/2026-09-09-tournament-operations.md) · 13 task, 4 nhóm | Shell 8 bước · sân · trung tâm điều hành · nhật ký | **046** |
+| 3 | [spec](2026-09-09-tournament-draw-standings-corrections-design.md) | [plan](../plans/2026-09-09-tournament-draw-standings-corrections.md) · 13 task, 2 khối | Bốc thăm chốt lịch · BXH & bracket · sửa kết quả đã chốt | **047** (+048 RPC) |
 
 ### 2.3 Spec đã lỗi thời
 
@@ -196,6 +196,7 @@ Ngoài ra `UI-BRAND-SYSTEM.md` dòng 34 viết *"Không dùng nền đen hoặc 
 | Không có trạng thái `cancelled` | Giải huỷ giữa chừng phải dùng `archived` + ghi lý do vào mô tả | tạm chấp nhận; thêm cần migration |
 | 7 mục kiểm tay của phase-3 | Preview Zalo/OG, tải PNG, rehearsal community + token thư ký | chưa ai làm |
 | Migration 038–041 chưa commit | Đã apply lên DB thật nhưng file `.sql` còn untracked | phải commit khi làm Spec 2 |
+| Số migration đã dịch | `043`/`044` đã bị `club_notifications` và `group_fund_qr` chiếm. Bốn plan dùng **045 · 046 · 047 · 048** | đã sửa 2026-09-09 |
 
 ---
 
@@ -205,8 +206,8 @@ Ngoài ra `UI-BRAND-SYSTEM.md` dòng 34 viết *"Không dùng nền đen hoặc 
 |---|---|---|
 | **0** | Spec 0 — danh sách & vòng đời | Cửa vào module, và vá lỗi 500 đang chờ nổ. Không migration, rẻ |
 | **1** | Spec 1 — số ván theo vòng | Nhỏ, đúng yêu cầu bắt buộc. Spec 2 mục 7 phụ thuộc `resolveMatchScoring` |
-| **2** | Spec 2 — bàn điều hành | Khối lớn nhất. Migration 044. Bắt đầu bằng lớp thuần + test đỏ trước, rồi API, rồi shell, rồi từng bước |
-| **3** | Spec 3 — bốc thăm, BXH, correction | Migration 045. Phần double-elim để cuối, cắt ra được nếu engine chưa xong |
+| **2** | Spec 2 — bàn điều hành | Khối lớn nhất. Migration 046. Bắt đầu bằng lớp thuần + test đỏ trước, rồi API, rồi shell, rồi từng bước |
+| **3** | Spec 3 — bốc thăm, BXH, correction | Migration 047. Phần double-elim để cuối, cắt ra được nếu engine chưa xong |
 
 Trước đợt 0 nên chốt xong **spec design system 2026-09-08** (tokens.css / primitives.css / Montserrat), nếu không mọi UI mới của Spec 0–3 sẽ phải sơn lại một lần nữa.
 

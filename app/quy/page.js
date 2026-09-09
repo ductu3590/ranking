@@ -54,6 +54,9 @@ export default function HomePage() {
     // Share event
     const [copiedEventId, setCopiedEventId] = useState(null);
 
+    // QR nhan quy (admin tai len o /admin). Chua co thi an han khoi.
+    const [fundQrUrl, setFundQrUrl] = useState(null);
+
     useEffect(() => {
         let active = true;
         fetch('/api/groups/session', { cache: 'no-store' })
@@ -71,6 +74,10 @@ export default function HomePage() {
                 loadTransactions();
                 loadEvents();
                 loadMembers();
+                fetch('/api/club/fund-qr', { cache: 'no-store' })
+                    .then((response) => (response.ok ? response.json() : null))
+                    .then((data) => { if (active) setFundQrUrl(data?.fundQrUrl || null); })
+                    .catch(() => {});
             })
             .catch(() => {
                 if (active) {
@@ -562,6 +569,15 @@ export default function HomePage() {
                             </div>
                         )}
                     </aside>
+                )}
+
+                {fundQrUrl && (
+                    <section className="fund-qr-card" aria-labelledby="fund-qr-heading">
+                        <span className="fund-qr-card__kicker">Chuyển khoản</span>
+                        <h2 id="fund-qr-heading">QR nhận quỹ CLB</h2>
+                        <img src={fundQrUrl} alt="Mã QR chuyển khoản vào quỹ CLB" />
+                        <p>Quét để chuyển khoản vào quỹ CLB. Hệ thống tự ghi nhận vào lịch sử giao dịch và BXH sau 1–3 phút.</p>
+                    </section>
                 )}
 
                 {/* ── Lịch sử giao dịch luôn hiển thị ── */}

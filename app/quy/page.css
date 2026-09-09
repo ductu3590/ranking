@@ -1458,3 +1458,10 @@
 .fund-toolbar { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 20px 12px; }
 .fund-bulkbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding: 12px 20px; background: var(--ph-tint-indigo); border-block: 1px solid var(--ph-tint-indigo-line); font-size: 12px; font-weight: 700; color: var(--ph-indigo); }
 .fund-bulkbar select { margin-left: auto; min-height: 44px; padding: 8px 12px; border: 1px solid var(--ph-tint-indigo-line); border-radius: var(--ph-radius-xs); background: var(--ph-card); font-family: inherit; font-size: 12px; font-weight: 700; }
+
+/* QR nhan quy - an han khi admin chua tai anh len */
+.fund-qr-card { padding: 18px; text-align: center; background: var(--ph-card); border: 1px solid var(--ph-line); border-radius: var(--ph-radius-card); box-shadow: var(--ph-shadow-soft); }
+.fund-qr-card__kicker { display: block; font-size: 11px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; color: var(--ph-muted); }
+.fund-qr-card h2 { margin: 4px 0 0; font-size: 15px; font-weight: 800; letter-spacing: -.02em; }
+.fund-qr-card img { display: block; width: 100%; max-width: 220px; height: auto; margin: 12px auto 0; padding: 11px; border-radius: var(--ph-radius-sm); background: var(--ph-card); border: 1px solid var(--ph-line); }
+.fund-qr-card p { margin: 12px 0 0; font-size: 11px; font-weight: 600; color: var(--ph-muted); line-height: 1.6; }

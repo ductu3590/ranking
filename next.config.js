@@ -40,6 +40,11 @@ const nextConfig = {
                 destination: '/thanh-vien',
                 permanent: true,
             },
+            {
+                source: '/quy/bxh',
+                destination: '/bxh',
+                permanent: true,
+            },
         ];
     },
 };

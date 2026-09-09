@@ -201,7 +201,7 @@ export default function FundLeaderboardPage() {
                                     {rows.length === 1 && <p className="ph-bxh-only">Người duy nhất góp quỹ kỳ này</p>}
                                 </section>
 
-                                {result.unassigned.count > 0 && <p className="ph-bxh-note">{amountText(result.unassigned.amount)} từ {result.unassigned.count} giao dịch chưa vào bảng. <a href="/admin?section=fund">Mở sổ quỹ để xử lý</a>.</p>}
+                                {result.unassigned.count > 0 && <p className="ph-bxh-note">{amountText(result.unassigned.amount)} từ {result.unassigned.count} giao dịch chưa vào bảng. <a href="/quy">Mở sổ quỹ để xử lý</a>.</p>}
 
                                 <section className="ph-bxh-list-wrap" aria-label="Tất cả thứ hạng">
                                     <div className="ph-bxh-section-heading">

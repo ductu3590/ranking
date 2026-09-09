@@ -6,6 +6,8 @@ import { requireValidatedGroupAdmin } from '@/lib/groupSession';
 import { getMatchEngine } from '@/lib/tournament/engines';
 import { advanceWinner } from '@/lib/tournament/results';
 import { validateGameScore } from '@/lib/tournament/rules/scoring';
+import { resolveMatchScoring } from '@/lib/tournament/rules/roundScoring';
+
 import { hashScorekeeperToken, validateScorekeeperToken } from '@/lib/tournament/scorekeeperToken';
 
 const db = supabaseAdmin || supabaseServer;
@@ -62,11 +64,35 @@ async function handleGames(request) {
 
         const { data: stage, error: stageErr } = await db
             .from('tournament_stages')
-            .select('match_format, config')
+            .select('id, tournament_id, division_id, schedule_format, match_format, config')
             .eq('id', match.stage_id)
             .eq('group_id', groupId)
             .single();
         if (stageErr || !stage) return NextResponse.json({ error: 'Stage không tồn tại' }, { status: 404 });
+
+        // Luật đem ra kiểm là luật của VÒNG chứa trận này, không phải luật chung
+        // của giải. Cần cả tournament và division để resolve đủ 4 tầng.
+        const [tournamentResult, divisionResult] = await Promise.all([
+            db.from('tournaments')
+                .select('id, default_scoring, tiebreak_policy')
+                .eq('id', stage.tournament_id).eq('group_id', groupId).maybeSingle(),
+            stage.division_id
+                ? db.from('tournament_divisions')
+                    .select('id, scoring_override, tiebreak_override')
+                    .eq('id', stage.division_id).eq('group_id', groupId).maybeSingle()
+                : Promise.resolve({ data: null, error: null }),
+        ]);
+        if (tournamentResult.error || divisionResult.error) {
+            return NextResponse.json({
+                error: (tournamentResult.error || divisionResult.error).message,
+            }, { status: 500 });
+        }
+        const scoring = resolveMatchScoring(
+            tournamentResult.data || {},
+            divisionResult.data || {},
+            stage,
+            match,
+        );
 
         let engine;
         try {
@@ -76,19 +102,24 @@ async function handleGames(request) {
         }
 
         const normalizedGames = normalizeGames(games);
-        const scoring = stage.config?.scoring;
-        if (scoring) {
-            for (let index = 0; index < normalizedGames.length; index += 1) {
-                const validation = validateGameScore(normalizedGames[index], scoring, index);
-                if (!validation.ok) return NextResponse.json({ error: 'Tỉ số không hợp lệ', code: validation.code }, { status: 400 });
+        // Luôn kiểm. Trước đây bọc trong if(scoring) nên giai đoạn chưa từng qua
+        // generate thì không có config.scoring và mọi tỉ số đều lọt.
+        for (let index = 0; index < normalizedGames.length; index += 1) {
+            const validation = validateGameScore(normalizedGames[index], scoring, index);
+            if (!validation.ok) {
+                return NextResponse.json({
+                    error: `Tỉ số ván ${index + 1} không hợp lệ với luật của ${scoring.round_key === 'GF' ? 'chung kết tổng' : `vòng ${scoring.round_key}`} (tới ${scoring.points_to}, cách ${scoring.win_by}${scoring.cap ? `, cap ${scoring.cap}` : ''}).`,
+                    code: validation.code,
+                }, { status: 400 });
             }
         }
+
         let resolved;
         try {
             resolved = engine.resolveMatch(
                 { entrant_a_id: match.entrant_a_id, entrant_b_id: match.entrant_b_id },
                 normalizedGames,
-                { ...(stage.config || {}), ...(scoring?.engine || {}) },
+                { ...(stage.config || {}), ...scoring.engine },
             );
         } catch (error) {
             console.error('Resolve match engine error:', error);
@@ -118,7 +149,11 @@ async function handleGames(request) {
             p_match_id: matchId,
             p_games: normalizedGames,
             p_winner_entrant_id: resolved.complete ? resolved.winner_entrant_id : null,
-            p_status: resolved.complete ? 'done' : 'live',
+            // 'finalized' chứ không phải 'done': constraint
+            // tournament_matches_status_phase3_ck chỉ nhận pending|live|finalized.
+            // Các engine dùng 'done' làm từ vựng nội bộ và có tầng dịch riêng ở
+            // standingsService — không đụng vào đó.
+            p_status: resolved.complete ? 'finalized' : 'live',
             p_parent_field: advancement?.field || null,
             p_expected_version: expectedVersion,
             p_idempotency_key: idempotencyKey,

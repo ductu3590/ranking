@@ -10,7 +10,7 @@ function entrantName(entrantsById, id) {
 }
 
 // Vòng tròn: gom theo group_label, mỗi bảng 1 sub-table.
-function RoundRobinStandings({ rows, entrantsById }) {
+function RoundRobinStandings({ rows, entrantsById, outlook }) {
     const groups = {};
     for (const r of rows) {
         const key = r.group_label || '';
@@ -37,6 +37,7 @@ function RoundRobinStandings({ rows, entrantsById }) {
                                         <th>B</th>
                                         <th>Hiệu số</th>
                                         <th>Điểm</th>
+                                        <th>Suất đi tiếp</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -49,6 +50,7 @@ function RoundRobinStandings({ rows, entrantsById }) {
                                             <td>{r.lost}</td>
                                             <td>{r.diff > 0 ? `+${r.diff}` : r.diff}</td>
                                             <td className="v2-st-pts">{r.match_points}</td>
+                                            <td>{outlook?.[r.entrant_id]?.label || '—'}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -91,7 +93,7 @@ function KnockoutStandings({ rows, entrantsById }) {
     );
 }
 
-export function StandingsView({ scheduleFormat, rows, entrantsById }) {
+export function StandingsView({ scheduleFormat, rows, entrantsById, outlook, tiebreakCriteria, criteriaLabel = 'Tiêu chí xếp hạng' }) {
     if (!rows || !rows.length) {
         return (
             <div className="v2-state v2-empty">
@@ -102,5 +104,10 @@ export function StandingsView({ scheduleFormat, rows, entrantsById }) {
     if (scheduleFormat === 'knockout') {
         return <KnockoutStandings rows={rows} entrantsById={entrantsById} />;
     }
-    return <RoundRobinStandings rows={rows} entrantsById={entrantsById} />;
+    return <>
+        <RoundRobinStandings rows={rows} entrantsById={entrantsById} outlook={outlook} />
+        {Array.isArray(tiebreakCriteria) && tiebreakCriteria.length > 0 ? (
+            <p className="v2-standings-criteria">{criteriaLabel}: {tiebreakCriteria.join(' → ')}</p>
+        ) : null}
+    </>;
 }

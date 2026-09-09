@@ -10,4 +10,7 @@ assert(s.includes('getStandings'), 'gọi getStandings');
 assert(s.includes('schedule_format'), 'nhánh theo schedule_format');
 assert(/round_robin|match_points|exit_round|knockout/.test(s), 'render 2 shape BXH');
 assert(exists('app/giai-dau/v2/console/tabs/BracketTab.js'), 'BracketTab tồn tại');
+assert(/outlook/.test(s), 'nhận outlook suất đi tiếp');
+assert(/Tiêu chí/.test(s), 'hiện dòng tiêu chí xếp hạng');
+assert(/tiebreak_criteria/.test(s), 'tiêu chí lấy từ API');
 console.log('ui-standings contract ok');

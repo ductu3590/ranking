@@ -73,6 +73,9 @@ export default function StandingsTab({ tournamentId, stageId, stages }) {
             scheduleFormat={data.schedule_format || stage?.schedule_format}
             rows={data.standings}
             entrantsById={entrantsById}
+            outlook={data.outlook}
+            tiebreakCriteria={data.tiebreak_criteria}
+            criteriaLabel="Tiêu chí xếp hạng"
         />
     );
 }

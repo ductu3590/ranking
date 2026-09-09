@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import ClubSettingsNav from '@/components/pickhub/ClubSettingsNav';
 import './club-settings.css';
 
 export default function ClubSettings() {
@@ -10,12 +11,15 @@ export default function ClubSettings() {
     const [notice, setNotice] = useState('');
     const [group, setGroup] = useState(null);
     const [qr, setQr] = useState({ joinUrl: '', qrCodeDataUrl: '' });
-    const [form, setForm] = useState({ name: '', description: '', memberPassword: '', shameBadgesEnabled: true });
+    const [form, setForm] = useState({ name: '', description: '', shameBadgesEnabled: true });
     const [logoUrl, setLogoUrl] = useState(null);
+    const [fundQrUrl, setFundQrUrl] = useState(null);
     const [passwordForm, setPasswordForm] = useState({ next: '', confirm: '' });
     const [changingPassword, setChangingPassword] = useState(false);
+    const [memberPasswordForm, setMemberPasswordForm] = useState({ next: '', confirm: '' });
+    const [changingMemberPassword, setChangingMemberPassword] = useState(false);
     const [bankAccounts, setBankAccounts] = useState([]);
-    const [bankForm, setBankForm] = useState({ accountNumber: '', bankName: '' });
+    const [bankForm, setBankForm] = useState({ accountNumber: '' });
     const [sepayForm, setSepayForm] = useState({ sepayWebhookSecret: '' });
     const [webhookUrl, setWebhookUrl] = useState('');
 
@@ -37,10 +41,10 @@ export default function ClubSettings() {
             setForm({
                 name: data.group.name || '',
                 description: data.group.description || '',
-                memberPassword: '',
                 shameBadgesEnabled: data.group.shame_badges_enabled !== false,
             });
             setLogoUrl(data.group.logo_url || null);
+            setFundQrUrl(data.group.fund_qr_url || null);
             setSepayForm({ sepayWebhookSecret: '' });
         } else {
             setError(data.error || 'Không tải được cài đặt.');
@@ -59,7 +63,6 @@ export default function ClubSettings() {
             logoUrl,
             shameBadgesEnabled: form.shameBadgesEnabled,
         };
-        if (form.memberPassword) payload.memberPassword = form.memberPassword;
         const res = await fetch('/api/club/settings', {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
@@ -68,13 +71,86 @@ export default function ClubSettings() {
         const data = await res.json();
         if (res.ok) {
             setGroup(data.group);
-            setForm((prev) => ({ ...prev, memberPassword: '' }));
             window.dispatchEvent(new Event('branding-updated'));
             setNotice('Đã lưu thay đổi.');
         } else {
             setError(data.error || 'Không lưu được.');
         }
         setSaving(false);
+    }
+
+    async function handleChangeMemberPassword(event) {
+        event.preventDefault();
+        setError('');
+        setNotice('');
+        if (memberPasswordForm.next.length < 4) {
+            setError('Mật khẩu thành viên cần ít nhất 4 ký tự.');
+            return;
+        }
+        if (memberPasswordForm.next !== memberPasswordForm.confirm) {
+            setError('Hai lần nhập mật khẩu thành viên không khớp.');
+            return;
+        }
+        setChangingMemberPassword(true);
+        const res = await fetch('/api/club/settings', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ memberPassword: memberPasswordForm.next }),
+        });
+        const data = await res.json();
+        setChangingMemberPassword(false);
+        if (res.ok) {
+            setMemberPasswordForm({ next: '', confirm: '' });
+            setNotice('Đã đặt mật khẩu thành viên mới. Hãy gửi lại mã CLB và mật khẩu cho cả nhóm.');
+        } else {
+            setError(data.error || 'Không đặt được mật khẩu thành viên.');
+        }
+    }
+
+    function handlePickFundQr(event) {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+            const img = new Image();
+            img.onload = () => {
+                const MAX = 640;
+                const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+                const canvas = document.createElement('canvas');
+                canvas.width = Math.round(img.width * scale);
+                canvas.height = Math.round(img.height * scale);
+                canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                // PNG chu khong WebP: QR nen mat du lieu bi ro canh, may quet doc loi.
+                const dataUrl = canvas.toDataURL('image/png');
+                if (dataUrl.length > 280000) {
+                    setError('Ảnh QR quá lớn, hãy chọn ảnh nhỏ hơn 200KB.');
+                    return;
+                }
+                setError('');
+                setFundQrUrl(dataUrl);
+                setNotice('Đã chọn ảnh QR, bấm "Lưu QR" để áp dụng.');
+            };
+            img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    async function handleSaveFundQr(nextValue) {
+        setError('');
+        setNotice('');
+        const res = await fetch('/api/club/settings', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fundQrUrl: nextValue }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+            setGroup(data.group);
+            setFundQrUrl(data.group.fund_qr_url || null);
+            setNotice(nextValue ? 'Đã lưu ảnh QR nhận quỹ.' : 'Đã xoá ảnh QR nhận quỹ.');
+        } else {
+            setError(data.error || 'Không lưu được ảnh QR.');
+        }
     }
 
     async function loadBankAccounts() {
@@ -91,12 +167,12 @@ export default function ClubSettings() {
         const res = await fetch('/api/club/bank-accounts', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ accountNumber: bankForm.accountNumber, bankName: bankForm.bankName }),
+            body: JSON.stringify({ accountNumber: bankForm.accountNumber }),
         });
         const data = await res.json();
         if (res.ok) {
             setBankAccounts((prev) => [...prev, data.account]);
-            setBankForm({ accountNumber: '', bankName: '' });
+            setBankForm({ accountNumber: '' });
             setNotice('Đã thêm tài khoản ngân hàng.');
         } else {
             setError(data.error || 'Không thêm được tài khoản.');
@@ -235,202 +311,259 @@ export default function ClubSettings() {
 
     return (
         <div className="club-settings">
+            <ClubSettingsNav />
+
             {error && <p className="club-settings-msg error">{error}</p>}
             {notice && <p className="club-settings-msg ok">{notice}</p>}
 
-            <form className="club-settings-form" onSubmit={handleSave}>
-                <label>
-                    Tên CLB
-                    <input
-                        value={form.name}
-                        onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
-                        required
-                    />
-                </label>
-                <label>
-                    Mô tả
-                    <textarea
-                        rows="3"
-                        value={form.description}
-                        onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
-                    />
-                </label>
-                <label className="ph-field">
-                    <span className="ph-field__label">Huy hiệu &quot;Trắng tay&quot; trên BXH</span>
-                    <select
-                        className="ph-field__control"
-                        value={form.shameBadgesEnabled ? 'on' : 'off'}
-                        onChange={(e) => setForm((p) => ({ ...p, shameBadgesEnabled: e.target.value === 'on' }))}
-                    >
-                        <option value="on">Bật — nêu tên người chưa đóng nhiều kỳ liền</option>
-                        <option value="off">Tắt — không nêu tên ai</option>
-                    </select>
-                </label>
-                <label>
-                    Đổi mật khẩu thành viên (để trống nếu không đổi)
-                    <input
-                        type="password"
-                        value={form.memberPassword}
-                        onChange={(e) => setForm((p) => ({ ...p, memberPassword: e.target.value }))}
-                        minLength="4"
-                        placeholder="••••"
-                    />
-                </label>
-                <div className="club-settings-logo">
-                    <span className="club-settings-logo-label">Logo CLB</span>
-                    <div className="club-settings-logo-row">
-                        {logoUrl ? (
-                            <img className="club-settings-logo-preview" src={logoUrl} alt="Logo CLB" />
-                        ) : (
-                            <span className="club-settings-logo-empty">Chưa có logo</span>
-                        )}
-                        <div className="club-settings-logo-actions">
-                            <label className="club-settings-logo-pick">
-                                Chọn ảnh
-                                <input type="file" accept="image/*" onChange={handleLogoFile} hidden />
-                            </label>
-                            {logoUrl && (
-                                <button
-                                    type="button"
-                                    className="club-settings-logo-remove"
-                                    onClick={() => { setLogoUrl(null); setNotice('Đã bỏ logo, bấm "Lưu thay đổi" để áp dụng.'); }}
-                                >
-                                    Xóa logo
-                                </button>
+            <section className="set-group" id="set-brand">
+                <h3>Nhận diện</h3>
+                <form className="club-settings-form" onSubmit={handleSave}>
+                    <label>
+                        Tên CLB
+                        <input
+                            value={form.name}
+                            onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+                            required
+                        />
+                    </label>
+                    <label>
+                        Mô tả
+                        <textarea
+                            rows="3"
+                            value={form.description}
+                            onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
+                        />
+                    </label>
+                    <label className="ph-field">
+                        <span className="ph-field__label">Huy hiệu &quot;Trắng tay&quot; trên BXH</span>
+                        <select
+                            className="ph-field__control"
+                            value={form.shameBadgesEnabled ? 'on' : 'off'}
+                            onChange={(e) => setForm((p) => ({ ...p, shameBadgesEnabled: e.target.value === 'on' }))}
+                        >
+                            <option value="on">Bật — nêu tên người chưa đóng nhiều kỳ liền</option>
+                            <option value="off">Tắt — không nêu tên ai</option>
+                        </select>
+                    </label>
+                    <div className="club-settings-logo">
+                        <span className="club-settings-logo-label">Logo CLB</span>
+                        <div className="club-settings-logo-row">
+                            {logoUrl ? (
+                                <img className="club-settings-logo-preview" src={logoUrl} alt="Logo CLB" />
+                            ) : (
+                                <span className="club-settings-logo-empty">Chưa có logo</span>
                             )}
+                            <div className="club-settings-logo-actions">
+                                <label className="club-settings-logo-pick">
+                                    Chọn ảnh
+                                    <input type="file" accept="image/*" onChange={handleLogoFile} hidden />
+                                </label>
+                                {logoUrl && (
+                                    <button
+                                        type="button"
+                                        className="club-settings-logo-remove"
+                                        onClick={() => { setLogoUrl(null); setNotice('Đã bỏ logo, bấm "Lưu thay đổi" để áp dụng.'); }}
+                                    >
+                                        Xóa logo
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" className="club-settings-save" disabled={saving}>
+                        {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
+                    </button>
+                </form>
+            </section>
+
+            <section className="set-group" id="set-code">
+                <h3>Mã CLB</h3>
+                <div className="club-settings-code">
+                    <label className="ph-field">
+                        <span className="ph-field__label">Mã CLB</span>
+                        <input className="ph-field__control" value={group.code} readOnly tabIndex={-1} />
+                    </label>
+                    {qr.qrCodeDataUrl && (
+                        <img src={qr.qrCodeDataUrl} alt={`QR tham gia ${group.code}`} />
+                    )}
+                    <p className="set-note">
+                        🔒 Mã CLB là định danh cố định. Chỉ superadmin đổi trực tiếp trong Supabase.
+                        Đổi mã sẽ nâng access_version và đăng xuất toàn bộ thành viên đang truy cập.
+                    </p>
+                </div>
+            </section>
+
+            <section className="set-group" id="set-pw-admin">
+                <h3>Mật khẩu quản trị</h3>
+                <form className="club-settings-account" onSubmit={handleChangePassword}>
+                    <p className="club-settings-account-hint">Đổi mật khẩu đăng nhập admin của bạn.</p>
+                    <label>
+                        Mật khẩu mới
+                        <input
+                            type="password"
+                            value={passwordForm.next}
+                            onChange={(e) => setPasswordForm((p) => ({ ...p, next: e.target.value }))}
+                            minLength="6"
+                            placeholder="••••••"
+                        />
+                    </label>
+                    <label>
+                        Xác nhận mật khẩu
+                        <input
+                            type="password"
+                            value={passwordForm.confirm}
+                            onChange={(e) => setPasswordForm((p) => ({ ...p, confirm: e.target.value }))}
+                            minLength="6"
+                            placeholder="••••••"
+                        />
+                    </label>
+                    <button type="submit" className="club-settings-save" disabled={changingPassword}>
+                        {changingPassword ? 'Đang đổi...' : 'Đổi mật khẩu'}
+                    </button>
+                </form>
+            </section>
+
+            <section className="set-group" id="set-pw-member">
+                <h3>Mật khẩu thành viên</h3>
+                <p>Mật khẩu dùng chung để thành viên tham gia CLB bằng mã CLB.</p>
+                <form className="club-settings-account" onSubmit={handleChangeMemberPassword}>
+                    <label>
+                        Mật khẩu mới
+                        <input
+                            type="password"
+                            value={memberPasswordForm.next}
+                            onChange={(e) => setMemberPasswordForm((p) => ({ ...p, next: e.target.value }))}
+                            minLength="4"
+                            placeholder="••••"
+                        />
+                    </label>
+                    <label>
+                        Xác nhận mật khẩu
+                        <input
+                            type="password"
+                            value={memberPasswordForm.confirm}
+                            onChange={(e) => setMemberPasswordForm((p) => ({ ...p, confirm: e.target.value }))}
+                            minLength="4"
+                            placeholder="••••"
+                        />
+                    </label>
+                    <button type="submit" className="club-settings-save" disabled={changingMemberPassword}>
+                        {changingMemberPassword ? 'Đang đổi...' : 'Đổi mật khẩu thành viên'}
+                    </button>
+                </form>
+            </section>
+
+            <section className="set-group" id="set-qr">
+                <h3>QR nhận quỹ</h3>
+                <p>Ảnh QR chuyển khoản của CLB, hiển thị ở cột phải trang Tổng quan quỹ để thành viên quét.</p>
+                <div className="set-qr-row">
+                    {fundQrUrl
+                        ? <img className="set-qr-preview" src={fundQrUrl} alt="QR nhận quỹ CLB" />
+                        : <span className="set-qr-empty">Chưa có ảnh QR</span>}
+                    <div className="set-qr-side">
+                        <label className="ph-field">
+                            <span className="ph-field__label">Ảnh QR (PNG/JPG, tối đa 200KB)</span>
+                            <input className="ph-field__control" type="file" accept="image/png,image/jpeg" onChange={handlePickFundQr} />
+                        </label>
+                        <div className="set-qr-actions">
+                            <button type="button" className="ph-btn ph-btn--primary ph-btn--sm" onClick={() => handleSaveFundQr(fundQrUrl)} disabled={!fundQrUrl}>Lưu QR</button>
+                            <button type="button" className="ph-btn ph-btn--danger ph-btn--sm" onClick={() => handleSaveFundQr(null)} disabled={!group.fund_qr_url}>Xoá QR</button>
                         </div>
                     </div>
                 </div>
-                <button type="submit" className="club-settings-save" disabled={saving}>
-                    {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
-                </button>
-            </form>
+            </section>
 
-            <div className="club-settings-code">
-                <p className="club-settings-code-label">Mã nhóm</p>
-                <strong className="club-settings-code-value">{group.code}</strong>
-                {qr.qrCodeDataUrl && (
-                    <img src={qr.qrCodeDataUrl} alt={`QR tham gia ${group.code}`} />
-                )}
-                <p className="club-settings-code-note">
-                    🔒 Mã CLB là định danh cố định, không đổi được từ giao diện. Chỉ superadmin
-                    đổi trực tiếp trong Supabase — đổi mã sẽ nâng access_version và đăng xuất
-                    toàn bộ thành viên đang truy cập.
-                </p>
-            </div>
-
-            <form className="club-settings-account" onSubmit={handleChangePassword}>
-                <p className="club-settings-account-title">Tài khoản đăng nhập</p>
-                <p className="club-settings-account-hint">Đổi mật khẩu đăng nhập admin của bạn.</p>
-                <label>
-                    Mật khẩu mới
-                    <input
-                        type="password"
-                        value={passwordForm.next}
-                        onChange={(e) => setPasswordForm((p) => ({ ...p, next: e.target.value }))}
-                        minLength="6"
-                        placeholder="••••••"
-                    />
-                </label>
-                <label>
-                    Xác nhận mật khẩu
-                    <input
-                        type="password"
-                        value={passwordForm.confirm}
-                        onChange={(e) => setPasswordForm((p) => ({ ...p, confirm: e.target.value }))}
-                        minLength="6"
-                        placeholder="••••••"
-                    />
-                </label>
-                <button type="submit" className="club-settings-save" disabled={changingPassword}>
-                    {changingPassword ? 'Đang đổi...' : 'Đổi mật khẩu'}
-                </button>
-            </form>
-
-            <div className="club-settings-sepay">
-                <p className="club-settings-bank-title">Thu quỹ tự động qua SePay</p>
-                <p className="club-settings-bank-hint">
-                    Kết nối SePay để mọi chuyển khoản vào tài khoản ngân hàng của CLB tự động được ghi nhận vào quỹ.
-                    Nếu không cấu hình SePay, trưởng nhóm cần tự tạo giao dịch thu/chi thủ công ở tab Quỹ.
-                </p>
-                <ol className="club-settings-sepay-steps">
-                    <li>
-                        Tạo tài khoản tại{' '}
-                        <a href="https://my.sepay.vn" target="_blank" rel="noreferrer">SePay</a>{' '}
-                        và liên kết tài khoản ngân hàng của CLB.
-                    </li>
-                    <li>
-                        Trong SePay: vào <strong>Webhooks → Thêm webhook</strong>, dán URL bên dưới,
-                        nếu muốn bảo mật thì chọn <strong>HMAC-SHA256</strong> và nhập cùng secret với
-                        <strong> Secret webhook riêng của CLB</strong> ở bên dưới. Nếu chọn không bảo mật,
-                        hãy để trống secret trong app.
-                    </li>
-                    <li>
-                        Chọn loại giao dịch và tài khoản là <em>Tất cả</em>, bấm <strong>Gửi thử</strong> để kiểm tra.
-                    </li>
-                    <li>Khai đúng số tài khoản ngân hàng đó vào mục &quot;Tài khoản ngân hàng&quot; bên dưới.</li>
-                </ol>
-                <div className="club-settings-sepay-url">
-                    <code>{webhookUrl}</code>
-                    <button type="button" onClick={copyWebhookUrl}>Sao chép</button>
+            <section className="set-group" id="set-sepay">
+                <div className="club-settings-sepay">
+                    <p className="club-settings-bank-title">Thu quỹ tự động qua SePay</p>
+                    <p className="club-settings-bank-hint">
+                        Kết nối SePay để mọi chuyển khoản vào tài khoản ngân hàng của CLB tự động được ghi nhận vào quỹ.
+                        Nếu không cấu hình SePay, trưởng nhóm cần tự tạo giao dịch thu/chi thủ công ở tab Quỹ.
+                    </p>
+                    <ol className="club-settings-sepay-steps">
+                        <li>
+                            Tạo tài khoản tại{' '}
+                            <a href="https://my.sepay.vn" target="_blank" rel="noreferrer">SePay</a>{' '}
+                            và liên kết tài khoản ngân hàng của CLB.
+                        </li>
+                        <li>
+                            Trong SePay: vào <strong>Webhooks → Thêm webhook</strong>, dán URL bên dưới,
+                            nếu muốn bảo mật thì chọn <strong>HMAC-SHA256</strong> và nhập cùng secret với
+                            <strong> Secret webhook riêng của CLB</strong> ở bên dưới. Nếu chọn không bảo mật,
+                            hãy để trống secret trong app.
+                        </li>
+                        <li>
+                            Chọn loại giao dịch và tài khoản là <em>Tất cả</em>, bấm <strong>Gửi thử</strong> để kiểm tra.
+                        </li>
+                        <li>Khai đúng số tài khoản ngân hàng đó vào mục &quot;Tài khoản ngân hàng&quot; bên dưới.</li>
+                    </ol>
+                    <div className="club-settings-sepay-url">
+                        <code>{webhookUrl}</code>
+                        <button type="button" onClick={copyWebhookUrl}>Sao chép</button>
+                    </div>
+                    <a
+                        className="club-settings-sepay-doc"
+                        href="https://developer.sepay.vn/vi/sepay-webhooks/bat-dau-nhanh"
+                        target="_blank"
+                        rel="noreferrer"
+                    >
+                        Xem hướng dẫn chi tiết của SePay ↗
+                    </a>
+                    <form className="club-settings-bank-form" onSubmit={handleSaveSepaySecret}>
+                        <input
+                            value={sepayForm.sepayWebhookSecret}
+                            onChange={(e) => setSepayForm({ sepayWebhookSecret: e.target.value })}
+                            placeholder={group.hasSepayWebhookSecret ? 'Đã có secret, nhập secret mới nếu muốn đổi' : 'Secret webhook riêng của CLB (tùy chọn)'}
+                        />
+                        <button type="submit" disabled={saving}>Lưu secret</button>
+                        {group.hasSepayWebhookSecret && (
+                            <button type="button" onClick={handleClearSepaySecret} disabled={saving}>
+                                Tắt bảo mật
+                            </button>
+                        )}
+                    </form>
                 </div>
-                <a
-                    className="club-settings-sepay-doc"
-                    href="https://developer.sepay.vn/vi/sepay-webhooks/bat-dau-nhanh"
-                    target="_blank"
-                    rel="noreferrer"
-                >
-                    Xem hướng dẫn chi tiết của SePay ↗
-                </a>
-                <form className="club-settings-bank-form" onSubmit={handleSaveSepaySecret}>
-                    <input
-                        value={sepayForm.sepayWebhookSecret}
-                        onChange={(e) => setSepayForm({ sepayWebhookSecret: e.target.value })}
-                        placeholder={group.hasSepayWebhookSecret ? 'Đã có secret, nhập secret mới nếu muốn đổi' : 'Secret webhook riêng của CLB (tùy chọn)'}
-                    />
-                    <button type="submit" disabled={saving}>Lưu secret</button>
-                    {group.hasSepayWebhookSecret && (
-                        <button type="button" onClick={handleClearSepaySecret} disabled={saving}>
-                            Tắt bảo mật
-                        </button>
-                    )}
-                </form>
-            </div>
+            </section>
 
-            <div className="club-settings-bank">
-                <p className="club-settings-bank-title">Tài khoản ngân hàng (thu quỹ tự động)</p>
-                <p className="club-settings-bank-hint">
-                    Khai số tài khoản nhận tiền của CLB. Chuyển khoản vào tài khoản này sẽ tự động ghi nhận vào quỹ CLB.
-                </p>
-                {bankAccounts.length > 0 ? (
-                    <ul className="club-settings-bank-list">
-                        {bankAccounts.map((a) => (
-                            <li key={a.id}>
-                                <span className="bank-acc-number">{a.account_number}</span>
-                                {a.bank_name && <span className="bank-acc-name">{a.bank_name}</span>}
-                                <button type="button" className="bank-acc-del" onClick={() => handleDeleteBank(a.id)}>
-                                    Xóa
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <p className="club-settings-bank-empty">Chưa có tài khoản nào, thu quỹ tự động đang tắt.</p>
-                )}
-                <form className="club-settings-bank-form" onSubmit={handleAddBank}>
-                    <input
-                        value={bankForm.accountNumber}
-                        onChange={(e) => setBankForm((p) => ({ ...p, accountNumber: e.target.value }))}
-                        placeholder="Số tài khoản"
-                    />
-                    <input
-                        value={bankForm.bankName}
-                        onChange={(e) => setBankForm((p) => ({ ...p, bankName: e.target.value }))}
-                        placeholder="Tên ngân hàng (tùy chọn)"
-                    />
-                    <button type="submit">Thêm</button>
-                </form>
-            </div>
+            <section className="set-group" id="set-bank">
+                <div className="club-settings-bank">
+                    <p className="club-settings-bank-title">Tài khoản ngân hàng (thu quỹ tự động)</p>
+                    <p className="club-settings-bank-hint">
+                        Khai số tài khoản nhận tiền của CLB. Chuyển khoản vào tài khoản này sẽ tự động ghi nhận vào quỹ CLB.
+                    </p>
+                    <p className="set-note set-note--warn">
+                        ⚠ Đây không phải thông tin hiển thị. Webhook SePay tra đúng số tài khoản này
+                        để biết tiền vào thuộc CLB nào — xoá hoặc nhập sai thì mọi giao dịch chuyển khoản
+                        sẽ bị từ chối và quỹ ngừng cập nhật tự động.
+                    </p>
+                    {bankAccounts.length > 0 ? (
+                        <ul className="club-settings-bank-list">
+                            {bankAccounts.map((a) => (
+                                <li key={a.id}>
+                                    <span className="bank-acc-number">{a.account_number}</span>
+                                    {a.bank_name && <span className="bank-acc-name">{a.bank_name}</span>}
+                                    <button type="button" className="bank-acc-del" onClick={() => handleDeleteBank(a.id)}>
+                                        Xóa
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p className="club-settings-bank-empty">Chưa có tài khoản nào, thu quỹ tự động đang tắt.</p>
+                    )}
+                    <form className="club-settings-bank-form" onSubmit={handleAddBank}>
+                        <input
+                            value={bankForm.accountNumber}
+                            onChange={(e) => setBankForm((p) => ({ ...p, accountNumber: e.target.value }))}
+                            placeholder="Số tài khoản"
+                        />
+                        <button type="submit">Thêm</button>
+                    </form>
+                </div>
+            </section>
+
+            <div className="set-spacer" aria-hidden="true" />
         </div>
     );
 }

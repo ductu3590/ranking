@@ -127,7 +127,6 @@ export default function HomePage() {
     const stats = {
         totalIn: transactions.filter(t => t.huong_giao_dich === 'in').reduce((s, t) => s + (t.so_tien || 0), 0),
         totalOut: transactions.filter(t => t.huong_giao_dich === 'out').reduce((s, t) => s + Math.abs(t.so_tien || 0), 0),
-        totalPenalty: transactions.filter(t => t.loai_giao_dich === 'nop_phat').reduce((s, t) => s + Math.abs(t.so_tien || 0), 0),
     };
     stats.balance = stats.totalIn - stats.totalOut;
 
@@ -362,13 +361,6 @@ export default function HomePage() {
                         <div className="stat-info">
                             <div className="stat-label">Tổng chi</div>
                             <div className="stat-value negative">{txError ? '—' : formatMoney(stats.totalOut)}</div>
-                        </div>
-                    </div>
-                    <div className="stat-card">
-                        <div className="stat-icon">⚠️</div>
-                        <div className="stat-info">
-                            <div className="stat-label">Quỹ phạt</div>
-                            <div className="stat-value">{txError ? '—' : formatMoney(stats.totalPenalty)}</div>
                         </div>
                     </div>
                 </div>

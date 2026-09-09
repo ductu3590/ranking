@@ -260,9 +260,16 @@ Chỉ đọc, không sửa, không xoá.
 
 ## 10. Giao diện — token
 
-Bản sắc: **tím `#6F48C9` + mực `#28243D` + gold `#FFC95E` + coral `#FF8B83` + cyan** (`docs/pickhub-core/UI-BRAND-SYSTEM.md`), đổ lên nền đen ám tím `#0A0812`. Thống nhất với spec `tournament-open-registration` (*"tông tối/tím ở mặt công khai lẫn console"*). Bộ xanh sân trong `app/globals.css` là hệ màu cũ chưa thay — spec này **không** đụng vào nó, chỉ định nghĩa bộ token tối cục bộ cho console.
+**Nguồn chuẩn là `ADR-006` (`accepted`, 2026-09-07) và spec `2026-09-08-pickhub-design-system-va-bxh-design` (`approved`)**, không phải `app/globals.css`. Hai quyết định ràng buộc spec này:
+
+1. **Font là `Montserrat`**, không phải `Outfit`. ADR-006 gỡ hẳn `Outfit` khỏi sản phẩm. *(Mockup đã duyệt dựng bằng Outfit — khi thi công phải đổi sang Montserrat; đây là sai sót của mockup, không phải quyết định thiết kế.)*
+2. **Chỉ dùng token `--ph-*`.** Các token `--court-green`, `--pickle-lime`, `--surface-court`, `--live-cyan`, `--rally-coral` đang có trong `globals.css` **bị khai tử** — đi qua `app/styles/legacy-aliases.css`. Spec này **không được khai token màu mới**; bộ tối là các biến `--ph-*-dark-*` bổ sung vào `app/styles/tokens.css`.
+
+Bảng màu: tím `--ph-indigo #6F48C9`, mực `--ph-ink #28243D`, `--ph-gold #FFC95E`, `--ph-coral #FF8B83`, `--ph-cyan #A8DFE9`, trên nền đen ám tím. Thống nhất với spec `tournament-open-registration` (*"tông tối/tím ở mặt công khai lẫn console"*).
 
 Vai màu ngữ nghĩa tách khỏi màu thương hiệu: tím = hành động chính và trạng thái đang chọn; cyan = đang chạy tốt; gold = đang đếm ngược; coral = cần chú ý.
+
+> **Cảnh báo tương phản.** Spec design system dòng 166–169 xác định `--ph-cyan` và `--ph-coral` **chỉ dùng làm nền/accent, không dùng cho chữ** — trên nền trắng chúng chỉ đạt ~1.3:1 và ~2.5:1. Bàn điều hành dùng chúng làm **chữ trên nền đen**, là phép đo khác hẳn. Plan phải có bước **đo lại tương phản của mọi cặp màu/nền trong theme tối** và chỉnh sắc độ cho đạt AA 4.5:1 trước khi chốt token — không được suy ra từ con số đo trên nền sáng.
 
 > **Ngoại lệ phải ghi vào brand system.** `UI-BRAND-SYSTEM.md` dòng 34 viết *"Không dùng nền đen hoặc navy đặc trong các màn hình vận hành"*. Bàn điều hành cố ý phá lệ: màn hình đứng lâu trong nhà thi đấu, cần tương phản cao và đọc được từ xa. Plan phải có một bước **sửa `UI-BRAND-SYSTEM.md`** để ghi nhận ngoại lệ này kèm lý do — không im lặng làm trái tài liệu.
 

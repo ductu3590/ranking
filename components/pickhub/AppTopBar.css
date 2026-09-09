@@ -1,0 +1,28 @@
+.ph-topbar { display: none; }
+
+@media (min-width: 1120px) {
+  .ph-topbar {
+    position: sticky; top: 0; z-index: 40;
+    display: flex; align-items: center; height: 64px; padding: 0 28px;
+    background: var(--ph-card);
+    border-bottom: 1px solid var(--ph-line);
+  }
+  .ph-topbar__inner {
+    display: flex; align-items: center; gap: 14px;
+    width: 100%; max-width: 1280px; margin: 0 auto;
+  }
+}
+
+.ph-crumb { display: flex; align-items: center; gap: 8px; min-width: 0; font-size: 12px; font-weight: 700; color: var(--ph-muted); }
+.ph-crumb__sep { color: var(--ph-line); }
+.ph-crumb__cur { color: var(--ph-text); }
+
+.ph-clubchip {
+  margin-left: auto;
+  display: flex; align-items: center; gap: 7px;
+  padding: 6px 12px; border-radius: 999px;
+  background: var(--ph-tint-positive); color: var(--ph-positive);
+  font-size: 12px; font-weight: 700;
+}
+.ph-clubchip i { display: block; width: 7px; height: 7px; border-radius: 999px; background: currentColor; }
+.ph-clubchip code { padding: 1px 6px; border-radius: 5px; background: var(--ph-tint-neutral); font-family: inherit; font-size: 11px; font-weight: 800; }

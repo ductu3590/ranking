@@ -90,7 +90,7 @@ assert.match(rosterPage, /Từ khoá nhận diện chuyển khoản/, 'bank keyw
 assert.match(rosterPage, /RoleActionBar/, 'admin roster actions use server-provided permissions');
 
 const infoPage = read('app/thong-tin/page.js');
-assert.match(infoPage, /MemberInfoPanel/);
+assert.match(infoPage, /MemberProfileView/);
 assert.match(infoPage, /\/api\/identity\/assessments/);
 assert.match(infoPage, /shared|dùng chung/i, 'member info must explain shared-session privacy');
 

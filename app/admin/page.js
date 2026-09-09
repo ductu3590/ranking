@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import AppShell from '@/components/pickhub/AppShell';
 import FundAdminPage from '@/app/quy/admin/page';
 import ClubSettings from '@/app/admin/ClubSettings';
-import MembersPage from '@/app/quy/members/page';
+import MembersPage from '@/app/thanh-vien/page';
 import './admin-center.css';
 
 export default function UnifiedAdminCenter() {

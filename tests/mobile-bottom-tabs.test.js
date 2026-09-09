@@ -13,7 +13,7 @@ const quyLayoutJs = read('app/quy/layout.js');
 const giaiDauLayoutJs = read('app/giai-dau/layout.js');
 const giaiDauPageJs = read('app/giai-dau/page.js');
 const quyPageJs = read('app/quy/page.js');
-const quyMembersPageJs = read('app/quy/members/page.js');
+const quyMembersPageJs = read('app/thanh-vien/page.js');
 const globalsCss = read('app/globals.css');
 
 assert(

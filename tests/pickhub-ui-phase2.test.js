@@ -29,8 +29,8 @@ assert.deepEqual(
   navigation.getGlobalNavLinksForRole('member').map(({ href, label }) => ({ href, label })),
   [
     { href: '/quy', label: 'Quỹ' },
-    { href: '/quy/members', label: 'Thành viên' },
-    { href: '/quy/bxh', label: 'BXH' },
+    { href: '/thanh-vien', label: 'Thành viên' },
+    { href: '/bxh', label: 'BXH' },
     { href: '/giai-dau', label: 'Giải' },
     { href: '/thong-tin', label: 'Thông tin' },
   ],
@@ -40,8 +40,8 @@ assert.deepEqual(
   navigation.getGlobalNavLinksForRole('admin').map(({ href, label }) => ({ href, label })),
   [
     { href: '/quy', label: 'Quỹ' },
-    { href: '/quy/members', label: 'Thành viên' },
-    { href: '/quy/bxh', label: 'BXH' },
+    { href: '/thanh-vien', label: 'Thành viên' },
+    { href: '/bxh', label: 'BXH' },
     { href: '/giai-dau', label: 'Giải' },
     { href: '/admin', label: 'Cấu hình' },
   ],
@@ -77,7 +77,7 @@ for (const file of [
   assert.doesNotMatch(read(file), /getCurrentGroupClient/, `${file} must not infer role from localStorage`);
 }
 
-const rosterPage = read('app/quy/members/page.js');
+const rosterPage = read('app/thanh-vien/page.js');
 assert.match(rosterPage, /\/api\/identity\/roster/, 'roster UI consumes the athlete/membership projection');
 for (const field of ['displayName', 'alias', 'status', 'effectiveFrom']) {
   assert.match(rosterPage, new RegExp(field), `roster UI renders ${field}`);

@@ -28,10 +28,16 @@ const nextConfig = {
                 destination: '/admin?section=tournament',
                 permanent: true,
             },
-            // Members
+            // Thanh vien: /members va /quy/members deu tro thang toi /thanh-vien.
+            // Khong de /members -> /quy/members -> /thanh-vien (hai chang).
             {
                 source: '/members',
-                destination: '/quy/members',
+                destination: '/thanh-vien',
+                permanent: true,
+            },
+            {
+                source: '/quy/members',
+                destination: '/thanh-vien',
                 permanent: true,
             },
         ];

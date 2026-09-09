@@ -246,7 +246,7 @@ export default function MembersPage({ embedded = false }) {
                     </div>
                     <RoleActionBar permissions={sessionView.permissions} actions={[
                         { id: 'add-athlete', label: '+ Thêm VĐV', permission: 'canManageRoster', onClick: () => setShowCreate(true) },
-                        { id: 'settings', label: 'Cấu hình CLB', permission: 'canManageSettings', href: '/admin?section=settings' },
+                        { id: 'settings', label: 'Cấu hình CLB', permission: 'canManageSettings', href: '/admin' },
                     ]} />
                 </header>
 

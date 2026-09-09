@@ -83,14 +83,14 @@ assert(
     'app/quy/page.js should read and write club data through the server APIs.'
 );
 
-const membersPage = read('app/quy/members/page.js');
+const membersPage = read('app/thanh-vien/page.js');
 assert(
     !membersPage.includes('@/lib/supabaseClient') && !membersPage.includes('.from('),
-    'app/quy/members/page.js should not query Supabase directly.'
+    'app/thanh-vien/page.js should not query Supabase directly.'
 );
 assert(
     membersPage.includes('/api/identity/roster'),
-    'app/quy/members/page.js should read athlete/membership roster through the Phase 2 server API.'
+    'app/thanh-vien/page.js should read athlete/membership roster through the Phase 2 server API.'
 );
 
 const rls = read('database/migrations/009_enable_rls.sql');

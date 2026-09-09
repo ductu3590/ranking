@@ -262,9 +262,18 @@ theo mục đang xem.
 
 ### 10.2 Tách mật khẩu quản trị và mật khẩu thành viên
 
-`PATCH /api/club/settings` **đã nhận sẵn cả `adminPassword` và `memberPassword`**
-([route.js:57–67](../../../app/api/club/settings/route.js)), chỉ là `ClubSettings.js`
-chưa bao giờ gửi `memberPassword`. **Đây là việc thuần UI, không đụng backend.**
+`PATCH /api/club/settings` nhận sẵn cả `adminPassword` và `memberPassword`
+([route.js:57–67](../../../app/api/club/settings/route.js)).
+
+Hiện trạng **không cân xứng**, đó mới là vấn đề cần sửa:
+
+- **Mật khẩu quản trị** có form riêng `handleChangePassword`, có ô nhập lại, kiểm ≥6 ký tự.
+- **Mật khẩu thành viên** chỉ là một ô lẻ nằm lẫn trong form "Lưu thay đổi" chung
+  cùng tên CLB, mô tả, logo và huy hiệu BXH — **không có ô xác nhận**, gõ nhầm là
+  cả CLB mất quyền vào mà không ai biết.
+
+Việc cần làm: tách mật khẩu thành viên ra mục riêng, có ô nhập lại và nút riêng, ngang
+hàng với mật khẩu quản trị. **Đây là việc thuần UI, không đụng backend.**
 
 Mỗi mục có ô nhập + ô nhập lại + nút riêng. Mục quản trị cảnh báo rõ: đổi xong sẽ
 đăng xuất mọi phiên admin kể cả phiên đang mở (do `access_version` bị nâng).
@@ -290,7 +299,7 @@ Upload ảnh PNG/JPG ≤200KB. Nén phía client theo đúng pattern của logo 
 mất dữ liệu bị rỗ cạnh, máy quét đọc lỗi.
 
 **Cần migration:** thêm cột `groups.fund_qr_url TEXT` (cùng kiểu `logo_url`).
-Migration tiếp theo là `042_`. Nhớ chạy `npm run migration:ledger`.
+Migration tiếp theo là `044_` (cao nhất hiện tại là `043_club_notifications_and_bxh_flag.sql`). Nhớ chạy `npm run migration:ledger`.
 
 **Ghi (admin):** `PATCH /api/club/settings` nhận thêm `fundQrUrl` — chuỗi dataURL,
 hoặc `null` để xoá. `GET` của route đó trả thêm trường này cho trang cấu hình.
@@ -328,7 +337,7 @@ Cột `bank_name` và `label` trong bảng giữ nguyên (nullable), chỉ bỏ 
 
 | Việc | File |
 |---|---|
-| Thêm cột `groups.fund_qr_url` | `database/migrations/042_*.sql` (mới) |
+| Thêm cột `groups.fund_qr_url` | `database/migrations/044_*.sql` (mới) |
 | Nhận/trả `fundQrUrl` (admin) | `app/api/club/settings/route.js` |
 | Route đọc QR cho member | `app/api/club/fund-qr/route.js` (mới, xem 10.4) |
 | **Xoá** endpoint tạo lại mã | `app/api/club/settings/regenerate-code/route.js` |

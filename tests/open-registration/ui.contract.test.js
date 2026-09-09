@@ -43,7 +43,12 @@ for (const a of ['admit', 'remove', 'restore']) assert(tabs.includes(a), 'nút h
 // G1: wired vào console
 const con = read('app/giai-dau/v2/console/TournamentConsoleV2.js');
 assert(con.includes('OpenRegTab'), 'console render OpenRegTab');
-assert(con.includes('openreg'), 'có tab key openreg');
+// Console đã đổi từ 7 tab ngang sang shell theo lộ trình 8 bước. OpenRegTab giờ
+// nằm trong bước "VĐV & cặp đấu"; khoá tab cũ `openreg` được ánh xạ sang đúng
+// bước đó nên link đã chia sẻ không vỡ.
+assert(/step === 'athletes'/.test(con), 'OpenRegTab nằm trong bước VĐV & cặp đấu');
+const shell = read('app/giai-dau/v2/console/ConsoleShell.js');
+assert(/openreg:\s*'athletes'/.test(shell), 'link cũ ?tab=openreg vẫn mở đúng bước');
 assert(con.includes("organizer_mode") && con.includes("community"), 'chỉ hiện với giải community');
 
 console.log('open-registration ui contract: OK');

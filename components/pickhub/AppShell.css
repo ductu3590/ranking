@@ -1,5 +1,6 @@
 .ph-shell { min-height: 100vh; background: var(--ph-surface); }
 .ph-shell__body { display: block; }
+.ph-shell__col { display: flex; flex-direction: column; min-width: 0; }
 
 .ph-rail { display: none; }
 
@@ -39,13 +40,17 @@
 .ph-usercard__dot { width: 8px; height: 8px; flex: 0 0 8px; border-radius: 999px; background: var(--ph-positive); }
 .ph-usercard__bell { flex: 0 0 auto; }
 
-.ph-shell__main { width: min(1160px, 100%); margin: 0 auto; padding: 24px 16px 48px; }
+.ph-shell__main { width: min(1280px, 100%); margin: 0 auto; padding: 24px 16px 48px; }
 
 @media (min-width: 768px) {
   .ph-shell__main { padding: 32px 24px 56px; }
 }
 
 @media (min-width: 1120px) {
-  .ph-shell__body { display: grid; grid-template-columns: var(--ph-rail-width) minmax(0, 1fr); }
-  .ph-shell__main { padding: 40px 40px 64px; }
+  .ph-shell__body { display: grid; grid-template-columns: 256px minmax(0, 1fr); align-items: start; }
+  .ph-shell__main { padding: 28px; }
+  /* Tu 1120px tro len: sidebar + top bar thay cho header va bottom nav */
+  .ph-shell .home-header { display: none; }
+  .ph-shell .mobile-bottom-nav { display: none; }
+  .ph-shell__headerbell { display: none; }
 }

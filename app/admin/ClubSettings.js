@@ -77,23 +77,6 @@ export default function ClubSettings() {
         setSaving(false);
     }
 
-    async function handleRegenerate() {
-        if (!confirm('Tạo lại mã nhóm? Mã và mã QR cũ sẽ NGỪNG hoạt động. Bạn cần gửi mã mới cho thành viên.')) return;
-        setSaving(true);
-        setError('');
-        setNotice('');
-        const res = await fetch('/api/club/settings/regenerate-code', { method: 'POST' });
-        const data = await res.json();
-        if (res.ok) {
-            setGroup((prev) => ({ ...prev, code: data.code }));
-            setQr({ joinUrl: data.joinUrl, qrCodeDataUrl: data.qrCodeDataUrl });
-            setNotice('Đã tạo mã mới. Hãy gửi lại cho thành viên.');
-        } else {
-            setError(data.error || 'Không tạo lại được mã.');
-        }
-        setSaving(false);
-    }
-
     async function loadBankAccounts() {
         const res = await fetch('/api/club/bank-accounts');
         const data = await res.json();
@@ -329,9 +312,11 @@ export default function ClubSettings() {
                 {qr.qrCodeDataUrl && (
                     <img src={qr.qrCodeDataUrl} alt={`QR tham gia ${group.code}`} />
                 )}
-                <button type="button" className="club-settings-regen" onClick={handleRegenerate} disabled={saving}>
-                    Tạo lại mã
-                </button>
+                <p className="club-settings-code-note">
+                    🔒 Mã CLB là định danh cố định, không đổi được từ giao diện. Chỉ superadmin
+                    đổi trực tiếp trong Supabase — đổi mã sẽ nâng access_version và đăng xuất
+                    toàn bộ thành viên đang truy cập.
+                </p>
             </div>
 
             <form className="club-settings-account" onSubmit={handleChangePassword}>

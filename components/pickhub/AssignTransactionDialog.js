@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import PhModal from './PhModal';
 
-export default function AssignTransactionDialog({ open, notification, onClose, onAssigned }) {
+export default function AssignTransactionDialog({ open, transaction, onClose, onAssigned }) {
     const [members, setMembers] = useState([]);
     const [query, setQuery] = useState('');
     const [saving, setSaving] = useState(false);
@@ -23,23 +23,22 @@ export default function AssignTransactionDialog({ open, notification, onClose, o
         const response = await fetch('/api/club/transactions', {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ids: [notification.subject_id], updates: { nguoi_nop: member.full_name } }),
+            body: JSON.stringify({ ids: [transaction.id], updates: { nguoi_nop: member.full_name } }),
         });
         setSaving(false);
         if (!response.ok) { setError('Không gán được, thử lại.'); return; }
-        onAssigned(notification);
+        onAssigned(transaction);
     }
 
-    if (!notification) return null;
-    const payload = notification.payload || {};
+    if (!transaction) return null;
     const filtered = members.filter((member) => member.full_name.toLowerCase().includes(query.toLowerCase()));
 
     return (
         <PhModal open={open} title="Gán giao dịch cho thành viên" onClose={onClose}>
             <div className="ph-card ph-card--flat">
-                <p><strong>{Number(payload.so_tien || 0).toLocaleString('vi-VN')}đ</strong></p>
-                <p>{payload.noi_dung_goc || '(không có nội dung)'}</p>
-                <p>{payload.created_at ? new Date(payload.created_at).toLocaleDateString('vi-VN') : ''} · {payload.ma_giao_dich}</p>
+                <p><strong>{Number(transaction.so_tien || 0).toLocaleString('vi-VN')}đ</strong></p>
+                <p>{transaction.noi_dung_goc || '(không có nội dung)'}</p>
+                <p>{transaction.created_at ? new Date(transaction.created_at).toLocaleDateString('vi-VN') : ''} · {transaction.ma_giao_dich}</p>
             </div>
             <label className="ph-field">
                 <span className="ph-field__label">Tìm thành viên</span>

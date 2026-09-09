@@ -35,6 +35,48 @@
     color: var(--text-primary);
 }
 
+.v2-toolbar {
+    margin: 0 0 16px;
+}
+
+.v2-search {
+    width: 100%;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    padding: 12px 14px;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+}
+
+.v2-list-groups {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.v2-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.v2-group-title {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+.v2-card-progress {
+    margin: 4px 0 0;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--primary);
+    font-variant-numeric: tabular-nums;
+}
+
 /* --- Nút --- */
 .v2-btn-primary {
     background: var(--gradient-court-green);

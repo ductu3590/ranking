@@ -3,20 +3,18 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { listTournaments, updateTournament, deleteTournament } from '@/lib/tournamentV2Client';
+import { STATUS_LABELS, groupOf, sortForGroup } from '@/lib/tournament/lifecycle';
 import TournamentConsoleV2 from './console/TournamentConsoleV2';
 import TournamentWizard from './TournamentWizard';
 import './v2.css';
 
-const STATUS_LABELS = {
-    draft: 'Nháp',
-    active: 'Đang diễn ra',
-    completed: 'Hoàn thành',
-};
-
 const STATUS_OPTIONS = [
-    { value: 'draft', label: 'Nháp' },
-    { value: 'active', label: 'Đang diễn ra' },
-    { value: 'completed', label: 'Hoàn thành' },
+    { value: 'draft', label: STATUS_LABELS.draft },
+    { value: 'registration_open', label: STATUS_LABELS.registration_open },
+    { value: 'registration_closed', label: STATUS_LABELS.registration_closed },
+    { value: 'scheduled', label: STATUS_LABELS.scheduled },
+    { value: 'live', label: STATUS_LABELS.live },
+    { value: 'completed', label: STATUS_LABELS.completed },
 ];
 
 const ENTRANT_TYPE_LABELS = {
@@ -126,6 +124,7 @@ function TournamentV2PageInner() {
     const [editing, setEditing] = useState(null);      // tournament object
     const [deletingId, setDeletingId] = useState(null); // id to delete
     const [deleteBusy, setDeleteBusy] = useState(false);
+    const [search, setSearch] = useState('');
 
     async function load() {
         setLoading(true);
@@ -224,6 +223,22 @@ function TournamentV2PageInner() {
 
     /* --- Danh sách giải --- */
     const deletingTournament = deletingId ? tournaments.find(t => t.id === deletingId) : null;
+    const visibleTournaments = tournaments.filter((t) => {
+        const q = search.trim().toLowerCase();
+        if (!q) return true;
+        return (t.name || '').toLowerCase().includes(q) || (t.location || '').toLowerCase().includes(q);
+    });
+    const groups = [
+        { key: 'running', title: 'Đang diễn ra' },
+        { key: 'upcoming', title: 'Sắp tổ chức' },
+        { key: 'finished', title: 'Đã kết thúc' },
+    ].map((section) => ({
+        ...section,
+        items: sortForGroup(
+            visibleTournaments.filter((t) => groupOf(t.status || 'draft') === section.key),
+            section.key,
+        ),
+    })).filter((section) => section.items.length > 0);
 
     return (
         <div className="v2-page">
@@ -266,6 +281,16 @@ function TournamentV2PageInner() {
                 )}
             </header>
 
+            <div className="v2-toolbar">
+                <input
+                    className="v2-search"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Tìm giải theo tên hoặc địa điểm"
+                    aria-label="Tìm giải"
+                />
+            </div>
+
             {loading ? (
                 <div className="v2-state v2-loading">
                     <span className="v2-spinner" aria-hidden="true" />
@@ -278,7 +303,7 @@ function TournamentV2PageInner() {
                         Thử lại
                     </button>
                 </div>
-            ) : tournaments.length === 0 ? (
+            ) : groups.length === 0 ? (
                 <div className="v2-state v2-empty">
                     <p>Chưa có giải đấu nào.</p>
                     {isAdmin && (
@@ -288,48 +313,60 @@ function TournamentV2PageInner() {
                     )}
                 </div>
             ) : (
-                <ul className="v2-card-list">
-                    {tournaments.map((t) => (
-                        <li key={t.id} className="v2-card-wrap">
-                            <button
-                                type="button"
-                                className="v2-card"
-                                onClick={() => openTournament(t.id)}
-                            >
-                                <div className="v2-card-top">
-                                    <span className={`v2-chip v2-chip-${t.status || 'draft'}`}>
-                                        {STATUS_LABELS[t.status] || 'Nháp'}
-                                    </span>
-                                    <span className="v2-card-date">{formatDate(t.event_date)}</span>
-                                </div>
-                                <h2 className="v2-card-name">{t.name}</h2>
-                                <p className="v2-card-meta">
-                                    {ENTRANT_TYPE_LABELS[t.entrant_type] || 'Cặp đôi'}
-                                    {t.location ? ` · ${t.location}` : ''}
-                                </p>
-                                <span className="v2-card-chevron" aria-hidden="true">›</span>
-                            </button>
-                            {isAdmin && (
-                                <div className="v2-card-actions">
-                                    <button
-                                        type="button"
-                                        className="v2-card-action-btn"
-                                        onClick={() => setEditing(t)}
-                                    >
-                                        ✏️ Sửa
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className="v2-card-action-btn v2-card-action-delete"
-                                        onClick={() => setDeletingId(t.id)}
-                                    >
-                                        🗑 Xoá
-                                    </button>
-                                </div>
-                            )}
-                        </li>
+                <div className="v2-list-groups">
+                    {groups.map((section) => (
+                        <section key={section.key} className="v2-group">
+                            <h2 className="v2-group-title">{section.title}</h2>
+                            <ul className="v2-card-list">
+                                {section.items.map((t) => (
+                                    <li key={t.id} className="v2-card-wrap">
+                                        <button
+                                            type="button"
+                                            className="v2-card"
+                                            onClick={() => openTournament(t.id)}
+                                        >
+                                            <div className="v2-card-top">
+                                                <span className={`v2-chip v2-chip-${t.status || 'draft'}`}>
+                                                    {STATUS_LABELS[t.status] || 'Nháp'}
+                                                </span>
+                                                <span className="v2-card-date">{formatDate(t.event_date)}</span>
+                                            </div>
+                                            <h2 className="v2-card-name">{t.name}</h2>
+                                            <p className="v2-card-meta">
+                                                {ENTRANT_TYPE_LABELS[t.entrant_type] || 'Cặp đôi'}
+                                                {t.location ? ` · ${t.location}` : ''}
+                                            </p>
+                                            {t.match_progress?.total > 0 ? (
+                                                <p className="v2-card-progress">
+                                                    {t.match_progress.finalized}/{t.match_progress.total} trận · {Math.round((t.match_progress.finalized / t.match_progress.total) * 100)}%
+                                                </p>
+                                            ) : null}
+                                            <span className="v2-card-chevron" aria-hidden="true">›</span>
+                                        </button>
+                                        {isAdmin && (
+                                            <div className="v2-card-actions">
+                                                <button
+                                                    type="button"
+                                                    className="v2-card-action-btn"
+                                                    onClick={() => setEditing(t)}
+                                                >
+                                                    ✏️ Sửa
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className="v2-card-action-btn v2-card-action-delete"
+                                                    onClick={() => setDeletingId(t.id)}
+                                                >
+                                                    🗑 Xoá
+                                                </button>
+                                            </div>
+                                        )}
+                                    </li>
+                                ))}
+                            </ul>
+                        </section>
                     ))}
-                </ul>
+                </div>
             )}
         </div>
     );

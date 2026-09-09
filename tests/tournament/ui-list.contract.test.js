@@ -13,4 +13,10 @@ assert(s.includes("sessionView?.session?.role === 'admin'"), 'hiển thị thao 
 assert(!s.includes('getCurrentGroupClient'), 'không lấy quyền admin từ localStorage');
 assert(/Tạo|Thêm/.test(s), 'có nút tạo (tiếng Việt)');
 assert(exists('app/giai-dau/v2/v2.css'), 'css kèm');
+assert(/Đang diễn ra/.test(s) && /Sắp tổ chức/.test(s) && /Đã kết thúc/.test(s), 'ba nhóm vòng đời');
+assert(/sortForGroup|groupOf/.test(s) && /tournament\/lifecycle/.test(s), 'nhóm bằng lifecycle');
+assert(/placeholder="Tìm/.test(s), 'có ô tìm');
+assert(/STATUS_LABELS/.test(s), 'nhãn trạng thái lấy từ lifecycle');
+assert(!/active:\s*'Đang diễn ra'/.test(s), 'không còn active');
+assert(/match_progress/.test(s), 'hiện tiến độ trận');
 console.log('ui-list contract ok');

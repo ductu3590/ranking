@@ -33,12 +33,23 @@ assert(
     'ClubSettings should load settings and support rename, member-password change, and code regeneration.'
 );
 
+// /admin khong con la trung tam co tab. Hai section cu da duoc go:
+// roster -> /thanh-vien, fund -> /quy. Trang gio render thang ClubSettings.
 const adminCenter = read('app/admin/page.js');
 assert(
     adminCenter.includes('ClubSettings') &&
-    adminCenter.includes("section === 'settings'") &&
-    adminCenter.includes('Cài đặt'),
-    'Admin center should render a Cài đặt (settings) section using ClubSettings.'
+    adminCenter.includes('Cấu hình CLB'),
+    'Admin page should render ClubSettings directly under the Cau hinh CLB heading.'
+);
+assert(
+    adminCenter.includes('LEGACY_SECTION_TARGET') &&
+    adminCenter.includes("roster: '/thanh-vien'") &&
+    adminCenter.includes("fund: '/quy'"),
+    'Admin page must redirect the retired ?section=roster and ?section=fund links.'
+);
+assert(
+    !adminCenter.includes('admin-center-tabs'),
+    'Admin page must not keep the retired tab bar.'
 );
 
 console.log('multitenant phase 3 contract ok');

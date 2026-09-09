@@ -72,7 +72,7 @@ Nếu lỡ stage nhầm: `git restore --staged <đường-dẫn>` để gỡ ra,
 | `app/admin/page.js`, `ClubSettings.js`, `club-settings.css` | Bỏ tab, chia 7 mục |
 | `app/thong-tin/page.js` | Dùng `MemberProfileView` |
 | `app/api/club/settings/route.js` | Nhận/trả `fundQrUrl` |
-| 7 file test ở mục 13 của spec | Cập nhật đường dẫn |
+| 8 file test (7 ở mục 13 của spec + `tests/multitenant-phase3.test.js`) | Cập nhật đường dẫn và hợp đồng |
 
 ### Xoá
 
@@ -2652,7 +2652,26 @@ Xoá hàm `handleRegenerate` (khoảng dòng 80–95) và mọi nút gọi nó. 
 `regenerating` nếu có. Giữ nguyên state `qr` — đó là **QR tham gia CLB**, khác hoàn
 toàn với `fundQrUrl` là **QR nhận quỹ**.
 
-- [ ] **Step 3: Xác nhận không còn tham chiếu**
+- [ ] **Step 3: Sửa hợp đồng trong `tests/multitenant-phase3.test.js`**
+
+File này có một assert bắt buộc `ClubSettings.js` phải chứa `/api/club/settings/regenerate-code`
+và chuỗi `'Tạo lại mã'`. Task này xoá đúng hai thứ đó nên assert sẽ đỏ. Sửa thành:
+
+```js
+const comp = read('app/admin/ClubSettings.js');
+assert(
+    comp.includes("'use client'") &&
+    comp.includes('/api/club/settings'),
+    'ClubSettings should load settings and support rename and member-password change.'
+);
+// Ma CLB nay la co dinh: khong con endpoint tao lai, cung khong con nut.
+assert(
+    !comp.includes('regenerate-code') && !comp.includes('Tạo lại mã'),
+    'ClubSettings must not offer club-code regeneration any more.'
+);
+```
+
+- [ ] **Step 3b: Xác nhận không còn tham chiếu**
 
 Run: `grep -rn "regenerate-code\|handleRegenerate" app components lib tests`
 Expected: không có kết quả

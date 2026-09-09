@@ -115,9 +115,6 @@ export default function TournamentConsoleV2({ tournamentId }) {
         <div className="v2-console">
             <header className="v2-console-head">
                 <h1 className="v2-console-title">{tournament ? tournament.name : 'Giải đấu'}</h1>
-                <button type="button" className="v2-btn-primary v2-operations-link" onClick={() => router.push(`/giai-dau/v2/operations?t=${tournamentId}${activeStageId ? `&stage=${activeStageId}` : ''}`)}>
-                    Bàn điều hành
-                </button>
             </header>
 
             <nav className="v2-tabbar" aria-label="Mục console">

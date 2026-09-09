@@ -1,0 +1,62 @@
+.member-profile { display: grid; gap: 18px; }
+
+/* CTA lien ket ho so - nut vo hieu, cho buoc sau */
+.member-cta { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; padding: 20px 22px; border-radius: var(--ph-radius-card); background: var(--ph-indigo); color: var(--ph-card); }
+.member-cta__ico { display: grid; place-items: center; width: 48px; height: 48px; flex: 0 0 48px; border-radius: var(--ph-radius-sm); background: var(--ph-indigo-hover); font-size: 22px; }
+.member-cta__body { flex: 1; min-width: 240px; }
+.member-cta__kicker { display: block; font-size: 11px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; color: var(--ph-lavender); }
+.member-cta__body h3 { margin: 4px 0 5px; font-size: 16px; font-weight: 800; letter-spacing: -.025em; }
+.member-cta__body p { margin: 0; max-width: 60ch; font-size: 12px; font-weight: 500; line-height: 1.6; color: var(--ph-lavender); }
+.member-cta__act { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+.member-cta__act .ph-btn { background: var(--ph-card); color: var(--ph-indigo); white-space: nowrap; }
+.member-cta__act .ph-btn:disabled { opacity: .92; cursor: not-allowed; }
+.member-cta__act small { font-size: 10px; font-weight: 700; color: var(--ph-lavender); }
+
+/* The danh tinh */
+.member-identity-card { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; padding: 22px; background: var(--ph-card); border: 1px solid var(--ph-line); border-radius: var(--ph-radius-card); }
+.member-profile-avatar { display: grid; place-items: center; width: 62px; height: 62px; flex: 0 0 62px; border-radius: 999px; background: var(--ph-lavender); color: var(--ph-indigo); font-size: 20px; font-weight: 800; }
+.member-kicker { display: block; font-size: 11px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; color: var(--ph-muted); }
+.member-identity-card h2 { margin: 4px 0; font-size: 22px; font-weight: 800; letter-spacing: -.03em; }
+.member-identity-card p { margin: 0; font-size: 12px; font-weight: 600; color: var(--ph-muted); }
+/* flex-basis 460px la bat buoc: thieu no thi khoi thong tin don thanh mot cot
+   va de trong mot mang giua the. */
+.member-identity-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: 12px; margin: 0 0 0 auto; flex: 1 1 460px; max-width: 620px; }
+.member-identity-facts > div { padding: 10px 14px; border-radius: var(--ph-radius-xs); background: var(--ph-tint-neutral-strong); border: 1px solid var(--ph-line); }
+.member-identity-facts dt { font-size: 10px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--ph-muted); }
+.member-identity-facts dd { margin: 4px 0 0; font-size: 13px; font-weight: 800; }
+
+/* PHR va lich su */
+.member-profile-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; }
+@media (max-width: 1023px) { .member-profile-grid { grid-template-columns: 1fr; } }
+.member-phr-card, .member-history-card { padding: 22px; background: var(--ph-card); border: 1px solid var(--ph-line); border-radius: var(--ph-radius-card); }
+.member-phr-card h2, .member-history-card h2 { margin: 4px 0 0; font-size: 17px; font-weight: 800; letter-spacing: -.02em; }
+.member-phr-score { display: flex; align-items: baseline; gap: 10px; margin: 14px 0 4px; }
+.member-phr-score strong { font-size: 42px; font-weight: 800; letter-spacing: -.04em; line-height: 1; font-variant-numeric: tabular-nums; }
+.member-phr-meter { position: relative; height: 8px; margin: 18px 0 8px; border-radius: 999px; background: var(--ph-tint-neutral); }
+.member-phr-meter i { display: block; height: 100%; border-radius: 999px; background: var(--ph-indigo); }
+.member-phr-meter b { position: absolute; top: -5px; width: 18px; height: 18px; border-radius: 999px; background: var(--ph-card); border: 4px solid var(--ph-indigo); transform: translateX(-9px); }
+.member-phr-scale { display: flex; justify-content: space-between; font-size: 10px; font-weight: 700; color: var(--ph-muted); }
+.member-phr-card p { margin: 16px 0 0; font-size: 12px; font-weight: 600; color: var(--ph-muted); }
+
+.member-timeline { list-style: none; margin: 14px 0 0; padding: 0; }
+.member-timeline li { position: relative; padding: 0 0 18px 22px; border-left: 2px solid var(--ph-line); }
+.member-timeline li:last-child { padding-bottom: 0; border-left-color: transparent; }
+.member-timeline li::before { content: ""; position: absolute; left: -7px; top: 2px; width: 12px; height: 12px; border-radius: 999px; background: var(--ph-card); border: 3px solid var(--ph-line); }
+.member-timeline li:first-child::before { border-color: var(--ph-indigo); }
+/* strong phai la flex: neu khong, badge "Moi nhat" bi keo dai het dong. */
+.member-timeline strong { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 13px; font-weight: 800; }
+.member-timeline span { display: block; margin-top: 3px; font-size: 11px; font-weight: 600; color: var(--ph-muted); line-height: 1.5; }
+
+.member-info-empty { padding: 16px 0 0; }
+.member-info-empty strong { display: block; font-size: 13px; font-weight: 800; }
+.member-info-empty p { margin: 4px 0 0; font-size: 12px; font-weight: 600; color: var(--ph-muted); }
+
+.member-privacy-note { padding: 16px 18px; border-radius: var(--ph-radius-sm); background: var(--ph-tint-neutral-strong); border: 1px solid var(--ph-line); font-size: 12px; font-weight: 600; color: var(--ph-muted); line-height: 1.6; }
+.member-privacy-note strong { display: block; margin-bottom: 4px; color: var(--ph-ink-2); font-weight: 800; }
+
+/* Dung chung voi /thong-tin - chuyen tu app/thong-tin/page.css sang day */
+.member-info-page { width: 100%; }
+.member-info-heading { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; justify-content: space-between; margin-bottom: 22px; }
+.member-info-heading h1 { margin: 6px 0 8px; font-size: 28px; font-weight: 800; letter-spacing: -.03em; }
+.member-info-heading > div > span { display: block; font-size: 11px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; color: var(--ph-muted); }
+.member-info-heading p { margin: 0; font-size: 13px; font-weight: 500; color: var(--ph-muted); line-height: 1.55; max-width: 62ch; }

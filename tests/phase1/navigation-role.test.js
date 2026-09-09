@@ -13,7 +13,7 @@ const unknownRoleLinks = navigation.getGlobalNavLinksForRole('unexpected');
 
 assert.deepStrictEqual(
     memberLinks.map((link) => link.href),
-    ['/quy', '/quy/members', '/quy/bxh', '/giai-dau', '/thong-tin'],
+    ['/quy', '/thanh-vien', '/bxh', '/giai-dau', '/thong-tin'],
     'Members must get the five-tab navigation with Thông tin instead of admin settings.'
 );
 assert.deepStrictEqual(

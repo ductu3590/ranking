@@ -26,14 +26,15 @@ assert(
 
 // NOTE: Tournament admin (overview/reset) chuyển sang module v2 (app/api/tournament-v2/*) — test ở tests/tournament/*.
 
-const fundAdmin = read('app/quy/admin/page.js');
+// Thao tac quy da chuyen tu app/quy/admin (da xoa) ve chinh trang /quy.
+const fundPage = read('app/quy/page.js');
 assert(
-    !fundAdmin.includes('@/lib/supabaseClient') && !fundAdmin.includes('.from('),
-    'Fund admin page should not query Supabase directly.'
+    !fundPage.includes('@/lib/supabaseClient') && !fundPage.includes('.from('),
+    'Fund page should not query Supabase directly.'
 );
 assert(
-    fundAdmin.includes('/api/club/transactions') && fundAdmin.includes('/api/club/members'),
-    'Fund admin page should use the club server APIs.'
+    fundPage.includes('/api/club/transactions') && fundPage.includes('/api/club/members'),
+    'Fund page should use the club server APIs.'
 );
 
 const navSrc = read('components/MobileBottomNav.js');

@@ -1,0 +1,14 @@
+/* Duoi 1120px KHONG duoc sticky: .home-header cung sticky o top:0 voi
+   z-index 1000 nen se de len sub-nav (z-index 30) va che gan het no.
+   Chieu cao header thay doi khi chu xuong dong, khong the bu bang offset
+   cung. Tu 1120px tro len header an di, luc do moi sticky duoi top bar. */
+.set-nav { position: static; z-index: 30; display: flex; gap: 8px; align-items: center; overflow-x: auto; padding: 12px 2px; margin-bottom: 18px; background: var(--ph-surface); border-bottom: 1px solid var(--ph-line); -webkit-overflow-scrolling: touch; }
+.set-nav__lbl { flex: 0 0 auto; padding-right: 4px; font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--ph-muted); }
+.set-nav a { flex: 0 0 auto; display: flex; align-items: center; min-height: 44px; padding: 8px 14px; border: 1px solid var(--ph-line); border-radius: 999px; background: var(--ph-card); font-size: 12px; font-weight: 700; color: var(--ph-ink-2); text-decoration: none; white-space: nowrap; transition: background .15s, color .15s, border-color .15s; }
+.set-nav a:hover { background: var(--ph-tint-neutral-strong); }
+.set-nav a.is-active { background: var(--ph-indigo); border-color: var(--ph-indigo); color: var(--ph-card); }
+.set-nav a:focus-visible { outline: 2px solid var(--ph-indigo); outline-offset: 2px; }
+
+@media (min-width: 1120px) { .set-nav { position: sticky; top: 64px; } }
+
+.set-spacer { height: min(62vh, 540px); }

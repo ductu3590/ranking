@@ -30,7 +30,7 @@ export async function GET(request) {
 
     const { data: group, error } = await supabaseAdmin
         .from('groups')
-        .select('id, code, name, description, logo_url, shame_badges_enabled, sepay_webhook_secret, access_version')
+        .select('id, code, name, description, logo_url, fund_qr_url, shame_badges_enabled, sepay_webhook_secret, access_version')
         .eq('id', adminCheck.groupId)
         .single();
     if (error) {
@@ -77,6 +77,17 @@ export async function PATCH(request) {
             updates.logo_url = logoUrl;
         }
     }
+    if (body?.fundQrUrl === null) {
+        updates.fund_qr_url = null;
+    } else if (typeof body?.fundQrUrl === 'string' && body.fundQrUrl) {
+        if (!body.fundQrUrl.startsWith('data:image/')) {
+            return NextResponse.json({ error: 'Ảnh QR không hợp lệ.' }, { status: 400 });
+        }
+        if (body.fundQrUrl.length > 280000) {
+            return NextResponse.json({ error: 'Ảnh QR quá lớn, hãy chọn ảnh nhỏ hơn 200KB.' }, { status: 400 });
+        }
+        updates.fund_qr_url = body.fundQrUrl;
+    }
     if (typeof body?.shameBadgesEnabled === 'boolean') {
         updates.shame_badges_enabled = body.shameBadgesEnabled;
     }
@@ -102,7 +113,7 @@ export async function PATCH(request) {
         .from('groups')
         .update(updates)
         .eq('id', adminCheck.groupId)
-        .select('id, code, name, description, logo_url, shame_badges_enabled, sepay_webhook_secret, access_version')
+        .select('id, code, name, description, logo_url, fund_qr_url, shame_badges_enabled, sepay_webhook_secret, access_version')
         .single();
     if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });

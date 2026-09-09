@@ -22,16 +22,29 @@ const nextConfig = {
                 destination: '/giai-dau/:path*',
                 permanent: true,
             },
-            // Admin tournament
+            // Admin tournament: tab ?section=tournament da bi go cung luc bo tab
+            // o /admin (dot 2026-09-09). Tro thang toi module giai dau thay vi
+            // roi im lang vao trang cau hinh.
             {
                 source: '/admin/tournament',
-                destination: '/admin?section=tournament',
+                destination: '/giai-dau',
                 permanent: true,
             },
-            // Members
+            // Thanh vien: /members va /quy/members deu tro thang toi /thanh-vien.
+            // Khong de /members -> /quy/members -> /thanh-vien (hai chang).
             {
                 source: '/members',
-                destination: '/quy/members',
+                destination: '/thanh-vien',
+                permanent: true,
+            },
+            {
+                source: '/quy/members',
+                destination: '/thanh-vien',
+                permanent: true,
+            },
+            {
+                source: '/quy/bxh',
+                destination: '/bxh',
                 permanent: true,
             },
         ];

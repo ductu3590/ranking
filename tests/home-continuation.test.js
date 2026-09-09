@@ -28,12 +28,8 @@ assert(
     'Homepage continuation requires the account-menu logout to preserve the remembered group.'
 );
 
-const fundAdmin = read('app/quy/admin/page.js');
-const fundLogout = getLogoutBlock(fundAdmin, 'if (loading)');
-assert(
-    fundLogout.includes("method: 'DELETE'") &&
-    !fundLogout.includes("removeItem('teamfund-current-group')"),
-    'Homepage continuation requires the fund-admin logout to preserve the remembered group.'
-);
+// app/quy/admin da bi go trong dot dieu huong 2026-09-09: khong con man hinh
+// so quy rieng nen cung khong con handleLogout rieng. Duong dang xuat duy nhat
+// la menu tai khoan, da duoc assert ngay phia tren.
 
 console.log('homepage continuation logout contract ok');

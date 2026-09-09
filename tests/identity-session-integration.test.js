@@ -23,7 +23,8 @@ const createRoute = read('app/api/groups/route.js');
 assert.match(createRoute, /accessVersion:\s*group\.access_version/);
 assert.match(createRoute, /issueClubSession/, 'new clubs persist their initial admin session');
 
-for (const route of ['app/api/club/settings/route.js', 'app/api/club/settings/regenerate-code/route.js']) {
+// regenerate-code da bi xoa (dot 2026-09-09): ma CLB co dinh, khong doi tu giao dien.
+for (const route of ['app/api/club/settings/route.js']) {
   const source = read(route);
   assert.match(source, /access_version\s*[:=]\s*nextAccessVersion/, `${route} bumps the club access version`);
   assert.match(source, /await requireValidatedGroupAdmin\(\)/,

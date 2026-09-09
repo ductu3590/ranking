@@ -1,6 +1,10 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
 import fundDashboardUtils from '@/lib/fundDashboard';
+import FundTransactionList from '@/components/pickhub/fund/FundTransactionList';
+import FundEntryForm from '@/components/pickhub/fund/FundEntryForm';
+import FundTransactionEditor from '@/components/pickhub/fund/FundTransactionEditor';
+import AssignTransactionDialog from '@/components/pickhub/AssignTransactionDialog';
 import './page.css';
 
 const { buildFundEventPanel } = fundDashboardUtils;
@@ -17,6 +21,13 @@ export default function HomePage() {
     const [searchQuery, setSearchQuery] = useState('');
     const [txPage, setTxPage] = useState(1);
     const txPerPage = 15;
+    const [entryDirection, setEntryDirection] = useState(null);   // 'in' | 'out' | null
+    const [editingTx, setEditingTx] = useState(null);
+    const [assigningTx, setAssigningTx] = useState(null);
+    const [selectedTxIds, setSelectedTxIds] = useState([]);
+    const [bulkCategory, setBulkCategory] = useState('nop_quy');
+    const [filterMember, setFilterMember] = useState('all');
+    const [filterCategory, setFilterCategory] = useState('all');
 
     // Fund Events state
     const [events, setEvents] = useState([]);
@@ -43,6 +54,9 @@ export default function HomePage() {
     // Share event
     const [copiedEventId, setCopiedEventId] = useState(null);
 
+    // QR nhan quy (admin tai len o /admin). Chua co thi an han khoi.
+    const [fundQrUrl, setFundQrUrl] = useState(null);
+
     useEffect(() => {
         let active = true;
         fetch('/api/groups/session', { cache: 'no-store' })
@@ -60,6 +74,10 @@ export default function HomePage() {
                 loadTransactions();
                 loadEvents();
                 loadMembers();
+                fetch('/api/club/fund-qr', { cache: 'no-store' })
+                    .then((response) => (response.ok ? response.json() : null))
+                    .then((data) => { if (active) setFundQrUrl(data?.fundQrUrl || null); })
+                    .catch(() => {});
             })
             .catch(() => {
                 if (active) {
@@ -92,6 +110,8 @@ export default function HomePage() {
 
     const filteredTx = transactions.filter(t => {
         if (filterDirection !== 'all' && t.huong_giao_dich !== filterDirection) return false;
+        if (filterCategory !== 'all' && t.loai_giao_dich !== filterCategory) return false;
+        if (filterMember !== 'all' && t.nguoi_nop !== filterMember) return false;
         if (searchQuery) {
             const q = searchQuery.toLowerCase();
             return (t.noi_dung_goc || '').toLowerCase().includes(q)
@@ -107,6 +127,7 @@ export default function HomePage() {
     const stats = {
         totalIn: transactions.filter(t => t.huong_giao_dich === 'in').reduce((s, t) => s + (t.so_tien || 0), 0),
         totalOut: transactions.filter(t => t.huong_giao_dich === 'out').reduce((s, t) => s + Math.abs(t.so_tien || 0), 0),
+        totalPenalty: transactions.filter(t => t.loai_giao_dich === 'nop_phat').reduce((s, t) => s + Math.abs(t.so_tien || 0), 0),
     };
     stats.balance = stats.totalIn - stats.totalOut;
 
@@ -145,6 +166,18 @@ export default function HomePage() {
         const res = await fetch('/api/club/members');
         const data = await res.json();
         setMembers(res.ok ? (data.members || []).filter((m) => m.is_active) : []);
+    }
+
+    async function applyBulkCategory() {
+        if (selectedTxIds.length === 0) return;
+        const response = await fetch('/api/club/transactions', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ids: selectedTxIds, updates: { loai_giao_dich: bulkCategory, is_manually_categorized: true } }),
+        });
+        if (!response.ok) return;
+        setSelectedTxIds([]);
+        loadTransactions();
     }
 
     async function handleCreateEvent(e) {
@@ -329,6 +362,13 @@ export default function HomePage() {
                         <div className="stat-info">
                             <div className="stat-label">Tổng chi</div>
                             <div className="stat-value negative">{txError ? '—' : formatMoney(stats.totalOut)}</div>
+                        </div>
+                    </div>
+                    <div className="stat-card">
+                        <div className="stat-icon">⚠️</div>
+                        <div className="stat-info">
+                            <div className="stat-label">Quỹ phạt</div>
+                            <div className="stat-value">{txError ? '—' : formatMoney(stats.totalPenalty)}</div>
                         </div>
                     </div>
                 </div>
@@ -531,6 +571,15 @@ export default function HomePage() {
                     </aside>
                 )}
 
+                {fundQrUrl && (
+                    <section className="fund-qr-card" aria-labelledby="fund-qr-heading">
+                        <span className="fund-qr-card__kicker">Chuyển khoản</span>
+                        <h2 id="fund-qr-heading">QR nhận quỹ CLB</h2>
+                        <img src={fundQrUrl} alt="Mã QR chuyển khoản vào quỹ CLB" />
+                        <p>Quét để chuyển khoản vào quỹ CLB. Hệ thống tự ghi nhận vào lịch sử giao dịch và BXH sau 1–3 phút.</p>
+                    </section>
+                )}
+
                 {/* ── Lịch sử giao dịch luôn hiển thị ── */}
                     <section className="tab-content transactions-panel" aria-labelledby="transaction-heading">
                         <div className="section-heading">
@@ -586,55 +635,36 @@ export default function HomePage() {
                             <div className="loading-state">⏳ Đang tải giao dịch...</div>
                         ) : txError ? null : (
                             <>
-                                <div className="tx-list">
-                                    {paginatedTx.map(t => (
-                                        <details key={t.id} className={`tx-item ${t.huong_giao_dich}`}>
-                                            <summary className="tx-summary">
-                                                <span className={`tx-direction-icon ${t.huong_giao_dich}`} aria-hidden="true">
-                                                    {t.huong_giao_dich === 'in' ? '↙' : '↗'}
-                                                </span>
-                                                <span className="tx-primary">
-                                                    <strong>{t.nguoi_nop || 'Không xác định'}</strong>
-                                                    <span className="tx-description">
-                                                        {t.noi_dung_goc || 'Không có nội dung'}
-                                                    </span>
-                                                    <span className="tx-date">
-                                                        {new Date(t.created_at).toLocaleString('vi-VN')}
-                                                    </span>
-                                                </span>
-                                                <span className={`tx-amount ${t.huong_giao_dich}`}>
-                                                    {t.huong_giao_dich === 'in' ? '+' : '-'}
-                                                    {formatMoney(Math.abs(Number(t.so_tien) || 0))}
-                                                </span>
-                                            </summary>
-                                            <div className="tx-detail">
-                                                <div className="tx-detail-copy">
-                                                    <div>
-                                                        <span className="tx-detail-label">Người giao dịch</span>
-                                                        <span>{t.nguoi_nop || 'Không xác định'}</span>
-                                                    </div>
-                                                    <div>
-                                                        <span className="tx-detail-label">Nội dung đầy đủ</span>
-                                                        <span>{t.noi_dung_goc || 'Không có nội dung'}</span>
-                                                    </div>
-                                                </div>
-                                                <div className="tx-detail-meta">
-                                                    <span className={`badge badge-${t.loai_giao_dich}`}>
-                                                        {t.loai_giao_dich === 'nop_phat' ? 'Nộp phạt' :
-                                                            t.loai_giao_dich === 'nop_quy' ? 'Nộp quỹ' : 'Khác'}
-                                                    </span>
-                                                    <span className="tx-code">Mã GD: {t.ma_giao_dich || 'N/A'}</span>
-                                                </div>
-                                            </div>
-                                        </details>
+                                {isAdmin && (
+                                    <div className="fund-toolbar">
+                                        <button type="button" className="ph-btn ph-btn--outline ph-btn--sm" onClick={() => setEntryDirection('in')}>＋ Ghi thu</button>
+                                        <button type="button" className="ph-btn ph-btn--outline ph-btn--sm" onClick={() => setEntryDirection('out')}>＋ Ghi chi</button>
+                                    </div>
+                                )}
+
+                                {isAdmin && selectedTxIds.length > 0 && (
+                                    <div className="fund-bulkbar" role="group" aria-label="Thao tác nhiều giao dịch">
+                                        <span>Đã chọn {selectedTxIds.length} giao dịch</span>
+                                        <select value={bulkCategory} onChange={(event) => setBulkCategory(event.target.value)} aria-label="Loại giao dịch áp dụng">
+                                            <option value="nop_quy">Nộp quỹ</option>
+                                            <option value="nop_phat">Nộp phạt</option>
+                                            <option value="khac">Khác</option>
+                                        </select>
+                                        <button type="button" className="ph-btn ph-btn--primary ph-btn--sm" onClick={applyBulkCategory}>Áp dụng</button>
+                                        <button type="button" className="ph-btn ph-btn--outline ph-btn--sm" onClick={() => setSelectedTxIds([])}>Bỏ chọn</button>
+                                    </div>
+                                )}
+
+                                <FundTransactionList
+                                    transactions={paginatedTx}
+                                    canManage={isAdmin}
+                                    selectedIds={selectedTxIds}
+                                    onToggleSelect={(id) => setSelectedTxIds((current) => (
+                                        current.includes(id) ? current.filter((value) => value !== id) : [...current, id]
                                     ))}
-                                    {paginatedTx.length === 0 && (
-                                        <div className="empty-state">
-                                            <div className="empty-icon">📭</div>
-                                            <p>Không có giao dịch nào</p>
-                                        </div>
-                                    )}
-                                </div>
+                                    onEdit={setEditingTx}
+                                    onAssign={setAssigningTx}
+                                />
 
                                 {/* Pagination */}
                                 {totalTxPages > 1 && (
@@ -759,6 +789,26 @@ export default function HomePage() {
                     </div>
                 </div>
             )}
+
+            <FundEntryForm
+                open={Boolean(entryDirection)}
+                direction={entryDirection}
+                onClose={() => setEntryDirection(null)}
+                onSaved={() => { setEntryDirection(null); loadTransactions(); }}
+            />
+            <FundTransactionEditor
+                open={Boolean(editingTx)}
+                transaction={editingTx}
+                members={members}
+                onClose={() => setEditingTx(null)}
+                onSaved={() => { setEditingTx(null); loadTransactions(); }}
+            />
+            <AssignTransactionDialog
+                open={Boolean(assigningTx)}
+                transaction={assigningTx}
+                onClose={() => setAssigningTx(null)}
+                onAssigned={() => { setAssigningTx(null); loadTransactions(); }}
+            />
         </div>
     );
 }

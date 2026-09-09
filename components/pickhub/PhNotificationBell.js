@@ -44,7 +44,12 @@ export default function PhNotificationBell() {
                     </div>)}
                 </div>
             </PhModal>
-            <AssignTransactionDialog open={Boolean(assigning)} notification={assigning} onClose={() => setAssigning(null)} onAssigned={() => { setAssigning(null); load(); }} />
+            <AssignTransactionDialog
+                open={Boolean(assigning)}
+                transaction={assigning ? { id: assigning.subject_id, ...(assigning.payload || {}) } : null}
+                onClose={() => setAssigning(null)}
+                onAssigned={() => { setAssigning(null); load(); }}
+            />
         </>
     );
 }

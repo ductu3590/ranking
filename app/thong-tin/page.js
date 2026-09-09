@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import AppShell from '@/components/pickhub/AppShell';
-import MemberInfoPanel from '@/components/pickhub/MemberInfoPanel';
+import MemberProfileView from '@/components/pickhub/MemberProfileView';
 import './page.css';
 
 export default function MemberInformationPage() {
@@ -74,7 +74,12 @@ export default function MemberInformationPage() {
                     : state.kind === 'forbidden' ? <StatePanel kind="forbidden" title="Không có quyền truy cập" message={state.message} action="Nhập lại Mã CLB + mật khẩu" />
                     : state.kind === 'error' ? <StatePanel kind="error" title="Chưa tải được thông tin" message={state.message} action="Tải lại trang" />
                     : state.kind === 'empty' ? <StatePanel kind="empty" title="Chưa có hồ sơ" message={state.message} />
-                    : <MemberInfoPanel athleteMembership={membership} phrSnapshot={assessments[0] || null} assessmentHistory={assessments} privacyFlags={{ sharedSession: true }} />}
+                    : <MemberProfileView
+                        athleteMembership={membership}
+                        phrSnapshot={assessments[0] || null}
+                        assessmentHistory={assessments}
+                        showLinkCta
+                    />}
                 </main>
             </div>
         </AppShell>

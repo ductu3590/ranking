@@ -15,30 +15,44 @@ assert(
     'Settings route should expose admin-guarded GET + PATCH and hash the member password.'
 );
 
-const regen = read('app/api/club/settings/regenerate-code/route.js');
+// Endpoint tao lai ma CLB da bi xoa trong dot dieu huong 2026-09-09.
+// Ma CLB gio la dinh danh co dinh; chi superadmin doi truc tiep trong Supabase.
+// Ly do bo: ham cu nang access_version -> dang xuat toan bo thanh vien dang truy cap.
 assert(
-    regen.includes('export async function POST') &&
-    /require(?:Validated)?GroupAdmin/.test(regen) &&
-    regen.includes('generateGroupCode') &&
-    regen.includes('QRCode.toDataURL'),
-    'Regenerate-code route should be admin-guarded and return a new unique code + QR.'
+    !fs.existsSync(path.join(root, 'app/api/club/settings/regenerate-code/route.js')),
+    'Regenerate-code route must stay deleted, not merely hidden from the UI.'
 );
 
 const comp = read('app/admin/ClubSettings.js');
 assert(
     comp.includes("'use client'") &&
-    comp.includes('/api/club/settings') &&
-    comp.includes('/api/club/settings/regenerate-code') &&
-    comp.includes('Tạo lại mã'),
-    'ClubSettings should load settings and support rename, member-password change, and code regeneration.'
+    comp.includes('/api/club/settings'),
+    'ClubSettings should load settings and support rename and member-password change.'
+);
+// Ma CLB la co dinh: khong con endpoint tao lai, cung khong con nut.
+// Ly do bo: ham cu nang access_version, dang xuat toan bo thanh vien dang truy cap.
+assert(
+    !comp.includes('regenerate-code') && !comp.includes('Tạo lại mã'),
+    'ClubSettings must not offer club-code regeneration any more.'
 );
 
+// /admin khong con la trung tam co tab. Hai section cu da duoc go:
+// roster -> /thanh-vien, fund -> /quy. Trang gio render thang ClubSettings.
 const adminCenter = read('app/admin/page.js');
 assert(
     adminCenter.includes('ClubSettings') &&
-    adminCenter.includes("section === 'settings'") &&
-    adminCenter.includes('Cài đặt'),
-    'Admin center should render a Cài đặt (settings) section using ClubSettings.'
+    adminCenter.includes('Cấu hình CLB'),
+    'Admin page should render ClubSettings directly under the Cau hinh CLB heading.'
+);
+assert(
+    adminCenter.includes('LEGACY_SECTION_TARGET') &&
+    adminCenter.includes("roster: '/thanh-vien'") &&
+    adminCenter.includes("fund: '/quy'"),
+    'Admin page must redirect the retired ?section=roster and ?section=fund links.'
+);
+assert(
+    !adminCenter.includes('admin-center-tabs'),
+    'Admin page must not keep the retired tab bar.'
 );
 
 console.log('multitenant phase 3 contract ok');

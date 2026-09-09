@@ -31,7 +31,9 @@
   --ph-space-8: 32px;
 
   /* Hinh khoi */
+  --ph-radius-xs: 8px;
   --ph-radius-sm: 12px;
+  --ph-radius-card: 16px;
   --ph-radius-md: 20px;
   --ph-radius-lg: 28px;
   --ph-shadow-soft: 0 8px 24px rgba(40, 36, 61, .06);

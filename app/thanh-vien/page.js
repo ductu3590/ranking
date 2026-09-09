@@ -38,6 +38,7 @@ export default function MembersPage({ embedded = false }) {
     const [phrByMembership, setPhrByMembership] = useState({});
     const [state, setState] = useState({ kind: 'loading', message: 'Đang tải danh sách thành viên…' });
     const [filterStatus, setFilterStatus] = useState('active');
+    const [filterSkill, setFilterSkill] = useState('all');
     const [showCreate, setShowCreate] = useState(false);
     const [createForm, setCreateForm] = useState({ displayName: '', alias: '' });
     const [mutationMessage, setMutationMessage] = useState('');
@@ -82,10 +83,16 @@ export default function MembersPage({ embedded = false }) {
 
     useEffect(() => { loadRoster(); }, []);
 
-    const filtered = useMemo(
-        () => members.filter((member) => (filterStatus === 'active' ? member.status === 'active' : member.status !== 'active')),
-        [members, filterStatus],
-    );
+    const filtered = useMemo(() => members.filter((member) => {
+        const matchStatus = filterStatus === 'active' ? member.status === 'active' : member.status !== 'active';
+        if (!matchStatus) return false;
+        if (filterSkill === 'all') return true;
+        const phr = Number(phrByMembership[member.id]);
+        if (!Number.isFinite(phr)) return false;
+        if (filterSkill === 'tan-thu') return phr < 2.5;
+        if (filterSkill === 'co-ban') return phr >= 2.5 && phr < 3.2;
+        return phr >= 3.2;
+    }), [members, filterStatus, filterSkill, phrByMembership]);
     const activeCount = members.filter((member) => member.status === 'active').length;
     const endedCount = members.length - activeCount;
     const showBulkColumn = canManageRoster && filterStatus === 'active';
@@ -276,6 +283,25 @@ export default function MembersPage({ embedded = false }) {
                     { key: 'ended', label: `Đã kết thúc (${endedCount})` },
                 ].map((filter) => <button type="button" key={filter.key} className={`filter-btn ${filterStatus === filter.key ? 'active' : ''}`} aria-pressed={filterStatus === filter.key} onClick={() => changeFilter(filter.key)}>{filter.label}</button>)}</div>}
 
+                {!canManageRoster && state.kind === 'ready' && (
+                    <div className="members-skillfilter" role="group" aria-label="Lọc theo trình độ">
+                        {[
+                            { key: 'all', label: 'Tất cả trình độ' },
+                            { key: 'tan-thu', label: 'Tân thủ (1,0–2,5)' },
+                            { key: 'co-ban', label: 'Cơ bản (2,5–3,2)' },
+                            { key: 'kha', label: 'Khá (3,2 trở lên)' },
+                        ].map((chip) => (
+                            <button
+                                key={chip.key}
+                                type="button"
+                                className={`skill-chip${filterSkill === chip.key ? ' is-active' : ''}`}
+                                aria-pressed={filterSkill === chip.key}
+                                onClick={() => setFilterSkill(chip.key)}
+                            >{chip.label}</button>
+                        ))}
+                    </div>
+                )}
+
                 {mutationMessage && <p className="members-mutation-status" role="status">{mutationMessage}</p>}
 
                 {showBulkColumn && selectedIds.length > 0 && <div className="members-bulkbar" role="group" aria-label="Thao tác nhiều thành viên">
@@ -293,7 +319,7 @@ export default function MembersPage({ embedded = false }) {
                         <table className="members-table">
                             <thead><tr>
                                 {showBulkColumn && <th className="members-pick-cell"><input type="checkbox" checked={allSelected} onChange={toggleSelectAll} aria-label="Chọn tất cả thành viên đang hiển thị" /></th>}
-                                <th>Mã TV</th><th>VĐV</th><th>Biệt danh</th><th>Trình độ PHR</th><th>Trạng thái</th>{canManageRoster && <th>Quản lý</th>}
+                                <th>Mã TV</th><th>VĐV</th><th>Biệt danh</th><th>Trình độ PHR</th><th>Trạng thái</th><th>{canManageRoster ? 'Quản lý' : 'Kết nối'}</th>
                             </tr></thead>
                             <tbody>{filtered.map((member) => <tr key={member.id} className={member.status !== 'active' ? 'inactive-row' : ''}>
                                 {showBulkColumn && <td className="members-pick-cell"><input type="checkbox" checked={selectedIds.includes(member.id)} onChange={() => toggleSelected(member.id)} aria-label={`Chọn ${member.alias || member.athlete?.displayName || 'thành viên'}`} /></td>}
@@ -304,7 +330,14 @@ export default function MembersPage({ embedded = false }) {
                                     ? <span className="phr-chip">{formatPhr(Number(phrByMembership[member.id]))} · {phrLabel(Number(phrByMembership[member.id]))}</span>
                                     : <span className="phr-chip is-empty">Chưa đánh giá</span>}</td>
                                 <td><span><span className={`status-badge status-${member.status === 'active' ? 'active' : 'inactive'}`}>{member.status === 'active' ? 'Đang sinh hoạt' : 'Đã kết thúc'}</span><small>Từ {member.effectiveFrom || 'chưa rõ'}</small></span></td>
-                                {canManageRoster && <td><div className="roster-row-actions"><button type="button" onClick={() => openEditor(member)}>Chỉnh sửa</button>{member.status === 'active' && <button type="button" className="is-danger" onClick={() => endMembership(member)}>Kết thúc</button>}</div></td>}
+                                <td>{canManageRoster ? (
+                                    <div className="roster-row-actions">
+                                        <button type="button" onClick={() => openEditor(member)}>Chỉnh sửa</button>
+                                        {member.status === 'active' && <button type="button" className="is-danger" onClick={() => endMembership(member)}>Kết thúc</button>}
+                                    </div>
+                                ) : (
+                                    <a className="ph-btn ph-btn--outline ph-btn--sm" href={`/thanh-vien/${member.id}`}>Xem hồ sơ</a>
+                                )}</td>
                             </tr>)}</tbody>
                         </table>
                         {filtered.length === 0 && <RosterState kind="empty" title="Chưa có thành viên" message={filterStatus === 'active' ? 'Chưa có thành viên nào đang sinh hoạt.' : 'Chưa có thành viên nào đã kết thúc sinh hoạt.'} />}

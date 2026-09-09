@@ -10,6 +10,11 @@
 .filter-btn { min-height: 44px; flex: 1 0 auto; padding: 0 15px; border: 0; border-radius: 10px; background: transparent; color: var(--ph-muted); font: inherit; font-size: 12px; font-weight: 850; cursor: pointer; }
 .filter-btn.active { background: var(--ph-lavender); color: var(--ph-indigo); }
 .members-mutation-status { margin: 0 0 12px; padding: 11px 13px; border-radius: 11px; background: var(--ph-lavender); color: var(--ph-indigo); font-size: 12px; font-weight: 750; }
+.members-skillfilter { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.skill-chip { min-height: 44px; padding: 8px 14px; border: 1px solid var(--ph-line); border-radius: 999px; background: var(--ph-card); font-family: inherit; font-size: 12px; font-weight: 700; color: var(--ph-ink-2); cursor: pointer; }
+.skill-chip:hover { background: var(--ph-tint-neutral-strong); }
+.skill-chip.is-active { background: var(--ph-indigo); border-color: var(--ph-indigo); color: var(--ph-card); }
+.skill-chip:focus-visible { outline: 2px solid var(--ph-indigo); outline-offset: 2px; }
 .members-table-wrap { overflow-x: auto; border: 1px solid var(--ph-line); border-radius: 19px; background: var(--ph-card); box-shadow: var(--ph-shadow-soft); }
 .members-table { width: 100%; min-width: 880px; border-collapse: collapse; }
 .members-table th { padding: 13px 16px; border-bottom: 1px solid var(--ph-line); background: #fafafe; color: var(--ph-muted); font-size: 10px; letter-spacing: .08em; text-align: left; text-transform: uppercase; }

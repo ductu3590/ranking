@@ -214,27 +214,25 @@ export default function FundLeaderboardPage() {
                                             const width = Math.min(100, (row.amount / scale) * 100);
                                             return (
                                                 <article className="ph-bxh-item" key={row.key}>
-                                                    <div className="ph-bxh-item__top">
-                                                        <div className="ph-bxh-person">
-                                                            <span className="ph-bxh-avatar ph-bxh-avatar--small" aria-hidden="true">{initials(row.name)}</span>
-                                                            <div className="ph-bxh-person__body">
-                                                                <h4>{row.name}</h4>
-                                                                <span className="ph-bxh-badges">
-                                                                    {row.streak >= 2 && <span className="ph-badge">Chuỗi {row.streak}</span>}
-                                                                    {row.badges.map((badge) => <span className="ph-badge ph-badge--gold" key={badge.kind}>{badge.label}</span>)}
-                                                                </span>
+                                                    <div className="ph-bxh-item__left">
+                                                        <span className="ph-bxh-item__av" aria-hidden="true">{initials(row.name)}</span>
+                                                        <div className="ph-bxh-item__body">
+                                                            <div className="ph-bxh-item__name">
+                                                                <span className="nm">{row.name}</span>
+                                                                {row.streak >= 2 && <span className="ph-bxh-tag ph-bxh-tag--brand">Chuỗi {row.streak}</span>}
+                                                                {row.badges.map((badge) => <span className="ph-bxh-tag ph-bxh-tag--gold" key={badge.kind}>{badge.label}</span>)}
                                                             </div>
-                                                        </div>
-                                                        <span className="ph-bxh-item__rank">#{row.rank}</span>
-                                                    </div>
-                                                    <div className="ph-bxh-item__bottom">
-                                                        <span className="ph-bxh-item__count">Lượt góp: <strong>{row.transactionCount}</strong></span>
-                                                        <div className="ph-bxh-item__amount">
-                                                            <strong>{amountText(row.amount)}</strong>
-                                                            <div className="ph-bxh-bar"><span style={{ width: `${width}%` }} /></div>
+                                                            <p className="ph-bxh-item__sub">Lượt góp: <strong>{row.transactionCount}</strong></p>
+                                                            {multiple && <small className="ph-bxh-item__multi">gấp {(row.amount / rows[1].amount).toFixed(1).replace('.', ',')} lần hạng 2</small>}
                                                         </div>
                                                     </div>
-                                                    {multiple && <small className="ph-bxh-item__multi">gấp {(row.amount / rows[1].amount).toFixed(1).replace('.', ',')} lần hạng 2</small>}
+                                                    <div className="ph-bxh-item__right">
+                                                        <div>
+                                                            <strong className="ph-bxh-item__amt">{amountText(row.amount)}</strong>
+                                                            <div className="ph-bxh-bar ph-bxh-bar--fixed"><span style={{ width: `${width}%` }} /></div>
+                                                        </div>
+                                                        <span className="ph-bxh-item__no">#{row.rank}</span>
+                                                    </div>
                                                 </article>
                                             );
                                         })}

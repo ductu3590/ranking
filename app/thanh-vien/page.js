@@ -323,14 +323,14 @@ export default function MembersPage({ embedded = false }) {
                             </tr></thead>
                             <tbody>{filtered.map((member) => <tr key={member.id} className={member.status !== 'active' ? 'inactive-row' : ''}>
                                 {showBulkColumn && <td className="members-pick-cell"><input type="checkbox" checked={selectedIds.includes(member.id)} onChange={() => toggleSelected(member.id)} aria-label={`Chọn ${member.alias || member.athlete?.displayName || 'thành viên'}`} /></td>}
-                                <td><strong className="member-code">#{member.id}</strong></td>
-                                <td><div className="member-name-wrap"><span className="member-avatar" aria-hidden="true">{(member.athlete?.displayName || member.alias || '?').slice(0, 1)}</span><span><strong className="member-fullname">{member.athlete?.displayName || 'VĐV chưa đặt tên'}</strong><small>{linkStatusLabel(member.athlete?.status)}</small></span></div></td>
-                                <td><strong>{member.alias || 'Chưa đặt'}</strong></td>
-                                <td>{Number.isFinite(Number(phrByMembership[member.id]))
+                                <td className="mcell mcell--code"><strong className="member-code">#{member.id}</strong></td>
+                                <td className="mcell mcell--name"><div className="member-name-wrap"><span className="member-avatar" aria-hidden="true">{(member.athlete?.displayName || member.alias || '?').slice(0, 1)}</span><span><strong className="member-fullname">{member.athlete?.displayName || 'VĐV chưa đặt tên'}</strong><small>{linkStatusLabel(member.athlete?.status)}</small></span></div></td>
+                                <td className="mcell mcell--alias"><strong>{member.alias || 'Chưa đặt'}</strong></td>
+                                <td className="mcell mcell--phr">{Number.isFinite(Number(phrByMembership[member.id]))
                                     ? <span className="phr-chip">{formatPhr(Number(phrByMembership[member.id]))} · {phrLabel(Number(phrByMembership[member.id]))}</span>
                                     : <span className="phr-chip is-empty">Chưa đánh giá</span>}</td>
-                                <td><span><span className={`status-badge status-${member.status === 'active' ? 'active' : 'inactive'}`}>{member.status === 'active' ? 'Đang sinh hoạt' : 'Đã kết thúc'}</span><small>Từ {member.effectiveFrom || 'chưa rõ'}</small></span></td>
-                                <td>{canManageRoster ? (
+                                <td className="mcell mcell--status"><span><span className={`status-badge status-${member.status === 'active' ? 'active' : 'inactive'}`}>{member.status === 'active' ? 'Đang sinh hoạt' : 'Đã kết thúc'}</span><small>Từ {member.effectiveFrom || 'chưa rõ'}</small></span></td>
+                                <td className="mcell mcell--act">{canManageRoster ? (
                                     <div className="roster-row-actions">
                                         <button type="button" onClick={() => openEditor(member)}>Chỉnh sửa</button>
                                         {member.status === 'active' && <button type="button" className="is-danger" onClick={() => endMembership(member)}>Kết thúc</button>}

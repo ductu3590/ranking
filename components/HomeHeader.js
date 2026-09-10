@@ -5,7 +5,7 @@ import ClubSwitcher from './pickhub/ClubSwitcher';
 import { readClubAccessContexts, readDefaultClubId } from '@/lib/clubAccessClient';
 import './HomeHeader.css';
 
-export default function HomeHeader({ trailing = null }) {
+export default function HomeHeader({ leading = null, trailing = null }) {
     const [branding, setBranding] = useState({ name: 'Pickhub', logoUrl: null });
     const [sessionView, setSessionView] = useState({ session: null, permissions: {}, loading: true });
     const [clubContexts, setClubContexts] = useState([]);
@@ -44,6 +44,8 @@ export default function HomeHeader({ trailing = null }) {
     return (
         <header className="home-header">
             <div className="header-container">
+                {leading}
+
                 <div className="header-logo">
                     <a href="/quy">
                         {branding.logoUrl && (

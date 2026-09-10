@@ -1,11 +1,14 @@
 /* Lớp riêng cho chuông thông báo.
-   Panel nằm trên cùng (z-index 1000) và KHÔNG phủ backdrop, nên khi mở chuông
-   không có lớp modal nào khác của trang bị gọi lên cùng. */
+   Panel nằm trên cùng và KHÔNG phủ backdrop, nên khi mở chuông không có lớp
+   modal nào khác của trang bị gọi lên cùng.
+   z-index phải vượt drawer điều hướng (.ph-rail 1200) vì chuông của admin nằm
+   trong user card của rail, mà panel lại portal thẳng ra body nên không thừa
+   hưởng stacking context của rail. */
 
 .ph-notification-layer {
     position: fixed;
     inset: 0;
-    z-index: 1000;
+    z-index: 1300;
     pointer-events: none;
 }
 

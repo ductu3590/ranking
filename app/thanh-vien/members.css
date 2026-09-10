@@ -59,3 +59,84 @@
 .roster-modal form > div { display: flex; justify-content: flex-end; gap: 8px; }.roster-modal button { min-height: 44px; padding: 0 15px; border: 1px solid var(--ph-line); border-radius: 11px; background: var(--ph-card); color: var(--ph-text); font: inherit; font-weight: 850; cursor: pointer; }.roster-modal button[type='submit'] { border-color: var(--ph-indigo); background: var(--ph-indigo); color: #fff; }
 .members-page button:focus-visible, .members-page input:focus-visible, .members-page textarea:focus-visible, .members-page a:focus-visible { outline: 3px solid var(--ph-gold); outline-offset: 2px; }
 @media (max-width: 720px) { .members-main { width: min(100% - 24px, 1180px); padding-top: 19px; } .members-header { align-items: stretch; flex-direction: column; gap: 14px; } }
+
+/* ===== Duoi 900px: bang 7 cot doi thanh danh sach the =====
+   Bang co min-width 880px nen tren dien thoai va tablet doc phai keo ngang moi
+   thay het cot (o 375px an mat 563px, tuc 5/7 cot). Doi sang the thi moi thong
+   tin nam gon trong be ngang man hinh. Nhan cot lay lai bang ::before vi thead
+   bi an. */
+@media (max-width: 899px) {
+    .members-table-wrap { overflow-x: visible; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+    .members-table { min-width: 0; display: block; }
+    .members-table thead { display: none; }
+    .members-table tbody { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+
+    .members-table tr {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 9px 12px;
+        padding: 14px;
+        border: 1px solid var(--ph-line);
+        border-radius: 17px;
+        background: var(--ph-card);
+        box-shadow: var(--ph-shadow-soft);
+    }
+    .members-table tr:last-child td { border-bottom: 0; }
+    .members-table td { display: block; min-width: 0; padding: 0; border-bottom: 0; }
+
+    /* Hang dau cua the: [checkbox] ten VDV ... ma TV */
+    .members-table td.members-pick-cell { grid-column: 1; grid-row: 1; width: auto; padding-right: 0; }
+    .members-table td.mcell--name { grid-column: 2; grid-row: 1; }
+    .members-table td.mcell--code { grid-column: 3; grid-row: 1; justify-self: end; font-size: 12px; }
+    .mcell--name .member-fullname { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* Cac dong con lai trai het be ngang the */
+    .members-table td.mcell--alias,
+    .members-table td.mcell--phr,
+    .members-table td.mcell--status,
+    .members-table td.mcell--act { grid-column: 1 / -1; }
+
+    .members-table td.mcell--alias,
+    .members-table td.mcell--phr,
+    .members-table td.mcell--status {
+        display: flex; align-items: center; justify-content: space-between; gap: 12px;
+        padding-top: 9px; border-top: 1px dashed var(--ph-line);
+    }
+    .members-table td.mcell--alias::before { content: 'Biệt danh'; }
+    .members-table td.mcell--phr::before { content: 'Trình độ PHR'; }
+    .members-table td.mcell--status::before { content: 'Trạng thái'; }
+    .members-table td.mcell--alias::before,
+    .members-table td.mcell--phr::before,
+    .members-table td.mcell--status::before {
+        flex: 0 0 auto;
+        color: var(--ph-muted); font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
+    }
+    .members-table td.mcell--status > span { justify-items: end; text-align: right; }
+
+    /* Nut thao tac tran ngang, du 44px chieu cao cham tay */
+    .members-table td.mcell--act { padding-top: 3px; }
+    .members-table td.mcell--act .roster-row-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .members-table td.mcell--act .roster-row-actions button { padding: 0 8px; font-size: 12px; }
+    .members-table td.mcell--act .ph-btn { display: flex; width: 100%; justify-content: center; }
+
+    /* Bo cuc bulk bar xep doc cho khoi tran */
+    .members-bulkbar { align-items: stretch; flex-direction: column; }
+    .members-bulkbar > div { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Tablet doc: mot the tran het be ngang thi nhan va gia tri xa nhau qua, xep
+   hai the mot hang cho day va van de doc. */
+@media (min-width: 600px) and (max-width: 899px) {
+    .members-table tbody { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Tu 900px tro len van la bang, nhung 880px min-width khong vua khung 774px cua
+   layout co side rail (1120–1279px), nen ha xuong va bop padding o. */
+@media (min-width: 900px) {
+    .members-table { min-width: 760px; }
+}
+@media (min-width: 900px) and (max-width: 1279px) {
+    .members-table th { padding: 12px 11px; }
+    .members-table td { padding: 12px 11px; }
+}

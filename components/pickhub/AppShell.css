@@ -2,15 +2,65 @@
 .ph-shell__body { display: block; }
 .ph-shell__col { display: flex; flex-direction: column; min-width: 0; }
 
-.ph-rail { display: none; }
+/* Duoi 1120px rail la drawer truot tu trai, mo bang nut ☰ tren header.
+   visibility: hidden de khi dong thi link ben trong khong bat duoc tab hay
+   cu cham. Z-index phai vuot bottom nav (1100) va home-header (1000). */
+.ph-rail {
+  position: fixed; inset: 0 auto 0 0; z-index: 1200;
+  display: flex; flex-direction: column;
+  width: min(292px, 86vw);
+  background: var(--ph-card);
+  border-right: 1px solid var(--ph-line);
+  box-shadow: 24px 0 56px rgb(10 8 18 / 26%);
+  transform: translateX(-100%);
+  visibility: hidden;
+  overscroll-behavior: contain;
+  transition: transform .22s ease, visibility .22s ease;
+}
+.ph-rail:focus { outline: none; }
+.ph-shell.is-drawer-open .ph-rail { transform: none; visibility: visible; }
+
+.ph-shell__scrim {
+  position: fixed; inset: 0; z-index: 1150;
+  background: rgb(10 8 18 / 46%);
+  opacity: 0; pointer-events: none;
+  transition: opacity .22s ease;
+}
+.ph-shell.is-drawer-open .ph-shell__scrim { opacity: 1; pointer-events: auto; }
+
+.ph-burger {
+  flex: 0 0 auto;
+  display: grid; place-items: center;
+  width: 42px; height: 42px;
+  border: 1px solid var(--ph-line); border-radius: 12px;
+  background: var(--ph-card); color: var(--ph-ink);
+  font-size: 17px; line-height: 1; cursor: pointer;
+}
+.ph-burger:hover { background: var(--ph-tint-neutral-strong); }
+.ph-burger:focus-visible { outline: 2px solid var(--ph-indigo); outline-offset: 2px; }
+
+.ph-rail__close {
+  flex: 0 0 auto; margin-left: auto;
+  display: grid; place-items: center;
+  width: 34px; height: 34px;
+  border: 1px solid var(--ph-line); border-radius: 10px;
+  background: var(--ph-card); color: var(--ph-muted);
+  font-size: 13px; line-height: 1; cursor: pointer;
+}
+.ph-rail__close:hover { background: var(--ph-tint-neutral-strong); color: var(--ph-ink); }
+.ph-rail__close:focus-visible { outline: 2px solid var(--ph-indigo); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ph-rail, .ph-shell__scrim { transition: none; }
+}
 
 @media (min-width: 1120px) {
+  /* Tro lai sidebar co dinh: xoa het dau vet cua drawer. */
   .ph-rail {
-    display: flex; flex-direction: column;
-    position: sticky; top: 0; height: 100vh;
-    background: var(--ph-card);
-    border-right: 1px solid var(--ph-line);
+    position: sticky; inset: auto; top: 0; height: 100vh; width: auto;
+    transform: none; visibility: visible; box-shadow: none; transition: none;
   }
+  .ph-shell__scrim, .ph-burger, .ph-rail__close { display: none; }
 }
 
 .ph-rail__brand { display: flex; align-items: center; gap: 12px; padding: 20px 18px; border-bottom: 1px solid var(--ph-line); }

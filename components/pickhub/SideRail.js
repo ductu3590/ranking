@@ -12,7 +12,7 @@ function initials(name) {
     return name.trim().split(/\s+/).slice(-2).map((part) => part[0]).join('').toUpperCase();
 }
 
-export default function SideRail({ role, clubName, clubLogoUrl, userName, memberCount, canLogout = false }) {
+export default function SideRail({ role, clubName, clubLogoUrl, userName, memberCount, canLogout = false, onNavigate, onClose }) {
     const pathname = usePathname();
     const links = getGlobalNavLinksForRole(role);
     const isAdmin = role === 'admin';
@@ -50,8 +50,10 @@ export default function SideRail({ role, clubName, clubLogoUrl, userName, member
         }
     }
 
+    // tabIndex -1: duoi 1120px rail la drawer, mo ra thi AppShell doi tieu diem
+    // vao day de ban phim va trinh doc man hinh di theo.
     return (
-        <div className="ph-rail">
+        <div className="ph-rail" id="ph-rail" tabIndex={-1}>
             <div className="ph-rail__brand">
                 {clubLogoUrl
                     ? <img className="ph-rail__logo" src={clubLogoUrl} alt="" />
@@ -60,6 +62,9 @@ export default function SideRail({ role, clubName, clubLogoUrl, userName, member
                     <span className="ph-rail__kicker">Câu lạc bộ</span>
                     <span className="ph-rail__name">{clubName || 'CLB của tôi'}</span>
                 </span>
+                {onClose && (
+                    <button type="button" className="ph-rail__close" aria-label="Đóng menu điều hướng" onClick={onClose}>✕</button>
+                )}
             </div>
 
             <nav className="ph-rail__nav" aria-label="Điều hướng chính">
@@ -72,6 +77,7 @@ export default function SideRail({ role, clubName, clubLogoUrl, userName, member
                             href={link.href}
                             className={`ph-rail__link${active ? ' is-active' : ''}`}
                             aria-current={active ? 'page' : undefined}
+                            onClick={onNavigate}
                         >
                             <span className="ph-rail__ico" aria-hidden="true">{link.icon}</span>
                             <span className="ph-rail__txt">{link.label}</span>

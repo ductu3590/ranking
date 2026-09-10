@@ -1,5 +1,8 @@
-.ph-bxh-page { display: flex; justify-content: center; }
-.ph-bxh-shell { width: 100%; max-width: 560px; margin: 0 auto; display: grid; gap: var(--ph-space-4); }
+.ph-bxh-page { display: flex; justify-content: center; min-width: 0; }
+/* minmax(0, 1fr) chu KHONG phai 1fr: mac dinh track cua grid rong bang
+   min-content cua noi dung, nen chi mot dong BXH khong co bop lai duoc la ca
+   trang bi keo rong hon man hinh va tran ngang. */
+.ph-bxh-shell { width: 100%; max-width: 560px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--ph-space-4); }
 
 /* Hero banner */
 .ph-bxh-hero { position: relative; overflow: hidden; padding: var(--ph-space-6) var(--ph-space-5); border-radius: var(--ph-radius-lg); background: linear-gradient(135deg, var(--ph-indigo) 0%, var(--ph-indigo) 48%, var(--ph-ink) 100%); color: var(--ph-card); box-shadow: var(--ph-shadow); }
@@ -41,8 +44,8 @@
 .ph-bxh-kpi__mini-value small { font-size: 11px; font-weight: 600; color: var(--ph-muted); }
 
 /* Two-column wrapper (desktop) */
-.ph-bxh-columns { display: grid; gap: var(--ph-space-4); }
-.ph-bxh-main, .ph-bxh-side { display: grid; gap: var(--ph-space-4); align-content: start; }
+.ph-bxh-columns { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--ph-space-4); }
+.ph-bxh-main, .ph-bxh-side { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--ph-space-4); align-content: start; min-width: 0; }
 
 /* Section headings */
 .ph-bxh-section-heading { display: flex; align-items: center; justify-content: space-between; gap: var(--ph-space-3); margin-bottom: var(--ph-space-3); }
@@ -53,7 +56,7 @@
 /* Podium */
 .ph-bxh-podium__heading { display: inline-flex; align-items: center; gap: 7px; margin: 0; font-size: 13px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--ph-muted); }
 .ph-bxh-podium__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-@media (max-width: 640px) { .ph-bxh-podium__grid { grid-template-columns: 1fr; } }
+@media (max-width: 640px) { .ph-bxh-podium__grid { grid-template-columns: minmax(0, 1fr); } }
 .ph-bxh-pod { display: flex; align-items: center; justify-content: space-between; gap: var(--ph-space-3); padding: var(--ph-space-3) var(--ph-space-4); border: 1.5px solid var(--ph-line); border-radius: var(--ph-radius-md); background: var(--ph-card); box-shadow: var(--ph-shadow-soft); }
 .ph-bxh-pod--1 { background: linear-gradient(135deg, var(--ph-tint-gold), var(--ph-tint-gold)); border-color: var(--ph-gold); }
 .ph-bxh-pod--2 { background: linear-gradient(135deg, var(--ph-tint-neutral-strong), var(--ph-tint-neutral)); border-color: var(--ph-line); }
@@ -82,8 +85,8 @@
 .ph-bxh-note a { color: var(--ph-indigo); font-weight: 700; }
 
 /* Full list */
-.ph-bxh-list { display: grid; }
-.ph-bxh-item { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 15px 0; border-bottom: 1px solid var(--ph-line); }
+.ph-bxh-list { display: grid; grid-template-columns: minmax(0, 1fr); }
+.ph-bxh-item { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-width: 0; padding: 15px 0; border-bottom: 1px solid var(--ph-line); }
 .ph-bxh-item:last-child { border-bottom: 0; }
 .ph-bxh-item__left { display: flex; align-items: center; gap: 13px; min-width: 0; }
 .ph-bxh-item__av { display: grid; place-items: center; width: 40px; height: 40px; flex: 0 0 40px; border-radius: var(--ph-radius-sm); background: var(--ph-lavender); color: var(--ph-indigo); font-size: 14px; font-weight: 800; }
@@ -105,6 +108,23 @@
 
 @media (max-width: 520px) { .ph-bxh-bar--fixed { width: 84px; } }
 
+/* ===== Dien thoai: mot dong BXH khong con nhet vua mot hang ngang =====
+   Ten VDV an het mot dong, huy hieu ("Chuoi 3", "Lan dau gop quy") xuong dong
+   duoi thay vi day khoi so tien ra ngoai man hinh. */
+@media (max-width: 600px) {
+    .ph-bxh-item { gap: 12px; }
+    .ph-bxh-item__left { gap: 11px; }
+    .ph-bxh-item__name { flex-wrap: wrap; }
+    .ph-bxh-item__name .nm { flex: 1 1 100%; }
+    .ph-bxh-tag { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+    /* So tien giu nguyen be rong (khong duoc xuong dong giua con so), phan phai
+       co lai la ten VDV vi ten da co san ellipsis. Thanh tien do an theo be
+       rong cua so tien. */
+    .ph-bxh-item__right { gap: 10px; }
+    .ph-bxh-item__amt { white-space: nowrap; }
+    .ph-bxh-bar--fixed { width: 100%; }
+}
+
 .ph-bxh-item__multi { display: block; margin-top: 6px; color: var(--ph-tint-gold-text); font-size: 11px; font-weight: 700; }
 .ph-bxh-avatar { display: grid; place-items: center; border-radius: 50%; background: var(--ph-lavender); color: var(--ph-indigo); font-weight: 800; }
 .ph-bxh-avatar--small { width: 38px; height: 38px; flex: 0 0 auto; border-radius: 12px; font-size: 14px; }
@@ -114,7 +134,7 @@
 .ph-bxh-reminder__head { display: flex; align-items: center; gap: 10px; margin-bottom: var(--ph-space-3); }
 .ph-bxh-reminder__icon { display: grid; place-items: center; width: 32px; height: 32px; flex: 0 0 auto; border-radius: 11px; background: var(--ph-tint-coral); font-size: 16px; }
 .ph-bxh-reminder__head h2 { margin: 0; font-size: 15px; color: var(--ph-ink); }
-.ph-bxh-reminder__list { display: grid; margin: 0; padding: 0; list-style: none; }
+.ph-bxh-reminder__list { display: grid; grid-template-columns: minmax(0, 1fr); margin: 0; padding: 0; list-style: none; }
 .ph-bxh-reminder__list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--ph-tint-coral-line); }
 .ph-bxh-reminder__list li:last-child { border-bottom: 0; }
 .ph-bxh-reminder__list strong { font-size: 13px; font-weight: 700; color: var(--ph-ink); }
@@ -129,16 +149,16 @@
 /* Recent activity card */
 .ph-bxh-recent { padding: var(--ph-space-4); border: 1px solid var(--ph-line); border-radius: var(--ph-radius-md); background: var(--ph-card); box-shadow: var(--ph-shadow-soft); }
 .ph-bxh-recent .ph-bxh-section-heading { margin-bottom: var(--ph-space-2); }
-.ph-bxh-recent__list { display: grid; margin: 0; padding: 0; list-style: none; }
+.ph-bxh-recent__list { display: grid; grid-template-columns: minmax(0, 1fr); margin: 0; padding: 0; list-style: none; }
 .ph-bxh-recent__list li { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--ph-line); }
 .ph-bxh-recent__list li:last-child { border-bottom: 0; }
-.ph-bxh-recent__who { min-width: 0; flex: 1 1 auto; display: grid; }
+.ph-bxh-recent__who { min-width: 0; flex: 1 1 auto; display: grid; grid-template-columns: minmax(0, 1fr); }
 .ph-bxh-recent__who strong { font-size: 12.5px; font-weight: 700; color: var(--ph-ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ph-bxh-recent__who span { font-size: 11px; color: var(--ph-muted); }
 .ph-bxh-recent__amount { flex: 0 0 auto; font-size: 13px; font-weight: 800; color: var(--ph-positive); font-variant-numeric: tabular-nums; }
 
 /* Skeleton */
-.ph-bxh-skeleton-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--ph-space-3); margin: var(--ph-space-4) 0; }
+.ph-bxh-skeleton-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--ph-space-3); margin: var(--ph-space-4) 0; }
 
 @keyframes ph-bxh-ping { 0% { box-shadow: 0 0 0 0 rgba(123, 229, 176, .6); } 70%, 100% { box-shadow: 0 0 0 7px rgba(123, 229, 176, 0); } }
 @media (prefers-reduced-motion: reduce) { .ph-bxh-hero__ping { animation: none; } }

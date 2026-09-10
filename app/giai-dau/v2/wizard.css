@@ -548,7 +548,7 @@
 /* --- Form step 2/3 nằm giữa --- */
 .w3-formwrap {
     padding: 18px 16px;
-    max-width: 640px;
+    max-width: none;
     margin: 0 auto;
     width: 100%;
 }

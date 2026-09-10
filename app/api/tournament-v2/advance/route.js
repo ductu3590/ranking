@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { requireValidatedGroupAdmin } from '@/lib/groupSession';
+import { requireTournamentAccess } from '@/lib/tournament/accessRuntime';
 import { getScheduleEngine } from '@/lib/tournament/engines';
 import { loadStageData } from '@/lib/tournament/standingsService';
 import { isStageComplete, seedNextStage } from '@/lib/tournament/orchestrator';
@@ -22,15 +23,14 @@ function rpcErrorResponse(error) {
 
 export async function POST(request) {
     try {
-        const adminCheck = await requireValidatedGroupAdmin();
-        if (!adminCheck.ok) return adminCheck.response;
-        const groupId = adminCheck.groupId;
-
         const body = await request.json();
         const stageId = body?.stageId;
         if (!stageId) {
             return NextResponse.json({ error: 'stageId is required' }, { status: 400 });
         }
+        const access = await requireTournamentAccess({ stageId, need: 'write' });
+        if (!access.ok) return access.response;
+        const groupId = access.groupId;
         const idempotencyKey = String(
             body?.idempotency_key || body?.idempotencyKey || randomUUID(),
         ).trim();

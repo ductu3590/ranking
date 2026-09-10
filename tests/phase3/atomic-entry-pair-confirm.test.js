@@ -1,0 +1,18 @@
+const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
+const root = path.join(__dirname, '..', '..');
+const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
+const migration = read('database/migrations/038_phase3_atomic_entries_pair_confirm.sql');
+const entries = read('app/api/tournament-v2/entries/route.js');
+const pairs = read('app/api/tournament-v2/pairings/route.js');
+const registrations = read('app/api/tournament-v2/registrations/route.js');
+assert(migration.includes('CREATE OR REPLACE FUNCTION public.create_tournament_entry_atomic'), 'entry RPC exists');
+assert(migration.includes('CREATE OR REPLACE FUNCTION public.create_tournament_pairs_atomic'), 'pair RPC exists');
+assert(migration.includes('pg_advisory_xact_lock'), 'RPC idempotency is serialized');
+assert(entries.includes("db.rpc('create_tournament_entry_atomic'"), 'entries route uses atomic RPC');
+assert(pairs.includes("db.rpc('create_tournament_pairs_atomic'"), 'pairings route uses atomic RPC');
+assert(registrations.includes("body.action === 'confirm_club'"), 'registration has independent club confirmation action');
+assert(registrations.includes("db.rpc('confirm_tournament_registration_club'"), 'confirmation uses versioned RPC');
+assert(!registrations.includes("patch.club_confirmation_status = 'confirmed'"), 'BTC approval does not auto-confirm club');
+console.log('phase3 atomic entry/pair confirmation contract ok');

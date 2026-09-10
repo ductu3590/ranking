@@ -5,6 +5,7 @@ import { requireValidatedGroupAdmin, getClubScope } from '@/lib/groupSession';
 import { SCORING_PRESETS, resolveStageScoring } from '@/lib/tournament/rules/scoring';
 import { TIEBREAK_PRESETS, resolveTiebreak } from '@/lib/tournament/rules/tiebreak';
 import { buildRulesPreview, SCORING_PRESET_OPTIONS, TIEBREAK_PRESET_OPTIONS } from '@/lib/tournament/wizardModel';
+import { requireTournamentAccess } from '@/lib/tournament/accessRuntime';
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -27,13 +28,13 @@ async function loadContext(tournamentId, groupId) {
 
 export async function GET(request) {
     try {
-        const scope = getClubScope();
-        if (!scope.ok) return scope.response;
         const { searchParams } = new URL(request.url);
         const tournamentId = searchParams.get('tournamentId');
         if (!tournamentId) return NextResponse.json({ error: 'tournamentId là bắt buộc' }, { status: 400 });
+        const access = await requireTournamentAccess({ tournamentId, need: 'read' });
+        if (!access.ok) return access.response;
 
-        const context = await loadContext(tournamentId, scope.groupId);
+        const context = await loadContext(tournamentId, access.groupId);
         if (!context.tournament) return NextResponse.json({ error: 'Không tìm thấy giải' }, { status: 404 });
 
         return NextResponse.json({
@@ -52,13 +53,13 @@ export async function GET(request) {
 
 export async function PATCH(request) {
     try {
-        const adminCheck = await requireValidatedGroupAdmin();
-        if (!adminCheck.ok) return adminCheck.response;
-        const groupId = adminCheck.groupId;
         const body = await request.json();
         const tournamentId = body?.tournament_id;
         const scopeTarget = body?.scope === 'division' ? 'division' : 'tournament';
         if (!tournamentId) return NextResponse.json({ error: 'tournament_id là bắt buộc' }, { status: 400 });
+        const access = await requireTournamentAccess({ tournamentId, need: 'write' });
+        if (!access.ok) return access.response;
+        const groupId = access.groupId;
         if (scopeTarget === 'division' && !body?.division_id) {
             return NextResponse.json({ error: 'division_id là bắt buộc khi override theo nội dung' }, { status: 400 });
         }

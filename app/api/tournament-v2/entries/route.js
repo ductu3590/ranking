@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { requireValidatedGroupAdmin, getClubScope } from '@/lib/groupSession';
+import { randomUUID } from 'crypto';
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -75,41 +76,23 @@ export async function POST(request) {
             return NextResponse.json({ error: 'Nội dung đánh đơn chỉ có một VĐV mỗi suất', code: 'SINGLES_ENTRY_SIZE' }, { status: 400 });
         }
 
-        const { data: entry, error } = await db
-            .from('tournament_entries')
-            .insert({
-                group_id: groupId,
-                division_id: divisionId,
-                tournament_club_id: body.tournament_club_id,
-                source_registration_id: body.source_registration_id || null,
-                name_snapshot: name,
-                color_snapshot: body.color || null,
-                seed: body.seed == null || body.seed === '' ? null : Number(body.seed),
-                status: 'approved',
-            })
-            .select(SELECT_FIELDS)
-            .single();
+        const idempotencyKey = String(body.idempotency_key || body.idempotencyKey || randomUUID());
+        if (idempotencyKey.length > 200) return NextResponse.json({ error: 'idempotency_key không hợp lệ' }, { status: 400 });
+        const rpcMembers = members.map((member) => ({
+            athlete_id: member.athlete_id ?? null,
+            display_name: String(member.display_name || name).trim(),
+            club_name: member.club_name || null,
+            phr_rating: member.phr_rating ?? null,
+            roster_role: member.roster_role || 'player',
+        }));
+        const { data, error } = await db.rpc('create_tournament_entry_atomic', {
+            p_group_id: groupId, p_division_id: Number(divisionId), p_tournament_club_id: Number(body.tournament_club_id),
+            p_name_snapshot: name, p_members: rpcMembers, p_source_registration_id: body.source_registration_id || null,
+            p_color_snapshot: body.color || null, p_seed: body.seed == null || body.seed === '' ? null : Number(body.seed),
+            p_idempotency_key: idempotencyKey,
+        });
         if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-
-        let insertedMembers = [];
-        if (members.length) {
-            const { data, error: membersError } = await db
-                .from('tournament_entry_members')
-                .insert(members.map((member) => ({
-                    group_id: groupId,
-                    entry_id: entry.id,
-                    athlete_id: member.athlete_id ?? null,
-                    display_name_snapshot: String(member.display_name || name).trim(),
-                    club_name_snapshot: member.club_name || null,
-                    skill_snapshot: member.phr_rating ?? null,
-                    roster_role: member.roster_role || 'player',
-                })))
-                .select();
-            if (membersError) return NextResponse.json({ error: membersError.message }, { status: 500 });
-            insertedMembers = data || [];
-        }
-
-        return NextResponse.json({ success: true, entry: { ...entry, members: insertedMembers } });
+        return NextResponse.json({ success: true, ...(data || {}) });
     } catch (err) {
         console.error('Entries POST error:', err);
         return NextResponse.json({ error: err.message }, { status: 500 });

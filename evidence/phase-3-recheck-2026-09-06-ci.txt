@@ -1,0 +1,188 @@
+
+> quy-pickleball@0.1.0 test:ci
+> npm run test:regression && npm run build
+
+
+> quy-pickleball@0.1.0 test:regression
+> npm run test:phase1 && npm run test:teamfund && npm run test:phase2 && npm run test:phase3 && npm run test:phase3-interclub && npm run test:phase4 && npm run test:phase5 && npm run test:phase6 && npm run test:mobile-nav && npm run test:leaderboard && npm run test:debug-guard && npm run test:admin-auth && npm run test:court-energy-css && npm run test:tournament
+
+
+> quy-pickleball@0.1.0 test:phase1
+> node tests/phase1/progress.test.js && node tests/phase1/navigation-role.test.js && node tests/phase1/migration-ledger.test.js && node tests/phase1/public-snapshot.test.js && node tests/phase1/polling-backoff.test.js && node tests/phase1/public-identity-migration.test.js && node tests/phase1/auth-boundary.test.js && node tests/phase1/atomic-mutations.test.js && node tests/phase1/tenant-constraints.test.js && node tests/phase1/tournament-member-origin.test.js && node tests/phase1/member-origin-trigger-hardening.test.js && node tests/phase1/member-origin-index.test.js && node tests/phase1/snapshot-tenant-scope.test.js && node tests/phase1/rls-hardening.test.js && node tests/phase1/fund-participant-tenancy.test.js && node tests/phase1/rate-limit.test.js && node tests/phase1/webhook-idempotency.test.js && node tests/phase1/advance-atomicity.test.js
+
+phase 1 progress contract ok
+phase 1 navigation role behavior ok
+phase 1 migration ledger behavior ok
+phase 1 public snapshot projection behavior ok
+phase 1 polling backoff behavior ok
+phase 1 public identity migration contract ok
+phase 1 auth boundary behavior ok
+phase 1 atomic mutation contract ok
+phase 1 tenant constraints contract ok
+phase 1 tournament member origin contract ok
+phase 1 member-origin trigger hardening contract ok
+phase 1 member-origin FK index contract ok
+phase 1 snapshot tenant scope contract ok
+phase 1 RLS hardening contract ok
+phase 1 fund participant tenancy contract ok
+phase 1 rate limit behavior ok
+phase 1 webhook idempotency contract ok
+phase 1 atomic stage advance contract ok
+
+> quy-pickleball@0.1.0 test:teamfund
+> node tests/teamfund-phase1.test.js && node tests/home-continuation.test.js
+
+teamfund phase 1 contract ok
+homepage continuation logout contract ok
+
+> quy-pickleball@0.1.0 test:phase2
+> node tests/multitenant-phase2.test.js
+
+multitenant phase 2 contract ok
+
+> quy-pickleball@0.1.0 test:phase3
+> node tests/multitenant-phase3.test.js
+
+multitenant phase 3 contract ok
+
+> quy-pickleball@0.1.0 test:phase3-interclub
+> node tests/phase3/interclub-migration.test.js && node tests/phase3/interclub-domain.test.js && node tests/phase3/interclub-competition.test.js && node tests/phase3/interclub-public.test.js && node tests/phase3/interclub-ui.test.js && node tests/phase3/competition-preflight.test.js && node tests/phase3/platform-auth.test.js && node tests/phase3/division-entry-migration.test.js && node tests/phase3/division-entry-convergence.test.js && node tests/phase3/scoring-rules.test.js && node tests/phase3/tiebreak-policy.test.js && node tests/phase3/score-token.test.js && node tests/phase3/share.test.js && node tests/phase3/wizard-competition-contract.test.js
+
+phase3 migration contract ok
+phase3 interclub domain ok
+phase3 interclub competition ok
+phase3 interclub public ok
+phase3 interclub ui contract ok
+Phase 3 Task 1 preflight contract: PASS
+Phase 3 Task 2 platform auth contract: PASS
+Phase 3 Task 3 migration contract: PASS
+Phase 3 Task 3 division-entry convergence integration contract: PASS
+phase3 scoring rules ok
+phase3 tiebreak policy ok
+phase3 scorekeeper token ok
+phase3 share ok
+phase3 wizard competition contract ok
+
+> quy-pickleball@0.1.0 test:phase4
+> node tests/multitenant-phase4.test.js
+
+multitenant phase 4 contract ok
+
+> quy-pickleball@0.1.0 test:phase5
+> node tests/multitenant-phase5.test.js
+
+multitenant phase 5 contract ok
+
+> quy-pickleball@0.1.0 test:phase6
+> node tests/multitenant-phase6.test.js
+
+multitenant phase 6 contract ok
+
+> quy-pickleball@0.1.0 test:mobile-nav
+> node tests/mobile-bottom-tabs.test.js
+
+mobile bottom tabs contract ok
+
+> quy-pickleball@0.1.0 test:leaderboard
+> node tests/fund-leaderboard.test.js && node tests/global-navigation.test.js
+
+fund leaderboard logic ok
+global navigation contract ok
+
+> quy-pickleball@0.1.0 test:debug-guard
+> node tests/debug-routes-guard.test.js
+
+debug routes guard ok
+
+> quy-pickleball@0.1.0 test:admin-auth
+> node tests/admin-auth.test.js
+
+admin auth contract ok
+
+> quy-pickleball@0.1.0 test:court-energy-css
+> node tests/court-energy-css.test.js
+
+Court Energy CSS contract ok
+
+> quy-pickleball@0.1.0 test:tournament
+> npm run test:t-migration && npm run test:t-engines && npm run test:t-api && npm run test:t-ui
+
+
+> quy-pickleball@0.1.0 test:t-migration
+> node tests/tournament/migration-015.test.js
+
+migration-015 contract ok
+
+> quy-pickleball@0.1.0 test:t-engines
+> node tests/tournament/seeding.test.js && node tests/tournament/match-simple.test.js && node tests/tournament/match-mlp.test.js && node tests/tournament/mlp-pairs.test.js && node tests/tournament/round-robin-schedule.test.js && node tests/tournament/round-robin-groups.test.js && node tests/tournament/round-robin-standings.test.js && node tests/tournament/knockout-schedule.test.js && node tests/tournament/knockout-standings.test.js && node tests/tournament/registry.test.js && node tests/tournament/orchestrator.test.js && node tests/tournament/mix-integration.test.js
+
+seeding ok
+match-simple ok
+match-mlp ok
+T1 8 members/4 rounds ok
+T2 4 members/4 rounds subKinds ok
+T3 determinism ok
+T4 odd members bench rotate ok
+T5 <2 VĐV throw ok
+T6 2 members/2 rounds subKinds ok
+T7 4 members/2 rounds subKinds ok
+mlp-pairs ok
+round-robin-schedule ok
+round-robin-groups ok
+round-robin-standings ok
+knockout-schedule ok
+knockout-standings ok
+registry ok
+orchestrator ok
+mix-integration ok
+
+> quy-pickleball@0.1.0 test:t-api
+> node tests/tournament/persistence.test.js && node tests/tournament/results.test.js && node tests/tournament/api-tournaments.contract.test.js && node tests/tournament/api-stages.contract.test.js && node tests/tournament/api-entrants.contract.test.js && node tests/tournament/api-generate.contract.test.js && node tests/tournament/api-games.contract.test.js && node tests/tournament/api-standings.contract.test.js && node tests/tournament/api-advance.contract.test.js && node tests/tournament/api-public.contract.test.js && node tests/tournament/api-matches.contract.test.js
+
+persistence ok
+results ok
+api-tournaments contract ok
+api-stages contract ok
+api-entrants contract ok
+api-generate contract ok
+api-games contract ok
+api-standings contract ok
+api-advance contract ok
+api-public contract ok
+api-matches contract ok
+
+> quy-pickleball@0.1.0 test:t-ui
+> node tests/tournament/ui-client.contract.test.js && node tests/tournament/ui-list.contract.test.js && node tests/tournament/ui-wizard.contract.test.js && node tests/tournament/ui-console.contract.test.js && node tests/tournament/ui-results.contract.test.js && node tests/tournament/ui-standings.contract.test.js && node tests/tournament/ui-public.contract.test.js
+
+ui-client contract ok
+ui-list contract ok
+ui-wizard contract ok
+ui-console contract ok
+ui-results contract ok
+ui-standings contract ok
+ui-public contract ok
+
+> quy-pickleball@0.1.0 build
+> next build
+
+   ▲ Next.js 14.1.0
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+
+> Build error occurred
+Error: spawn EPERM
+    at ChildProcess.spawn (node:internal/child_process:420:11)
+    at spawn (node:child_process:796:9)
+    at fork (node:child_process:174:10)
+    at ChildProcessWorker.initialize (C:\Users\ductu\ranking\node_modules\next\dist\compiled\jest-worker\index.js:1:10853)
+    at new ChildProcessWorker (C:\Users\ductu\ranking\node_modules\next\dist\compiled\jest-worker\index.js:1:10741)
+    at WorkerPool.createWorker (C:\Users\ductu\ranking\node_modules\next\dist\compiled\jest-worker\index.js:1:6314)
+    at new BaseWorkerPool (C:\Users\ductu\ranking\node_modules\next\dist\compiled\jest-worker\index.js:1:8173)
+    at new WorkerPool (C:\Users\ductu\ranking\node_modules\next\dist\compiled\jest-worker\index.js:1:6110)
+    at new Worker (C:\Users\ductu\ranking\node_modules\next\dist\compiled\jest-worker\index.js:1:23092)
+    at getWorker (C:\Users\ductu\ranking\node_modules\next\dist\build\webpack-build\index.js:87:25) {
+  errno: -4048,
+  code: 'EPERM',
+  syscall: 'spawn'
+}

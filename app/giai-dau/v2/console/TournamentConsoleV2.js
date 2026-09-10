@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { listTournaments, listStages, getCourtBoard } from '@/lib/tournamentV2Client';
-import { getCurrentGroupClient } from '@/lib/groupClient';
 import ConsoleShell from './ConsoleShell';
 import CourtsStep from './steps/CourtsStep';
 import ControlStep from './steps/ControlStep';
@@ -22,6 +21,7 @@ export default function TournamentConsoleV2({ tournamentId }) {
   const [board, setBoard] = useState(null);
   const [activeStageId, setActiveStageId] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -43,8 +43,23 @@ export default function TournamentConsoleV2({ tournamentId }) {
   }, [tournamentId]);
 
   useEffect(() => {
-    setIsAdmin(getCurrentGroupClient().role === 'admin');
+    let active = true;
+    fetch('/api/groups/session', { credentials: 'same-origin', cache: 'no-store' })
+      .then((response) => response.ok ? response.json() : null)
+      .then((view) => {
+        if (!active) return;
+        const nextSession = view?.session || null;
+        setSession(nextSession);
+        setIsAdmin(nextSession?.role === 'admin');
+      })
+      .catch(() => {
+        if (active) {
+          setSession(null);
+          setIsAdmin(false);
+        }
+      });
     load();
+    return () => { active = false; };
   }, [load]);
 
   const activeStage = stages.find((stage) => String(stage.id) === String(activeStageId)) || null;
@@ -60,7 +75,7 @@ export default function TournamentConsoleV2({ tournamentId }) {
   if (loading) return <div className="v2-state v2-loading"><span className="v2-spinner" aria-hidden="true" /><p>Đang tải dữ liệu giải...</p></div>;
   if (error) return <div className="v2-state v2-error"><p>{error}</p><button type="button" className="v2-btn-secondary" onClick={load}>Thử lại</button></div>;
 
-  return <ConsoleShell tournament={tournament} tournamentId={tournamentId} progress={board?.progress} readiness={readiness}>
+  return <ConsoleShell tournament={tournament} tournamentId={tournamentId} progress={board?.progress} readiness={readiness} actor={session}>
     {(step) => <>
       {stages.length > 1 && step !== 'control' && step !== 'log' ? <div className="ops-stage-picker" role="tablist" aria-label="Giai đoạn">
         {stages.map((stage) => <button key={stage.id} type="button" aria-pressed={String(activeStageId) === String(stage.id)} onClick={() => setActiveStageId(stage.id)}>{stage.name}</button>)}

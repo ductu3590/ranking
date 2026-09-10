@@ -28,7 +28,7 @@ function StepButton({ step, active, done, onClick }) {
   </button>;
 }
 
-export default function ConsoleShell({ tournament, progress, readiness, children }) {
+export default function ConsoleShell({ tournament, progress, readiness, actor, children }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -48,6 +48,14 @@ export default function ConsoleShell({ tournament, progress, readiness, children
       <div className="ops-live-wrap"><div className="ops-live-box"><div className="ops-live-head"><span className="ops-step-n">{control.n}</span><b>{control.label}</b></div><div className="ops-live-meta">{tournament?.status === 'live' ? <span className="ops-live-dot"><i />LIVE</span> : null}<span>{progress ? `${progress.finalized}/${progress.total} trận` : 'Chưa có dữ liệu'}</span></div><button type="button" onClick={() => go('control')}>Vào điều hành</button></div></div>
       <div className="ops-phase"><span>Trong &amp; sau giải</span></div>
       {STEPS.filter((step) => step.phase === 'after').map((step) => <StepButton key={step.key} step={step} active={activeKey === step.key} done={false} onClick={go} />)}
+      <div className="ops-admin-card">
+        <span className="ops-admin-avatar" aria-hidden="true">{String(actor?.group_code || 'PH').slice(0, 2)}</span>
+        <span className="ops-admin-copy">
+          <b>{actor?.group_name || 'PickHub'}</b>
+          <small>{actor?.role === 'admin' ? 'Quản trị viên (Admin)' : 'Đang xác thực quyền...'}</small>
+        </span>
+        <i aria-label="Đang hoạt động" />
+      </div>
     </aside>
     <div className="ops-main"><div className="ops-topbar"><button type="button" className="ops-burger" aria-label="Mở menu" onClick={() => setDrawerOpen((open) => !open)}>☰</button><span className="ops-topbar-title">{STEPS.find((step) => step.key === activeKey)?.label}</span></div><div className="ops-scroll">{children(activeKey)}</div></div>
   </div>;

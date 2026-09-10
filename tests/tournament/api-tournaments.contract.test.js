@@ -19,6 +19,9 @@ assert(/from '@\/lib\/tournament\/lifecycle'/.test(s) && /canTransition\(/.test(
 assert(/INVALID_STATUS_TRANSITION/.test(s) && /TOURNAMENT_HAS_APPROVED_REGISTRATIONS/.test(s), 'PATCH trả lỗi rõ ràng');
 assert(/canDelete\(/.test(s), 'DELETE gọi canDelete');
 assert(/groupOf\(/.test(s) && /match_progress/.test(s), 'GET trả nhóm và tiến độ');
+assert(/tournament_divisions/.test(s) && /registration_capacity/.test(s), 'GET tổng hợp sức chứa từng nội dung');
+assert(/tournament_registrations/.test(s) && /registration_summary/.test(s), 'GET trả số đăng ký đã duyệt theo giải');
+assert(/organizer_mode/.test(s) && /formats/.test(s), 'GET trả phạm vi tổ chức và thể thức để render danh sách');
 assert(/finalStandingsFrom/.test(s), 'chốt giải ghim hạng chung cuộc');
 assert(/final_standings/.test(s), 'ghi vào cột final_standings');
 console.log('api-tournaments contract ok');

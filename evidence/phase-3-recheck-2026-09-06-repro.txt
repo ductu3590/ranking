@@ -1,0 +1,4 @@
+CONFIRMED: member registrations GET returns private_note and captain_declaration.
+CONFIRMED: divisions POST rejects a platform-only session without consulting platform authorization.
+CONFIRMED: entries POST writes the entry before member failure, with no rollback/atomic RPC.
+No live database writes or real user data used.

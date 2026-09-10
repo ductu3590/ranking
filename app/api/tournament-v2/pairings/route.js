@@ -4,6 +4,7 @@ import { supabaseServer } from '@/lib/supabaseServer';
 import { requireValidatedGroupAdmin } from '@/lib/groupSession';
 import { previewPairing, confirmPairing } from '@/lib/tournament/interclub';
 import { summarizeRosterWarnings } from '@/lib/tournament/wizardModel';
+import { randomUUID } from 'crypto';
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -103,61 +104,18 @@ export async function POST(request) {
         }
         if (!locked.length) return NextResponse.json({ error: 'Chưa có cặp nào để chốt' }, { status: 400 });
 
-        const createdPairs = [];
-        const createdEntries = [];
-        for (const pair of locked) {
-            const members = pair.members.map((member) => byId.get(String(member.tournament_athlete_id))).filter(Boolean);
-            if (members.length !== pair.members.length) {
-                return NextResponse.json({ error: 'Cặp chứa VĐV không thuộc giải này' }, { status: 400 });
-            }
-            const nameSnapshot = members.map(athleteLabel).join(' / ');
+        const idempotencyKey = String(body.idempotency_key || body.idempotencyKey || randomUUID());
+        if (idempotencyKey.length > 200) return NextResponse.json({ error: 'idempotency_key không hợp lệ' }, { status: 400 });
+        const { data: atomicResult, error: atomicError } = await db.rpc('create_tournament_pairs_atomic', {
+            p_group_id: groupId,
+            p_division_id: Number(division.id),
+            p_pairs: locked,
+            p_pairing_mode: body?.pairing_mode === 'manual' || division.pairing_mode === 'manual' ? 'manual' : 'random_balanced',
+            p_idempotency_key: idempotencyKey,
+        });
+        if (atomicError) return NextResponse.json({ error: atomicError.message }, { status: 500 });
+        return NextResponse.json({ success: true, ...(atomicResult || {}) });
 
-            const { data: pairRow, error: pairError } = await db
-                .from('tournament_pairs')
-                .insert({
-                    group_id: groupId,
-                    division_id: division.id,
-                    name_snapshot: nameSnapshot,
-                    pairing_mode: body?.pairing_mode === 'manual' || division.pairing_mode === 'manual' ? 'manual' : 'random_balanced',
-                    status: 'confirmed',
-                })
-                .select('id, division_id, name_snapshot, pairing_mode, status')
-                .single();
-            if (pairError) return NextResponse.json({ error: pairError.message }, { status: 500 });
-
-            const { error: pairMemberError } = await db.from('tournament_pair_members').insert(
-                members.map((member) => ({ group_id: groupId, pair_id: pairRow.id, tournament_athlete_id: member.id, role: 'player' })),
-            );
-            if (pairMemberError) return NextResponse.json({ error: pairMemberError.message }, { status: 500 });
-            createdPairs.push(pairRow);
-
-            const { data: entryRow, error: entryError } = await db
-                .from('tournament_entries')
-                .insert({
-                    group_id: groupId,
-                    division_id: division.id,
-                    tournament_club_id: members[0].tournament_club_id,
-                    name_snapshot: nameSnapshot,
-                    status: 'approved',
-                })
-                .select('id, division_id, tournament_club_id, name_snapshot, seed, status')
-                .single();
-            if (entryError) return NextResponse.json({ error: entryError.message }, { status: 500 });
-
-            const { error: entryMemberError } = await db.from('tournament_entry_members').insert(
-                members.map((member) => ({
-                    group_id: groupId,
-                    entry_id: entryRow.id,
-                    athlete_id: member.athlete_id,
-                    display_name_snapshot: athleteLabel(member),
-                    skill_snapshot: member.phr_rating,
-                })),
-            );
-            if (entryMemberError) return NextResponse.json({ error: entryMemberError.message }, { status: 500 });
-            createdEntries.push(entryRow);
-        }
-
-        return NextResponse.json({ success: true, pairs: createdPairs, entries: createdEntries });
     } catch (err) {
         console.error('Pairings POST error:', err);
         return NextResponse.json({ error: err.message }, { status: 500 });

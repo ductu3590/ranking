@@ -187,6 +187,13 @@ async function checkTransitionGuards(guards, tournamentId, groupId) {
     return null;
 }
 
+function organizerModeForList(tournament) {
+    const configured = tournament?.settings?.organizer_mode;
+    if (['internal', 'friendly', 'community'].includes(configured)) return configured;
+    if (tournament?.organizer_type === 'community') return 'community';
+    return 'internal';
+}
+
 // Hạng chung cuộc là dữ kiện lịch sử: ghi sau khi chốt giải, nhưng lỗi ghi hạng
 // không được đảo ngược trạng thái completed đã lưu thành công.
 async function writeFinalStandings(tournamentId, groupId) {
@@ -252,7 +259,7 @@ export async function GET() {
         const ids = tournaments.map((t) => t.id);
         const { data: stages, error: stageErr } = await db
             .from('tournament_stages')
-            .select('id, tournament_id')
+            .select('id, tournament_id, schedule_format, match_format')
             .eq('group_id', groupId)
             .in('tournament_id', ids);
         if (stageErr) {
@@ -280,6 +287,54 @@ export async function GET() {
             matches = rowMatches || [];
         }
 
+        const { data: divisions, error: divisionErr } = await db
+            .from('tournament_divisions')
+            .select('id, tournament_id, capacity, registration_capacity')
+            .eq('group_id', groupId)
+            .in('tournament_id', ids);
+        if (divisionErr) {
+            return NextResponse.json({ error: divisionErr.message }, { status: 500 });
+        }
+
+        const divisionRows = divisions || [];
+        const divisionIds = divisionRows.map((division) => division.id);
+        let registrations = [];
+        if (divisionIds.length > 0) {
+            const { data: rows, error: registrationErr } = await db
+                .from('tournament_registrations')
+                .select('division_id, status')
+                .eq('group_id', groupId)
+                .in('division_id', divisionIds);
+            if (registrationErr) {
+                return NextResponse.json({ error: registrationErr.message }, { status: 500 });
+            }
+            registrations = rows || [];
+        }
+
+        const divisionToTournament = new Map(divisionRows.map((division) => [division.id, division.tournament_id]));
+        const registrationSummaryByTournament = new Map();
+        for (const division of divisionRows) {
+            const current = registrationSummaryByTournament.get(division.tournament_id) || {
+                approved: 0,
+                submitted: 0,
+                capacity: 0,
+                hasUnlimitedDivision: false,
+                divisionCount: 0,
+            };
+            const capacity = division.registration_capacity ?? division.capacity;
+            current.divisionCount += 1;
+            if (capacity == null) current.hasUnlimitedDivision = true;
+            else current.capacity += Number(capacity || 0);
+            registrationSummaryByTournament.set(division.tournament_id, current);
+        }
+        for (const registration of registrations) {
+            const tournamentId = divisionToTournament.get(registration.division_id);
+            const current = registrationSummaryByTournament.get(tournamentId);
+            if (!current) continue;
+            if (registration.status === 'approved') current.approved += 1;
+            if (registration.status === 'submitted') current.submitted += 1;
+        }
+
         const countsByTournament = new Map();
         for (const match of matches) {
             const tournamentId = (stages || []).find((s) => s.id === match.stage_id)?.tournament_id;
@@ -292,13 +347,37 @@ export async function GET() {
 
         const enriched = tournaments.map((t) => {
             const value = countsByTournament.get(t.id);
+            const registration = registrationSummaryByTournament.get(t.id);
+            const formats = Array.from(new Set(
+                (stages || [])
+                    .filter((stage) => stage.tournament_id === t.id)
+                    .map((stage) => `${stage.schedule_format}:${stage.match_format}`),
+            )).map((value) => {
+                const [schedule_format, match_format] = value.split(':');
+                return { schedule_format, match_format };
+            });
+            const registration_summary = registration ? {
+                approved: registration.approved,
+                submitted: registration.submitted,
+                capacity: registration.hasUnlimitedDivision ? null : registration.capacity,
+                division_count: registration.divisionCount,
+            } : null;
             if (!value || value.total === 0) {
-                return { ...t, match_progress: null };
+                return {
+                    ...t,
+                    organizer_mode: organizerModeForList(t),
+                    formats,
+                    registration_summary,
+                    match_progress: null,
+                };
             }
             const total = value.total;
             const finalized = value.finalized;
             return {
                 ...t,
+                organizer_mode: organizerModeForList(t),
+                formats,
+                registration_summary,
                 match_progress: {
                     total,
                     finalized,

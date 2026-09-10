@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { requireValidatedGroupAdmin, getClubScope } from '@/lib/groupSession';
+import { requireTournamentAccess } from '@/lib/tournament/accessRuntime';
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -56,14 +57,14 @@ function buildStagePayload(body, groupId) {
 
 export async function GET(request) {
     try {
-        const scope = getClubScope();
-        if (!scope.ok) return scope.response;
-        const groupId = scope.groupId;
         const { searchParams } = new URL(request.url);
         const tournamentId = searchParams.get('tournamentId');
         if (!tournamentId) {
             return NextResponse.json({ error: 'tournamentId is required' }, { status: 400 });
         }
+        const access = await requireTournamentAccess({ tournamentId, need: 'read' });
+        if (!access.ok) return access.response;
+        const groupId = access.groupId;
 
         const { data, error } = await db
             .from('tournament_stages')
@@ -85,9 +86,6 @@ export async function GET(request) {
 
 export async function POST(request) {
     try {
-        const adminCheck = await requireValidatedGroupAdmin();
-        if (!adminCheck.ok) return adminCheck.response;
-
         const body = await request.json();
         const tournamentId = body.tournament_id;
         const name = body.name?.trim();
@@ -102,6 +100,9 @@ export async function POST(request) {
         if (!body.division_id) {
             return NextResponse.json({ error: 'division_id is required for new stages' }, { status: 400 });
         }
+        const access = await requireTournamentAccess({ tournamentId, need: 'write' });
+        if (!access.ok) return access.response;
+        const groupId = access.groupId;
         if (!scheduleFormat) {
             return NextResponse.json({ error: 'schedule_format is required' }, { status: 400 });
         }
@@ -116,7 +117,7 @@ export async function POST(request) {
             const { data: existing, error: existingErr } = await db
                 .from('tournament_stages')
                 .select('stage_order')
-                .eq('group_id', adminCheck.groupId)
+                .eq('group_id', groupId)
                 .eq('tournament_id', tournamentId)
                 .order('stage_order', { ascending: false })
                 .limit(1);
@@ -133,7 +134,7 @@ export async function POST(request) {
             match_format: body.match_format || 'simple',
             status: body.status || 'pending',
             config: body.config || {},
-        }, adminCheck.groupId);
+        }, groupId);
 
         const { data, error } = await db
             .from('tournament_stages')
@@ -154,14 +155,14 @@ export async function POST(request) {
 
 export async function PATCH(request) {
     try {
-        const adminCheck = await requireValidatedGroupAdmin();
-        if (!adminCheck.ok) return adminCheck.response;
-
         const body = await request.json();
         const id = body?.id;
         if (!id) {
             return NextResponse.json({ error: 'Stage id is required' }, { status: 400 });
         }
+        const access = await requireTournamentAccess({ stageId: id, need: 'write' });
+        if (!access.ok) return access.response;
+        const groupId = access.groupId;
 
         const validationError = validateStage(body);
         if (validationError) {
@@ -176,7 +177,7 @@ export async function PATCH(request) {
             .from('tournament_stages')
             .update(payload)
             .eq('id', id)
-            .eq('group_id', adminCheck.groupId)
+            .eq('group_id', groupId)
             .select()
             .single();
 
@@ -193,20 +194,19 @@ export async function PATCH(request) {
 
 export async function DELETE(request) {
     try {
-        const adminCheck = await requireValidatedGroupAdmin();
-        if (!adminCheck.ok) return adminCheck.response;
-
         const { searchParams } = new URL(request.url);
         const id = searchParams.get('id');
         if (!id) {
             return NextResponse.json({ error: 'Stage id is required' }, { status: 400 });
         }
+        const access = await requireTournamentAccess({ stageId: id, need: 'write' });
+        if (!access.ok) return access.response;
 
         const { error } = await db
             .from('tournament_stages')
             .delete()
             .eq('id', id)
-            .eq('group_id', adminCheck.groupId);
+            .eq('group_id', access.groupId);
 
         if (error) {
             return NextResponse.json({ error: error.message }, { status: 500 });

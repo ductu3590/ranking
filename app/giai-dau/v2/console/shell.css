@@ -50,6 +50,12 @@
 .ops-live-dot i { width: 6px; height: 6px; border-radius: 50%; background: var(--ops-coral); animation: ops-blip 1.6s infinite; }
 @keyframes ops-blip { 50% { opacity: .25; } }
 .ops-live-box button { border: 0; border-radius: 10px; padding: 8px; cursor: pointer; font: 700 .8rem inherit; }
+.ops-admin-card { display: flex; align-items: center; gap: 9px; margin-top: auto; padding: 11px 8px 3px; border-top: 1px solid var(--ops-line); }
+.ops-admin-avatar { display: grid; width: 31px; height: 31px; flex: 0 0 auto; place-items: center; border-radius: 50%; background: var(--ops-indigo-soft); color: var(--ops-lavender); font-size: .7rem; font-weight: 800; text-transform: uppercase; }
+.ops-admin-copy { display: grid; min-width: 0; gap: 2px; }
+.ops-admin-copy b { overflow: hidden; color: var(--ops-ink); font-size: .76rem; text-overflow: ellipsis; white-space: nowrap; }
+.ops-admin-copy small { color: var(--ops-ink-3); font-size: .65rem; white-space: nowrap; }
+.ops-admin-card > i { width: 7px; height: 7px; margin-left: auto; border-radius: 50%; background: #41c98d; box-shadow: 0 0 0 3px rgba(65, 201, 141, .12); }
 .ops-main { display: flex; min-width: 0; flex-direction: column; }
 .ops-topbar { display: flex; align-items: center; gap: 10px; padding: 11px 16px; border-bottom: 1px solid var(--ops-line); background: var(--ops-surface); }
 .ops-topbar-title { font-size: .95rem; font-weight: 700; }

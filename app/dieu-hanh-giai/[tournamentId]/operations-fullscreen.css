@@ -1,0 +1,31 @@
+.ops-full-page {
+    min-height: 100vh;
+    background: #0A0812;
+}
+
+.ops-full-page > .ops-shell {
+    min-height: 100vh;
+}
+
+.ops-full-page-back {
+    position: fixed;
+    z-index: 80;
+    top: 12px;
+    right: 16px;
+    border: 1px solid rgba(207, 194, 255, .35);
+    border-radius: 9px;
+    padding: 7px 10px;
+    background: rgba(21, 17, 37, .92);
+    color: #efecf9;
+    cursor: pointer;
+    font: 700 .76rem var(--ph-font-loaded), system-ui, sans-serif;
+}
+
+.ops-full-page-back:hover {
+    border-color: #a98bff;
+    background: #2a2344;
+}
+
+@media (max-width: 899px) {
+    .ops-full-page-back { right: 12px; }
+}

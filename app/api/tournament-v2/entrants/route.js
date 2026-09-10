@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { requireValidatedGroupAdmin, getClubScope } from '@/lib/groupSession';
+import { requireTournamentAccess } from '@/lib/tournament/accessRuntime';
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -83,14 +84,14 @@ function buildMemberRows(members, groupId, entrantId, memberGroups = new Map()) 
 
 export async function GET(request) {
     try {
-        const scope = getClubScope();
-        if (!scope.ok) return scope.response;
-        const groupId = scope.groupId;
         const { searchParams } = new URL(request.url);
         const tournamentId = searchParams.get('tournamentId');
         if (!tournamentId) {
             return NextResponse.json({ error: 'tournamentId is required' }, { status: 400 });
         }
+        const access = await requireTournamentAccess({ tournamentId, need: 'read' });
+        if (!access.ok) return access.response;
+        const groupId = access.groupId;
 
         const { data: entrants, error } = await db
             .from('tournament_entrants')
@@ -104,7 +105,63 @@ export async function GET(request) {
         }
 
         if (!entrants || entrants.length === 0) {
-            return NextResponse.json({ entrants: [] });
+            // Giải tạo bằng wizard lưu đội ở tournament_entries theo division.
+            // Trả về cùng shape {id, name, seed} để UI không phải biết hai nguồn.
+            const { data: divisions, error: divErr } = await db
+                .from('tournament_divisions')
+                .select('id')
+                .eq('group_id', groupId)
+                .eq('tournament_id', tournamentId);
+            if (divErr) {
+                return NextResponse.json({ error: divErr.message }, { status: 500 });
+            }
+            const divisionIds = (divisions || []).map((d) => d.id);
+            if (divisionIds.length === 0) {
+                return NextResponse.json({ entrants: [] });
+            }
+
+            const { data: entries, error: entryErr } = await db
+                .from('tournament_entries')
+                .select('id, division_id, name_snapshot, color_snapshot, seed, status')
+                .eq('group_id', groupId)
+                .in('division_id', divisionIds)
+                .order('seed', { ascending: true });
+            if (entryErr) {
+                return NextResponse.json({ error: entryErr.message }, { status: 500 });
+            }
+
+            const entryIds = (entries || []).map((e) => e.id);
+            let membersByEntry = {};
+            if (entryIds.length) {
+                const { data: entryMembers, error: emErr } = await db
+                    .from('tournament_entry_members')
+                    .select('id, entry_id, display_name_snapshot, club_name_snapshot, roster_role')
+                    .eq('group_id', groupId)
+                    .in('entry_id', entryIds)
+                    .order('id', { ascending: true });
+                if (emErr) {
+                    return NextResponse.json({ error: emErr.message }, { status: 500 });
+                }
+                for (const member of entryMembers || []) {
+                    const key = String(member.entry_id);
+                    if (!membersByEntry[key]) membersByEntry[key] = [];
+                    membersByEntry[key].push(member);
+                }
+            }
+
+            return NextResponse.json({
+                entrants: (entries || []).map((e) => ({
+                    id: e.id,
+                    tournament_id: Number(tournamentId),
+                    division_id: e.division_id,
+                    name: e.name_snapshot,
+                    seed: e.seed,
+                    color: e.color_snapshot ?? null,
+                    status: e.status,
+                    source: 'entry',
+                    members: membersByEntry[String(e.id)] || [],
+                })),
+            });
         }
 
         const entrantIds = entrants.map((e) => e.id);
@@ -139,19 +196,19 @@ export async function GET(request) {
 
 export async function POST(request) {
     try {
-        const adminCheck = await requireValidatedGroupAdmin();
-        if (!adminCheck.ok) return adminCheck.response;
-
         const body = await request.json();
         const tournamentId = body.tournament_id;
         if (!tournamentId) {
             return NextResponse.json({ error: 'tournament_id is required' }, { status: 400 });
         }
+        const access = await requireTournamentAccess({ tournamentId, need: 'write' });
+        if (!access.ok) return access.response;
+        const groupId = access.groupId;
         if (!String(body.name || '').trim()) {
             return NextResponse.json({ error: 'Tên đội/cặp là bắt buộc' }, { status: 400 });
         }
 
-        const payload = buildEntrantPayload(body, adminCheck.groupId);
+        const payload = buildEntrantPayload(body, groupId);
         const memberResolution = await resolveMemberGroups(body.members);
         if (memberResolution.error) {
             return NextResponse.json({ error: memberResolution.error }, { status: 400 });
@@ -170,7 +227,7 @@ export async function POST(request) {
         let members = [];
         const memberRows = buildMemberRows(
             body.members,
-            adminCheck.groupId,
+            groupId,
             entrant.id,
             memberResolution.memberGroups,
         );
@@ -194,14 +251,16 @@ export async function POST(request) {
 
 export async function PATCH(request) {
     try {
-        const adminCheck = await requireValidatedGroupAdmin();
-        if (!adminCheck.ok) return adminCheck.response;
-
         const body = await request.json();
         const id = body?.id;
         if (!id) {
             return NextResponse.json({ error: 'Entrant id is required' }, { status: 400 });
         }
+        const { data: existingEntrant, error: existingError } = await db.from('tournament_entrants').select('tournament_id').eq('id', id).maybeSingle();
+        if (existingError || !existingEntrant) return NextResponse.json({ error: 'Entrant không tồn tại' }, { status: 404 });
+        const access = await requireTournamentAccess({ tournamentId: existingEntrant.tournament_id, need: 'write' });
+        if (!access.ok) return access.response;
+        const groupId = access.groupId;
 
         const payload = buildEntrantPayload(body);
         delete payload.group_id;
@@ -216,7 +275,7 @@ export async function PATCH(request) {
             .from('tournament_entrants')
             .update(payload)
             .eq('id', id)
-            .eq('group_id', adminCheck.groupId)
+            .eq('group_id', groupId)
             .select()
             .single();
 
@@ -229,7 +288,7 @@ export async function PATCH(request) {
             const { error: delErr } = await db
                 .from('tournament_entrant_members')
                 .delete()
-                .eq('group_id', adminCheck.groupId)
+                .eq('group_id', groupId)
                 .eq('entrant_id', id);
             if (delErr) {
                 return NextResponse.json({ error: delErr.message }, { status: 500 });
@@ -237,7 +296,7 @@ export async function PATCH(request) {
 
             const memberRows = buildMemberRows(
                 body.members,
-                adminCheck.groupId,
+                groupId,
                 id,
                 memberResolution.memberGroups,
             );
@@ -264,20 +323,21 @@ export async function PATCH(request) {
 
 export async function DELETE(request) {
     try {
-        const adminCheck = await requireValidatedGroupAdmin();
-        if (!adminCheck.ok) return adminCheck.response;
-
         const { searchParams } = new URL(request.url);
         const id = searchParams.get('id');
         if (!id) {
             return NextResponse.json({ error: 'Entrant id is required' }, { status: 400 });
         }
+        const { data: existingEntrant, error: existingError } = await db.from('tournament_entrants').select('tournament_id').eq('id', id).maybeSingle();
+        if (existingError || !existingEntrant) return NextResponse.json({ error: 'Entrant không tồn tại' }, { status: 404 });
+        const access = await requireTournamentAccess({ tournamentId: existingEntrant.tournament_id, need: 'write' });
+        if (!access.ok) return access.response;
 
         const { error } = await db
             .from('tournament_entrants')
             .delete()
             .eq('id', id)
-            .eq('group_id', adminCheck.groupId);
+            .eq('group_id', access.groupId);
 
         if (error) {
             return NextResponse.json({ error: error.message }, { status: 500 });

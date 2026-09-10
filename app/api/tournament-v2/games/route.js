@@ -116,8 +116,13 @@ async function handleGames(request) {
 
         let resolved;
         try {
+            // Giải theo division chỉ có entry_*_id; engine nói ngôn ngữ entrant_*_id.
+            // Không quy đổi ở đây thì engine nhận null và không bao giờ ra người thắng.
             resolved = engine.resolveMatch(
-                { entrant_a_id: match.entrant_a_id, entrant_b_id: match.entrant_b_id },
+                {
+                    entrant_a_id: match.entrant_a_id ?? match.entry_a_id ?? null,
+                    entrant_b_id: match.entrant_b_id ?? match.entry_b_id ?? null,
+                },
                 normalizedGames,
                 { ...(stage.config || {}), ...scoring.engine },
             );

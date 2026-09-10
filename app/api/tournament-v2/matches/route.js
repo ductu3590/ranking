@@ -30,7 +30,15 @@ export async function GET(request) {
         if (mErr) {
             return NextResponse.json({ error: mErr.message }, { status: 500 });
         }
-        const matchList = matches || [];
+        // Giải tạo bằng wizard chạy theo division nên trận chỉ có entry_*_id;
+        // toàn bộ UI (console, trang công khai) đọc entrant_*_id. Chuẩn hoá ở đây
+        // để một chỗ duy nhất biết về hai nguồn đội, thay vì vá từng màn hình.
+        const matchList = (matches || []).map((m) => ({
+            ...m,
+            entrant_a_id: m.entrant_a_id ?? m.entry_a_id ?? null,
+            entrant_b_id: m.entrant_b_id ?? m.entry_b_id ?? null,
+            winner_entrant_id: m.winner_entrant_id ?? m.winner_entry_id ?? null,
+        }));
 
         // 2. games của các match, gom theo match_id
         const gamesByMatchId = {};

@@ -52,7 +52,11 @@ function getSubKinds(pairSchedule, gamesPerMatchup) {
 
 const MATCH_STATUS_LABELS = {
     pending: 'Chưa đấu',
+    warmup: 'Khởi động',
     live: 'Đang đấu',
+    paused: 'Tạm dừng',
+    // DB ghi 'finalized' (migration 046); thiếu nhãn thì lòi chữ Anh ra giao diện.
+    finalized: 'Đã chốt',
     done: 'Đã xong',
 };
 

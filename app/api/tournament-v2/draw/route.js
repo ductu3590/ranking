@@ -37,24 +37,46 @@ async function loadEntrants(stage, groupId) {
         // Dùng để cảnh báo hai đội cùng CLB rơi chung một bảng.
         const { data: entries, error } = await db
             .from('tournament_entries')
-            .select('id, seed, tournament_club_id')
+            .select('id, seed, tournament_club_id, name_snapshot')
             .eq('group_id', groupId)
             .eq('division_id', stage.division_id);
         if (error) throw error;
-        return (entries || []).map((r) => ({ id: r.id, seed: r.seed, club_id: r.tournament_club_id ?? null }));
+        // UI bốc thăm đọc `name`; thiếu nó thì màn hình chỉ hiện "Đội #id".
+        return (entries || []).map((r) => ({
+            id: r.id,
+            seed: r.seed,
+            club_id: r.tournament_club_id ?? null,
+            name: r.name_snapshot || null,
+        }));
     }
 
     if (stageEntrants && stageEntrants.length) {
-        return stageEntrants.map((r) => ({ id: r.entrant_id, seed: r.seed_in_stage, club_id: null }));
+        const ids = stageEntrants.map((r) => r.entrant_id).filter((id) => id != null);
+        let nameById = {};
+        if (ids.length) {
+            const { data: named, error: nameErr } = await db
+                .from('tournament_entrants')
+                .select('id, name')
+                .eq('group_id', groupId)
+                .in('id', ids);
+            if (nameErr) throw nameErr;
+            nameById = Object.fromEntries((named || []).map((r) => [String(r.id), r.name]));
+        }
+        return stageEntrants.map((r) => ({
+            id: r.entrant_id,
+            seed: r.seed_in_stage,
+            club_id: null,
+            name: nameById[String(r.entrant_id)] || null,
+        }));
     }
 
     const { data: tEntrants, error: teErr } = await db
         .from('tournament_entrants')
-        .select('id, seed')
+        .select('id, seed, name')
         .eq('group_id', groupId)
         .eq('tournament_id', stage.tournament_id);
     if (teErr) throw teErr;
-    return (tEntrants || []).map((r) => ({ id: r.id, seed: r.seed, club_id: null }));
+    return (tEntrants || []).map((r) => ({ id: r.id, seed: r.seed, club_id: null, name: r.name || null }));
 }
 
 async function countPlayedMatches(stageId, groupId) {
@@ -246,9 +268,11 @@ export async function POST(request) {
                 .eq('stage_id', stage.id);
             if (clearErr) return NextResponse.json({ error: clearErr.message }, { status: 500 });
 
+            // division_id là NOT NULL từ migration 033 nên phải ghi kèm, không chỉ entry_id.
             const rows = current.slots.map((slot) => ({
                 group_id: access.groupId,
                 stage_id: stage.id,
+                division_id: stage.division_id,
                 ...(entryBased ? { entry_id: slot.entry_id } : { entrant_id: slot.entry_id }),
                 group_label: slot.group_label,
                 seed_in_stage: slot.seed_in_stage,

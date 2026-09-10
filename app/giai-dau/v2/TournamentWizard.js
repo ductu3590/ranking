@@ -311,6 +311,9 @@ export default function TournamentWizard({ onDone }) {
                 organizer_mode: scope,
                 entrant_type: competition.entrant_type,
                 description: info.description || undefined,
+                // Số ván mỗi trận là thứ duy nhất bước 1 chốt về luật; không gửi
+                // thì luật rơi về mặc định BO3 và trận BO1 không bao giờ kết thúc.
+                default_scoring: competition.best_of ? { best_of: Number(competition.best_of) } : undefined,
             });
             const tournamentId = tRes.tournament?.id;
             if (!tournamentId) throw new Error('Không nhận được mã giải.');

@@ -1,0 +1,16 @@
+.signup-page { max-width: 560px; margin: 0 auto; padding: 20px 16px 48px; display: grid; gap: 16px; }
+.signup-head span { color: var(--ph-muted); font-size: 11px; font-weight: 750; text-transform: uppercase; letter-spacing: .08em; }
+.signup-head h1 { margin: 6px 0 4px; color: var(--ph-ink); font-size: 24px; }
+.signup-head p { margin: 0; color: var(--ph-muted); line-height: 1.5; }
+.signup-card { display: grid; gap: 14px; padding: 20px; border: 1px solid var(--ph-line); border-radius: 20px; background: var(--ph-card); box-shadow: var(--ph-shadow-soft); }
+.signup-field { display: grid; gap: 6px; }
+.signup-field label { color: var(--ph-muted); font-size: 12px; font-weight: 750; }
+.signup-field input, .signup-field select { min-height: 46px; padding: 0 12px; border: 1px solid var(--ph-line); border-radius: 12px; background: var(--ph-surface); color: var(--ph-ink); font: inherit; }
+.signup-field small { color: var(--ph-muted); font-size: 11px; }
+.signup-field input:focus-visible, .signup-field select:focus-visible { outline: 3px solid var(--ph-gold); outline-offset: 2px; }
+.signup-submit { min-height: 48px; border: 0; border-radius: 14px; background: var(--ph-indigo); color: white; font-weight: 850; font-size: 15px; cursor: pointer; }
+.signup-submit:disabled { opacity: .6; cursor: not-allowed; }
+.signup-alert { padding: 12px 14px; border-radius: 12px; font-size: 13px; line-height: 1.5; }
+.signup-alert.is-error { border: 1px solid #f2c2c2; background: #fdf1f1; color: #a03030; }
+.signup-alert.is-ok { border: 1px solid #b9e2c8; background: #f1fbf5; color: #1d7a45; }
+.signup-alert a { color: inherit; font-weight: 800; }

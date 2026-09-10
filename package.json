@@ -17,7 +17,9 @@
     "test:debug-guard": "node tests/debug-routes-guard.test.js",
     "test:admin-auth": "node tests/admin-auth.test.js",
     "test:admin-layout": "node tests/admin-layout-redesign.test.js",
-    "test:identity": "node tests/identity-domain.test.js && node tests/identity-migration-028.test.js && node tests/identity-migration-029.test.js && node tests/identity-session-integration.test.js && node tests/identity-services.test.js && node tests/identity-compatibility-repository.test.js && node tests/identity-route-adapters.test.js && node tests/phase2/validated-mutation-guard.test.js",
+    "test:identity": "node tests/identity-domain.test.js && node tests/identity-migration-028.test.js && node tests/identity-migration-029.test.js && node tests/identity-session-integration.test.js && node tests/identity-services.test.js && node tests/identity-compatibility-repository.test.js && node tests/identity-route-adapters.test.js && node tests/phase2/validated-mutation-guard.test.js && node tests/athlete-accounts.test.js",
+    "test:athlete-accounts": "node tests/athlete-accounts.test.js",
+    "test:athlete-accounts-live": "node tests/athlete-accounts/live.integration.test.js",
     "test:phase2-ui": "node tests/pickhub-ui-phase2.test.js && node tests/pickhub-ui-phase2.browser.test.js",
     "test:ui-phase2": "npm run test:phase2-ui",
     "test:phase2": "node tests/multitenant-phase2.test.js",
@@ -39,7 +41,7 @@
     "test:tournament": "npm run test:t-migration && npm run test:t-lifecycle && npm run test:t-round-scoring && npm run test:t-operations && npm run test:t-ops-ui && npm run test:t-draw && npm run test:t-engines && npm run test:t-api && npm run test:t-ui",
     "test:open-registration": "node tests/open-registration/domain.test.js && node tests/open-registration/api.contract.test.js && node tests/open-registration/ui.contract.test.js",
     "test:open-registration-live": "node tests/open-registration/live.integration.test.js",
-    "test:regression": "npm run test:phase1 && npm run test:teamfund && npm run test:phase2 && npm run test:phase3 && npm run test:phase3-interclub && npm run test:phase4 && npm run test:phase5 && npm run test:phase6 && npm run test:mobile-nav && npm run test:leaderboard && npm run test:debug-guard && npm run test:admin-auth && npm run test:ph-ui && npm run test:tournament && npm run test:open-registration",
+    "test:regression": "npm run test:phase1 && npm run test:teamfund && npm run test:phase2 && npm run test:phase3 && npm run test:phase3-interclub && npm run test:phase4 && npm run test:phase5 && npm run test:phase6 && npm run test:mobile-nav && npm run test:leaderboard && npm run test:debug-guard && npm run test:admin-auth && npm run test:ph-ui && npm run test:athlete-accounts && npm run test:tournament && npm run test:open-registration",
     "test:ci": "npm run test:regression && npm run build"
   },
   "dependencies": {

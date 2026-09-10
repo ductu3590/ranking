@@ -31,8 +31,8 @@ export default function MemberProfileView({
                         <p>Liên kết tài khoản để tự quản lý chỉ số PHR, xem lịch sử đóng góp quỹ của riêng mình và nhận thông báo trực tiếp.</p>
                     </div>
                     <div className="member-cta__act">
-                        <button type="button" className="ph-btn" disabled>Tạo tài khoản &amp; liên kết VĐV này</button>
-                        <small>Chưa hoạt động — sẽ mở ở bước sau</small>
+                        <a className="ph-btn" href={`/dang-ky?membershipId=${athleteMembership.id}`}>Tạo tài khoản &amp; liên kết VĐV này</a>
+                        <small>Mỗi hồ sơ chỉ liên kết được một tài khoản</small>
                     </div>
                 </section>
             )}

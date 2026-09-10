@@ -31,6 +31,23 @@ assert(/\.eq\('group_id'/.test(route), 'Route thông báo phải scope theo grou
 
 const bell = fs.readFileSync(path.join(root, 'components/pickhub/PhNotificationBell.js'), 'utf8');
 assert(/aria-label/.test(bell), 'Chuông phải có aria-label');
-assert(/PhModal/.test(bell) || /role="dialog"/.test(bell), 'Panel chuông phải dùng contract dialog');
+assert(/createPortal/.test(bell) && /ph-notification-layer/.test(bell), 'Chuông phải dùng lớp portal độc lập trên cùng');
+assert(!/PhModal/.test(bell), 'Chuông không được gọi modal chung của trang');
+assert(/setError/.test(bell) && /Không tải được thông báo/.test(bell), 'Chuông phải thông báo rõ khi tải việc cần xử lý thất bại');
+assert(fs.existsSync(path.join(root, 'components/pickhub/PhNotificationBell.css')), 'Panel chuông có CSS lớp riêng');
+const bellCss = fs.readFileSync(path.join(root, 'components/pickhub/PhNotificationBell.css'), 'utf8');
+assert(/z-index:\s*1000/.test(bellCss) && !/ph-notification-layer[^}]*background:\s*var\(--ph-backdrop\)/.test(bellCss), 'Panel chuông ở lớp trên cùng và không phủ backdrop modal');
+
+const modal = fs.readFileSync(path.join(root, 'components/pickhub/PhModal.js'), 'utf8');
+assert(/aria-label="Đóng"/.test(modal) && /onClick=\{onClose\}/.test(modal), 'Modal thông báo phải có nút đóng nhìn thấy');
+const primitives = fs.readFileSync(path.join(root, 'app/styles/primitives.css'), 'utf8');
+assert(/\.ph-modal\s*\{[^}]*position:\s*relative/.test(primitives), 'Nút đóng phải được neo trong khung modal');
+
+const rail = fs.readFileSync(path.join(root, 'components/pickhub/SideRail.js'), 'utf8');
+assert(/aria-haspopup="menu"/.test(rail) && /Đăng xuất/.test(rail), 'Thẻ quản trị viên phải mở menu tài khoản có Đăng xuất');
+assert(/fetch\('\/api\/groups\/session', \{ method: 'DELETE' \}\)/.test(rail), 'Đăng xuất menu trái phải xoá group session trên server');
+const appShellCss = fs.readFileSync(path.join(root, 'components/pickhub/AppShell.css'), 'utf8');
+assert(/\.ph-usercard__name[^}]*white-space:\s*nowrap/.test(appShellCss), 'Tên quản trị viên không được xuống dòng');
+assert(/\.ph-usercard__role[^}]*white-space:\s*nowrap/.test(appShellCss), 'Vai trò quản trị viên không được xuống dòng');
 
 console.log('club-notifications: PASS');

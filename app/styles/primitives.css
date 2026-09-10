@@ -64,8 +64,10 @@
 
 /* Modal */
 .ph-modal__backdrop { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 16px; background: var(--ph-backdrop); }
-.ph-modal { width: min(520px, 100%); max-height: 85vh; overflow: auto; padding: var(--ph-space-6); background: var(--ph-card); border-radius: var(--ph-radius-md); box-shadow: var(--ph-shadow); }
+.ph-modal { position: relative; width: min(520px, 100%); max-height: 85vh; overflow: auto; padding: var(--ph-space-6); background: var(--ph-card); border-radius: var(--ph-radius-md); box-shadow: var(--ph-shadow); }
 .ph-modal__title { margin: 0 0 8px; font-size: 17px; font-weight: 800; letter-spacing: -.02em; color: var(--ph-ink); }
+.ph-modal__close { position: absolute; top: 12px; right: 12px; display: grid; width: 32px; height: 32px; place-items: center; border: 0; border-radius: 9px; background: transparent; color: var(--ph-muted); cursor: pointer; font-size: 24px; line-height: 1; }
+.ph-modal__close:hover, .ph-modal__close:focus-visible { background: var(--ph-tint-neutral-strong); color: var(--ph-ink); outline: none; }
 .ph-modal__actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: var(--ph-space-6); }
 
 /* Truong nhap */

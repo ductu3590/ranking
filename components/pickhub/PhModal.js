@@ -61,6 +61,7 @@ export default function PhModal({ open, title, onClose, children, footer }) {
                 ref={dialogRef}
             >
                 <h2 className="ph-modal__title" id={titleId}>{title}</h2>
+                <button type="button" className="ph-modal__close" aria-label="Đóng" onClick={onClose}>×</button>
                 {children}
                 {footer && <div className="ph-modal__actions">{footer}</div>}
             </div>

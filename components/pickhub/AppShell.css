@@ -32,15 +32,31 @@
 .ph-rail__count { padding: 2px 8px; border-radius: 999px; background: var(--ph-tint-neutral); color: var(--ph-ink-2); font-size: 11px; font-weight: 700; }
 .ph-rail__link.is-active .ph-rail__count { background: var(--ph-card); color: var(--ph-indigo); }
 
-.ph-usercard { display: flex; align-items: center; gap: 11px; margin: 12px; padding: 12px; border-radius: var(--ph-radius-sm); background: var(--ph-tint-neutral-strong); border: 1px solid var(--ph-line); }
-.ph-usercard__av { display: grid; place-items: center; width: 38px; height: 38px; flex: 0 0 38px; border-radius: 999px; background: var(--ph-lavender); color: var(--ph-indigo); font-size: 12px; font-weight: 800; }
-.ph-usercard__body { flex: 1; min-width: 0; }
-.ph-usercard__name { display: block; font-size: 13px; font-weight: 800; line-height: 1.2; }
-.ph-usercard__role { display: block; margin-top: 2px; font-size: 11px; font-weight: 600; color: var(--ph-muted); }
+.ph-usercard-wrap { position: relative; margin: 12px; }
+.ph-usercard { display: flex; align-items: center; gap: 8px; padding: 10px 10px 10px 12px; border-radius: var(--ph-radius-sm); background: var(--ph-tint-neutral-strong); border: 1px solid var(--ph-line); }
+.ph-usercard__account { display: flex; align-items: center; gap: 9px; min-width: 0; flex: 1 1 auto; padding: 0; border: 0; background: transparent; color: inherit; cursor: pointer; text-align: left; }
+.ph-usercard__account:hover .ph-usercard__name { color: var(--ph-indigo); }
+.ph-usercard__av { display: grid; place-items: center; width: 34px; height: 34px; flex: 0 0 34px; border-radius: 999px; background: var(--ph-lavender); color: var(--ph-indigo); font-size: 12px; font-weight: 800; }
+.ph-usercard__body { flex: 1 1 auto; min-width: 0; }
+/* Ten va vai tro luon mot dong, tran thi cat bang dau ba cham. */
+.ph-usercard__name { display: block; font-size: 13px; font-weight: 800; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ph-usercard__role { display: block; margin-top: 2px; font-size: 11px; font-weight: 600; color: var(--ph-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ph-usercard__caret { flex: 0 0 auto; color: var(--ph-muted); font-size: 15px; line-height: 1; transition: transform .15s ease; }
+.ph-usercard__account[aria-expanded="true"] .ph-usercard__caret { transform: rotate(180deg); }
 .ph-usercard__dot { width: 8px; height: 8px; flex: 0 0 8px; border-radius: 999px; background: var(--ph-positive); }
-.ph-usercard__bell { flex: 0 0 auto; }
+.ph-usercard__bell { position: relative; flex: 0 0 auto; }
+.ph-usercard__bell .ph-btn { min-height: 32px; padding: 0 6px; }
+/* So viec can xu ly dan len goc chuong de be rong the khong doi, ten khoi bi cat. */
+.ph-usercard__bell .ph-badge { position: absolute; top: -3px; right: -3px; justify-content: center; min-width: 18px; height: 18px; padding: 0 4px; border: 2px solid var(--ph-tint-neutral-strong); border-radius: 999px; font-size: 10px; font-weight: 800; line-height: 1; }
+.ph-usercard__menu { position: absolute; z-index: 70; right: 0; bottom: calc(100% + 8px); min-width: 174px; padding: 6px; border: 1px solid var(--ph-line); border-radius: var(--ph-radius-sm); background: var(--ph-card); box-shadow: 0 12px 28px rgb(28 35 70 / 16%); }
+.ph-usercard__logout { width: 100%; min-height: 38px; padding: 0 10px; border: 0; border-radius: var(--ph-radius-xs); background: transparent; color: var(--ph-negative); cursor: pointer; font-size: 13px; font-weight: 800; text-align: left; }
+.ph-usercard__logout:hover, .ph-usercard__logout:focus-visible { background: var(--ph-tint-negative); outline: none; }
+.ph-usercard__logout:disabled { cursor: wait; opacity: .7; }
 
 .ph-shell__main { width: min(1280px, 100%); margin: 0 auto; padding: 24px 16px 48px; }
+
+/* Bàn quản lý giải cần bề ngang cho lịch, bảng đấu và wizard nhiều cột. */
+.ph-shell--tournament .ph-shell__main { max-width: none; }
 
 @media (min-width: 768px) {
   .ph-shell__main { padding: 32px 24px 56px; }

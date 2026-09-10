@@ -8,9 +8,10 @@ import AppTopBar from './AppTopBar';
 import PhNotificationBell from './PhNotificationBell';
 import './AppShell.css';
 
-export default function AppShell({ children }) {
+export default function AppShell({ children, layout = '' }) {
     const [role, setRole] = useState('member');
     const [club, setClub] = useState({ name: '', code: '', logoUrl: null, userName: '' });
+    const [hasClubSession, setHasClubSession] = useState(false);
 
     useEffect(() => {
         let active = true;
@@ -22,6 +23,9 @@ export default function AppShell({ children }) {
                 const sessionRole = payload?.session?.role;
                 if (payload?.permissions?.canViewClub && ['admin', 'member'].includes(sessionRole)) {
                     setRole(sessionRole);
+                    setHasClubSession(true);
+                } else {
+                    setHasClubSession(false);
                 }
                 if (payload?.session) {
                     setClub((current) => ({
@@ -49,13 +53,14 @@ export default function AppShell({ children }) {
     }, []);
 
     return (
-        <div className="ph-shell">
+        <div className={`ph-shell${layout ? ` ph-shell--${layout}` : ''}`}>
             <div className="ph-shell__body">
                 <SideRail
                     role={role}
                     clubName={club.name}
                     clubLogoUrl={club.logoUrl}
                     userName={club.userName}
+                    canLogout={hasClubSession}
                 />
                 <div className="ph-shell__col">
                     <HomeHeader trailing={role === 'admin' ? <span className="ph-shell__headerbell"><PhNotificationBell /></span> : null} />

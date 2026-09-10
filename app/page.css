@@ -1,277 +1,619 @@
-.teamfund-home {
-    min-height: 100vh;
-    min-height: 100dvh;
-    background: var(--surface-court-soft);
-    color: var(--text-primary);
-    display: flex;
-    justify-content: center;
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
+/* Trang chu cong khai (landing). Dung token --ph-* cua he thiet ke PickHub.
+   Mobile-first: 1 cot tu ~380px, mo rong toi da 896px tren desktop. */
 
-.teamfund-app {
-    width: min(100%, 480px);
-    min-height: 100vh;
-    min-height: 100dvh;
+.ph-land {
     display: flex;
     flex-direction: column;
-    background: var(--surface-court);
+    min-height: 100vh;
+    min-height: 100dvh;
+    color: var(--ph-text);
+    background-color: var(--ph-surface);
+    background-image: radial-gradient(var(--ph-tint-indigo-line) 1px, transparent 1px);
+    background-size: 24px 24px;
 }
 
-@media (min-width: 520px) {
-    .teamfund-app {
-        box-shadow: 0 0 50px rgba(20, 38, 45, .16);
-    }
+/* ---------- Thanh dieu huong dinh dau trang ---------- */
+
+.ph-land__nav {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: rgb(255 255 255 / 82%);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--ph-line);
 }
 
-/* App bar */
-.teamfund-appbar {
+.ph-land__navinner {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: calc(env(safe-area-inset-top, 0px) + 22px) 20px 22px;
-    background: var(--gradient-court-hero);
-    color: #fff;
-    border-bottom-left-radius: 24px;
-    border-bottom-right-radius: 24px;
-    box-shadow: 0 16px 38px rgba(7, 27, 24, 0.22);
+    justify-content: space-between;
+    gap: 12px;
+    width: min(100%, 960px);
+    min-height: 64px;
+    margin: 0 auto;
+    padding: 0 16px;
 }
 
-.teamfund-app-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 15px;
+.ph-land__brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px;
+    border-radius: var(--ph-radius-sm);
+    color: inherit;
+    text-decoration: none;
+}
+
+.ph-land__brandmark {
     display: grid;
     place-items: center;
-    background: rgba(255, 255, 255, .18);
-    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    border-radius: var(--ph-radius-sm);
+    background: linear-gradient(135deg, #7C4DD6 0%, #5A37AD 100%);
+    color: #fff;
+    box-shadow: 0 6px 16px rgb(111 72 201 / 28%);
+    transition: transform .18s ease;
 }
 
-.teamfund-app-icon svg {
-    width: 32px;
-    height: 32px;
-}
+.ph-land__brand:hover .ph-land__brandmark { transform: scale(1.05); }
 
-.teamfund-appbar-text h1 {
-    margin: 0;
-    font-size: 22px;
-    line-height: 1;
-    font-weight: 900;
-    letter-spacing: 0;
-}
+.ph-land__brandmark svg { width: 22px; height: 22px; }
 
-.teamfund-appbar-text p {
-    margin: 4px 0 0;
-    font-size: 12.5px;
-    font-weight: 500;
-    opacity: .92;
-}
-
-/* Content */
-.teamfund-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    padding: 22px 16px calc(env(safe-area-inset-bottom, 0px) + 32px);
-}
-
-.teamfund-block {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.teamfund-section-title {
+.ph-land__brandtext {
     display: flex;
     align-items: center;
-    gap: 7px;
-    margin: 0;
-    color: var(--text-secondary);
-    font-size: 12px;
+    gap: 8px;
+    min-width: 0;
+}
+
+.ph-land__wordmark {
+    font-size: 19px;
     font-weight: 800;
-    text-transform: uppercase;
+    letter-spacing: -.02em;
+    background: linear-gradient(90deg, #5A37AD 0%, #4F46E5 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.ph-land__brandtag {
+    display: none;
+    padding: 2px 9px;
+    border: 1px solid var(--ph-tint-indigo-line);
+    border-radius: 999px;
+    background: var(--ph-tint-indigo);
+    color: var(--ph-indigo);
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.ph-land__navcta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 55%;
+    min-height: 38px;
+    padding: 0 12px;
+    border: 1px solid var(--ph-line);
+    border-radius: 999px;
+    background: var(--ph-card);
+    color: var(--ph-ink);
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.ph-land__navcta:hover {
+    border-color: var(--ph-tint-indigo-line);
+    box-shadow: var(--ph-shadow-soft);
+}
+
+.ph-land__navdot {
+    width: 7px;
+    height: 7px;
+    flex: 0 0 7px;
+    border-radius: 999px;
+    background: var(--ph-positive);
+}
+
+.ph-land__navclub {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ph-land__navcode {
+    flex: 0 0 auto;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--ph-tint-neutral);
+    color: var(--ph-muted);
+    font-size: 10px;
     letter-spacing: .04em;
 }
 
-.teamfund-section-title svg {
+/* ---------- Khung noi dung ---------- */
+
+.ph-land__main {
+    flex: 1;
+    width: min(100%, 960px);
+    margin: 0 auto;
+    padding: 20px 16px 40px;
+}
+
+/* ---------- Hero ---------- */
+
+.ph-land__hero {
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 28px;
+    padding: 22px;
+    border-radius: var(--ph-radius-lg);
+    background: linear-gradient(135deg, #7C4DD6 0%, #6F48C9 45%, #4F46E5 100%);
+    color: #fff;
+    box-shadow: 0 20px 44px rgb(79 70 229 / 22%);
+}
+
+.ph-land__glow {
+    position: absolute;
+    border-radius: 999px;
+    pointer-events: none;
+}
+
+.ph-land__glow--a {
+    right: -40px;
+    bottom: -40px;
+    width: 190px;
+    height: 190px;
+    background: rgb(255 255 255 / 12%);
+    filter: blur(34px);
+}
+
+.ph-land__glow--b {
+    right: 48px;
+    top: 12px;
+    width: 128px;
+    height: 128px;
+    background: rgb(168 223 233 / 26%);
+    filter: blur(26px);
+}
+
+.ph-land__herorow {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.ph-land__heromain {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    min-width: 0;
+}
+
+.ph-land__heroicon {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    flex: 0 0 56px;
+    border-radius: var(--ph-radius-md);
+    background: rgb(255 255 255 / 16%);
+    border: 1px solid rgb(255 255 255 / 22%);
+}
+
+.ph-land__heroicon svg { width: 34px; height: 34px; }
+
+.ph-land__herotext { min-width: 0; }
+
+.ph-land__herotext h1 {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -.02em;
+}
+
+.ph-land__herotext p {
+    margin: 6px 0 0;
+    color: rgb(255 255 255 / 88%);
+    font-size: 13.5px;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.ph-land__herochip {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    gap: 7px;
+    padding: 6px 13px;
+    border: 1px solid rgb(255 255 255 / 30%);
+    border-radius: 999px;
+    background: rgb(255 255 255 / 18%);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.ph-land__herochip svg {
+    width: 14px;
+    height: 14px;
+    color: #C8F169;
+}
+
+/* ---------- Khoi hanh dong ---------- */
+
+.ph-land__block { margin-bottom: 28px; }
+
+.ph-land__blocktitle {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0 0 12px;
+    padding: 0 4px;
+    color: var(--ph-ink-2);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+
+.ph-land__blocktitle svg {
     width: 15px;
     height: 15px;
+    color: var(--ph-indigo);
 }
 
-/* Cards / rows */
-.teamfund-group-card,
-.teamfund-action-row {
-    width: 100%;
-    border: 1px solid var(--border-color);
-    background: #fff;
-    box-shadow: var(--shadow-sm);
-    border-radius: 16px;
-}
-
-.teamfund-group-card {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 15px;
-}
-
-.teamfund-row-main {
-    display: flex;
-    align-items: center;
-    gap: 13px;
-    min-width: 0;
-}
-
-.teamfund-tile {
-    width: 44px;
-    height: 44px;
-    border-radius: 13px;
-    display: grid;
-    place-items: center;
-    flex: 0 0 auto;
-}
-
-.teamfund-tile svg {
-    width: 23px;
-    height: 23px;
-}
-
-.teamfund-tile-orange {
-    background: var(--pickle-lime-soft);
-    color: var(--court-green);
-}
-
-.teamfund-tile-purple {
-    background: var(--court-green-soft);
-    color: var(--court-green);
-}
-
-.teamfund-tile-blue {
-    background: var(--live-cyan-soft);
-    color: var(--court-green);
-}
-
-.teamfund-item-text {
-    min-width: 0;
-    text-align: left;
-}
-
-.teamfund-item-text strong {
-    display: block;
-    color: var(--text-primary);
-    font-size: 15px;
-    line-height: 1.2;
-    font-weight: 800;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.teamfund-item-text span {
-    display: block;
-    margin-top: 3px;
-    color: var(--text-muted);
-    font-size: 12px;
-    line-height: 1.25;
-    font-weight: 500;
-}
-
-.teamfund-role-pill {
-    display: inline-flex !important;
-    margin-top: 6px !important;
-    color: var(--court-midnight) !important;
-    background: var(--pickle-lime-soft);
-    border-radius: 999px;
-    padding: 3px 10px;
-    font-size: 11px !important;
-    font-weight: 800 !important;
-}
-
-.teamfund-more {
-    width: 32px;
-    height: 32px;
-    display: grid;
-    place-items: center;
-    border-radius: 999px;
-    color: var(--text-muted);
-    background: var(--surface-court-soft);
-    flex: 0 0 auto;
-    text-decoration: none;
-}
-
-.teamfund-more svg {
-    width: 18px;
-    height: 18px;
-}
-
-.teamfund-actions {
+.ph-land__rows {
     display: grid;
     gap: 12px;
 }
 
-.teamfund-action-row {
+.ph-land__row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 15px;
-    cursor: pointer;
+    gap: 14px;
+    width: 100%;
+    padding: 16px;
+    border: 1px solid var(--ph-line);
+    border-radius: var(--ph-radius-md);
+    background: var(--ph-card);
+    box-shadow: var(--ph-shadow-soft);
+    color: var(--ph-text);
     font: inherit;
     text-align: left;
-    color: var(--text-primary);
     text-decoration: none;
-    transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease;
+    cursor: pointer;
+    transition: transform .14s ease, border-color .14s ease, box-shadow .14s ease;
 }
 
-.teamfund-continue-card {
-    border-color: rgba(15, 168, 103, .32);
-    background: linear-gradient(135deg, #ffffff 0%, #f0fff8 100%);
-}
-
-.teamfund-continue-card:hover,
-.teamfund-continue-card:focus-visible {
-    border-color: var(--court-green);
-}
-
-.teamfund-action-row:hover,
-.teamfund-action-row:focus-visible {
-    border-color: var(--border-strong);
-    box-shadow: var(--shadow-md);
+.ph-land__row:hover,
+.ph-land__row:focus-visible {
     transform: translateY(-1px);
-    outline: none;
+    border-color: var(--ph-tint-indigo-line);
+    box-shadow: var(--ph-shadow);
 }
 
-.teamfund-action-row:active {
-    transform: translateY(0);
+.ph-land__row:active { transform: translateY(0); }
+
+.ph-land__row--continue {
+    border-color: rgb(31 122 82 / 32%);
+    background: linear-gradient(135deg, #fff 0%, var(--ph-tint-positive) 100%);
 }
 
-.teamfund-chevron {
-    width: 20px;
-    height: 20px;
-    color: var(--text-muted);
-    flex: 0 0 auto;
+.ph-land__row--continue:hover,
+.ph-land__row--continue:focus-visible {
+    border-color: var(--ph-positive);
 }
 
-/* Modal */
+.ph-land__rowmain {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+}
+
+.ph-land__tile {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
+    border-radius: var(--ph-radius-card);
+    transition: transform .14s ease;
+}
+
+.ph-land__row:hover .ph-land__tile { transform: scale(1.05); }
+
+.ph-land__tile svg { width: 24px; height: 24px; }
+
+.ph-land__tile--gold {
+    border: 1px solid var(--ph-tint-gold-line);
+    background: var(--ph-tint-gold);
+    color: var(--ph-tint-gold-text);
+}
+
+.ph-land__tile--indigo {
+    border: 1px solid var(--ph-tint-indigo-line);
+    background: var(--ph-tint-indigo);
+    color: var(--ph-indigo);
+}
+
+.ph-land__tile--cyan {
+    border: 1px solid var(--ph-tint-cyan-line);
+    background: var(--ph-tint-cyan);
+    color: #1F7C8F;
+}
+
+.ph-land__tile--lime {
+    border: 1px solid rgb(31 122 82 / 22%);
+    background: var(--ph-tint-positive);
+    color: var(--ph-positive);
+}
+
+.ph-land__rowtext { min-width: 0; }
+
+.ph-land__rowtext strong {
+    display: block;
+    font-size: 15.5px;
+    font-weight: 800;
+    line-height: 1.25;
+    letter-spacing: -.01em;
+}
+
+.ph-land__new {
+    display: inline-block;
+    margin-left: 7px;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: var(--ph-tint-gold);
+    color: var(--ph-tint-gold-text);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    vertical-align: middle;
+}
+
+.ph-land__rowsub {
+    display: block;
+    margin-top: 4px;
+    color: var(--ph-muted);
+    font-size: 12.5px;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.ph-land__rowmeta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.ph-land__pill {
+    padding: 3px 10px;
+    border: 1px solid var(--ph-tint-gold-line);
+    border-radius: 999px;
+    background: var(--ph-tint-gold);
+    color: var(--ph-tint-gold-text);
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.ph-land__code {
+    color: var(--ph-muted);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .04em;
+}
+
+.ph-land__arrow {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+    border-radius: 999px;
+    background: var(--ph-tint-neutral-strong);
+    color: var(--ph-muted);
+    transition: transform .14s ease, color .14s ease;
+}
+
+.ph-land__row:hover .ph-land__arrow {
+    transform: translateX(3px);
+    color: var(--ph-indigo);
+}
+
+.ph-land__row--continue:hover .ph-land__arrow { color: var(--ph-positive); }
+
+.ph-land__arrow svg { width: 19px; height: 19px; }
+
+/* ---------- Khoi gia tri ---------- */
+
+.ph-land__features {
+    padding-top: 22px;
+    border-top: 1px solid var(--ph-line);
+}
+
+.ph-land__featurehead {
+    margin-bottom: 18px;
+    text-align: center;
+}
+
+.ph-land__featurehead h2 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: -.01em;
+}
+
+.ph-land__featurehead p {
+    margin: 5px 0 0;
+    color: var(--ph-muted);
+    font-size: 12.5px;
+    font-weight: 500;
+}
+
+.ph-land__featuregrid {
+    display: grid;
+    gap: 12px;
+}
+
+.ph-land__feature {
+    padding: 18px;
+    border: 1px solid var(--ph-line);
+    border-radius: var(--ph-radius-md);
+    background: var(--ph-card);
+    box-shadow: var(--ph-shadow-soft);
+}
+
+.ph-land__featureicon {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    margin-bottom: 12px;
+    border-radius: var(--ph-radius-sm);
+}
+
+.ph-land__featureicon svg { width: 20px; height: 20px; }
+
+.ph-land__featureicon--indigo { background: var(--ph-tint-indigo); color: var(--ph-indigo); }
+.ph-land__featureicon--gold { background: var(--ph-tint-gold); color: var(--ph-tint-gold-text); }
+.ph-land__featureicon--cyan { background: var(--ph-tint-cyan); color: #1F7C8F; }
+
+.ph-land__feature h3 {
+    margin: 0 0 6px;
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1.3;
+}
+
+.ph-land__feature p {
+    margin: 0;
+    color: var(--ph-muted);
+    font-size: 12.5px;
+    font-weight: 500;
+    line-height: 1.55;
+}
+
+.ph-land__highlights {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-around;
+    gap: 16px;
+    margin-top: 20px;
+    padding: 18px;
+    border-radius: var(--ph-radius-md);
+    background: var(--ph-ink);
+    color: #fff;
+    text-align: center;
+}
+
+.ph-land__highlight strong {
+    display: block;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -.01em;
+}
+
+.ph-land__highlight:nth-child(1) strong { color: #C4B5FD; }
+.ph-land__highlight:nth-child(3) strong { color: #86EFAC; }
+.ph-land__highlight:nth-child(5) strong { color: var(--ph-gold); }
+
+.ph-land__highlight span {
+    display: block;
+    margin-top: 3px;
+    color: rgb(255 255 255 / 66%);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.ph-land__hairline {
+    display: none;
+    width: 1px;
+    height: 32px;
+    background: rgb(255 255 255 / 16%);
+}
+
+/* ---------- Chan trang ---------- */
+
+.ph-land__footer {
+    margin-top: 28px;
+    padding: 22px 16px;
+    border-top: 1px solid var(--ph-line);
+    background: var(--ph-card);
+    text-align: center;
+}
+
+.ph-land__footer p {
+    width: min(100%, 720px);
+    margin: 0 auto;
+    color: var(--ph-muted);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.6;
+}
+
+.ph-land__footer strong { color: var(--ph-ink-2); font-weight: 800; }
+
+/* ---------- Man hinh rong ---------- */
+
+@media (min-width: 640px) {
+    .ph-land__brandtag { display: inline-block; }
+    .ph-land__navinner { padding: 0 24px; }
+    .ph-land__main { padding: 28px 24px 48px; }
+    .ph-land__hero { padding: 30px; }
+    .ph-land__herorow { flex-direction: row; align-items: center; justify-content: space-between; }
+    .ph-land__herochip { align-self: center; }
+    .ph-land__herotext h1 { font-size: 30px; }
+    .ph-land__herotext p { font-size: 15px; }
+    .ph-land__blocktitle { font-size: 13px; }
+    .ph-land__row { padding: 18px 20px; }
+    .ph-land__rowtext strong { font-size: 17px; }
+    .ph-land__rowsub { font-size: 13px; }
+    .ph-land__featurehead h2 { font-size: 19px; }
+    .ph-land__hairline { display: block; }
+}
+
+@media (min-width: 860px) {
+    .ph-land__featuregrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .ph-land__highlight strong { font-size: 24px; }
+}
+
+/* ---------- Modal tao / tham gia CLB ---------- */
+
 .teamfund-modal-backdrop {
     position: fixed;
     inset: 0;
-    z-index: 50;
+    z-index: 60;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 18px;
-    background: rgba(10, 18, 25, .62);
-    backdrop-filter: blur(8px);
+    background: var(--ph-backdrop);
+    backdrop-filter: blur(6px);
 }
 
 .teamfund-modal {
     width: min(100%, 430px);
     max-height: 92vh;
     overflow: auto;
-    border-radius: 20px;
-    background: #fff;
-    border: 1px solid var(--border-color);
-    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--ph-line);
+    border-radius: var(--ph-radius-md);
+    background: var(--ph-card);
+    box-shadow: var(--ph-shadow);
 }
 
 .teamfund-modal-header {
@@ -280,53 +622,52 @@
     justify-content: space-between;
     gap: 12px;
     padding: 18px 20px;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--ph-line);
 }
 
 .teamfund-modal-header h2 {
     margin: 0;
-    font-size: 18px;
-    color: var(--text-primary);
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--ph-ink);
 }
 
 .teamfund-modal-header button {
     width: 32px;
     height: 32px;
+    flex: 0 0 32px;
     border: 0;
     border-radius: 999px;
-    background: var(--surface-court-soft);
-    color: var(--text-secondary);
-    cursor: pointer;
-    font-size: 22px;
+    background: var(--ph-tint-neutral-strong);
+    color: var(--ph-muted);
+    font-size: 21px;
     line-height: 1;
+    cursor: pointer;
 }
+
+.teamfund-modal-header button:hover { background: var(--ph-tint-neutral); color: var(--ph-ink); }
 
 .teamfund-form,
-.teamfund-success {
-    padding: 20px;
-}
+.teamfund-success { padding: 20px; }
 
-.teamfund-form {
-    display: grid;
-    gap: 14px;
-}
+.teamfund-form { display: grid; gap: 14px; }
 
 .teamfund-form label {
     display: grid;
     gap: 7px;
-    color: var(--text-primary);
+    color: var(--ph-ink);
     font-size: 13px;
-    font-weight: 760;
+    font-weight: 700;
 }
 
 .teamfund-form input,
 .teamfund-form textarea {
     width: 100%;
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
     padding: 12px 13px;
-    color: var(--text-primary);
-    background: var(--surface-court-soft);
+    border: 1px solid var(--ph-line);
+    border-radius: var(--ph-radius-sm);
+    background: var(--ph-tint-neutral-strong);
+    color: var(--ph-text);
     font: inherit;
     font-size: 16px;
     outline: none;
@@ -334,19 +675,19 @@
 
 .teamfund-form input:focus,
 .teamfund-form textarea:focus {
-    border-color: var(--court-green);
-    box-shadow: var(--focus-ring);
+    border-color: var(--ph-indigo);
+    box-shadow: var(--ph-focus-ring);
 }
 
 .teamfund-error {
     margin: 0;
-    border: 1px solid rgba(255, 107, 53, .28);
-    border-radius: 12px;
     padding: 10px 12px;
-    background: var(--rally-coral-soft);
-    color: var(--rally-coral);
+    border: 1px solid var(--ph-tint-coral-line);
+    border-radius: var(--ph-radius-sm);
+    background: var(--ph-tint-negative);
+    color: var(--ph-negative);
     font-size: 13px;
-    font-weight: 650;
+    font-weight: 700;
 }
 
 .teamfund-modal-actions {
@@ -360,88 +701,70 @@
 .teamfund-submit,
 .teamfund-save-image {
     min-height: 44px;
-    border: 0;
-    border-radius: 12px;
     padding: 0 16px;
+    border: 0;
+    border-radius: var(--ph-radius-xs);
     font: inherit;
+    font-size: 13px;
     font-weight: 800;
     cursor: pointer;
 }
 
 .teamfund-cancel {
-    background: var(--surface-court-soft);
-    color: var(--text-secondary);
+    background: var(--ph-tint-neutral-strong);
+    color: var(--ph-ink-2);
 }
 
 .teamfund-submit {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: var(--gradient-court-action);
-    color: var(--court-midnight);
+    background: var(--ph-indigo);
+    color: #fff;
     text-decoration: none;
 }
 
-.teamfund-submit:disabled {
-    cursor: wait;
-    opacity: .7;
-}
+.teamfund-submit:hover:not(:disabled) { background: var(--ph-indigo-hover); }
+
+.teamfund-submit:disabled { cursor: wait; opacity: .7; }
 
 .teamfund-save-image {
-    background: var(--court-green-soft);
-    color: var(--court-green);
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--ph-line);
+    background: var(--ph-card);
+    color: var(--ph-ink);
 }
 
-.teamfund-save-image:hover {
-    background: var(--surface-court-soft);
-}
+.teamfund-save-image:hover { background: var(--ph-tint-neutral-strong); }
 
-.teamfund-success {
-    text-align: center;
-}
+.teamfund-success { text-align: center; }
 
 .teamfund-success img {
+    display: block;
     width: 190px;
     height: 190px;
-    display: block;
     margin: 12px auto;
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
+    border: 1px solid var(--ph-line);
+    border-radius: var(--ph-radius-card);
 }
 
 .teamfund-success p {
     margin: 0;
-    color: var(--text-secondary);
+    color: var(--ph-muted);
     font-size: 13px;
 }
 
 .teamfund-code-label {
-    text-transform: uppercase;
-    letter-spacing: .08em;
+    font-size: 12px;
     font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
 }
 
 .teamfund-code {
     display: block;
     margin-top: 4px;
-    color: var(--text-primary);
+    color: var(--ph-indigo);
     font-size: 28px;
+    font-weight: 800;
     letter-spacing: .08em;
-}
-
-@media (max-width: 360px) {
-    .teamfund-appbar {
-        padding-left: 16px;
-        padding-right: 16px;
-    }
-
-    .teamfund-appbar-text h1 {
-        font-size: 20px;
-    }
-
-    .teamfund-content {
-        padding-left: 12px;
-        padding-right: 12px;
-    }
 }

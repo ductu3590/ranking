@@ -32,10 +32,10 @@ assert(
 assert(
     rootPage.includes('<h1>Pickhub</h1>') &&
     rootPage.includes('Cùng xây dựng cộng đồng Pickleball phát triển.') &&
-    rootPage.includes('Tạo nhóm mới') &&
-    rootPage.includes('Tham gia nhóm') &&
+    rootPage.includes('Tạo CLB mới') &&
+    rootPage.includes('Tham gia CLB') &&
     rootPage.includes('Tiếp tục') &&
-    rootPage.includes('Vào nhóm của bạn') &&
+    rootPage.includes('Vào CLB của bạn') &&
     rootPage.includes('currentGroup.name'),
     'Root page should include Pickhub branding, returning-user continuation, and the two start actions.'
 );

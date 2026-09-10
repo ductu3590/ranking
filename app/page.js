@@ -193,97 +193,191 @@ export default function PickhubHomePage() {
     }
 
     return (
-        <main className="teamfund-home">
-            <div className="teamfund-app">
-                <header className="teamfund-appbar">
-                    <div className="teamfund-app-icon" aria-hidden="true">
-                        <PeopleWalletIcon />
-                    </div>
-                    <div className="teamfund-appbar-text">
-                        <h1>Pickhub</h1>
-                        <p>Cùng xây dựng cộng đồng Pickleball phát triển.</p>
-                    </div>
-                </header>
+        <div className="ph-land">
+            <header className="ph-land__nav">
+                <div className="ph-land__navinner">
+                    <a className="ph-land__brand" href="/" aria-label="PickHub - trang chủ">
+                        <span className="ph-land__brandmark" aria-hidden="true"><PaddleIcon /></span>
+                        <span className="ph-land__brandtext">
+                            <span className="ph-land__wordmark">PickHub</span>
+                            <span className="ph-land__brandtag">Cộng đồng Pickleball</span>
+                        </span>
+                    </a>
 
-                <div className="teamfund-content">
-                    {hasLoadedStoredGroup && currentGroup && (
-                        <section className="teamfund-block">
-                            <h2 className="teamfund-section-title">
-                                <UsersIcon />
-                                Tiếp tục
-                            </h2>
+                    {hasLoadedStoredGroup && currentGroup ? (
+                        <a className="ph-land__navcta" href={currentGroup.role === 'admin' ? '/admin' : '/quy'}>
+                            <span className="ph-land__navdot" aria-hidden="true" />
+                            <span className="ph-land__navclub">{currentGroup.name}</span>
+                            <span className="ph-land__navcode">{currentGroup.code}</span>
+                        </a>
+                    ) : null}
+                </div>
+            </header>
 
-                            <a
-                                className="teamfund-action-row teamfund-continue-card"
-                                href={currentGroup.role === 'admin' ? '/admin' : '/quy'}
-                                aria-label="Vào nhóm của bạn"
-                            >
-                                <span className="teamfund-row-main">
-                                    <span className="teamfund-tile teamfund-tile-orange">
-                                        <WalletIcon />
-                                    </span>
-                                    <span className="teamfund-item-text">
-                                        <strong>Vào nhóm của bạn</strong>
-                                        <span>{currentGroup.name}</span>
-                                        <span className="teamfund-role-pill">
+            <main className="ph-land__main">
+                <section className="ph-land__hero">
+                    <span className="ph-land__glow ph-land__glow--a" aria-hidden="true" />
+                    <span className="ph-land__glow ph-land__glow--b" aria-hidden="true" />
+                    <div className="ph-land__herorow">
+                        <div className="ph-land__heromain">
+                            <span className="ph-land__heroicon" aria-hidden="true"><PeopleWalletIcon /></span>
+                            <div className="ph-land__herotext">
+                                <h1>Pickhub</h1>
+                                <p>Cùng xây dựng cộng đồng Pickleball phát triển.</p>
+                            </div>
+                        </div>
+                        <span className="ph-land__herochip">
+                            <CheckIcon />
+                            Hệ thống hoạt động ổn định
+                        </span>
+                    </div>
+                </section>
+
+                {hasLoadedStoredGroup && currentGroup && (
+                    <section className="ph-land__block" aria-labelledby="ph-land-continue">
+                        <h2 className="ph-land__blocktitle" id="ph-land-continue">
+                            <UsersIcon />
+                            Tiếp tục
+                        </h2>
+
+                        <a
+                            className="ph-land__row ph-land__row--continue"
+                            href={currentGroup.role === 'admin' ? '/admin' : '/quy'}
+                            aria-label="Vào CLB của bạn"
+                        >
+                            <span className="ph-land__rowmain">
+                                <span className="ph-land__tile ph-land__tile--gold" aria-hidden="true">
+                                    <CourtIcon />
+                                </span>
+                                <span className="ph-land__rowtext">
+                                    <strong>Vào CLB của bạn</strong>
+                                    <span className="ph-land__rowsub">{currentGroup.name}</span>
+                                    <span className="ph-land__rowmeta">
+                                        <span className="ph-land__pill">
                                             {currentGroup.role === 'admin' ? 'Quản trị viên' : 'Thành viên'}
                                         </span>
+                                        {currentGroup.code ? <span className="ph-land__code">#{currentGroup.code}</span> : null}
                                     </span>
                                 </span>
-                                <ChevronIcon />
-                            </a>
-                        </section>
-                    )}
+                            </span>
+                            <span className="ph-land__arrow" aria-hidden="true"><ChevronIcon /></span>
+                        </a>
+                    </section>
+                )}
 
-                    {hasLoadedStoredGroup && <section className="teamfund-block">
-                        <h2 className="teamfund-section-title">Bắt đầu</h2>
-                        <div className="teamfund-actions">
-                            <button
-                                type="button"
-                                className="teamfund-action-row"
-                                onClick={() => setActiveModal('create')}
-                            >
-                                <span className="teamfund-row-main">
-                                    <span className="teamfund-tile teamfund-tile-purple">
+                {hasLoadedStoredGroup && (
+                    <section className="ph-land__block" aria-labelledby="ph-land-start">
+                        <h2 className="ph-land__blocktitle" id="ph-land-start">
+                            <BoltIcon />
+                            Bắt đầu
+                        </h2>
+
+                        <div className="ph-land__rows">
+                            <button type="button" className="ph-land__row" onClick={() => setActiveModal('create')}>
+                                <span className="ph-land__rowmain">
+                                    <span className="ph-land__tile ph-land__tile--indigo" aria-hidden="true">
                                         <PlusIcon />
                                     </span>
-                                    <span className="teamfund-item-text">
-                                        <strong>Tạo nhóm mới</strong>
-                                        <span>Tạo nhóm và quản lý quỹ</span>
+                                    <span className="ph-land__rowtext">
+                                        <strong>Tạo CLB mới</strong>
+                                        <span className="ph-land__rowsub">Tạo CLB và quản lý quỹ minh bạch, sắp cặp đấu tự động</span>
                                     </span>
                                 </span>
-                                <ChevronIcon />
+                                <span className="ph-land__arrow" aria-hidden="true"><ChevronIcon /></span>
                             </button>
 
-                            <button
-                                type="button"
-                                className="teamfund-action-row"
-                                onClick={() => setActiveModal('join')}
-                            >
-                                <span className="teamfund-row-main">
-                                    <span className="teamfund-tile teamfund-tile-blue">
+                            <button type="button" className="ph-land__row" onClick={() => setActiveModal('join')}>
+                                <span className="ph-land__rowmain">
+                                    <span className="ph-land__tile ph-land__tile--cyan" aria-hidden="true">
                                         <KeyIcon />
                                     </span>
-                                    <span className="teamfund-item-text">
-                                        <strong>Tham gia nhóm</strong>
-                                        <span>Nhập mã nhóm và mật khẩu để vào</span>
+                                    <span className="ph-land__rowtext">
+                                        <strong>Tham gia CLB</strong>
+                                        <span className="ph-land__rowsub">Nhập mã CLB và mật khẩu để vào CLB</span>
                                     </span>
                                 </span>
-                                <ChevronIcon />
+                                <span className="ph-land__arrow" aria-hidden="true"><ChevronIcon /></span>
                             </button>
+
+                            <a className="ph-land__row" href="/dk">
+                                <span className="ph-land__rowmain">
+                                    <span className="ph-land__tile ph-land__tile--lime" aria-hidden="true">
+                                        <TrophyIcon />
+                                    </span>
+                                    <span className="ph-land__rowtext">
+                                        <strong>
+                                            Khám phá giải đấu Pickleball
+                                            <span className="ph-land__new">Mới</span>
+                                        </strong>
+                                        <span className="ph-land__rowsub">Xem giải đang mở đăng ký, ghép cặp và theo dõi kết quả trực tiếp</span>
+                                    </span>
+                                </span>
+                                <span className="ph-land__arrow" aria-hidden="true"><ChevronIcon /></span>
+                            </a>
                         </div>
-                    </section>}
-                </div>
-            </div>
+                    </section>
+                )}
+
+                <section className="ph-land__features" aria-labelledby="ph-land-features">
+                    <div className="ph-land__featurehead">
+                        <h2 id="ph-land-features">Giải pháp toàn diện cho CLB Pickleball phong trào</h2>
+                        <p>Chuẩn hoá quản lý — tối ưu thời gian trên sân thi đấu</p>
+                    </div>
+
+                    <div className="ph-land__featuregrid">
+                        <article className="ph-land__feature">
+                            <span className="ph-land__featureicon ph-land__featureicon--indigo" aria-hidden="true"><CoinIcon /></span>
+                            <h3>Quản lý quỹ tự động với SePay</h3>
+                            <p>Biến động số dư về thẳng ứng dụng qua mã QR, thu chi công khai và đối soát tức thì.</p>
+                        </article>
+
+                        <article className="ph-land__feature">
+                            <span className="ph-land__featureicon ph-land__featureicon--gold" aria-hidden="true"><MedalIcon /></span>
+                            <h3>BXH đóng góp minh bạch</h3>
+                            <p>Vinh danh thành viên tích cực, bảng đóng góp cập nhật tự động theo từng kỳ quỹ.</p>
+                        </article>
+
+                        <article className="ph-land__feature">
+                            <span className="ph-land__featureicon ph-land__featureicon--cyan" aria-hidden="true"><ShieldIcon /></span>
+                            <h3>Bảo mật &amp; riêng tư</h3>
+                            <p>Mỗi CLB một không gian riêng, phân quyền quản trị viên và thành viên bằng mã CLB kèm mật khẩu.</p>
+                        </article>
+                    </div>
+
+                    <div className="ph-land__highlights">
+                        <div className="ph-land__highlight">
+                            <strong>Miễn phí</strong>
+                            <span>Cho CLB phong trào</span>
+                        </div>
+                        <span className="ph-land__hairline" aria-hidden="true" />
+                        <div className="ph-land__highlight">
+                            <strong>Tự động</strong>
+                            <span>Đối soát quỹ qua SePay</span>
+                        </div>
+                        <span className="ph-land__hairline" aria-hidden="true" />
+                        <div className="ph-land__highlight">
+                            <strong>Trực tiếp</strong>
+                            <span>Tỉ số &amp; BXH cập nhật ngay</span>
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+            <footer className="ph-land__footer">
+                <p>
+                    © {new Date().getFullYear()} <strong>PickHub Vietnam</strong>. Đồng hành xây dựng cộng đồng Pickleball
+                    năng động và phát triển bền vững.
+                </p>
+            </footer>
 
             {activeModal === 'create' && (
-                <Modal title="Tạo nhóm mới" onClose={closeModal}>
+                <Modal title="Tạo CLB mới" onClose={closeModal}>
                     {createdGroup ? (
                         <div className="teamfund-success">
-                            <p className="teamfund-code-label">Mã nhóm</p>
+                            <p className="teamfund-code-label">Mã CLB</p>
                             <strong className="teamfund-code">{createdGroup.group.code}</strong>
-                            <img src={createdGroup.qrCodeDataUrl} alt={`QR tham gia nhóm ${createdGroup.group.code}`} />
-                            <p>Gửi mã nhóm hoặc QR này cho thành viên.</p>
+                            <img src={createdGroup.qrCodeDataUrl} alt={`QR tham gia CLB ${createdGroup.group.code}`} />
+                            <p>Gửi mã CLB hoặc QR này cho thành viên.</p>
                             <div className="teamfund-modal-actions teamfund-group-card-download">
                                 <button type="button" className="teamfund-save-image" onClick={downloadGroupCardImage}>
                                     Lưu ảnh
@@ -295,7 +389,7 @@ export default function PickhubHomePage() {
                         <form className="teamfund-form" onSubmit={handleCreateGroup}>
                             <FormError message={error} />
                             <label>
-                                Tên nhóm
+                                Tên CLB
                                 <input
                                     value={createForm.name}
                                     onChange={(event) => updateCreateForm('name', event.target.value)}
@@ -308,12 +402,12 @@ export default function PickhubHomePage() {
                                 <textarea
                                     value={createForm.description}
                                     onChange={(event) => updateCreateForm('description', event.target.value)}
-                                    placeholder="Nhóm quản lý quỹ và thành viên"
+                                    placeholder="CLB quản lý quỹ và thành viên"
                                     rows="3"
                                 />
                             </label>
                             <label>
-                                Mật khẩu admin
+                                Mật khẩu quản trị
                                 <input
                                     type="password"
                                     value={createForm.adminPassword}
@@ -335,7 +429,7 @@ export default function PickhubHomePage() {
                             <div className="teamfund-modal-actions">
                                 <button type="button" className="teamfund-cancel" onClick={closeModal}>Hủy</button>
                                 <button type="submit" className="teamfund-submit" disabled={loading}>
-                                    {loading ? 'Đang tạo...' : 'Tạo nhóm'}
+                                    {loading ? 'Đang tạo...' : 'Tạo CLB'}
                                 </button>
                             </div>
                         </form>
@@ -344,11 +438,11 @@ export default function PickhubHomePage() {
             )}
 
             {activeModal === 'join' && (
-                <Modal title="Tham gia nhóm" onClose={closeModal}>
+                <Modal title="Tham gia CLB" onClose={closeModal}>
                     <form className="teamfund-form" onSubmit={handleJoinGroup}>
                         <FormError message={error} />
                         <label>
-                            Mã nhóm
+                            Mã CLB
                             <input
                                 value={joinForm.code}
                                 onChange={(event) => updateJoinForm('code', event.target.value)}
@@ -369,13 +463,13 @@ export default function PickhubHomePage() {
                         <div className="teamfund-modal-actions">
                             <button type="button" className="teamfund-cancel" onClick={closeModal}>Hủy</button>
                             <button type="submit" className="teamfund-submit" disabled={loading}>
-                                {loading ? 'Đang vào...' : 'Vào nhóm'}
+                                {loading ? 'Đang vào...' : 'Vào CLB'}
                             </button>
                         </div>
                     </form>
                 </Modal>
             )}
-        </main>
+        </div>
     );
 }
 
@@ -447,15 +541,28 @@ function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight) {
     if (line) ctx.fillText(line, x, currentY);
 }
 
+function PaddleIcon() {
+    return (
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="6" y="2" width="12" height="14" rx="5" fill="currentColor" fillOpacity=".28" />
+            <rect x="6" y="2" width="12" height="14" rx="5" stroke="currentColor" strokeWidth="1.8" />
+            <path d="M12 16v6M10 22h4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+            <circle cx="15.4" cy="6.2" r="1.3" fill="currentColor" />
+            <circle cx="9.6" cy="8.6" r="1.1" fill="currentColor" />
+            <circle cx="13" cy="11.2" r="1.1" fill="currentColor" />
+        </svg>
+    );
+}
+
 function PeopleWalletIcon() {
     return (
         <svg viewBox="0 0 48 48" fill="none">
             <rect x="7" y="13" width="34" height="27" rx="7" fill="white" opacity=".96" />
-            <path d="M14 26h20M14 32h12" stroke="#10a568" strokeWidth="3" strokeLinecap="round" />
+            <path d="M14 26h20M14 32h12" stroke="#6F48C9" strokeWidth="3" strokeLinecap="round" />
             <circle cx="17" cy="16" r="4" fill="white" />
             <circle cx="24" cy="15" r="5" fill="white" />
             <circle cx="31" cy="16" r="4" fill="white" />
-            <path d="M14 22c1.6-3.3 5.1-5.4 10-5.4s8.4 2.1 10 5.4" stroke="#10a568" strokeWidth="3" strokeLinecap="round" />
+            <path d="M14 22c1.6-3.3 5.1-5.4 10-5.4s8.4 2.1 10 5.4" stroke="#6F48C9" strokeWidth="3" strokeLinecap="round" />
         </svg>
     );
 }
@@ -468,11 +575,19 @@ function UsersIcon() {
     );
 }
 
-function WalletIcon() {
+function BoltIcon() {
     return (
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M12 7v10M7 12h10" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
-            <path d="M5 10.5c0-2.2 1.8-4 4-4h6c2.2 0 4 1.8 4 4v5c0 2.2-1.8 4-4 4H9c-2.2 0-4-1.8-4-4v-5Z" stroke="currentColor" strokeWidth="2" />
+            <path d="M13 10V3L4 14h7v7l9-11h-7Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+    );
+}
+
+function CourtIcon() {
+    return (
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="4" stroke="currentColor" strokeWidth="2" />
+            <path d="M12 3v18M3 12h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
         </svg>
     );
 }
@@ -494,10 +609,56 @@ function KeyIcon() {
     );
 }
 
+function TrophyIcon() {
+    return (
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M7 4h10v5a5 5 0 0 1-10 0V4Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+            <path d="M7 6H4v1.5A3.5 3.5 0 0 0 7.5 11M17 6h3v1.5a3.5 3.5 0 0 1-3.5 3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            <path d="M12 14v4M8 21h8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        </svg>
+    );
+}
+
 function ChevronIcon() {
     return (
-        <svg className="teamfund-chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="m9 6 6 6-6 6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+    );
+}
+
+function CheckIcon() {
+    return (
+        <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fillRule="evenodd" clipRule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.707-9.293a1 1 0 0 0-1.414-1.414L9 10.586 7.707 9.293a1 1 0 0 0-1.414 1.414l2 2a1 1 0 0 0 1.414 0l4-4Z" />
+        </svg>
+    );
+}
+
+function CoinIcon() {
+    return (
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
+            <path d="M14.6 9.2c-.5-.6-1.5-1-2.6-1-1.7 0-3 .9-3 2s1.3 2 3 2 3 .9 3 2-1.3 2-3 2c-1.1 0-2.1-.4-2.6-1M12 6.5v11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        </svg>
+    );
+}
+
+function MedalIcon() {
+    return (
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="12" cy="15" r="6" stroke="currentColor" strokeWidth="2" />
+            <path d="M9 9.5 6.5 3h11L15 9.5" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+            <path d="M12 13v4M10.5 15h3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        </svg>
+    );
+}
+
+function ShieldIcon() {
+    return (
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 3 4 6v6c0 4.4 3.3 8.2 8 9 4.7-.8 8-4.6 8-9V6l-8-3Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+            <path d="m9 12 2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
     );
 }

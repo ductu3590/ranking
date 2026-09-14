@@ -4,6 +4,8 @@ import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import AppShell from '@/components/pickhub/AppShell';
 import ClubSettings from '@/app/admin/ClubSettings';
+import OnboardingWelcome from '@/components/pickhub/OnboardingWelcome';
+import SetupChecklist from '@/components/pickhub/SetupChecklist';
 import './admin-center.css';
 
 export default function ClubSettingsPage() {
@@ -26,6 +28,7 @@ function ClubSettingsPageContent() {
     const legacySection = searchParams.get('section');
     const legacyTarget = LEGACY_SECTION_TARGET[legacySection] || null;
     const [access, setAccess] = useState({ kind: 'loading' });
+    const [clubName, setClubName] = useState('');
 
     useEffect(() => {
         if (legacyTarget) {
@@ -38,6 +41,7 @@ function ClubSettingsPageContent() {
             .then((payload) => {
                 if (!active) return;
                 setAccess({ kind: payload.permissions?.canManageSettings ? 'ready' : 'forbidden' });
+                if (payload.session?.group_name) setClubName(payload.session.group_name);
             })
             .catch(() => { if (active) setAccess({ kind: 'error' }); });
         return () => { active = false; };
@@ -62,7 +66,7 @@ function ClubSettingsPageContent() {
                     {access.kind === 'loading' ? <AdminAccessState title="Đang xác thực quyền" message="Máy chủ đang kiểm tra phiên trưởng nhóm…" />
                         : access.kind === 'forbidden' ? <AdminAccessState title="Không có quyền quản trị" message="Hãy nhập Mã CLB và mật khẩu trưởng nhóm để mở Cấu hình." action />
                         : access.kind === 'error' ? <AdminAccessState title="Chưa kiểm tra được quyền" message="Không thể kết nối máy chủ. Vui lòng tải lại trang." />
-                        : <ClubSettings />}
+                        : <><OnboardingWelcome clubName={clubName || 'câu lạc bộ'} /><SetupChecklist /><ClubSettings /></>}
                 </main>
             </div>
         </AppShell>

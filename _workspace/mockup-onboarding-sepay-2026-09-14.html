@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockup — Onboarding admin CLB &amp; Cấu hình SePay · PickHub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   Token copy nguyen van tu app/styles/tokens.css (2026-09-02)
+   Mockup khong duoc dinh nghia mau moi ngoai bang token nay.
+   ============================================================ */
+:root{
+  color-scheme: light;
+  --ph-ink:#28243D; --ph-ink-2:#514A72; --ph-indigo:#6F48C9; --ph-indigo-hover:#5A37AD;
+  --ph-lavender:#EEE9FF; --ph-gold:#FFC95E; --ph-cyan:#A8DFE9; --ph-coral:#FF8B83;
+  --ph-surface:#F5F6FB; --ph-card:#FFFFFF; --ph-line:#E4E9F2; --ph-muted:#667085; --ph-text:#20213A;
+  --ph-positive:#1F7A52; --ph-negative:#C2453A;
+  --ph-space-1:4px; --ph-space-2:8px; --ph-space-3:12px; --ph-space-4:16px; --ph-space-6:24px; --ph-space-8:32px;
+  --ph-radius-xs:8px; --ph-radius-sm:12px; --ph-radius-card:16px; --ph-radius-md:20px; --ph-radius-lg:28px;
+  --ph-shadow-soft:0 8px 24px rgba(40,36,61,.06);
+  --ph-shadow:0 16px 40px rgba(40,36,61,.08);
+  --ph-focus-ring:0 0 0 3px rgba(111,72,201,.35);
+  --ph-font:'Montserrat',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
+  --ph-bottom-nav-height:78px; --ph-rail-width:232px;
+  --ph-tint-indigo:#F4F2FE; --ph-tint-indigo-line:#DED6FA;
+  --ph-tint-gold:#FFF4DC; --ph-tint-gold-line:#F5E2B8; --ph-tint-gold-text:#8A5B00;
+  --ph-tint-cyan:#EFFAFD; --ph-tint-cyan-line:#C9EDF6;
+  --ph-tint-coral:#FFF1EF; --ph-tint-coral-line:#FBD8D3;
+  --ph-tint-positive:#E8F5EE; --ph-tint-negative:#FDECEA;
+  --ph-tint-neutral:#EEF0F5; --ph-tint-neutral-strong:#F7F8FB;
+  --ph-backdrop:rgba(40,36,61,.45);
+}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--ph-surface);font-family:var(--ph-font);color:var(--ph-text);-webkit-font-smoothing:antialiased}
+img{max-width:100%}
+
+/* ---------- Primitives copy tu app/styles/primitives.css ---------- */
+.ph-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border:0;border-radius:var(--ph-radius-sm);font:inherit;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;transition:background .16s ease,border-color .16s ease}
+.ph-btn:disabled{opacity:.55;cursor:not-allowed}
+.ph-btn--primary{background:var(--ph-indigo);color:var(--ph-card)}
+.ph-btn--primary:hover{background:var(--ph-indigo-hover)}
+.ph-btn--outline{background:var(--ph-card);color:var(--ph-ink);border:1px solid var(--ph-line)}
+.ph-btn--outline:hover{border-color:var(--ph-ink-2)}
+.ph-btn--ghost{background:transparent;color:var(--ph-indigo)}
+.ph-btn--ghost:hover{background:var(--ph-lavender)}
+.ph-btn--danger{background:var(--ph-negative);color:var(--ph-card)}
+.ph-btn--sm{min-height:36px;padding:0 12px;font-size:12px}
+.ph-btn--block{width:100%}
+.ph-card,.ph-panel{background:var(--ph-card);border:1px solid var(--ph-line);border-radius:var(--ph-radius-md);box-shadow:var(--ph-shadow-soft)}
+.ph-panel{padding:var(--ph-space-6)}
+.ph-badge,.ph-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700;line-height:1.5}
+.ph-badge{background:var(--ph-lavender);color:var(--ph-indigo)}
+.ph-badge--gold{background:var(--ph-tint-gold);color:var(--ph-tint-gold-text)}
+.ph-badge--positive{background:var(--ph-tint-positive);color:var(--ph-positive)}
+.ph-badge--negative{background:var(--ph-tint-negative);color:var(--ph-negative)}
+.ph-badge--muted{background:var(--ph-tint-neutral);color:var(--ph-muted)}
+.ph-modal{position:relative;width:min(520px,100%);padding:var(--ph-space-6);background:var(--ph-card);border-radius:var(--ph-radius-md);box-shadow:var(--ph-shadow)}
+.ph-modal__title{margin:0 0 8px;font-size:17px;font-weight:800;letter-spacing:-.02em;color:var(--ph-ink)}
+.ph-modal__close{position:absolute;top:12px;right:12px;display:grid;width:32px;height:32px;place-items:center;border:0;border-radius:9px;background:transparent;color:var(--ph-muted);cursor:pointer;font-size:24px;line-height:1}
+.ph-modal__actions{display:flex;justify-content:flex-end;gap:8px;margin-top:var(--ph-space-6);flex-wrap:wrap}
+
+/* ---------- MOI: stepper dung chung .ph-step* (de-xuat them vao primitives.css) ---------- */
+.ph-stepper{display:flex;align-items:center;gap:6px;margin-bottom:var(--ph-space-6)}
+.ph-stepchip{display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border-radius:999px;background:var(--ph-tint-neutral);color:var(--ph-muted);font-size:12px;font-weight:700;white-space:nowrap}
+.ph-stepchip .ph-stepchip__n{display:grid;place-items:center;width:20px;height:20px;border-radius:999px;background:var(--ph-card);color:var(--ph-muted);font-size:11px;font-weight:800}
+.ph-stepchip.is-active{background:var(--ph-indigo);color:var(--ph-card)}
+.ph-stepchip.is-active .ph-stepchip__n{background:rgba(255,255,255,.24);color:var(--ph-card)}
+.ph-stepchip.is-done{background:var(--ph-tint-positive);color:var(--ph-positive)}
+.ph-stepchip.is-done .ph-stepchip__n{background:var(--ph-positive);color:var(--ph-card)}
+.ph-stepline{flex:1;height:2px;min-width:10px;background:var(--ph-line);border-radius:2px}
+.ph-stepline.is-done{background:var(--ph-positive)}
+/* Trong modal, chua cho nut dong o goc phai de chip cuoi khong bi de len. */
+.ph-modal .ph-stepper{padding-right:36px}
+
+/* ---------- MOI: checklist thiet lap CLB ---------- */
+.setup{padding:var(--ph-space-6)}
+.setup__head{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--ph-space-4);flex-wrap:wrap}
+.setup__title{margin:0;font-size:17px;font-weight:800;letter-spacing:-.02em;color:var(--ph-ink)}
+.setup__sub{margin:4px 0 0;font-size:13px;color:var(--ph-muted);max-width:52ch}
+.setup__headactions{display:flex;gap:8px;flex-wrap:wrap}
+.setup__progress{margin:var(--ph-space-4) 0 var(--ph-space-2);display:flex;align-items:center;gap:var(--ph-space-3)}
+.setup__bar{flex:1;height:8px;border-radius:999px;background:var(--ph-tint-neutral);overflow:hidden}
+.setup__bar > i{display:block;height:100%;border-radius:999px;background:var(--ph-indigo)}
+.setup__count{font-size:12px;font-weight:800;color:var(--ph-ink-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.setup__list{list-style:none;margin:var(--ph-space-4) 0 0;padding:0;display:grid;gap:var(--ph-space-2)}
+.setup__item{display:flex;align-items:flex-start;gap:var(--ph-space-3);padding:var(--ph-space-3);border:1px solid var(--ph-line);border-radius:var(--ph-radius-sm);background:var(--ph-card)}
+.setup__item.is-done{background:var(--ph-tint-neutral-strong);border-color:var(--ph-line)}
+.setup__item.is-warning{background:var(--ph-tint-gold);border-color:var(--ph-tint-gold-line)}
+.setup__tick{flex:none;display:grid;place-items:center;width:26px;height:26px;margin-top:1px;border-radius:999px;border:2px solid var(--ph-line);background:var(--ph-card);color:var(--ph-muted);font-size:13px;font-weight:800}
+.setup__item.is-done .setup__tick{background:var(--ph-positive);border-color:var(--ph-positive);color:var(--ph-card)}
+.setup__item.is-warning .setup__tick{background:var(--ph-gold);border-color:var(--ph-gold);color:var(--ph-tint-gold-text)}
+.setup__body{flex:1;min-width:0}
+.setup__name{margin:0;font-size:14px;font-weight:800;color:var(--ph-ink);letter-spacing:-.01em}
+.setup__item.is-done .setup__name{color:var(--ph-muted);text-decoration:line-through;text-decoration-thickness:1px}
+.setup__desc{margin:3px 0 0;font-size:12px;color:var(--ph-muted);line-height:1.5}
+.setup__warn{margin:6px 0 0;font-size:12px;font-weight:700;color:var(--ph-tint-gold-text);line-height:1.5}
+.setup__affil{margin:8px 0 0;font-size:12px;color:var(--ph-muted);line-height:1.6}
+.setup__affil a{color:var(--ph-indigo);font-weight:700}
+.setup__cta{flex:none;align-self:center}
+.setup__done-banner{display:flex;align-items:center;gap:var(--ph-space-4);padding:var(--ph-space-4);border-radius:var(--ph-radius-sm);background:var(--ph-tint-positive);border:1px solid var(--ph-positive);color:var(--ph-positive);font-size:13px;font-weight:700;line-height:1.5}
+.setup__done-banner .emo{font-size:26px;line-height:1}
+
+/* ---------- MOI: khoi SePay ---------- */
+.sp{padding:var(--ph-space-6)}
+.sp__head{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--ph-space-4);flex-wrap:wrap;margin-bottom:var(--ph-space-4)}
+.sp__head h2{margin:0;font-size:16px;font-weight:800;letter-spacing:-.02em;color:var(--ph-ink)}
+.sp__head p{margin:4px 0 0;font-size:13px;color:var(--ph-muted)}
+.sp__free{padding:var(--ph-space-4);border-radius:var(--ph-radius-sm);background:var(--ph-tint-cyan);border:1px solid var(--ph-tint-cyan-line)}
+.sp__free h3{margin:0 0 6px;font-size:14px;font-weight:800;color:var(--ph-ink)}
+.sp__free p{margin:0 0 8px;font-size:13px;line-height:1.6;color:var(--ph-ink-2)}
+.sp__free p:last-of-type{margin-bottom:var(--ph-space-4)}
+.sp__free b{color:var(--ph-ink)}
+.sp__freeactions{display:flex;align-items:center;gap:var(--ph-space-3);flex-wrap:wrap}
+.sp__freeactions a.muted{font-size:12px;font-weight:700;color:var(--ph-ink-2);text-decoration:underline}
+.sp__actions{display:flex;align-items:center;gap:var(--ph-space-3);flex-wrap:wrap;margin-top:var(--ph-space-4)}
+.sp__manual{font-size:12px;font-weight:700;color:var(--ph-muted);text-decoration:underline;background:none;border:0;cursor:pointer;padding:0;font-family:inherit}
+.sp__note{margin:var(--ph-space-3) 0 0;font-size:12px;color:var(--ph-muted);line-height:1.6}
+
+.sp__field{display:grid;gap:6px;margin-bottom:var(--ph-space-4)}
+.sp__label{font-size:12px;font-weight:700;color:var(--ph-ink)}
+.sp__copyrow{display:flex;align-items:stretch;gap:8px}
+.sp__copyrow code{flex:1;min-width:0;max-width:100%;display:flex;align-items:center;padding:0 12px;min-height:44px;border:1px solid var(--ph-line);border-radius:var(--ph-radius-sm);background:var(--ph-tint-neutral-strong);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;color:var(--ph-ink);overflow-x:auto;white-space:nowrap}
+.sp__hintline{margin:6px 0 0;font-size:11.5px;color:var(--ph-muted)}
+
+.sp__guide{list-style:none;counter-reset:g;margin:0;padding:0;display:grid;gap:var(--ph-space-3)}
+.sp__guide li{counter-increment:g;display:grid;grid-template-columns:26px 1fr;gap:var(--ph-space-3);align-items:start}
+.sp__guide li::before{content:counter(g);display:grid;place-items:center;width:26px;height:26px;border-radius:999px;background:var(--ph-lavender);color:var(--ph-indigo);font-size:12px;font-weight:800}
+.sp__guide .t{font-size:13px;line-height:1.6;color:var(--ph-text)}
+.sp__guide .t b{color:var(--ph-ink)}
+.sp__shot{margin-top:8px;display:grid;place-items:center;height:104px;border:1px dashed var(--ph-line);border-radius:var(--ph-radius-xs);background:var(--ph-tint-neutral-strong);color:var(--ph-muted);font-size:11.5px;text-align:center;padding:8px}
+
+.sp__transfer{padding:var(--ph-space-4);border-radius:var(--ph-radius-sm);background:var(--ph-tint-indigo);border:1px solid var(--ph-tint-indigo-line)}
+.sp__transfer .cap{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ph-indigo)}
+.sp__amount{margin:6px 0 var(--ph-space-3);font-size:22px;font-weight:800;letter-spacing:-.03em;color:var(--ph-ink);font-variant-numeric:tabular-nums}
+.sp__countdown{display:flex;align-items:center;gap:8px;margin-top:var(--ph-space-4);padding-top:var(--ph-space-4);border-top:1px solid var(--ph-tint-indigo-line);font-size:13px;font-weight:700;color:var(--ph-ink-2)}
+.sp__clock{font-variant-numeric:tabular-nums;font-size:18px;font-weight:800;color:var(--ph-indigo)}
+
+.sp__hintbox{display:flex;gap:var(--ph-space-3);margin-top:var(--ph-space-4);padding:var(--ph-space-3) var(--ph-space-4);border-radius:var(--ph-radius-sm);background:var(--ph-tint-gold);border:1px solid var(--ph-tint-gold-line);font-size:12.5px;line-height:1.6;color:var(--ph-tint-gold-text)}
+.sp__hintbox .emo{flex:none;font-size:16px;line-height:1.4}
+.sp__errbox{display:flex;gap:var(--ph-space-3);padding:var(--ph-space-4);border-radius:var(--ph-radius-sm);background:var(--ph-tint-negative);border:1px solid var(--ph-negative);font-size:13px;line-height:1.6;color:var(--ph-negative)}
+.sp__errbox b{display:block;margin-bottom:4px;color:var(--ph-negative)}
+.sp__errbox .emo{flex:none;font-size:18px;line-height:1.3}
+
+.sp__ok{display:flex;align-items:center;gap:var(--ph-space-4);padding:var(--ph-space-4);border-radius:var(--ph-radius-sm);background:var(--ph-tint-positive);border:1px solid var(--ph-positive)}
+.sp__ok .emo{font-size:28px;line-height:1}
+.sp__ok b{display:block;font-size:14px;font-weight:800;color:var(--ph-positive)}
+.sp__ok span{display:block;margin-top:3px;font-size:13px;color:var(--ph-ink-2);font-variant-numeric:tabular-nums}
+.sp__grid2{display:grid;gap:var(--ph-space-3);margin-top:var(--ph-space-4);grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.sp__stat{padding:var(--ph-space-4);border-radius:var(--ph-radius-sm);border:1px solid var(--ph-line);background:var(--ph-card)}
+.sp__stat .lab{display:block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ph-muted)}
+.sp__stat .val{display:block;margin-top:6px;font-size:19px;font-weight:800;letter-spacing:-.03em;color:var(--ph-ink);font-variant-numeric:tabular-nums}
+.sp__stat .sub{display:block;margin-top:6px;font-size:12px;color:var(--ph-muted);line-height:1.5}
+.sp__quota{margin-top:10px;height:8px;border-radius:999px;background:var(--ph-tint-neutral);overflow:hidden}
+.sp__quota > i{display:block;height:100%;border-radius:999px;background:var(--ph-positive)}
+.sp__quota.is-warn > i{background:var(--ph-gold)}
+
+/* ---------- Khung trinh bay cua mockup (khong thuoc san pham) ---------- */
+.mk-top{position:sticky;top:0;z-index:20;background:var(--ph-ink);color:#fff;padding:14px 20px}
+.mk-top__in{width:min(100% - 0px,1180px);margin:0 auto;display:flex;align-items:center;gap:var(--ph-space-4);flex-wrap:wrap}
+.mk-top h1{margin:0;font-size:14px;font-weight:800;letter-spacing:-.01em}
+.mk-top nav{display:flex;gap:6px;flex-wrap:wrap}
+.mk-top nav a{padding:5px 10px;border-radius:999px;background:rgba(255,255,255,.12);color:#fff;text-decoration:none;font-size:11.5px;font-weight:700}
+.mk-top nav a:hover{background:rgba(255,255,255,.24)}
+.mk-wrap{width:min(100%,1180px);margin:0 auto;padding-inline:20px;padding-block:var(--ph-space-8) 96px}
+.mk-lead{margin:0 0 var(--ph-space-8);font-size:13.5px;line-height:1.7;color:var(--ph-ink-2);max-width:76ch}
+.mk-lead code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;background:var(--ph-lavender);color:var(--ph-indigo);padding:1px 6px;border-radius:6px}
+.mk-sec{margin-bottom:var(--ph-space-8);scroll-margin-top:84px}
+.mk-sec__head{display:flex;align-items:baseline;gap:var(--ph-space-3);flex-wrap:wrap;margin-bottom:var(--ph-space-2)}
+.mk-sec__id{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;background:var(--ph-ink);color:#fff;font-size:11px;font-weight:800;letter-spacing:.04em}
+.mk-sec__head h2{margin:0;font-size:19px;font-weight:800;letter-spacing:-.03em;color:var(--ph-ink)}
+.mk-sec__note{margin:0 0 var(--ph-space-4);font-size:13px;color:var(--ph-muted);line-height:1.6;max-width:76ch}
+.mk-stage{padding:var(--ph-space-6);border-radius:var(--ph-radius-lg);background:var(--ph-tint-neutral);border:1px solid var(--ph-line)}
+.mk-stage--dark{background:var(--ph-backdrop);border-color:transparent;display:grid;place-items:center}
+.mk-variant{margin:0 0 var(--ph-space-3);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ph-muted)}
+.mk-variant + .ph-card{margin-bottom:var(--ph-space-6)}
+.mk-phones{display:flex;gap:var(--ph-space-6);flex-wrap:wrap;justify-content:center}
+/* Khung dien thoai 380px phai co lai duoc khi pane hep hon the. */
+.mk-phones > div{max-width:100%;min-width:0}
+.mk-phone{width:380px;max-width:100%;border:10px solid var(--ph-ink);border-radius:36px;background:var(--ph-surface);overflow:hidden;box-shadow:var(--ph-shadow)}
+.mk-phone__bar{height:26px;display:grid;place-items:center;background:var(--ph-ink)}
+.mk-phone__bar i{display:block;width:86px;height:5px;border-radius:999px;background:rgba(255,255,255,.35)}
+.mk-phone__body{padding:var(--ph-space-3)}
+.mk-phone__body .ph-card{box-shadow:none}
+.mk-phone__cap{margin:var(--ph-space-3) 0 0;text-align:center;font-size:11.5px;font-weight:700;color:var(--ph-muted)}
+
+/* Khung dien thoai la mot CONTAINER hep nam trong trang desktop rong, nen moi
+   @media theo viewport deu KHONG ap dung ben trong no. Phai nhac lai cac rule
+   mobile theo container o day. Neu thieu: .setup__cta doi 100% chieu rong trong
+   mot hang nowrap -> bop .setup__body ve 0px (chu bien mat) va nut tran ra
+   ngoai the. Trong san pham that, media query lam viec nay. */
+.mk-phone .setup__head{flex-direction:column;align-items:stretch}
+.mk-phone .setup__item{flex-wrap:wrap}
+.mk-phone .setup__cta{align-self:stretch;width:100%}
+.mk-phone .setup__cta .ph-btn{width:100%}
+.mk-phone .sp__head{flex-wrap:wrap}
+.mk-phone .ph-stepper{flex-wrap:wrap;gap:6px}
+.mk-phone .ph-stepline{display:none}
+.mk-phone .sp__copyrow{flex-direction:column;align-items:stretch}
+.mk-phone .sp__copyrow .ph-btn{width:100%}
+.mk-phone .sp__copyrow code{display:block;white-space:normal;word-break:break-all;line-height:1.55;padding:10px 12px;min-height:0}
+.mk-phone .sp__prepitem{flex-wrap:wrap}
+.mk-phone .sp__prepside{align-self:stretch;width:100%}
+.mk-phone .sp__prepside .ph-btn{width:100%}
+.mk-phone .sp__grid2{grid-template-columns:1fr}
+.mk-phone .sp__countdown{flex-wrap:wrap}
+.mk-phone .sp__freeactions .ph-btn{width:100%}
+
+@media (max-width:640px){
+  .mk-stage{padding:var(--ph-space-3)}
+  .setup,.sp,.ph-panel{padding:var(--ph-space-4)}
+  .setup__cta{align-self:stretch;width:100%}
+  .setup__cta .ph-btn{width:100%}
+  .setup__item{flex-wrap:wrap}
+}
+@media (max-width:560px){
+  /* Stepper: chip co white-space:nowrap nen 3 chip + 2 duong noi tran ngang o ~375px.
+     Bo duong noi, cho chip xuong dong. */
+  .ph-stepper{flex-wrap:wrap;gap:6px;margin-bottom:var(--ph-space-4);padding-right:36px}
+  .ph-stepline{display:none}
+  .ph-stepchip{font-size:11px;padding:4px 9px}
+  /* Hang copy: nut xuong dong duoi o code thay vi ep code co lai. */
+  .sp__copyrow{flex-direction:column;align-items:stretch}
+  .sp__copyrow .ph-btn{width:100%}
+  /* Khoa bao mat dai 64 ky tu: cho xuong dong han thay vi cuon ngang.
+     white-space:nowrap tao ap luc min-content lam tran ca trang o man hinh hep. */
+  .sp__copyrow code{display:block;white-space:normal;word-break:break-all;line-height:1.55;padding:10px 12px;min-height:0}
+  .sp__countdown{flex-wrap:wrap}
+  .mk-sec__head h2{font-size:17px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ---------- MOI: khoi moi goi + 4 buoc chuan bi ---------- */
+.sp__pitch{padding:var(--ph-space-6);border-radius:var(--ph-radius-md);background:linear-gradient(135deg,var(--ph-tint-indigo),var(--ph-tint-cyan));border:1px solid var(--ph-tint-indigo-line)}
+.sp__pitch h2{margin:0 0 8px;font-size:clamp(19px,3.2vw,24px);font-weight:800;letter-spacing:-.035em;color:var(--ph-ink);text-wrap:balance}
+.sp__pitch p{margin:0;font-size:14px;line-height:1.7;color:var(--ph-ink-2);max-width:60ch}
+.sp__pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:var(--ph-space-4)}
+.sp__pill{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:var(--ph-card);border:1px solid var(--ph-tint-indigo-line);font-size:12px;font-weight:700;color:var(--ph-ink)}
+
+/* Danh sach loi ich, moi dong mot dau tich xanh. */
+.sp__benefits{list-style:none;margin:var(--ph-space-4) 0 0;padding:0;display:grid;gap:10px}
+.sp__benefits li{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;line-height:1.6;color:var(--ph-ink-2)}
+.sp__check{flex:none;display:grid;place-items:center;width:22px;height:22px;margin-top:1px;border-radius:999px;background:var(--ph-positive);color:var(--ph-card);font-size:12px;font-weight:800}
+.sp__benefits b{color:var(--ph-ink)}
+
+.sp__prep{list-style:none;margin:var(--ph-space-6) 0 0;padding:0;display:grid;gap:var(--ph-space-3)}
+/* Buoc chuan bi: icon tron lon (tuong hinh) + so thu tu nho o goc. */
+.sp__prepfig{flex:none;position:relative;display:grid;place-items:center;width:56px;height:56px;border-radius:var(--ph-radius-card);background:var(--ph-lavender);border:1px solid var(--ph-tint-indigo-line);font-size:26px;line-height:1}
+.sp__prepitem.is-ready .sp__prepfig{background:var(--ph-tint-positive);border-color:var(--ph-positive)}
+.sp__prepfig i{position:absolute;top:-7px;left:-7px;display:grid;place-items:center;width:22px;height:22px;border-radius:999px;background:var(--ph-indigo);color:var(--ph-card);font-size:11px;font-weight:800;font-style:normal}
+.sp__prepitem.is-ready .sp__prepfig i{background:var(--ph-positive)}
+.sp__prepitem{display:flex;gap:var(--ph-space-4);align-items:flex-start;padding:var(--ph-space-4);border:1px solid var(--ph-line);border-radius:var(--ph-radius-sm);background:var(--ph-card)}
+.sp__prepitem.is-ready{background:var(--ph-tint-positive);border-color:var(--ph-positive)}
+.sp__prepn{flex:none;display:grid;place-items:center;width:32px;height:32px;border-radius:999px;background:var(--ph-indigo);color:var(--ph-card);font-size:14px;font-weight:800}
+.sp__prepitem.is-ready .sp__prepn{background:var(--ph-positive)}
+.sp__prepbody{flex:1;min-width:0}
+.sp__prepbody h3{margin:0 0 3px;font-size:14px;font-weight:800;color:var(--ph-ink);letter-spacing:-.01em}
+.sp__prepbody p{margin:0;font-size:12.5px;line-height:1.6;color:var(--ph-muted)}
+.sp__prepbody p + p{margin-top:6px}
+.sp__prepbody a{color:var(--ph-indigo);font-weight:700}
+.sp__prepside{flex:none;align-self:center;display:flex;gap:8px;flex-wrap:wrap}
+.sp__preptime{margin:var(--ph-space-4) 0 0;font-size:12.5px;color:var(--ph-muted);line-height:1.6}
+
+@media (max-width:560px){
+  .sp__prepitem{flex-wrap:wrap}
+  .sp__prepside{align-self:stretch;width:100%}
+  .sp__prepside .ph-btn{width:100%}
+}
+
+/* O nhap so tai khoan quy. */
+.sp__input{width:100%;min-height:44px;padding:0 12px;border:1px solid var(--ph-line);border-radius:var(--ph-radius-sm);background:var(--ph-tint-neutral-strong);font:inherit;font-size:15px;font-weight:700;letter-spacing:.02em;color:var(--ph-ink);font-variant-numeric:tabular-nums}
+.sp__input:focus-visible{outline:none;box-shadow:var(--ph-focus-ring);border-color:var(--ph-indigo)}
+</style>
+</head>
+<body>
+
+<div class="mk-top">
+  <div class="mk-top__in">
+    <h1>Mockup · Onboarding admin CLB &amp; Cấu hình SePay</h1>
+    <nav>
+      <a href="#m1">M1 Chào mừng</a>
+      <a href="#m2">M2 Checklist</a>
+      <a href="#m3">M3 Mời gọi &amp; 4 bước</a>
+      <a href="#m4">M4 Tư vấn gói</a>
+      <a href="#m5">M5 Khai báo</a>
+      <a href="#m6">M6 Chờ tín hiệu</a>
+      <a href="#m7">M7 Đã kết nối</a>
+      <a href="#m8">M8 Lỗi</a>
+      <a href="#m9">M9 Mobile</a>
+    </nav>
+  </div>
+</div>
+
+<div class="mk-wrap">
+
+<p class="mk-lead">
+  Bản xem trước tĩnh cho thiết kế <b>Onboarding admin CLB lần đầu + Cấu hình SePay</b>.
+  Toàn bộ màu, bo góc, khoảng cách lấy từ token <code>--ph-*</code> của <code>app/styles/tokens.css</code>;
+  nút và thẻ tái dùng lớp <code>.ph-btn</code>, <code>.ph-card</code>, <code>.ph-badge</code> trong
+  <code>app/styles/primitives.css</code>. Nhóm lớp <code>.ph-step*</code> là phần <b>đề xuất thêm mới</b> vào primitives.
+  Spec đầy đủ: <code>docs/superpowers/specs/2026-09-14-onboarding-admin-va-sepay-design.md</code>.
+</p>
+
+<!-- ==================== M1 ==================== -->
+<section class="mk-sec" id="m1">
+  <div class="mk-sec__head"><span class="mk-sec__id">M1</span><h2>Wizard chào mừng — chỉ hiện một lần</h2></div>
+  <p class="mk-sec__note">
+    Mở tự động khi <code>onboarding_seen_at IS NULL</code>. Dựng trên <code>PhModal</code> (đã có focus trap, Esc, khoá scroll,
+    trả focus). Đóng bằng bất kỳ cách nào cũng ghi <code>mark_welcome_seen</code> — không hỏi lại lần hai.
+  </p>
+
+  <div class="mk-stage mk-stage--dark">
+    <div class="ph-modal" role="dialog" aria-modal="true" aria-label="Chào mừng đến PickHub">
+      <button class="ph-modal__close" type="button" aria-label="Đóng">&times;</button>
+
+      <div class="ph-stepper" aria-label="Tiến trình chào mừng">
+        <span class="ph-stepchip is-active"><span class="ph-stepchip__n">1</span>Chào mừng</span>
+        <span class="ph-stepline"></span>
+        <span class="ph-stepchip"><span class="ph-stepchip__n">2</span>Làm được gì</span>
+        <span class="ph-stepline"></span>
+        <span class="ph-stepchip"><span class="ph-stepchip__n">3</span>Bắt đầu</span>
+      </div>
+
+      <h2 class="ph-modal__title">Chào mừng đến PickHub, CLB Pickleball 246!</h2>
+      <p style="margin:0 0 16px;font-size:13.5px;line-height:1.7;color:var(--ph-ink-2)">
+        CLB của bạn đã được tạo. Còn vài bước ngắn để mọi thứ chạy trơn tru —
+        mất khoảng <b>10 phút</b>, và bạn có thể làm dần, không cần xong ngay hôm nay.
+      </p>
+
+      <ul style="list-style:none;margin:0;padding:0;display:grid;gap:10px">
+        <li style="display:flex;gap:12px;align-items:flex-start">
+          <span style="flex:none;font-size:20px;line-height:1.2">👥</span>
+          <span style="font-size:13px;line-height:1.6;color:var(--ph-text)"><b>Quản lý thành viên</b> — danh sách thành viên, trình độ, hồ sơ vận động viên.</span>
+        </li>
+        <li style="display:flex;gap:12px;align-items:flex-start">
+          <span style="flex:none;font-size:20px;line-height:1.2">💰</span>
+          <span style="font-size:13px;line-height:1.6;color:var(--ph-text)"><b>Quỹ tự động</b> — ai chuyển tiền vào quỹ là PickHub ghi sổ và gán đúng tên, thủ quỹ không phải gõ tay.</span>
+        </li>
+        <li style="display:flex;gap:12px;align-items:flex-start">
+          <span style="flex:none;font-size:20px;line-height:1.2">🏆</span>
+          <span style="font-size:13px;line-height:1.6;color:var(--ph-text)"><b>Giải đấu</b> — sinh lịch, bảng xếp hạng, sơ đồ loại trực tiếp tự động.</span>
+        </li>
+      </ul>
+
+      <div class="ph-modal__actions">
+        <button type="button" class="ph-btn ph-btn--ghost">Để sau</button>
+        <button type="button" class="ph-btn ph-btn--primary">Tiếp tục →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== M2 ==================== -->
+<section class="mk-sec" id="m2">
+  <div class="mk-sec__head"><span class="mk-sec__id">M2</span><h2>Checklist thiết lập CLB — thường trực ở <code style="font-size:.8em">/admin</code> và <code style="font-size:.8em">/quy</code></h2></div>
+  <p class="mk-sec__note">
+    5 bước, tất cả <b>suy ra từ dữ liệu thật</b> (logo, danh sách thành viên, QR quỹ, tài khoản ngân hàng, giải đấu) — không có cờ nào lưu
+    trong DB nên trạng thái không bao giờ lệch. "Chia sẻ mã CLB" là hành động ở header, <b>không đếm vào tiến độ</b>.
+    Dòng bôi vàng giờ dành cho lời khuyên <b>mở tài khoản ngân hàng riêng</b> thay vì cảnh báo bảo mật — thủ quỹ đọc là làm được ngay,
+    còn cảnh báo kỹ thuật thì không giúp họ hành động.
+  </p>
+
+  <div class="mk-stage">
+    <p class="mk-variant">Biến thể A — đang làm (2/5)</p>
+    <div class="ph-card setup">
+      <div class="setup__head">
+        <div>
+          <h2 class="setup__title">Hoàn tất thiết lập CLB</h2>
+          <p class="setup__sub">Làm xong 5 bước này là CLB chạy đủ chức năng. Có thể làm dần, không cần xong hôm nay.</p>
+        </div>
+        <div class="setup__headactions">
+          <button type="button" class="ph-btn ph-btn--outline ph-btn--sm">🔗 Chia sẻ mã CLB</button>
+          <button type="button" class="ph-btn ph-btn--ghost ph-btn--sm">Ẩn checklist</button>
+        </div>
+      </div>
+
+      <div class="setup__progress">
+        <div class="setup__bar" role="progressbar" aria-valuenow="2" aria-valuemin="0" aria-valuemax="5" aria-label="Tiến độ thiết lập"><i style="width:40%"></i></div>
+        <span class="setup__count">2 / 5 bước</span>
+      </div>
+
+      <ul class="setup__list">
+        <li class="setup__item is-done">
+          <span class="setup__tick" aria-hidden="true">✓</span>
+          <div class="setup__body">
+            <p class="setup__name">Thêm logo và kiểm tra tên CLB</p>
+            <p class="setup__desc">Logo hiển thị trên trang chủ và ảnh chia sẻ.</p>
+          </div>
+          <div class="setup__cta"><span class="ph-badge ph-badge--positive">Đã xong</span></div>
+        </li>
+
+        <li class="setup__item is-done">
+          <span class="setup__tick" aria-hidden="true">✓</span>
+          <div class="setup__body">
+            <p class="setup__name">Thêm thành viên đầu tiên</p>
+            <p class="setup__desc">Đã có 12 thành viên. Có danh sách thành viên thì quỹ mới tự nhận ra ai vừa chuyển tiền.</p>
+          </div>
+          <div class="setup__cta"><span class="ph-badge ph-badge--positive">Đã xong</span></div>
+        </li>
+
+        <li class="setup__item">
+          <span class="setup__tick" aria-hidden="true">3</span>
+          <div class="setup__body">
+            <p class="setup__name">Tải ảnh QR nhận quỹ</p>
+            <p class="setup__desc">Thành viên quét QR này để chuyển tiền vào quỹ CLB.</p>
+          </div>
+          <div class="setup__cta"><a class="ph-btn ph-btn--outline ph-btn--sm" href="#">Tải ảnh QR</a></div>
+        </li>
+
+        <li class="setup__item is-warning">
+          <span class="setup__tick" aria-hidden="true">4</span>
+          <div class="setup__body">
+            <p class="setup__name">Bật Auto Quỹ — tiền vào tự động lên sổ</p>
+            <p class="setup__desc">Ai chuyển tiền vào quỹ là PickHub ghi sổ và gán đúng tên, thủ quỹ không phải gõ tay dòng nào.</p>
+            <p class="setup__warn">🏦 Trước khi bắt đầu, hãy <b>mở một tài khoản ngân hàng riêng cho quỹ CLB</b> — đừng dùng tài khoản cá nhân thủ quỹ đang xài hằng ngày. Mở trên app ngân hàng khoảng 5 phút, miễn phí.</p>
+          </div>
+          <div class="setup__cta"><a class="ph-btn ph-btn--primary ph-btn--sm" href="#m3">Thiết lập Auto Quỹ với SePay</a></div>
+        </li>
+
+        <li class="setup__item">
+          <span class="setup__tick" aria-hidden="true">5</span>
+          <div class="setup__body">
+            <p class="setup__name">Tạo giải đấu đầu tiên</p>
+            <p class="setup__desc">Sinh lịch, bảng xếp hạng và sơ đồ loại trực tiếp tự động.</p>
+          </div>
+          <div class="setup__cta"><a class="ph-btn ph-btn--outline ph-btn--sm" href="#">Tạo giải</a></div>
+        </li>
+      </ul>
+    </div>
+
+    <p class="mk-variant">Biến thể B — hoàn tất (thẻ tự ẩn sau khi admin đọc)</p>
+    <div class="ph-card setup">
+      <div class="setup__done-banner">
+        <span class="emo" aria-hidden="true">🎉</span>
+        <div>
+          CLB Pickleball 246 đã thiết lập xong cả 5 bước. Auto Quỹ đang chạy, khoá bảo mật đã bật.
+          <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+            <button type="button" class="ph-btn ph-btn--outline ph-btn--sm">🔗 Chia sẻ mã CLB</button>
+            <button type="button" class="ph-btn ph-btn--ghost ph-btn--sm">Ẩn thẻ này</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==================== M3 ==================== -->
+<section class="mk-sec" id="m3">
+  <div class="mk-sec__head"><span class="mk-sec__id">M3</span><h2>Màn giới thiệu — chỉ để thuyết phục, chưa nhập gì cả</h2></div>
+  <p class="mk-sec__note">
+    Màn <b>đầu tiên</b> admin thấy khi bấm "Thiết lập Auto Quỹ". Ở đây <b>không có ô nhập nào</b> — việc duy nhất của nó là
+    cho thấy được gì và mất bao nhiêu công. Bốn bước chuẩn bị hiện hết một lượt để admin biết toàn cảnh, không có bước nào
+    bị giấu để bung ra giữa chừng.
+  </p>
+
+  <div class="mk-stage">
+    <div class="ph-card sp">
+      <div class="sp__pitch">
+        <h2>Để PickHub tự ghi sổ quỹ giúp bạn</h2>
+        <ul class="sp__benefits">
+          <li><span class="sp__check" aria-hidden="true">✓</span><span><b>Tiền vào là tự lên sổ.</b> Không phải gõ tay dòng nào.</span></li>
+          <li><span class="sp__check" aria-hidden="true">✓</span><span><b>Tự gán đúng tên người nộp.</b> PickHub đọc nội dung chuyển khoản và khớp với danh sách thành viên.</span></li>
+          <li><span class="sp__check" aria-hidden="true">✓</span><span><b>Thủ quỹ hết phải đối chiếu.</b> Không cần mở app ngân hàng dò từng khoản nữa.</span></li>
+          <li><span class="sp__check" aria-hidden="true">✓</span><span><b>Cả CLB tự xem được.</b> Ai đã nộp, ai chưa, quỹ còn bao nhiêu — công khai, không ai phải hỏi.</span></li>
+          <li><span class="sp__check" aria-hidden="true">✓</span><span><b>Miễn phí.</b> Gói miễn phí của SePay được 50 giao dịch mỗi tháng.</span></li>
+        </ul>
+        <div class="sp__pills">
+          <span class="sp__pill">⏱️ Khoảng 10 phút</span>
+          <span class="sp__pill">🙂 Không cần biết kỹ thuật</span>
+          <span class="sp__pill">↩️ Sai thì làm lại được</span>
+        </div>
+      </div>
+
+      <ol class="sp__prep">
+        <li class="sp__prepitem">
+          <span class="sp__prepfig" aria-hidden="true">🏦<i>1</i></span>
+          <div class="sp__prepbody">
+            <h3>Tài khoản ngân hàng riêng của quỹ</h3>
+            <p>Một tài khoản mới, đứng tên thủ quỹ, chỉ dùng cho quỹ CLB. Mở ngay trên app ngân hàng, khoảng 5 phút, miễn phí.</p>
+          </div>
+          <div class="sp__prepside"><span class="ph-badge ph-badge--muted">Làm ở app ngân hàng</span></div>
+        </li>
+
+        <li class="sp__prepitem">
+          <span class="sp__prepfig" aria-hidden="true">📱<i>2</i></span>
+          <div class="sp__prepbody">
+            <h3>Tài khoản SePay</h3>
+            <p>SePay là dịch vụ báo cho PickHub biết khi có tiền vào tài khoản. Đăng ký bằng số điện thoại.</p>
+          </div>
+          <div class="sp__prepside">
+            <a class="ph-btn ph-btn--primary ph-btn--sm" href="https://my.sepay.vn/register?gcid=1008" target="_blank" rel="noreferrer">Đăng ký SePay ↗</a>
+          </div>
+        </li>
+
+        <li class="sp__prepitem">
+          <span class="sp__prepfig" aria-hidden="true">🎁<i>3</i></span>
+          <div class="sp__prepbody">
+            <h3>Chọn gói dịch vụ</h3>
+            <p>Cứ chọn gói miễn phí trước — 50 giao dịch mỗi tháng. SePay hay có khuyến mãi, ngó qua trước khi chọn.</p>
+          </div>
+          <div class="sp__prepside">
+            <a class="ph-btn ph-btn--outline ph-btn--sm" href="https://sepay.vn/khuyen-mai" target="_blank" rel="noreferrer">Xem khuyến mãi ↗</a>
+          </div>
+        </li>
+
+        <li class="sp__prepitem">
+          <span class="sp__prepfig" aria-hidden="true">🔗<i>4</i></span>
+          <div class="sp__prepbody">
+            <h3>Kết nối SePay với PickHub</h3>
+            <p>Copy hai dòng chữ từ PickHub dán sang SePay, rồi bấm một nút. Có ảnh chụp màn hình từng bước.</p>
+          </div>
+          <div class="sp__prepside"><span class="ph-badge">PickHub lo phần này</span></div>
+        </li>
+      </ol>
+
+      <div class="sp__actions">
+        <button type="button" class="ph-btn ph-btn--primary">Bạn đã có tài khoản ngân hàng? Bắt đầu kết nối →</button>
+      </div>
+      <p class="sp__note">Chưa có cũng không sao — đóng lại lúc nào cũng được, PickHub nhớ bạn đang làm tới đâu.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== M4 ==================== -->
+<section class="mk-sec" id="m4">
+  <div class="mk-sec__head"><span class="mk-sec__id">M4</span><h2>Bắt đầu thiết lập — số tài khoản quỹ &amp; tài khoản SePay</h2></div>
+  <p class="mk-sec__note">
+    Tới đây admin <b>đã có tài khoản ngân hàng</b> nên bỏ hết phần khuyên nhủ, vào việc luôn.
+    Khối tư vấn gói rút xuống ba gạch đầu dòng: chỉ nêu con số thật và lợi ích, không suy diễn "tương đương bao nhiêu người",
+    không nhắc ưu đãi cụ thể của ngân hàng nào — thứ đó đổi liên tục, để link khuyến mãi lo.
+  </p>
+
+  <div class="mk-stage">
+    <div class="ph-card sp">
+      <div class="ph-stepper" aria-label="Tiến trình kết nối SePay">
+        <span class="ph-stepchip is-active"><span class="ph-stepchip__n">1</span>Tài khoản quỹ</span>
+        <span class="ph-stepline"></span>
+        <span class="ph-stepchip"><span class="ph-stepchip__n">2</span>Khai báo với SePay</span>
+        <span class="ph-stepline"></span>
+        <span class="ph-stepchip"><span class="ph-stepchip__n">3</span>Bấm Gửi thử</span>
+      </div>
+
+      <div class="sp__field">
+        <label class="sp__label" for="mk-acc1">Số tài khoản ngân hàng của quỹ CLB</label>
+        <input class="sp__input" id="mk-acc1" type="text" inputmode="numeric" placeholder="Nhập số tài khoản">
+        <p class="sp__hintline">Copy từ app ngân hàng cho chắc. Số này chỉ dùng để PickHub biết tiền vào là của CLB bạn.</p>
+      </div>
+
+      <div class="sp__free">
+        <h3>Chưa có tài khoản SePay?</h3>
+        <ul class="sp__benefits" style="margin-top:0">
+          <li><span class="sp__check" aria-hidden="true">✓</span><span>Gói miễn phí: <b>50 giao dịch mỗi tháng</b>.</span></li>
+          <li><span class="sp__check" aria-hidden="true">✓</span><span>Tiền vào quỹ <b>tự động lên sổ</b>, không phải gõ tay.</span></li>
+          <li><span class="sp__check" aria-hidden="true">✓</span><span>Vượt 50 vẫn chạy bình thường, chỉ phát sinh phí theo giao dịch.</span></li>
+        </ul>
+        <p style="margin:12px 0">SePay hay đổi chính sách và có đợt khuyến mãi — ngó qua trước khi đăng ký.</p>
+        <div class="sp__freeactions">
+          <a class="ph-btn ph-btn--primary" href="https://my.sepay.vn/register?gcid=1008" target="_blank" rel="noreferrer">Đăng ký SePay miễn phí ↗</a>
+          <a class="ph-btn ph-btn--outline" href="https://sepay.vn/khuyen-mai" target="_blank" rel="noreferrer">🎁 Xem khuyến mãi ↗</a>
+          <a class="muted" href="https://sepay.vn/bang-gia.html" target="_blank" rel="noreferrer">Xem bảng giá</a>
+        </div>
+      </div>
+
+      <div class="sp__actions">
+        <button type="button" class="ph-btn ph-btn--primary">Lưu và khai báo với SePay →</button>
+        <button type="button" class="ph-btn ph-btn--ghost">Để sau</button>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="mk-sec" id="m5">
+  <div class="mk-sec__head"><span class="mk-sec__id">M5</span><h2>Khai báo với SePay — copy hai dòng, dán sang</h2></div>
+  <p class="mk-sec__note">
+    <b>Thay đổi so với bản trước:</b> tài liệu SePay cho biết chức năng <b>Gửi thử</b> gửi một <em>payload mẫu</em>
+    (ví dụ trong tài liệu dùng số tài khoản mẫu <code>1017588888</code>), nên <b>không thể dùng nó để tự phát hiện số tài khoản</b>.
+    Vì vậy admin xác nhận số tài khoản ở bước 1 — họ biết số này, chỉ cần copy từ app ngân hàng — còn "Gửi thử" đảm nhiệm
+    đúng việc nó làm tốt: <b>chứng minh đường ống chạy thật</b>. Đổi lại, không ai phải chuyển tiền thật nữa.
+  </p>
+
+  <div class="mk-stage">
+    <div class="ph-card sp">
+      <div class="ph-stepper" aria-label="Tiến trình kết nối SePay">
+        <span class="ph-stepchip is-done"><span class="ph-stepchip__n">✓</span>Tài khoản quỹ</span>
+        <span class="ph-stepline is-done"></span>
+        <span class="ph-stepchip is-active"><span class="ph-stepchip__n">2</span>Khai báo với SePay</span>
+        <span class="ph-stepline"></span>
+        <span class="ph-stepchip"><span class="ph-stepchip__n">3</span>Bấm Gửi thử</span>
+      </div>
+
+      <div class="sp__field">
+        <label class="sp__label" for="mk-acc">Số tài khoản ngân hàng của quỹ CLB</label>
+        <input class="sp__input" id="mk-acc" type="text" inputmode="numeric" value="19071234567890" readonly>
+        <p class="sp__hintline">✅ Đã lưu. Đây phải đúng là tài khoản bạn vừa liên kết với SePay ở bước trước.</p>
+      </div>
+
+      <div class="sp__field">
+        <label class="sp__label" for="mk-url">Địa chỉ nhận giao dịch của CLB bạn</label>
+        <div class="sp__copyrow">
+          <code id="mk-url">https://pickhub.vn/api/webhook</code>
+          <button type="button" class="ph-btn ph-btn--outline">Sao chép</button>
+        </div>
+        <p class="sp__hintline">Dán vào ô <b>URL</b> khi thêm webhook trong SePay.</p>
+      </div>
+
+      <div class="sp__field">
+        <label class="sp__label" for="mk-secret">Khoá bảo mật (PickHub đã sinh sẵn cho bạn)</label>
+        <div class="sp__copyrow">
+          <code id="mk-secret">9f2c4b7e1a6d38c05e92f4bb70a1d6ec83b5f0297ac41de6b82f5c93a70d14e8</code>
+          <button type="button" class="ph-btn ph-btn--outline">Sao chép</button>
+        </div>
+        <p class="sp__hintline">⚠ Khoá này chỉ hiện trong lúc thiết lập. Dán vào ô <b>Secret</b> và chọn kiểu xác thực <b>HMAC-SHA256</b> trong SePay.</p>
+      </div>
+
+      <ol class="sp__guide">
+        <li>
+          <div class="t">
+            Mở <b>my.sepay.vn</b> → menu <b>Tích hợp WebHooks</b> → nút <b>Thêm webhook</b>.
+            <div class="sp__shot">[ Ảnh: màn hình danh sách Webhooks của SePay, khoanh đỏ nút "Thêm webhook" ]<br>public/images/sepay/01-them-webhook.png</div>
+          </div>
+        </li>
+        <li>
+          <div class="t">
+            Dán <b>Địa chỉ nhận giao dịch</b> ở trên vào ô <b>URL</b>.
+            <div class="sp__shot">[ Ảnh: form thêm webhook, khoanh đỏ ô URL ]<br>public/images/sepay/02-dan-url.png</div>
+          </div>
+        </li>
+        <li>
+          <div class="t">
+            Ở mục <b>Kiểu xác thực</b>, chọn <b>HMAC-SHA256</b> rồi dán <b>Khoá bảo mật</b> ở trên vào ô <b>Secret</b>.
+            <div class="sp__shot">[ Ảnh: dropdown Kiểu xác thực + ô Secret ]<br>public/images/sepay/03-hmac-secret.png</div>
+          </div>
+        </li>
+        <li>
+          <div class="t">
+            Ở mục <b>Tài khoản</b>, chọn đúng số <b>19071234567890</b> — <u>đừng để "Tất cả tài khoản"</u>.
+            Ở mục <b>Giao dịch</b>, chọn <b>Có tiền vào</b>. Bấm <b>Lưu</b>.
+            <div class="sp__shot">[ Ảnh: ô chọn Tài khoản và ô chọn Giao dịch ]<br>public/images/sepay/04-chon-tai-khoan.png</div>
+          </div>
+        </li>
+        <li>
+          <div class="t">
+            Quay lại danh sách webhook, mở menu <b>⋮</b> ở dòng vừa tạo rồi bấm <b>Gửi thử</b>.
+            SePay sẽ bắn một tín hiệu mẫu sang PickHub — <b>không tốn tiền, không tạo giao dịch nào</b>.
+            <div class="sp__shot">[ Ảnh: menu ⋮ của webhook, khoanh đỏ mục "Gửi thử" ]<br>public/images/sepay/04-gui-thu.png</div>
+          </div>
+        </li>
+      </ol>
+
+      <div class="sp__actions">
+        <button type="button" class="ph-btn ph-btn--primary">Tôi đã bấm Gửi thử →</button>
+        <button type="button" class="ph-btn ph-btn--ghost">Để sau</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== M6 ==================== -->
+<section class="mk-sec" id="m6">
+  <div class="mk-sec__head"><span class="mk-sec__id">M6</span><h2>Đang chờ tín hiệu từ SePay — không ai phải chuyển tiền</h2></div>
+  <p class="mk-sec__note">
+    PickHub mở cửa sổ chờ 10 phút và chấp nhận <b>bất kỳ</b> request nào tới <code>/api/webhook</code> có
+    <b>chữ ký HMAC khớp khoá bảo mật của CLB đó</b> — kể cả khi payload mang số tài khoản mẫu. Chữ ký là bằng chứng đủ mạnh
+    (chỉ CLB đó biết khoá), và vì ta <b>không</b> suy số tài khoản ra từ payload nên không có rủi ro gán nhầm.
+    Thiết kế này bỏ được hẳn bảng phiên ghép nối, RPC, giao dịch thử 2.000đ và cột <code>is_pairing_probe</code>.
+  </p>
+
+  <div class="mk-stage">
+    <div class="ph-card sp">
+      <div class="sp__head">
+        <div>
+          <h2>Đang chờ tín hiệu từ SePay…</h2>
+          <p>Bấm <b>Gửi thử</b> bên SePay là xong. Màn hình này tự cập nhật, bạn không cần làm gì thêm.</p>
+        </div>
+        <span class="ph-badge">Đang kiểm tra</span>
+      </div>
+
+      <div class="sp__transfer">
+        <span class="cap">Việc cuối cùng</span>
+        <p class="sp__amount">Bấm “Gửi thử” trong SePay</p>
+        <p style="margin:0 0 12px;font-size:13px;line-height:1.65;color:var(--ph-ink-2)">
+          Vào <b>my.sepay.vn</b> → <b>Tích hợp WebHooks</b> → mở menu <b>⋮</b> ở dòng webhook vừa tạo → bấm <b>Gửi thử</b>.
+          Tín hiệu này <b>miễn phí</b> và <b>không tạo giao dịch nào</b> trong sổ quỹ.
+        </p>
+        <a class="ph-btn ph-btn--primary" href="https://my.sepay.vn" target="_blank" rel="noreferrer">Mở SePay ở tab mới ↗</a>
+        <div class="sp__countdown">
+          <span>Cửa sổ kiểm tra còn</span>
+          <span class="sp__clock">09:41</span>
+          <span style="color:var(--ph-muted);font-weight:600">· hết giờ thì bấm kiểm tra lại, không mất gì</span>
+        </div>
+      </div>
+
+      <div class="sp__hintbox">
+        <span class="emo" aria-hidden="true">💡</span>
+        <div>
+          <b>Đã nhận được tín hiệu nhưng chữ ký không khớp.</b><br>
+          Nghĩa là địa chỉ đúng rồi, chỉ sai khoá bảo mật. Quay lại SePay, sửa webhook, dán lại <b>Khoá bảo mật</b>
+          ở bước trước rồi bấm <b>Gửi thử</b> lần nữa.
+        </div>
+      </div>
+
+      <div class="sp__actions">
+        <button type="button" class="ph-btn ph-btn--outline" disabled>⏳ Đang chờ tín hiệu…</button>
+        <button type="button" class="ph-btn ph-btn--ghost">Huỷ</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== M7 ==================== -->
+<section class="mk-sec" id="m7">
+  <div class="mk-sec__head"><span class="mk-sec__id">M7</span><h2>Đã kết nối — kèm đồng hồ hạn mức và sức khoẻ kết nối</h2></div>
+  <p class="mk-sec__note">
+    Hai thẻ thống kê tính từ <code>quy_pickleball</code> đã có (<code>created_at</code>, <code>group_id</code>,
+    <code>parsing_method</code>) — <b>không cần bảng mới</b>. Thẻ "sức khoẻ kết nối" là thứ biến
+    "hỏng im lặng" thành "hỏng nhìn thấy được".
+  </p>
+
+  <div class="mk-stage">
+    <p class="mk-variant">Biến thể A — mọi thứ bình thường</p>
+    <div class="ph-card sp">
+      <div class="sp__head">
+        <div>
+          <h2>Auto Quỹ — tiền vào tự động lên sổ</h2>
+          <p>Ai chuyển tiền vào quỹ là PickHub ghi sổ và gán đúng tên.</p>
+        </div>
+        <span class="ph-badge ph-badge--positive">Đang hoạt động · Đã bật khoá bảo mật</span>
+      </div>
+
+      <div class="sp__ok">
+        <span class="emo" aria-hidden="true">✅</span>
+        <div>
+          <b>Đã kết nối!</b>
+          <span>Tài khoản 1907••••7890 · BIDV · nhận tín hiệu thử lúc 14:33 ngày 14/09/2026</span>
+        </div>
+      </div>
+
+      <div class="sp__grid2">
+        <div class="sp__stat">
+          <span class="lab">Hạn mức gói miễn phí tháng này</span>
+          <span class="val">28 / 50 giao dịch</span>
+          <div class="sp__quota"><i style="width:56%"></i></div>
+          <span class="sub">Gói miễn phí vẫn đủ cho CLB bạn. Vượt 50 thì SePay vẫn chạy, chỉ phát sinh phí theo giao dịch.</span>
+        </div>
+        <div class="sp__stat">
+          <span class="lab">Sức khoẻ kết nối</span>
+          <span class="val">2 giờ trước</span>
+          <span class="sub">✅ Giao dịch gần nhất nhận được từ SePay — kết nối đang chạy tốt.</span>
+        </div>
+      </div>
+
+      <div class="sp__actions">
+        <button type="button" class="ph-btn ph-btn--outline">Kiểm tra lại kết nối</button>
+        <button type="button" class="ph-btn ph-btn--ghost">Thêm tài khoản thứ hai</button>
+      </div>
+    </div>
+
+    <p class="mk-variant">Biến thể B — sắp chạm hạn mức + lâu không nhận tín hiệu</p>
+    <div class="ph-card sp">
+      <div class="sp__head">
+        <div>
+          <h2>Auto Quỹ — tiền vào tự động lên sổ</h2>
+          <p>Ai chuyển tiền vào quỹ là PickHub ghi sổ và gán đúng tên.</p>
+        </div>
+        <span class="ph-badge ph-badge--gold">Cần chú ý</span>
+      </div>
+
+      <div class="sp__grid2" style="margin-top:0">
+        <div class="sp__stat" style="border-color:var(--ph-tint-gold-line);background:var(--ph-tint-gold)">
+          <span class="lab">Hạn mức gói miễn phí tháng này</span>
+          <span class="val">46 / 50 giao dịch</span>
+          <div class="sp__quota is-warn"><i style="width:92%"></i></div>
+          <span class="sub">
+            Sắp chạm hạn mức. Ba cách: <b>gộp kỳ thu</b> (thu quỹ theo quý thay vì theo tháng — giảm 3 lần số giao dịch),
+            xem <a href="https://sepay.vn/khuyen-mai" target="_blank" rel="noreferrer" style="color:var(--ph-tint-gold-text);font-weight:700">khuyến mãi đang chạy ↗</a>
+            (SePay hay tặng gói nhiều lượt hơn), hoặc <a href="https://sepay.vn/bang-gia.html" target="_blank" rel="noreferrer" style="color:var(--ph-tint-gold-text);font-weight:700">nâng gói ↗</a>.
+          </span>
+        </div>
+        <div class="sp__stat" style="border-color:var(--ph-negative);background:var(--ph-tint-negative)">
+          <span class="lab">Sức khoẻ kết nối</span>
+          <span class="val" style="color:var(--ph-negative)">21 ngày trước</span>
+          <span class="sub" style="color:var(--ph-negative)">
+            ⚠ Đã 21 ngày không nhận giao dịch nào trong khi CLB vẫn sinh hoạt. Khai báo bên SePay có thể đã bị xoá, hoặc khoá bảo mật đã bị đổi.
+          </span>
+        </div>
+      </div>
+
+      <div class="sp__actions">
+        <button type="button" class="ph-btn ph-btn--primary">Kiểm tra lại kết nối</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== M8 ==================== -->
+<section class="mk-sec" id="m8">
+  <div class="mk-sec__head"><span class="mk-sec__id">M8</span><h2>Hai ca lỗi — luôn kèm việc cần làm tiếp</h2></div>
+  <p class="mk-sec__note">
+    Thông báo trùng tài khoản <b>không tiết lộ CLB nào</b> đang giữ số tài khoản (tránh rò rỉ dữ liệu tenant khác)
+    và che bớt số tài khoản. Không có màn hình lỗi nào chỉ báo lỗi rồi để admin tự xoay — mỗi ca đều có nút hành động.
+  </p>
+
+  <div class="mk-stage">
+    <p class="mk-variant">Ca 1 — số tài khoản đã thuộc CLB khác</p>
+    <div class="ph-card sp">
+      <div class="sp__head">
+        <div><h2>Không dùng được số tài khoản này</h2><p>Mỗi số tài khoản chỉ thuộc về một CLB trong PickHub.</p></div>
+        <span class="ph-badge ph-badge--negative">Trùng tài khoản</span>
+      </div>
+      <div class="sp__errbox">
+        <span class="emo" aria-hidden="true">🚫</span>
+        <div>
+          <b>Số tài khoản 1907••••7890 đã được một CLB khác đăng ký.</b>
+          Nếu đây đúng là tài khoản của CLB bạn, vui lòng liên hệ hỗ trợ để chuyển quyền.
+        </div>
+      </div>
+      <div class="sp__actions">
+        <button type="button" class="ph-btn ph-btn--primary">Nhập số tài khoản khác</button>
+        <button type="button" class="ph-btn ph-btn--outline">Liên hệ hỗ trợ</button>
+      </div>
+    </div>
+
+    <p class="mk-variant">Ca 2 — hết cửa sổ kiểm tra, chưa nhận được tín hiệu nào</p>
+    <div class="ph-card sp">
+      <div class="sp__head">
+        <div><h2>Chưa nhận được tín hiệu nào từ SePay</h2><p>Cửa sổ kiểm tra 10 phút đã hết.</p></div>
+        <span class="ph-badge ph-badge--muted">Hết giờ</span>
+      </div>
+      <div class="sp__errbox" style="background:var(--ph-tint-gold);border-color:var(--ph-tint-gold-line);color:var(--ph-tint-gold-text)">
+        <span class="emo" aria-hidden="true">⏰</span>
+        <div>
+          <b>Không sao, bấm kiểm tra lại là được — bạn không mất gì.</b>
+          Khoá bảo mật vẫn giữ nguyên nên <b>không cần khai báo lại bên SePay</b>, chỉ cần bấm <b>Gửi thử</b> một lần nữa.
+        </div>
+      </div>
+      <div class="sp__actions">
+        <button type="button" class="ph-btn ph-btn--primary">Kiểm tra lại</button>
+        <button type="button" class="sp__manual">Xem lại hướng dẫn khai báo</button>
+      </div>
+      <p class="sp__note">
+        Hay gặp nhất: quên bấm <b>Lưu</b> sau khi điền form bên SePay, dán nhầm địa chỉ nhận giao dịch,
+        hoặc quên chọn kiểu xác thực <b>HMAC-SHA256</b>. Bấm "Xem lại hướng dẫn khai báo" để đối chiếu từng bước có ảnh.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== M9 ==================== -->
+<section class="mk-sec" id="m9">
+  <div class="mk-sec__head"><span class="mk-sec__id">M9</span><h2>Mobile 380px — nơi trưởng nhóm thực sự dùng</h2></div>
+  <p class="mk-sec__note">
+    Mọi nút chạm ≥ 44px, nhãn luôn hiện (không dùng placeholder làm nhãn), badge trạng thái luôn kèm chữ —
+    theo <code>docs/pickhub-core/UI-BRAND-SYSTEM.md</code> §5 và §7. Dưới 640px, nút hành động của mỗi bước
+    giãn hết chiều rộng để dễ bấm bằng ngón cái.
+  </p>
+
+  <div class="mk-stage">
+    <div class="mk-phones">
+
+      <div>
+        <div class="mk-phone">
+          <div class="mk-phone__bar"><i></i></div>
+          <div class="mk-phone__body">
+            <div class="ph-card setup" style="padding:14px">
+              <div class="setup__head">
+                <div>
+                  <h2 class="setup__title" style="font-size:15px">Hoàn tất thiết lập CLB</h2>
+                  <p class="setup__sub" style="font-size:12px">Làm xong 5 bước là CLB chạy đủ chức năng. Có thể làm dần.</p>
+                </div>
+                <div class="setup__headactions">
+                  <button type="button" class="ph-btn ph-btn--outline ph-btn--sm">🔗 Chia sẻ mã CLB</button>
+                  <button type="button" class="ph-btn ph-btn--ghost ph-btn--sm">Ẩn</button>
+                </div>
+              </div>
+
+              <div class="setup__progress">
+                <div class="setup__bar"><i style="width:40%"></i></div>
+                <span class="setup__count">2 / 5 bước</span>
+              </div>
+
+              <ul class="setup__list">
+                <li class="setup__item is-done">
+                  <span class="setup__tick" aria-hidden="true">✓</span>
+                  <div class="setup__body">
+                    <p class="setup__name" style="font-size:13px">Thêm logo và kiểm tra tên CLB</p>
+                  </div>
+                </li>
+
+                <li class="setup__item is-done">
+                  <span class="setup__tick" aria-hidden="true">✓</span>
+                  <div class="setup__body">
+                    <p class="setup__name" style="font-size:13px">Thêm thành viên đầu tiên</p>
+                    <p class="setup__desc">Đã có 12 thành viên.</p>
+                  </div>
+                </li>
+
+                <li class="setup__item">
+                  <span class="setup__tick" aria-hidden="true">3</span>
+                  <div class="setup__body">
+                    <p class="setup__name" style="font-size:13px">Tải ảnh QR nhận quỹ</p>
+                    <p class="setup__desc">Thành viên quét QR này để chuyển tiền vào quỹ.</p>
+                  </div>
+                  <div class="setup__cta"><a class="ph-btn ph-btn--outline ph-btn--sm" href="#">Tải ảnh QR</a></div>
+                </li>
+
+                <li class="setup__item is-warning">
+                  <span class="setup__tick" aria-hidden="true">4</span>
+                  <div class="setup__body">
+                    <p class="setup__name" style="font-size:13px">Bật Auto Quỹ — tiền vào tự động lên sổ</p>
+                    <p class="setup__desc">Ai chuyển tiền vào quỹ là PickHub ghi sổ và gán đúng tên.</p>
+                    <p class="setup__warn">🏦 Trước khi bắt đầu, hãy mở một <b>tài khoản ngân hàng riêng cho quỹ CLB</b>. Mở trên app ngân hàng khoảng 5 phút, miễn phí.</p>
+                  </div>
+                  <div class="setup__cta"><a class="ph-btn ph-btn--primary ph-btn--sm" href="#">Thiết lập Auto Quỹ với SePay</a></div>
+                </li>
+
+                <li class="setup__item">
+                  <span class="setup__tick" aria-hidden="true">5</span>
+                  <div class="setup__body">
+                    <p class="setup__name" style="font-size:13px">Tạo giải đấu đầu tiên</p>
+                    <p class="setup__desc">Sinh lịch, bảng xếp hạng và sơ đồ loại trực tiếp tự động.</p>
+                  </div>
+                  <div class="setup__cta"><a class="ph-btn ph-btn--outline ph-btn--sm" href="#">Tạo giải</a></div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <p class="mk-phone__cap">M2 · Checklist trên điện thoại</p>
+      </div>
+      </div>
+
+      <div>
+        <div class="mk-phone">
+          <div class="mk-phone__bar"><i></i></div>
+          <div class="mk-phone__body">
+            <div class="ph-card sp" style="padding:16px">
+              <div class="sp__pitch" style="padding:16px">
+                <h2 style="font-size:18px">Để PickHub tự ghi sổ quỹ giúp bạn</h2>
+                <ul class="sp__benefits" style="margin-top:12px">
+                  <li><span class="sp__check">✓</span><span style="font-size:12.5px"><b>Tiền vào là tự lên sổ.</b> Không phải gõ tay.</span></li>
+                  <li><span class="sp__check">✓</span><span style="font-size:12.5px"><b>Tự gán đúng tên người nộp.</b></span></li>
+                  <li><span class="sp__check">✓</span><span style="font-size:12.5px"><b>Cả CLB tự xem được</b> ai đã nộp, ai chưa.</span></li>
+                  <li><span class="sp__check">✓</span><span style="font-size:12.5px"><b>Miễn phí</b> 50 giao dịch mỗi tháng.</span></li>
+                </ul>
+                <div class="sp__pills">
+                  <span class="sp__pill">⏱️ 10 phút</span>
+                  <span class="sp__pill">🙂 Không cần biết kỹ thuật</span>
+                </div>
+              </div>
+              <ol class="sp__prep">
+                <li class="sp__prepitem">
+                  <span class="sp__prepfig">🏦<i>1</i></span>
+                  <div class="sp__prepbody"><h3>Tài khoản ngân hàng riêng của quỹ</h3><p>Mở trên app ngân hàng, ~5 phút, miễn phí.</p></div>
+                </li>
+                <li class="sp__prepitem">
+                  <span class="sp__prepfig">📱<i>2</i></span>
+                  <div class="sp__prepbody"><h3>Tài khoản SePay</h3><p>Đăng ký bằng số điện thoại.</p></div>
+                  <div class="sp__prepside"><a class="ph-btn ph-btn--primary ph-btn--sm ph-btn--block" href="https://my.sepay.vn/register?gcid=1008" target="_blank" rel="noreferrer">Đăng ký ↗</a></div>
+                </li>
+                <li class="sp__prepitem">
+                  <span class="sp__prepfig">🎁<i>3</i></span>
+                  <div class="sp__prepbody"><h3>Chọn gói dịch vụ</h3><p>Cứ chọn gói miễn phí trước — 50 giao dịch/tháng.</p></div>
+                </li>
+                <li class="sp__prepitem">
+                  <span class="sp__prepfig">🔗<i>4</i></span>
+                  <div class="sp__prepbody"><h3>Kết nối với PickHub</h3><p>PickHub hướng dẫn từng bước, có ảnh.</p></div>
+                </li>
+              </ol>
+              <div class="sp__actions"><button type="button" class="ph-btn ph-btn--primary ph-btn--block">Bạn đã có tài khoản ngân hàng? Bắt đầu kết nối →</button></div>
+            </div>
+          </div>
+        </div>
+        <p class="mk-phone__cap">M3 · Màn mời gọi trên điện thoại</p>
+      </div>
+
+      <div>
+        <div class="mk-phone">
+          <div class="mk-phone__bar"><i></i></div>
+          <div class="mk-phone__body">
+            <div class="ph-card sp" style="padding:16px">
+              <div class="sp__head" style="margin-bottom:12px">
+                <div><h2 style="font-size:15px">Đang chờ tín hiệu…</h2></div>
+                <span class="ph-badge">Đang kiểm tra</span>
+              </div>
+              <div class="sp__transfer">
+                <span class="cap">Việc cuối cùng</span>
+                <p class="sp__amount" style="font-size:17px">Bấm &ldquo;Gửi thử&rdquo; trong SePay</p>
+                <p style="margin:0 0 12px;font-size:12.5px;line-height:1.6;color:var(--ph-ink-2)">Tích hợp WebHooks → menu <b>⋮</b> → <b>Gửi thử</b>. Miễn phí, không tạo giao dịch nào.</p>
+                <a class="ph-btn ph-btn--primary ph-btn--block" href="https://my.sepay.vn" target="_blank" rel="noreferrer">Mở SePay ↗</a>
+                <div class="sp__countdown"><span>Còn</span><span class="sp__clock">09:41</span></div>
+              </div>
+              <div class="sp__actions"><button type="button" class="ph-btn ph-btn--ghost ph-btn--block">Huỷ</button></div>
+            </div>
+          </div>
+        </div>
+        <p class="mk-phone__cap">M6 · Chờ tín hiệu trên điện thoại</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+</div><!-- /.mk-wrap -->
+</body>
+</html>

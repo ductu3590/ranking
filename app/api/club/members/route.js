@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
-import { getGroupIdForDatabase, requireValidatedGroupAdmin } from '@/lib/groupSession';
+import { requireValidatedGroupAdmin } from '@/lib/groupSession';
+import { getClubReadScopeId } from '@/lib/clubReadContext';
 
 export async function GET() {
-    const groupId = getGroupIdForDatabase();
+    const groupId = await getClubReadScopeId();
     const { data, error } = await supabaseAdmin
         .from('club_members')
         .select('*')

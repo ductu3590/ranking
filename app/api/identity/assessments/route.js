@@ -1,4 +1,5 @@
-import { identityRepository, readSignedClubSession, requireIdentitySession } from '@/lib/identityRuntime';
+import { identityRepository, readSignedClubSession } from '@/lib/identityRuntime';
+import { requireClubReadSession } from '@/lib/clubReadContext';
 import assessmentModule from '@/lib/application/identity/assessments';
 import { toIdentityResponse, identityRouteError } from '@/lib/application/identity/routeAdapter';
 import {
@@ -11,7 +12,7 @@ const recordMembershipAssessment = createRecordMembershipAssessment({ repository
 
 export async function GET(request) {
     try {
-        const session = await requireIdentitySession('read');
+        const session = await requireClubReadSession();
         const membershipId = new URL(request.url).searchParams.get('membershipId');
         const assessments = (await identityRepository.listMembershipAssessments(session.group_id, membershipId || null))
             .map((assessment) => ({

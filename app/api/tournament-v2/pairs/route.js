@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
-import { requireValidatedGroupAdmin, getClubScope } from '@/lib/groupSession';
+import { requireValidatedGroupAdmin } from '@/lib/groupSession';
 import { generatePairSchedule } from '@/lib/tournament/match/mlpPairs';
+import { getClubReadScope } from '@/lib/clubReadContext';
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -10,7 +11,7 @@ const db = supabaseAdmin || supabaseServer;
 // Đọc pairSchedule hiện có của 1 stage. null nếu chưa sinh.
 export async function GET(request) {
     try {
-        const scope = getClubScope();
+        const scope = await getClubReadScope();
         if (!scope.ok) return scope.response;
         const groupId = scope.groupId;
         const { searchParams } = new URL(request.url);

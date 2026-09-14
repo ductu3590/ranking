@@ -19,10 +19,11 @@ export default function MemberProfileView({
     const hasScore = Number.isFinite(score);
     const percent = hasScore ? Math.min(100, Math.max(0, (score / 5) * 100)) : 0;
     const initials = displayName.split(/\s+/).slice(-2).map((part) => part[0]).join('').toUpperCase();
+    const isSelf = athleteMembership.self === true;
 
     return (
         <div className="member-profile">
-            {showLinkCta && (
+            {showLinkCta && !isSelf && (
                 <section className="member-cta">
                     <span className="member-cta__ico" aria-hidden="true">🔗</span>
                     <div className="member-cta__body">
@@ -31,8 +32,22 @@ export default function MemberProfileView({
                         <p>Liên kết tài khoản để tự quản lý chỉ số PHR, xem lịch sử đóng góp quỹ của riêng mình và nhận thông báo trực tiếp.</p>
                     </div>
                     <div className="member-cta__act">
-                        <button type="button" className="ph-btn" disabled>Tạo tài khoản &amp; liên kết VĐV này</button>
-                        <small>Chưa hoạt động — sẽ mở ở bước sau</small>
+                        <a className="ph-btn" href={`/dang-ky?membershipId=${athleteMembership.id}`}>Tạo tài khoản &amp; liên kết VĐV này</a>
+                        <small>Mỗi hồ sơ chỉ liên kết được một tài khoản</small>
+                    </div>
+                </section>
+            )}
+
+            {isSelf && (
+                <section className="member-cta member-cta--self" aria-label="Dữ liệu của chính bạn">
+                    <span className="member-cta__ico" aria-hidden="true">👤</span>
+                    <div className="member-cta__body">
+                        <span className="member-cta__kicker">Tài khoản của bạn</span>
+                        <h3>Đây là hồ sơ VĐV của chính bạn</h3>
+                        <p>Dữ liệu công khai của CLB: PHR và lịch sử đánh giá hiện ở đây. Thông tin liên hệ riêng chỉ nằm ở Hồ sơ của tôi.</p>
+                    </div>
+                    <div className="member-cta__act">
+                        <a className="ph-btn ph-btn--outline" href="/ho-so-vdv">Hồ sơ &amp; cài đặt của tôi</a>
                     </div>
                 </section>
             )}
@@ -95,9 +110,30 @@ export default function MemberProfileView({
                 </article>
             </div>
 
+            <article className="member-tournament-card" aria-label="Lịch sử tham gia giải đấu">
+                <span className="member-kicker">Giải đấu</span>
+                <h2>Lịch sử tham gia giải</h2>
+                <div className="member-info-empty member-info-empty--panel">
+                    <strong>Chưa sẵn sàng hiển thị</strong>
+                    <p>
+                        PickHub chưa có API/projection ổn định theo athlete hoặc membership để liệt kê các giải đã tham gia.
+                        Khối này sẽ được bật khi backend cung cấp dữ liệu an toàn, thay vì tự ghép lịch sử ở trình duyệt.
+                    </p>
+                </div>
+            </article>
+
             <aside className="member-privacy-note">
-                <strong>Phiên truy cập CLB dùng chung</strong>
-                <p>Đây là dữ liệu athlete/membership được chọn trong CLB, không phải xác nhận danh tính cá nhân. Thông tin liên hệ và ghi chú riêng không được hiển thị.</p>
+                {isSelf ? (
+                    <>
+                        <strong>Đã xác thực bằng tài khoản VĐV</strong>
+                        <p>Đây là hồ sơ của chính bạn trong CLB. Thông tin liên hệ riêng chỉ hiển thị ở trang Hồ sơ &amp; cài đặt của tôi.</p>
+                    </>
+                ) : (
+                    <>
+                        <strong>Phiên truy cập CLB dùng chung</strong>
+                        <p>Đây là dữ liệu athlete/membership được chọn trong CLB, không phải xác nhận danh tính cá nhân. Thông tin liên hệ và ghi chú riêng không được hiển thị.</p>
+                    </>
+                )}
             </aside>
         </div>
     );

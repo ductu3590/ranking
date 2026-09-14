@@ -1,16 +1,16 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
-import { getClubScope } from '@/lib/groupSession';
 import { computeStageStandings } from '@/lib/tournament/standingsService';
 import { qualificationOutlook } from '@/lib/tournament/qualification';
 import { resolveTiebreak } from '@/lib/tournament/rules/tiebreak';
+import { getClubReadScope } from '@/lib/clubReadContext';
 
 const db = supabaseAdmin || supabaseServer;
 
 export async function GET(request) {
     try {
-        const scope = getClubScope();
+        const scope = await getClubReadScope();
         if (!scope.ok) return scope.response;
         const groupId = scope.groupId;
 

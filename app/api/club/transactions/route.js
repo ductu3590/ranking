@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
-import { getGroupIdForDatabase, requireValidatedGroupAdmin } from '@/lib/groupSession';
+import { requireValidatedGroupAdmin } from '@/lib/groupSession';
+import { getClubReadScopeId } from '@/lib/clubReadContext';
 import { loadContributionInputs } from '@/lib/fundContributions';
 
 export async function GET() {
-    const groupId = getGroupIdForDatabase();
+    const groupId = await getClubReadScopeId();
     try {
         const { transactions } = await loadContributionInputs(supabaseAdmin, groupId);
         return NextResponse.json({ transactions });

@@ -51,6 +51,10 @@
 .member-info-empty strong { display: block; font-size: 13px; font-weight: 800; }
 .member-info-empty p { margin: 4px 0 0; font-size: 12px; font-weight: 600; color: var(--ph-muted); }
 
+.member-tournament-card { padding: 22px; background: var(--ph-card); border: 1px solid var(--ph-line); border-radius: var(--ph-radius-card); }
+.member-tournament-card h2 { margin: 4px 0 0; font-size: 17px; font-weight: 800; letter-spacing: -.02em; }
+.member-info-empty--panel { margin-top: 14px; padding: 16px; border: 1px dashed var(--ph-line); border-radius: var(--ph-radius-sm); background: var(--ph-tint-neutral-strong); }
+
 .member-privacy-note { padding: 16px 18px; border-radius: var(--ph-radius-sm); background: var(--ph-tint-neutral-strong); border: 1px solid var(--ph-line); font-size: 12px; font-weight: 600; color: var(--ph-muted); line-height: 1.6; }
 .member-privacy-note strong { display: block; margin-bottom: 4px; color: var(--ph-ink-2); font-weight: 800; }
 

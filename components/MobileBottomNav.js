@@ -19,8 +19,8 @@ export default function MobileBottomNav() {
             .then((response) => (response.ok ? response.json() : null))
             .then((payload) => {
                 const sessionRole = payload?.session?.role;
-                if (active && payload?.permissions?.canViewClub && ['admin', 'member'].includes(sessionRole)) {
-                    setRole(sessionRole);
+                if (active && payload?.permissions?.canViewClub && ['admin', 'member', 'athlete'].includes(sessionRole)) {
+                    setRole(sessionRole === 'athlete' ? 'member' : sessionRole);
                 }
             })
             .catch(() => {})

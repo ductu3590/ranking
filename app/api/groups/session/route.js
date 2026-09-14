@@ -1,18 +1,21 @@
 import { NextResponse } from 'next/server';
 import {
     clearGroupSessionCookie,
-    getDefaultGroupContext,
     getValidatedGroupSessionFromCookies,
     getGroupSessionFromCookies,
 } from '@/lib/groupSession';
 import { identityRepository } from '@/lib/identityRuntime';
+import { getClubReadContext } from '@/lib/clubReadContext';
 import sessionViewModule from '@/lib/clubSessionView';
 
 const { buildClubSessionView } = sessionViewModule;
 
 export async function GET() {
-    const session = await getValidatedGroupSessionFromCookies();
-    return NextResponse.json(buildClubSessionView(session || getDefaultGroupContext()));
+    // Luôn validate group_session để access_version/thu hồi vẫn được kiểm tra. Khi có
+    // athlete_session, getClubReadContext vẫn ưu tiên danh tính VĐV đã xác thực.
+    const validatedClubSession = await getValidatedGroupSessionFromCookies();
+    const context = await getClubReadContext();
+    return NextResponse.json(buildClubSessionView(context.role === 'athlete' ? context : validatedClubSession || context));
 }
 
 export async function DELETE() {

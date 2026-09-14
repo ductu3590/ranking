@@ -1,0 +1,5 @@
+/* Dùng lại bộ class .signup-* của /dang-ky để hai trang cùng một ngôn ngữ thị giác. */
+@import '../dang-ky/page.css';
+
+.login-hint { margin: 0; color: var(--ph-muted); font-size: 13px; text-align: center; }
+.login-hint a { color: var(--ph-indigo); font-weight: 800; }

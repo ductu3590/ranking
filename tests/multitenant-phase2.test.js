@@ -49,9 +49,18 @@ for (const route of [
     const scopeSource = route === 'app/api/club/transactions/route.js'
         ? read('lib/fundContributions.js')
         : src;
+    // getClubReadScopeId là bản async của getGroupIdForDatabase: vẫn suy group_id từ
+    // cookie đã ký phía server (phiên CLB, hoặc vé VĐV đã đối chiếu DB), chỉ khác là
+    // nhận thêm nguồn vé VĐV. Điều phải giữ là group_id KHÔNG đến từ client.
+    const scopesFromSignedCookie = src.includes('getGroupIdForDatabase')
+        || src.includes('await getClubReadScopeId()');
     assert(
-        src.includes('getGroupIdForDatabase') && scopeSource.includes(".eq('group_id', groupId)"),
+        scopesFromSignedCookie && scopeSource.includes(".eq('group_id', groupId)"),
         `${route} should scope reads to the current group via the signed cookie.`
+    );
+    assert(
+        !/searchParams\.get\('group|body\?\.group_id/.test(src),
+        `${route} must not take group_id from the client.`
     );
 }
 

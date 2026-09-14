@@ -7,6 +7,8 @@ import './page.css';
 
 const EMPTY_CREATE_FORM = {
     name: '',
+    code: '',
+    venue: '',
     description: '',
     adminPassword: '',
     memberPassword: '',
@@ -19,11 +21,17 @@ export default function PickhubHomePage() {
     const [activeModal, setActiveModal] = useState(null);
     const [createForm, setCreateForm] = useState(EMPTY_CREATE_FORM);
     const [joinForm, setJoinForm] = useState({ code: '', password: '' });
+    const [athleteForm, setAthleteForm] = useState({ login: '', password: '' });
+    const [athleteAccount, setAthleteAccount] = useState(null);
     const [currentGroup, setCurrentGroup] = useState(null);
     const [hasLoadedStoredGroup, setHasLoadedStoredGroup] = useState(false);
     const [createdGroup, setCreatedGroup] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [showAdminPassword, setShowAdminPassword] = useState(false);
+    const [showMemberPassword, setShowMemberPassword] = useState(false);
+    const [adminPasswordConfirmation, setAdminPasswordConfirmation] = useState('');
+    const [memberPasswordConfirmation, setMemberPasswordConfirmation] = useState('');
 
     useEffect(() => {
         const storedGroup = window.localStorage.getItem(GROUP_STORAGE_KEY);
@@ -52,11 +60,18 @@ export default function PickhubHomePage() {
             })
             .catch(() => {});
 
+        fetch('/api/identity/athlete-sessions', { cache: 'no-store' })
+            .then((response) => response.json())
+            .then((payload) => setAthleteAccount(payload?.account || null))
+            .catch(() => {});
+
         const params = new URLSearchParams(window.location.search);
         const groupCode = params.get('group');
         if (groupCode) {
             setJoinForm((prev) => ({ ...prev, code: groupCode.toUpperCase() }));
             setActiveModal('join');
+        } else if (params.get('login') === 'vdv' || params.get('dang-nhap') === 'vdv' || params.has('dang-nhap-vdv')) {
+            setActiveModal('athlete-login');
         }
 
         setHasLoadedStoredGroup(true);
@@ -64,6 +79,24 @@ export default function PickhubHomePage() {
 
     function updateCreateForm(field, value) {
         setCreateForm((prev) => ({ ...prev, [field]: value }));
+    }
+
+    function updateCreateCode(value) {
+        const normalized = String(value || '')
+            .normalize('NFKC')
+            .toUpperCase()
+            .replace(/[^A-Z0-9]/g, '')
+            .slice(0, 16);
+        setCreateForm((prev) => ({ ...prev, code: normalized }));
+    }
+
+    function suggestCreateCode() {
+        const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        let code = '';
+        for (let i = 0; i < 8; i += 1) {
+            code += alphabet[Math.floor(Math.random() * alphabet.length)];
+        }
+        setCreateForm((prev) => ({ ...prev, code }));
     }
 
     function updateJoinForm(field, value) {
@@ -78,9 +111,20 @@ export default function PickhubHomePage() {
 
     async function handleCreateGroup(event) {
         event.preventDefault();
-        setLoading(true);
         setError('');
         setCreatedGroup(null);
+
+        if (createForm.adminPassword !== adminPasswordConfirmation) {
+            setError('Mật khẩu quản trị và xác nhận mật khẩu chưa khớp.');
+            return;
+        }
+
+        if (createForm.memberPassword !== memberPasswordConfirmation) {
+            setError('Mật khẩu gia nhập và xác nhận mật khẩu chưa khớp.');
+            return;
+        }
+
+        setLoading(true);
 
         try {
             const response = await fetch('/api/groups', {
@@ -94,6 +138,8 @@ export default function PickhubHomePage() {
             rememberGroup(data.group, data.role);
             setCreatedGroup(data);
             setCreateForm(EMPTY_CREATE_FORM);
+            setAdminPasswordConfirmation('');
+            setMemberPasswordConfirmation('');
         } catch (err) {
             setError(err.message);
         } finally {
@@ -124,10 +170,42 @@ export default function PickhubHomePage() {
         }
     }
 
+    function updateAthleteForm(field, value) {
+        setAthleteForm((prev) => ({ ...prev, [field]: value }));
+    }
+
+    async function handleAthleteLogin(event) {
+        event.preventDefault();
+        setLoading(true);
+        setError('');
+
+        try {
+            const response = await fetch('/api/identity/athlete-sessions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    login: athleteForm.login,
+                    password: athleteForm.password,
+                }),
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Không thể đăng nhập.');
+            window.location.assign('/ho-so-vdv');
+        } catch (err) {
+            setError(err.message);
+            setLoading(false);
+        }
+    }
+
     function closeModal() {
         setActiveModal(null);
         setError('');
         setCreatedGroup(null);
+        setAthleteForm({ login: '', password: '' });
+        setShowAdminPassword(false);
+        setShowMemberPassword(false);
+        setAdminPasswordConfirmation('');
+        setMemberPasswordConfirmation('');
     }
 
     async function downloadGroupCardImage() {
@@ -269,7 +347,7 @@ export default function PickhubHomePage() {
                     <section className="ph-land__block" aria-labelledby="ph-land-start">
                         <h2 className="ph-land__blocktitle" id="ph-land-start">
                             <BoltIcon />
-                            Bắt đầu
+                            Truy cập CLB
                         </h2>
 
                         <div className="ph-land__rows">
@@ -292,12 +370,71 @@ export default function PickhubHomePage() {
                                         <KeyIcon />
                                     </span>
                                     <span className="ph-land__rowtext">
-                                        <strong>Tham gia CLB</strong>
+                                        <strong>Truy cập CLB của bạn</strong>
                                         <span className="ph-land__rowsub">Nhập mã CLB và mật khẩu để vào CLB</span>
                                     </span>
                                 </span>
                                 <span className="ph-land__arrow" aria-hidden="true"><ChevronIcon /></span>
                             </button>
+
+                        </div>
+                    </section>
+                )}
+
+                {hasLoadedStoredGroup && (
+                    <section className="ph-land__block" aria-labelledby="ph-land-athlete">
+                        <h2 className="ph-land__blocktitle" id="ph-land-athlete">
+                            <AthleteIcon />
+                            Hồ sơ VĐV &amp; đăng ký giải
+                        </h2>
+
+                        <div className="ph-land__rows">
+                            {athleteAccount ? (
+                                <a className="ph-land__row ph-land__row--continue" href="/ho-so-vdv">
+                                    <span className="ph-land__rowmain">
+                                        <span className="ph-land__tile ph-land__tile--lime" aria-hidden="true">
+                                            <AthleteIcon />
+                                        </span>
+                                        <span className="ph-land__rowtext">
+                                            <strong>Hồ sơ VĐV của bạn</strong>
+                                            <span className="ph-land__rowsub">
+                                                {athleteAccount.displayName
+                                                    ? `Đã đăng nhập · ${athleteAccount.displayName}`
+                                                    : 'Mở hồ sơ cá nhân, PHR và thông tin liên kết'}
+                                            </span>
+                                        </span>
+                                    </span>
+                                    <span className="ph-land__arrow" aria-hidden="true"><ChevronIcon /></span>
+                                </a>
+                            ) : (
+                                <>
+                                    <button type="button" className="ph-land__row" onClick={() => setActiveModal('athlete-login')}>
+                                        <span className="ph-land__rowmain">
+                                            <span className="ph-land__tile ph-land__tile--gold" aria-hidden="true">
+                                                <AthleteIcon />
+                                            </span>
+                                            <span className="ph-land__rowtext">
+                                                <strong>Đăng nhập tài khoản VĐV</strong>
+                                                <span className="ph-land__rowsub">Xem hồ sơ, PHR và thông tin cá nhân của bạn</span>
+                                            </span>
+                                        </span>
+                                        <span className="ph-land__arrow" aria-hidden="true"><ChevronIcon /></span>
+                                    </button>
+
+                                    <a className="ph-land__row" href="/dang-ky">
+                                        <span className="ph-land__rowmain">
+                                            <span className="ph-land__tile ph-land__tile--indigo" aria-hidden="true">
+                                                <PlusIcon />
+                                            </span>
+                                            <span className="ph-land__rowtext">
+                                                <strong>Đăng ký tài khoản VĐV</strong>
+                                                <span className="ph-land__rowsub">Tạo tài khoản và liên kết với hồ sơ VĐV trong CLB</span>
+                                            </span>
+                                        </span>
+                                        <span className="ph-land__arrow" aria-hidden="true"><ChevronIcon /></span>
+                                    </a>
+                                </>
+                            )}
 
                             <a className="ph-land__row" href="/dk">
                                 <span className="ph-land__rowmain">
@@ -309,7 +446,7 @@ export default function PickhubHomePage() {
                                             Khám phá giải đấu Pickleball
                                             <span className="ph-land__new">Mới</span>
                                         </strong>
-                                        <span className="ph-land__rowsub">Xem giải đang mở đăng ký, ghép cặp và theo dõi kết quả trực tiếp</span>
+                                        <span className="ph-land__rowsub">Xem giải cộng đồng đang mở đăng ký, liên kết hồ sơ VĐV và theo dõi kết quả</span>
                                     </span>
                                 </span>
                                 <span className="ph-land__arrow" aria-hidden="true"><ChevronIcon /></span>
@@ -371,7 +508,13 @@ export default function PickhubHomePage() {
             </footer>
 
             {activeModal === 'create' && (
-                <Modal title="Tạo CLB mới" onClose={closeModal}>
+                <Modal
+                    title="Tạo Câu Lạc Bộ mới"
+                    subtitle="Khởi tạo không gian sinh hoạt, quản lý quỹ tự động và tổ chức giải đấu cho CLB của bạn."
+                    icon={<CreateClubIcon />}
+                    wide
+                    onClose={closeModal}
+                >
                     {createdGroup ? (
                         <div className="teamfund-success">
                             <p className="teamfund-code-label">Mã CLB</p>
@@ -386,54 +529,196 @@ export default function PickhubHomePage() {
                             </div>
                         </div>
                     ) : (
-                        <form className="teamfund-form" onSubmit={handleCreateGroup}>
+                        <form className="teamfund-form teamfund-create-form" onSubmit={handleCreateGroup}>
                             <FormError message={error} />
-                            <label>
-                                Tên CLB
-                                <input
-                                    value={createForm.name}
-                                    onChange={(event) => updateCreateForm('name', event.target.value)}
-                                    placeholder="Pickleball Team"
-                                    required
-                                />
+
+                            <div className="teamfund-create-grid">
+                                <label className="teamfund-field">
+                                    <span className="teamfund-field__label">
+                                        Tên Câu Lạc Bộ <em>*</em>
+                                    </span>
+                                    <span className="teamfund-field__control">
+                                        <span className="teamfund-field__icon" aria-hidden="true"><PaddleIcon /></span>
+                                        <input
+                                            value={createForm.name}
+                                            onChange={(event) => updateCreateForm('name', event.target.value)}
+                                            placeholder="Ví dụ: Pickleball Tân Bình Club"
+                                            required
+                                        />
+                                    </span>
+                                </label>
+
+                                <label className="teamfund-field">
+                                    <span className="teamfund-field__label">
+                                        Mã CLB / ID
+                                        <span className="teamfund-field__optional">tuỳ chọn</span>
+                                    </span>
+                                    <span className="teamfund-field__control teamfund-field__control--code">
+                                        <input
+                                            value={createForm.code}
+                                            onChange={(event) => updateCreateCode(event.target.value)}
+                                            placeholder="Tự sinh nếu để trống"
+                                            autoCapitalize="characters"
+                                            spellCheck={false}
+                                            maxLength={16}
+                                        />
+                                        <button
+                                            type="button"
+                                            className="teamfund-code-suggest"
+                                            onClick={suggestCreateCode}
+                                            title="Sinh mã ngẫu nhiên"
+                                        >
+                                            Sinh mã
+                                        </button>
+                                    </span>
+                                </label>
+                            </div>
+
+                            <label className="teamfund-field">
+                                <span className="teamfund-field__label">
+                                    Sân sinh hoạt chính / Địa bàn
+                                </span>
+                                <span className="teamfund-field__control">
+                                    <span className="teamfund-field__icon" aria-hidden="true"><LocationIcon /></span>
+                                    <input
+                                        value={createForm.venue}
+                                        onChange={(event) => updateCreateForm('venue', event.target.value)}
+                                        placeholder="Ví dụ: Sân 246 Hoàng Hoa Thám"
+                                    />
+                                </span>
                             </label>
-                            <label>
-                                Mô tả
-                                <textarea
-                                    value={createForm.description}
-                                    onChange={(event) => updateCreateForm('description', event.target.value)}
-                                    placeholder="CLB quản lý quỹ và thành viên"
-                                    rows="3"
-                                />
-                            </label>
-                            <label>
-                                Mật khẩu quản trị
-                                <input
-                                    type="password"
-                                    value={createForm.adminPassword}
-                                    onChange={(event) => updateCreateForm('adminPassword', event.target.value)}
-                                    minLength="6"
-                                    required
-                                />
-                            </label>
-                            <label>
-                                Mật khẩu thành viên
-                                <input
-                                    type="password"
-                                    value={createForm.memberPassword}
-                                    onChange={(event) => updateCreateForm('memberPassword', event.target.value)}
-                                    minLength="4"
-                                    required
-                                />
-                            </label>
-                            <div className="teamfund-modal-actions">
-                                <button type="button" className="teamfund-cancel" onClick={closeModal}>Hủy</button>
-                                <button type="submit" className="teamfund-submit" disabled={loading}>
-                                    {loading ? 'Đang tạo...' : 'Tạo CLB'}
+
+                            <div className="teamfund-pass-card">
+                                <div className="teamfund-pass-card__head">
+                                    <span className="teamfund-pass-card__icon" aria-hidden="true"><ShieldIcon /></span>
+                                    <div>
+                                        <strong>Mật khẩu Quản trị <em>*</em></strong>
+                                        <p>Dùng khi đăng nhập quản lý thu chi, giải đấu và cấu hình CLB</p>
+                                    </div>
+                                </div>
+                                <span className="teamfund-field__control teamfund-field__control--password">
+                                    <input
+                                        type={showAdminPassword ? 'text' : 'password'}
+                                        value={createForm.adminPassword}
+                                        onChange={(event) => updateCreateForm('adminPassword', event.target.value)}
+                                        placeholder="Ít nhất 6 ký tự"
+                                        minLength="6"
+                                        required
+                                        autoComplete="new-password"
+                                    />
+                                    <button
+                                        type="button"
+                                        className="teamfund-password-toggle"
+                                        onClick={() => setShowAdminPassword((prev) => !prev)}
+                                        aria-label={showAdminPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                                    >
+                                        {showAdminPassword ? 'Ẩn' : 'Hiện'}
+                                    </button>
+                                </span>
+                                <label className="teamfund-password-confirmation">
+                                    <span>Xác nhận mật khẩu quản trị <em>*</em></span>
+                                    <input
+                                        type={showAdminPassword ? 'text' : 'password'}
+                                        value={adminPasswordConfirmation}
+                                        onChange={(event) => setAdminPasswordConfirmation(event.target.value)}
+                                        placeholder="Nhập lại mật khẩu quản trị"
+                                        minLength="6"
+                                        required
+                                        autoComplete="new-password"
+                                    />
+                                </label>
+
+                            </div>
+
+                            <div className="teamfund-pass-card">
+                                <div className="teamfund-pass-card__head">
+                                    <span className="teamfund-pass-card__icon teamfund-pass-card__icon--member" aria-hidden="true"><UsersIcon /></span>
+                                    <div>
+                                        <strong>Mật khẩu Gia nhập <em>*</em></strong>
+                                        <p>Chia sẻ cho hội viên để đăng nhập và xem BXH / quỹ CLB</p>
+                                    </div>
+                                </div>
+                                <span className="teamfund-field__control teamfund-field__control--password">
+                                    <input
+                                        type={showMemberPassword ? 'text' : 'password'}
+                                        value={createForm.memberPassword}
+                                        onChange={(event) => updateCreateForm('memberPassword', event.target.value)}
+                                        placeholder="Ít nhất 4 ký tự"
+                                        minLength="4"
+                                        required
+                                        autoComplete="new-password"
+                                    />
+                                    <button
+                                        type="button"
+                                        className="teamfund-password-toggle"
+                                        onClick={() => setShowMemberPassword((prev) => !prev)}
+                                        aria-label={showMemberPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                                    >
+                                        {showMemberPassword ? 'Ẩn' : 'Hiện'}
+                                    </button>
+                                </span>
+                                <label className="teamfund-password-confirmation">
+                                    <span>Xác nhận mật khẩu gia nhập <em>*</em></span>
+                                    <input
+                                        type={showMemberPassword ? 'text' : 'password'}
+                                        value={memberPasswordConfirmation}
+                                        onChange={(event) => setMemberPasswordConfirmation(event.target.value)}
+                                        placeholder="Nhập lại mật khẩu gia nhập"
+                                        minLength="4"
+                                        required
+                                        autoComplete="new-password"
+                                    />
+                                </label>
+                            </div>
+
+                            <div className="teamfund-modal-actions teamfund-modal-actions--create">
+                                <button type="button" className="teamfund-cancel" onClick={closeModal}>Hủy bỏ</button>
+                                <button type="submit" className="teamfund-submit teamfund-submit--create" disabled={loading}>
+                                    {loading ? 'Đang tạo...' : 'Khởi tạo CLB ngay'}
                                 </button>
                             </div>
+
+                            <p className="teamfund-create-note">
+                                <VerifiedIcon />
+                                <span>Không cần tài khoản: Quản trị và truy cập CLB trực tiếp qua Mã CLB và Mật khẩu riêng biệt.</span>
+                            </p>
                         </form>
                     )}
+                </Modal>
+            )}
+            {activeModal === 'athlete-login' && (
+                <Modal title="Đăng nhập tài khoản VĐV" onClose={closeModal}>
+                    <form className="teamfund-form" onSubmit={handleAthleteLogin}>
+                        <p className="teamfund-modal-hint">Dùng tên đăng nhập và mật khẩu bạn đã tạo khi liên kết hồ sơ VĐV.</p>
+                        <FormError message={error} />
+                        <label>
+                            Tên đăng nhập
+                            <input
+                                value={athleteForm.login}
+                                onChange={(event) => updateAthleteForm('login', event.target.value.toLowerCase())}
+                                autoComplete="username"
+                                autoCapitalize="none"
+                                required
+                            />
+                        </label>
+                        <label>
+                            Mật khẩu
+                            <input
+                                type="password"
+                                value={athleteForm.password}
+                                onChange={(event) => updateAthleteForm('password', event.target.value)}
+                                autoComplete="current-password"
+                                required
+                            />
+                        </label>
+                        <div className="teamfund-modal-actions">
+                            <button type="button" className="teamfund-cancel" onClick={closeModal}>Hủy</button>
+                            <button type="submit" className="teamfund-submit" disabled={!athleteForm.login.trim() || !athleteForm.password || loading}>
+                                {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+                            </button>
+                        </div>
+                        <p className="teamfund-modal-hint">Chưa có tài khoản? <a href="/dang-ky">Đăng ký &amp; liên kết hồ sơ VĐV</a>.</p>
+                    </form>
                 </Modal>
             )}
 
@@ -447,7 +732,7 @@ export default function PickhubHomePage() {
                                 value={joinForm.code}
                                 onChange={(event) => updateJoinForm('code', event.target.value)}
                                 placeholder="AB12CD34"
-                                maxLength="8"
+                                maxLength="16"
                                 required
                             />
                         </label>
@@ -473,18 +758,28 @@ export default function PickhubHomePage() {
     );
 }
 
-function Modal({ title, children, onClose }) {
+function Modal({ title, subtitle, icon, wide = false, children, onClose }) {
     return (
         <div className="teamfund-modal-backdrop" role="presentation" onClick={onClose}>
             <section
-                className="teamfund-modal"
+                className={`teamfund-modal${wide ? ' teamfund-modal--wide' : ''}`}
                 role="dialog"
                 aria-modal="true"
                 aria-label={title}
                 onClick={(event) => event.stopPropagation()}
             >
-                <header className="teamfund-modal-header">
-                    <h2>{title}</h2>
+                <header className={`teamfund-modal-header${icon ? ' teamfund-modal-header--rich' : ''}`}>
+                    {icon ? (
+                        <div className="teamfund-modal-header__brand">
+                            <span className="teamfund-modal-header__badge" aria-hidden="true">{icon}</span>
+                            <div className="teamfund-modal-header__copy">
+                                <h2>{title}</h2>
+                                {subtitle ? <p>{subtitle}</p> : null}
+                            </div>
+                        </div>
+                    ) : (
+                        <h2>{title}</h2>
+                    )}
                     <button type="button" onClick={onClose} aria-label="Đóng">×</button>
                 </header>
                 {children}
@@ -592,6 +887,15 @@ function CourtIcon() {
     );
 }
 
+function AthleteIcon() {
+    return (
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="12" cy="7" r="3.5" stroke="currentColor" strokeWidth="2" />
+            <path d="M5 21c.8-4 3.1-6 7-6s6.2 2 7 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        </svg>
+    );
+}
+
 function PlusIcon() {
     return (
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -658,6 +962,33 @@ function ShieldIcon() {
     return (
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M12 3 4 6v6c0 4.4 3.3 8.2 8 9 4.7-.8 8-4.6 8-9V6l-8-3Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+            <path d="m9 12 2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+    );
+}
+
+function CreateClubIcon() {
+    return (
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="3" y="4" width="18" height="16" rx="4" stroke="currentColor" strokeWidth="2" />
+            <path d="M8 2v4M16 2v4M3 10h18M8 14h3M8 17h6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        </svg>
+    );
+}
+
+function LocationIcon() {
+    return (
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 21s-7-5.3-7-10.7A7 7 0 0 1 12 3.3a7 7 0 0 1 7 7c0 5.4-7 10.7-7 10.7Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <circle cx="12" cy="10.3" r="2.5" stroke="currentColor" strokeWidth="2" />
+        </svg>
+    );
+}
+
+function VerifiedIcon() {
+    return (
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 2 9.5 4.6 6 4.3l-.8 3.5-3.2 1.6 1.4 3.2-1.4 3.2 3.2 1.6.8 3.5 3.5-.3L12 23.2l2.5-2.5 3.5.3.8-3.5 3.2-1.6-1.4-3.2 1.4-3.2-3.2-1.6-.8-3.5-3.5.3L12 2Z" fill="currentColor" fillOpacity=".15" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
             <path d="m9 12 2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
     );

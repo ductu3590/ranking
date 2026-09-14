@@ -10,7 +10,7 @@ export default function MemberProfilePage() {
     const [state, setState] = useState({ kind: 'loading', message: 'Đang tải hồ sơ…' });
     const [membership, setMembership] = useState(null);
     const [assessments, setAssessments] = useState([]);
-    const [role, setRole] = useState('member');
+    const [showLinkCta, setShowLinkCta] = useState(false);
 
     useEffect(() => {
         if (!membershipId) return undefined;
@@ -18,13 +18,26 @@ export default function MemberProfilePage() {
 
         async function load() {
             try {
-                const sessionResponse = await fetch('/api/groups/session', { cache: 'no-store', signal: controller.signal });
+                // Quyền xem CLB đến từ group_session hoặc athlete_session; route session
+                // đã gộp cả hai nhánh qua getClubReadContext.
+                const [sessionResponse, athleteResponse] = await Promise.all([
+                    fetch('/api/groups/session', { cache: 'no-store', signal: controller.signal }),
+                    fetch('/api/identity/athlete-sessions', { cache: 'no-store', signal: controller.signal }),
+                ]);
                 const sessionView = await sessionResponse.json();
                 if (!sessionView.permissions?.canViewClub) {
-                    setState({ kind: 'forbidden', message: 'Phiên CLB không hợp lệ hoặc đã hết hạn.' });
+                    setState({ kind: 'forbidden', message: 'Bạn cần đăng nhập CLB hoặc tài khoản VĐV để xem hồ sơ này.' });
                     return;
                 }
-                setRole(sessionView.session?.role || 'member');
+
+                const athletePayload = await athleteResponse.json().catch(() => ({}));
+                const athleteAccount = athletePayload?.account || null;
+                const isOwnProfile = athleteAccount
+                    && Number(athleteAccount.membershipId) === Number(membershipId);
+
+                // Đã có athlete_session thì không hỏi "Xác thực chính chủ" nữa.
+                // Chỉ còn gợi ý liên kết khi đang xem bằng phiên CLB dùng chung.
+                setShowLinkCta(!athleteAccount && sessionView.session?.role === 'member');
 
                 const [rosterResponse, assessmentResponse] = await Promise.all([
                     fetch('/api/identity/roster', { cache: 'no-store', signal: controller.signal }),
@@ -37,7 +50,10 @@ export default function MemberProfilePage() {
                     setState({ kind: 'empty', message: 'Không tìm thấy hồ sơ này trong CLB.' });
                     return;
                 }
-                setMembership(found);
+                setMembership({
+                    ...found,
+                    self: isOwnProfile || found.self === true,
+                });
                 const assessmentPayload = await assessmentResponse.json().catch(() => ({}));
                 setAssessments(assessmentPayload.assessments || []);
                 setState({ kind: 'ready', message: '' });
@@ -66,7 +82,7 @@ export default function MemberProfilePage() {
                     athleteMembership={membership}
                     phrSnapshot={assessments[0] || null}
                     assessmentHistory={assessments}
-                    showLinkCta={role === 'member'}
+                    showLinkCta={showLinkCta}
                 />
                 : <section className="ph-state" role={state.kind === 'ready' ? 'status' : 'alert'}>
                     <h2 className="ph-state__title">

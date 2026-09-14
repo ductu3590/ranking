@@ -1,4 +1,5 @@
-import { identityRepository, requireIdentitySession, readSignedClubSession } from '@/lib/identityRuntime';
+import { identityRepository, readSignedClubSession } from '@/lib/identityRuntime';
+import { requireClubReadSession, getAthleteClubContext } from '@/lib/clubReadContext';
 import rosterModule from '@/lib/application/identity/roster';
 import { toIdentityResponse, identityRouteError } from '@/lib/application/identity/routeAdapter';
 import {
@@ -17,8 +18,15 @@ const endClubMembership = createEndClubMembership({ repository: identityReposito
 
 export async function GET() {
     try {
-        const session = await requireIdentitySession('read');
-        return toIdentityResponse({ roster: await identityRepository.listRoster(session.group_id) });
+        const session = await requireClubReadSession();
+        const roster = await identityRepository.listRoster(session.group_id);
+        const self = await getAthleteClubContext();
+        const selfMembershipId = self?.membership_id ?? null;
+        const rosterWithSelf = roster.map((item) => ({
+            ...item,
+            self: selfMembershipId != null && Number(item.id) === Number(selfMembershipId),
+        }));
+        return toIdentityResponse({ roster: rosterWithSelf });
     } catch (error) {
         return identityRouteError(error);
     }

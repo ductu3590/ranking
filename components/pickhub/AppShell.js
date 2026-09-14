@@ -12,6 +12,10 @@ export default function AppShell({ children, layout = '' }) {
     const [role, setRole] = useState('member');
     const [club, setClub] = useState({ name: '', code: '', logoUrl: null, userName: '' });
     const [hasClubSession, setHasClubSession] = useState(false);
+    // Vé VĐV thắng vé CLB ở thẻ người dùng: phiên CLB chỉ nói "CLB nào", còn vé VĐV
+    // nói "ai". Đăng nhập bằng tài khoản VĐV rồi mà rail vẫn hiện "Thành viên" chung
+    // thì người dùng không biết mình đang là ai.
+    const [athlete, setAthlete] = useState(null);
 
     useEffect(() => {
         let active = true;
@@ -21,9 +25,11 @@ export default function AppShell({ children, layout = '' }) {
             .then((payload) => {
                 if (!active) return;
                 const sessionRole = payload?.session?.role;
-                if (payload?.permissions?.canViewClub && ['admin', 'member'].includes(sessionRole)) {
-                    setRole(sessionRole);
-                    setHasClubSession(true);
+                // athlete_session mở quyền xem CLB tương đương member; không gộp thành
+                // admin. Nav dùng role member để hiện mục Thông tin.
+                if (payload?.permissions?.canViewClub && ['admin', 'member', 'athlete'].includes(sessionRole)) {
+                    setRole(sessionRole === 'athlete' ? 'member' : sessionRole);
+                    setHasClubSession(sessionRole !== 'athlete');
                 } else {
                     setHasClubSession(false);
                 }
@@ -34,6 +40,15 @@ export default function AppShell({ children, layout = '' }) {
                         code: payload.session.group_code || current.code,
                     }));
                 }
+            })
+            .catch(() => {});
+
+        // Route này tự trả {account:null} khi vé hỏng/hết hạn nên không cần bắt lỗi riêng.
+        fetch('/api/identity/athlete-sessions', { cache: 'no-store' })
+            .then((response) => (response.ok ? response.json() : null))
+            .then((payload) => {
+                if (!active || !payload?.account) return;
+                setAthlete(payload.account);
             })
             .catch(() => {});
 
@@ -59,7 +74,8 @@ export default function AppShell({ children, layout = '' }) {
                     role={role}
                     clubName={club.name}
                     clubLogoUrl={club.logoUrl}
-                    userName={club.userName}
+                    userName={athlete?.displayName || club.userName}
+                    athlete={athlete}
                     canLogout={hasClubSession}
                 />
                 <div className="ph-shell__col">

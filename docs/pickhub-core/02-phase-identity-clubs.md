@@ -165,7 +165,14 @@ acceptance criteria của Phase 2.
 - Chưa có giải liên CLB, rating tự động hay ghép cân bằng; thuộc Phase 3–5.
 - Không biến club code thành quyền truy cập dữ liệu CLB khác.
 
-## 10. Test matrix bắt buộc
+## 10. Backlog hồ sơ cá nhân và lịch sử giải
+
+- **Trường hồ sơ chưa hỗ trợ:** địa chỉ và các kênh liên hệ khác ngoài email/SĐT/Facebook cần migration riêng trên `athlete_accounts`, validation allowlist tại API hồ sơ cá nhân và quyết định retention/audit trước khi bật UI. Không lưu các trường này trong `athletes` hoặc public roster projection. Facebook URL đã được hỗ trợ trên `athlete_accounts.facebook_profile_url` qua migration 052 và PATCH `/api/identity/athlete-profile`.
+- **Privacy contact:** email, số điện thoại và link Facebook là private self-service data của `athlete_accounts`; chỉ route hồ sơ xác thực bằng `athlete_session` của chính chủ được đọc/ghi. Không đưa contact vào `/api/identity/roster`, hồ sơ membership hay bất kỳ public/tournament snapshot nào. Nếu sau này BTC/CLB cần xem contact để xác thực VĐV tham gia giải, phải có policy visibility, consent, role, audit và endpoint riêng.
+
+- **Lịch sử tham gia giải:** cần projection/API server-side ổn định, scope CLB/giải rõ ràng, keyed bằng `athlete_id` và/hoặc `club_membership_id`. Contract tối thiểu gồm giải, stage/division, entrant/team snapshot, vai trò, trạng thái và ngày thi đấu; phải bảo toàn snapshot lịch sử khi membership đổi. UI không tự join bảng giải từ browser hoặc suy diễn từ tên VĐV.
+
+## 11. Test matrix bắt buộc
 
 ### Unit
 

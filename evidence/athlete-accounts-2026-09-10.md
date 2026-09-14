@@ -54,6 +54,50 @@ mobile bottom tabs contract ok
 npm run build → thành công, route /dang-ky có trong output (2.24 kB / 96 kB)
 ```
 
+## Đóng vòng: đăng nhập & hồ sơ của chính mình
+
+Đăng ký xong mà không đăng nhập được thì tài khoản chưa có giá trị, nên phần này bổ
+sung nốt vòng: `/dang-ky` → `/dang-nhap-vdv` → `/ho-so-vdv` → đăng xuất.
+
+### Vé phiên riêng, không dùng chung với `group_session`
+
+- `athlete_account_sessions` (cùng migration `048_athlete_accounts.sql`) lưu **hash**
+  khoá phiên (SHA-256), không lưu khoá thô; có `revoked_at` để đăng xuất từng thiết bị.
+  RLS bật, không policy.
+- Cookie `athlete_session` (httpOnly, sameSite lax, secure ở production), ký HMAC riêng.
+  Khoá lấy từ `ATHLETE_SESSION_SECRET`, nếu chưa đặt thì **dẫn xuất** từ
+  `GROUP_SESSION_SECRET` qua HMAC với nhãn `pickhub:athlete-session:v1` — không phải
+  thêm biến môi trường khi deploy, mà hai hệ vé vẫn không dùng chung khoá.
+- Cookie không phải nguồn sự thật: mỗi request đối chiếu lại bản ghi phiên + trạng thái
+  tài khoản trong DB. Tài khoản bị `disabled`, `access_version` tăng, hồ sơ bị chuyển
+  CLB khác, hoặc phiên bị thu hồi → vé cũ chết ngay.
+- Sai login và sai mật khẩu trả **cùng một** mã lỗi/thông báo, không tiết lộ login nào
+  tồn tại. Đăng nhập giới hạn 8 lần / 5 phút theo IP + login (siết hơn mức 20/phút của
+  mutation thường vì đây là điểm dò mật khẩu).
+- `/api/identity/athlete-profile` lấy `accountId` từ vé đã ký, không nhận id từ query,
+  nên không thể đọc hồ sơ tài khoản khác.
+
+### Test
+
+- `tests/athlete-sessions.test.js` (unit) — `npm run test:athlete-sessions`: ký/verify vé
+  (sai khoá, sửa payload, thiếu chữ ký, hết hạn, chưa hiệu lực, lệch `access_version`),
+  8 nhánh của `getAthleteSessionState`, login/logout/profile với repository giả.
+- `tests/athlete-accounts/login.live.integration.test.js` (chạy thật) —
+  `npm run test:athlete-sessions-live`: **65 checks**, gồm đăng ký → đăng nhập → hồ sơ →
+  đăng xuất; DB chỉ lưu hash khoá phiên; login chữ HOA vẫn vào được; regression `_`/`%`
+  không thành wildcard khi tra login; vé tự ký cho tài khoản khác bị chặn; tài khoản
+  `disabled`; `access_version` tăng; đăng xuất thu hồi đúng một phiên (phiên khác còn
+  sống); phiên hết hạn trong DB.
+- `test:identity` và `test:regression` nay gọi cả `test:athlete-sessions`.
+
+```
+athlete-sessions: all checks passed
+cleanup trước khi chạy: athlete_accounts=0 club_memberships=0
+athlete-login live: all 65 checks passed
+cleanup sau khi chạy: athlete_account_sessions=6 athlete_accounts=1 club_memberships=2 athletes=2
+npm run build → thành công; có /dang-nhap-vdv (1.33 kB / 95.1 kB) và /ho-so-vdv (1.53 kB / 95.3 kB)
+```
+
 ## An toàn dữ liệu
 
 Test live chỉ ghi vào 2 CLB test cố định `AATESTA0` / `AATESTB0`; kiểm tra code CLB

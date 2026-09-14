@@ -4,7 +4,7 @@ import path from 'node:path';
 import { ImageResponse } from 'next/og';
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
-import { getEffectiveGroupContext, getGroupIdForDatabase } from '@/lib/groupSession';
+import { getClubReadContext } from '@/lib/clubReadContext';
 import { loadContributionInputs } from '@/lib/fundContributions';
 import { buildContributionLeaderboard } from '@/lib/fundLeaderboard';
 
@@ -70,14 +70,14 @@ function renderShareCard(result, clubName, period) {
 }
 
 export async function GET(request) {
-    const groupId = getGroupIdForDatabase();
+    const context = await getClubReadContext();
+    const groupId = context.group_id;
     if (!groupId) return NextResponse.json({ error: 'Cần phiên CLB hợp lệ.' }, { status: 403 });
     const period = new URL(request.url).searchParams.get('period') || 'week';
     if (!PERIODS.has(period)) return NextResponse.json({ error: 'Kỳ không hợp lệ.' }, { status: 400 });
 
     try {
         const { transactions, members } = await loadContributionInputs(supabaseAdmin, groupId);
-        const context = getEffectiveGroupContext();
         const result = buildContributionLeaderboard({ transactions, members, period });
         return new ImageResponse(renderShareCard(result, context.group_name || 'PickHub', period), {
             width: 1200,

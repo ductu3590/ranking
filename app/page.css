@@ -616,6 +616,10 @@
     box-shadow: var(--ph-shadow);
 }
 
+.teamfund-modal--wide {
+    width: min(100%, 800px);
+}
+
 .teamfund-modal-header {
     display: flex;
     align-items: center;
@@ -623,6 +627,56 @@
     gap: 12px;
     padding: 18px 20px;
     border-bottom: 1px solid var(--ph-line);
+}
+
+.teamfund-modal-header--rich {
+    align-items: flex-start;
+    padding: 22px 22px 18px;
+}
+
+.teamfund-modal-header__brand {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    min-width: 0;
+}
+
+.teamfund-modal-header__badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--ph-indigo), #7c5cff);
+    color: #fff;
+    box-shadow: 0 10px 24px rgba(79, 70, 229, .22);
+}
+
+.teamfund-modal-header__badge svg {
+    width: 22px;
+    height: 22px;
+}
+
+.teamfund-modal-header__copy {
+    min-width: 0;
+}
+
+.teamfund-modal-header__copy h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--ph-ink);
+    line-height: 1.25;
+}
+
+.teamfund-modal-header__copy p {
+    margin: 6px 0 0;
+    color: var(--ph-muted);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.45;
 }
 
 .teamfund-modal-header h2 {
@@ -649,6 +703,238 @@
 
 .teamfund-form,
 .teamfund-success { padding: 20px; }
+
+.teamfund-create-form {
+    gap: 16px;
+    padding: 18px 22px 22px;
+}
+
+.teamfund-field {
+    display: grid;
+    gap: 8px;
+}
+
+.teamfund-field__label {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    color: var(--ph-ink);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.teamfund-field__label em {
+    color: var(--ph-negative);
+    font-style: normal;
+}
+
+.teamfund-field__optional {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--ph-tint-neutral-strong);
+    color: var(--ph-muted);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.teamfund-field__hint {
+    display: block;
+    overflow-wrap: anywhere;
+    color: var(--ph-muted);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.teamfund-field__control {
+    position: relative;
+    display: flex;
+    min-width: 0;
+    align-items: center;
+}
+
+.teamfund-field__icon {
+    position: absolute;
+    left: 12px;
+    display: inline-flex;
+    color: var(--ph-muted);
+    pointer-events: none;
+}
+
+.teamfund-field__icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.teamfund-field__control input {
+    padding-left: 40px;
+}
+
+.teamfund-field__control--code input {
+    padding-left: 13px;
+    padding-right: 92px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    font-weight: 800;
+}
+
+/* Keep generated-code placeholder readable beside the action button. */
+.teamfund-field__control--code input::placeholder {
+    letter-spacing: normal;
+    text-transform: none;
+    font-weight: 500;
+}
+
+.teamfund-field__control--password input {
+    padding-left: 13px;
+    padding-right: 72px;
+}
+
+.teamfund-code-suggest,
+.teamfund-password-toggle {
+    position: absolute;
+    right: 8px;
+    min-height: 32px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--ph-indigo);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.teamfund-code-suggest:hover,
+.teamfund-password-toggle:hover {
+    background: var(--ph-tint-indigo, rgba(79, 70, 229, .08));
+}
+
+.teamfund-create-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.teamfund-pass-card {
+    display: grid;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid var(--ph-line);
+    border-radius: 16px;
+    background: linear-gradient(180deg, rgba(248, 250, 252, .9), #fff);
+}
+
+.teamfund-pass-card__head {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.teamfund-pass-card__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+    border-radius: 12px;
+    background: rgba(79, 70, 229, .1);
+    color: var(--ph-indigo);
+}
+
+.teamfund-pass-card__icon--member {
+    background: rgba(16, 185, 129, .12);
+    color: #059669;
+}
+
+.teamfund-pass-card__icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.teamfund-pass-card__head strong {
+    display: block;
+    color: var(--ph-ink);
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.teamfund-pass-card__head strong em {
+    color: var(--ph-negative);
+    font-style: normal;
+}
+
+.teamfund-pass-card__head p {
+    margin: 4px 0 0;
+    color: var(--ph-muted);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.teamfund-password-confirmation {
+    display: grid;
+    gap: 7px;
+    color: var(--ph-ink);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.teamfund-password-confirmation em {
+    color: var(--ph-negative);
+    font-style: normal;
+}
+
+.teamfund-modal-actions--create {
+    margin-top: 4px;
+}
+
+.teamfund-submit--create {
+    min-width: 180px;
+    background: linear-gradient(135deg, var(--ph-indigo), #7c5cff);
+    box-shadow: 0 10px 22px rgba(79, 70, 229, .22);
+}
+
+.teamfund-create-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 2px 0 0;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: rgba(16, 185, 129, .08);
+    color: #047857;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.45;
+}
+
+.teamfund-create-note svg {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 18px;
+    margin-top: 1px;
+}
+
+@media (max-width: 740px) {
+    .teamfund-create-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .teamfund-modal-actions--create {
+        flex-direction: column-reverse;
+    }
+
+    .teamfund-submit--create,
+    .teamfund-modal-actions--create .teamfund-cancel {
+        width: 100%;
+    }
+}
 
 .teamfund-form { display: grid; gap: 14px; }
 
@@ -679,6 +965,21 @@
     box-shadow: var(--ph-focus-ring);
 }
 
+/* This must follow the generic input rule so icons never cover placeholder text. */
+.teamfund-form .teamfund-field__control input {
+    padding-left: 40px;
+}
+
+.teamfund-form .teamfund-field__control--code input {
+    padding-left: 13px;
+    padding-right: 92px;
+}
+
+.teamfund-form .teamfund-field__control--password input {
+    padding-left: 13px;
+    padding-right: 72px;
+}
+
 .teamfund-error {
     margin: 0;
     padding: 10px 12px;
@@ -688,6 +989,19 @@
     color: var(--ph-negative);
     font-size: 13px;
     font-weight: 700;
+}
+
+.teamfund-modal-hint {
+    margin: 0;
+    color: var(--ph-muted);
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.teamfund-modal-hint a {
+    color: var(--ph-indigo);
+    font-weight: 700;
+    text-decoration: underline;
 }
 
 .teamfund-modal-actions {

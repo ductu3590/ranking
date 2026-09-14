@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
-import { requireValidatedGroupAdmin, getClubScope } from '@/lib/groupSession';
+import { requireValidatedGroupAdmin } from '@/lib/groupSession';
 import { randomUUID } from 'crypto';
+import { getClubReadScope } from '@/lib/clubReadContext';
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -12,7 +13,7 @@ const SELECT_FIELDS = 'id, group_id, division_id, tournament_club_id, name_snaps
 
 export async function GET(request) {
     try {
-        const scope = getClubScope();
+        const scope = await getClubReadScope();
         if (!scope.ok) return scope.response;
         const { searchParams } = new URL(request.url);
         const divisionId = searchParams.get('divisionId');

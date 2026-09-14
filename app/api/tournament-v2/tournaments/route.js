@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { randomBytes } from 'crypto';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
-import { requireValidatedGroupAdmin, getClubScope } from '@/lib/groupSession';
+import { requireValidatedGroupAdmin } from '@/lib/groupSession';
 import { requirePlatformAdmin } from '@/lib/platformSession';
 import { assertTournamentOrganizer } from '@/lib/tournament/interclub';
 import { resolveOrganizerPayload } from '@/lib/tournament/wizardModel';
@@ -10,6 +10,7 @@ import { canTransition, isStatus, canDelete, groupOf } from '@/lib/tournament/li
 import { writeOperationLog } from '@/lib/tournament/operationLog';
 import { finalStandingsFrom } from '@/lib/tournament/qualification';
 import { computeStageStandings } from '@/lib/tournament/standingsService';
+import { getClubReadScope } from '@/lib/clubReadContext';
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -232,7 +233,7 @@ async function insertWithSlugRetry(payload) {
 
 export async function GET() {
     try {
-        const scope = getClubScope();
+        const scope = await getClubReadScope();
         if (!scope.ok) return scope.response;
         const groupId = scope.groupId;
 

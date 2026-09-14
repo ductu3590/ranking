@@ -33,7 +33,7 @@ assert(
     rootPage.includes('<h1>Pickhub</h1>') &&
     rootPage.includes('Cùng xây dựng cộng đồng Pickleball phát triển.') &&
     rootPage.includes('Tạo CLB mới') &&
-    rootPage.includes('Tham gia CLB') &&
+    rootPage.includes('Truy cập CLB của bạn') &&
     rootPage.includes('Tiếp tục') &&
     rootPage.includes('Vào CLB của bạn') &&
     rootPage.includes('currentGroup.name'),
@@ -116,6 +116,65 @@ assert(
     rootPage.includes('downloadGroupCardImage') &&
     rootPage.includes('teamfund-group-card-download'),
     'Create group success popup should let admin save an image containing the group code and QR.'
+);
+
+assert(
+    createRoute.includes('validateCustomCode') &&
+    createRoute.includes('assertCodeAvailable') &&
+    createRoute.includes('venue') &&
+    createRoute.includes("Mã CLB này đã được sử dụng") &&
+    createRoute.includes('groups_code_length') === false,
+    'Create group API should accept optional custom code, save venue, and return friendly duplicate-code errors.'
+);
+
+assert(
+    createRoute.includes('body?.code') &&
+    createRoute.includes('createUniqueGroupCode') &&
+    createRoute.includes('CODE_ALPHABET_RE'),
+    'Create group API should normalize custom codes and auto-generate when code is blank.'
+);
+
+assert(
+    rootPage.includes('Tạo Câu Lạc Bộ mới') &&
+    rootPage.includes('teamfund-create-form') &&
+    rootPage.includes('updateCreateCode') &&
+    rootPage.includes('suggestCreateCode') &&
+    rootPage.includes('createForm.venue') &&
+    rootPage.includes('showAdminPassword') &&
+    rootPage.includes('Xác nhận mật khẩu quản trị') &&
+    rootPage.includes('Xác nhận mật khẩu gia nhập') &&
+    rootPage.includes('adminPasswordConfirmation') &&
+    rootPage.includes('memberPasswordConfirmation') &&
+    rootPage.includes('Khởi tạo CLB ngay') &&
+    !rootPage.includes('Tuỳ chọn thiết lập nhanh'),
+    'Create-club modal should follow Stitch layout with custom code, venue, password cards, and no quick-setup section.'
+);
+
+assert(
+    rootCss.includes('teamfund-modal--wide') &&
+    rootCss.includes('teamfund-pass-card') &&
+    rootCss.includes('teamfund-create-grid') &&
+    rootCss.includes('width: min(100%, 800px)') &&
+    rootCss.includes('repeat(2, minmax(0, 1fr))') &&
+    rootCss.includes('@media (max-width: 740px)') &&
+    rootCss.includes('.teamfund-form .teamfund-field__control input') &&
+    rootCss.includes('teamfund-field__control--code input::placeholder') &&
+    rootCss.includes('teamfund-password-confirmation') &&
+    rootCss.includes('teamfund-create-note'),
+    'Create-club modal styles should include wide layout, password cards, and responsive grid.'
+);
+
+const venueMigrationPath = 'database/migrations/045_groups_venue_and_code_flexibility.sql';
+assert(
+    fs.existsSync(path.join(root, venueMigrationPath)),
+    'Venue and flexible club-code migration should exist.'
+);
+
+const venueMigration = read(venueMigrationPath);
+assert(
+    venueMigration.includes('ADD COLUMN IF NOT EXISTS venue') &&
+    venueMigration.includes('BETWEEN 3 AND 16'),
+    'Migration 045 should add groups.venue and relax code length to 3–16 characters.'
 );
 
 assert(

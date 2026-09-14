@@ -12,10 +12,15 @@ function initials(name) {
     return name.trim().split(/\s+/).slice(-2).map((part) => part[0]).join('').toUpperCase();
 }
 
-export default function SideRail({ role, clubName, clubLogoUrl, userName, memberCount, canLogout = false }) {
+export default function SideRail({ role, clubName, clubLogoUrl, userName, memberCount, athlete = null, canLogout = false }) {
     const pathname = usePathname();
     const links = getGlobalNavLinksForRole(role);
     const isAdmin = role === 'admin';
+    // Có vé VĐV thì thẻ người dùng nói tên người thật, và mở được menu tài khoản dù
+    // không có phiên CLB nào (trước đây canLogout chỉ đúng cho phiên CLB).
+    const hasAthlete = Boolean(athlete?.id);
+    const showAccountMenu = canLogout || hasAthlete;
+    const displayName = hasAthlete ? (athlete.displayName || athlete.login) : userName;
     const [accountOpen, setAccountOpen] = useState(false);
     const [loggingOut, setLoggingOut] = useState(false);
     const accountBtnRef = useRef(null);
@@ -45,6 +50,16 @@ export default function SideRail({ role, clubName, clubLogoUrl, userName, member
         setLoggingOut(true);
         try {
             await fetch('/api/groups/session', { method: 'DELETE' });
+        } finally {
+            window.location.assign('/');
+        }
+    }
+
+    // Đăng xuất VĐV chỉ thu hồi vé VĐV, không chạm phiên CLB dùng chung trên máy đó.
+    async function handleAthleteLogout() {
+        setLoggingOut(true);
+        try {
+            await fetch('/api/identity/athlete-sessions', { method: 'DELETE' });
         } finally {
             window.location.assign('/');
         }
@@ -85,12 +100,12 @@ export default function SideRail({ role, clubName, clubLogoUrl, userName, member
 
             <div className="ph-usercard-wrap">
                 <div className="ph-usercard">
-                    {canLogout ? (
+                    {showAccountMenu ? (
                         <button type="button" ref={accountBtnRef} className="ph-usercard__account" aria-haspopup="menu" aria-expanded={accountOpen} onClick={() => setAccountOpen((open) => !open)}>
-                            <span className="ph-usercard__av" aria-hidden="true">{initials(userName)}</span>
+                            <span className="ph-usercard__av" aria-hidden="true">{initials(displayName)}</span>
                             <span className="ph-usercard__body">
-                                <span className="ph-usercard__name">{userName || (isAdmin ? 'Quản trị viên' : 'Thành viên')}</span>
-                                <span className="ph-usercard__role">{isAdmin ? 'Quản trị viên CLB' : 'Thành viên'}</span>
+                                <span className="ph-usercard__name">{displayName || (isAdmin ? 'Quản trị viên' : 'Thành viên')}</span>
+                                <span className="ph-usercard__role">{hasAthlete ? 'Tài khoản VĐV' : isAdmin ? 'Quản trị viên CLB' : 'Thành viên'}</span>
                             </span>
                             <span className="ph-usercard__caret" aria-hidden="true">⌄</span>
                         </button>
@@ -103,8 +118,12 @@ export default function SideRail({ role, clubName, clubLogoUrl, userName, member
                     </>}
                     {isAdmin ? <span className="ph-usercard__bell"><PhNotificationBell /></span> : <span className="ph-usercard__dot" aria-hidden="true" />}
                 </div>
-                {canLogout && accountOpen ? <div className="ph-usercard__menu" role="menu" ref={accountMenuRef}>
-                    <button type="button" role="menuitem" className="ph-usercard__logout" onClick={handleLogout} disabled={loggingOut}>{loggingOut ? 'Đang đăng xuất...' : 'Đăng xuất'}</button>
+                {showAccountMenu && accountOpen ? <div className="ph-usercard__menu" role="menu" ref={accountMenuRef}>
+                    {hasAthlete ? <>
+                        <a role="menuitem" className="ph-usercard__link" href="/ho-so-vdv">Hồ sơ &amp; cài đặt của tôi</a>
+                        <button type="button" role="menuitem" className="ph-usercard__logout" onClick={handleAthleteLogout} disabled={loggingOut}>{loggingOut ? 'Đang đăng xuất...' : 'Đăng xuất tài khoản VĐV'}</button>
+                    </> : null}
+                    {!hasAthlete && canLogout ? <button type="button" role="menuitem" className="ph-usercard__logout" onClick={handleLogout} disabled={loggingOut}>{loggingOut ? 'Đang đăng xuất...' : 'Đăng xuất'}</button> : null}
                 </div> : null}
             </div>
         </div>

@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
-import { getEffectiveGroupContext } from '@/lib/groupSession';
+import { getClubReadContext } from '@/lib/clubReadContext';
 
 // Public: members and logged-out visitors read their active club's branding.
 // Only non-sensitive fields (name, logo) are exposed.
 export async function GET() {
-    const context = getEffectiveGroupContext();
+    const context = await getClubReadContext();
     if (context.is_default) {
         return NextResponse.json({ name: 'Pickhub', logoUrl: null, shameBadgesEnabled: true });
     }

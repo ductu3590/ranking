@@ -7,6 +7,8 @@ const path = require('node:path');
 const { IdentityServiceError } = require('../lib/application/identity/errors');
 const {
   validateAthleteAccountRegistration,
+  validateAthleteAccountContact,
+  validateContactFacebookProfileUrl,
   validateMembershipClaimable,
   validateAthleteClaimable,
 } = require('../lib/domain/identity/athleteAccount');
@@ -71,6 +73,38 @@ function testDomainValidation() {
   assert.equal(validateMembershipClaimable({ club_id: 7, status: 'ended' }, { clubId: 7 }).reason, 'membership_not_active');
   assert.equal(validateAthleteClaimable({ status: 'linked' }).reason, 'athlete_already_linked');
   assert.equal(validateAthleteClaimable({ status: 'unclaimed' }).valid, true);
+
+  assert.equal(validateAthleteAccountContact({}).reason, 'contact_no_changes');
+  assert.equal(validateAthleteAccountContact({ email: 'a@b' }).reason, 'email_format_invalid');
+  assert.equal(validateAthleteAccountContact({ phone: '123' }).reason, 'phone_format_invalid');
+  assert.equal(
+    validateContactFacebookProfileUrl('https://example.com/me').reason,
+    'facebook_profile_url_invalid',
+  );
+  assert.equal(
+    validateContactFacebookProfileUrl('https://fb.com/tuan.nguyen').reason,
+    'facebook_profile_url_invalid',
+  );
+  assert.equal(
+    validateContactFacebookProfileUrl('https://www.facebook.com/groups/123').reason,
+    'facebook_profile_url_invalid',
+  );
+
+  const facebook = validateContactFacebookProfileUrl('facebook.com/tuan.nguyen#about');
+  assert.equal(facebook.valid, true);
+  assert.equal(facebook.facebookProfileUrl, 'https://facebook.com/tuan.nguyen');
+
+  const contact = validateAthleteAccountContact({
+    email: '  Tuan@Example.COM ',
+    phone: '+84 912 345 678',
+    facebookProfileUrl: 'https://m.facebook.com/tuan.nguyen/',
+  });
+  assert.equal(contact.valid, true);
+  assert.deepEqual(contact.changes, {
+    email: 'tuan@example.com',
+    phone: '0912345678',
+    facebookProfileUrl: 'https://m.facebook.com/tuan.nguyen',
+  });
 }
 
 async function testRegisterHappyPath() {

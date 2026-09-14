@@ -14,7 +14,9 @@ assert(
 const branding = read('app/api/club/branding/route.js');
 assert(
     branding.includes('export async function GET') &&
-    branding.includes('getEffectiveGroupContext') &&
+    // getClubReadContext thay getEffectiveGroupContext: cùng ngữ cảnh CLB suy từ
+    // cookie server, thêm nguồn vé VĐV. Vẫn phải giữ nhánh is_default cho khách.
+    (branding.includes('getEffectiveGroupContext') || branding.includes('await getClubReadContext()')) &&
     branding.includes('supabaseAdmin') &&
     branding.includes('logoUrl') &&
     branding.includes('Pickhub') &&

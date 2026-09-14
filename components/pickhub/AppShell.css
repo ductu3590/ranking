@@ -52,6 +52,8 @@
 .ph-usercard__logout { width: 100%; min-height: 38px; padding: 0 10px; border: 0; border-radius: var(--ph-radius-xs); background: transparent; color: var(--ph-negative); cursor: pointer; font-size: 13px; font-weight: 800; text-align: left; }
 .ph-usercard__logout:hover, .ph-usercard__logout:focus-visible { background: var(--ph-tint-negative); outline: none; }
 .ph-usercard__logout:disabled { cursor: wait; opacity: .7; }
+.ph-usercard__link { display: flex; align-items: center; min-height: 38px; padding: 0 10px; border-radius: var(--ph-radius-xs); color: var(--ph-ink); font-size: 13px; font-weight: 800; text-decoration: none; }
+.ph-usercard__link:hover, .ph-usercard__link:focus-visible { background: var(--ph-tint-indigo); outline: none; }
 
 .ph-shell__main { width: min(1280px, 100%); margin: 0 auto; padding: 24px 16px 48px; }
 

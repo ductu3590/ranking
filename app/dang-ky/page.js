@@ -85,7 +85,11 @@ export default function AthleteSignupPage() {
             if (!response.ok) throw new Error(payload.error || 'Không thể tạo tài khoản.');
             setCandidates((current) => current.filter((item) => String(item.membershipId) !== String(form.membershipId)));
             setForm(EMPTY_FORM);
-            setFeedback({ kind: 'ok', text: `Đã tạo tài khoản ${payload.account.login} và liên kết với hồ sơ ${payload.account.displayName}.` });
+            setFeedback({
+                kind: 'ok',
+                text: `Đã tạo tài khoản ${payload.account.login} và liên kết với hồ sơ ${payload.account.displayName}.`,
+                login: payload.account.login,
+            });
         } catch (error) {
             setFeedback({ kind: 'error', text: error.message });
         } finally {
@@ -114,7 +118,13 @@ export default function AthleteSignupPage() {
                     </section>
                 ) : (
                     <form className="signup-card" onSubmit={submit}>
-                        {feedback && <p className={`signup-alert is-${feedback.kind}`} role={feedback.kind === 'error' ? 'alert' : 'status'}>{feedback.text}</p>}
+                        {feedback && (
+                            <p className={`signup-alert is-${feedback.kind}`} role={feedback.kind === 'error' ? 'alert' : 'status'}>
+                                {feedback.text}
+                                {/* Đóng vòng: tạo xong thì mời đăng nhập ngay để vào hồ sơ của mình. */}
+                                {feedback.kind === 'ok' && <> <a href="/dang-nhap-vdv">Đăng nhập ngay</a>.</>}
+                            </p>
+                        )}
 
                         <div className="signup-field">
                             <label htmlFor="signup-membership">Bạn là VĐV nào?</label>

@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
-import { requireValidatedGroupAdmin, getClubScope } from '@/lib/groupSession';
+import { requireValidatedGroupAdmin } from '@/lib/groupSession';
 import { validateTournamentAthlete } from '@/lib/tournament/interclub';
 import { buildGuestAthletePayload, buildClubMemberAthletePayload } from '@/lib/tournament/wizardModel';
 import { requireTournamentAccess } from '@/lib/tournament/accessRuntime';
+import { getClubReadScope } from '@/lib/clubReadContext';
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -23,7 +24,7 @@ export async function GET(request) {
         // Roster CLB: club_members là danh sách hiển thị, athletes là danh tính
         // dài hạn (athletes.legacy_club_member_id trỏ về club_members).
         if (mode === 'roster') {
-            const scope = getClubScope();
+            const scope = await getClubReadScope();
             if (!scope.ok) return scope.response;
             const { data: members, error: membersError } = await db
                 .from('club_members')

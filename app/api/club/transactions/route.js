@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { requireValidatedGroupAdmin } from '@/lib/groupSession';
-import { getClubReadScopeId } from '@/lib/clubReadContext';
+import { requireClubReadScope } from '@/lib/clubReadContext';
 import { loadContributionInputs } from '@/lib/fundContributions';
 
 export async function GET() {
-    const groupId = await getClubReadScopeId();
+    const scope = await requireClubReadScope();
+    if (!scope.ok) return scope.response;
+    const groupId = scope.groupId;
     try {
         const { transactions } = await loadContributionInputs(supabaseAdmin, groupId);
         return NextResponse.json({ transactions });

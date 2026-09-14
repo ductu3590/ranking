@@ -462,10 +462,13 @@ function testAthleteReadAccess() {
     ['app/api/identity/assessments/route.js', /requireClubReadSession\(\)/],
     ['app/api/groups/session/route.js', /getClubReadContext\(\)/],
     ['app/api/club/branding/route.js', /await getClubReadContext\(\)/],
-    ['app/api/club/transactions/route.js', /await getClubReadScopeId\(\)/],
-    ['app/api/club/members/route.js', /await getClubReadScopeId\(\)/],
-    ['app/api/club/events/route.js', /await getClubReadScopeId\(\)/],
-    ['app/api/club/bxh/share-image/route.js', /await getClubReadContext\(\)/],
+    // Dữ liệu riêng của CLB: requireClubReadScope vẫn nhận vé VĐV như trước,
+    // nhưng không còn rơi về CLB mặc định khi người gọi ẩn danh (xem
+    // tests/phase1/club-read-scope.test.js).
+    ['app/api/club/transactions/route.js', /await requireClubReadScope\(\)/],
+    ['app/api/club/members/route.js', /await requireClubReadScope\(\)/],
+    ['app/api/club/events/route.js', /await requireClubReadScope\(\)/],
+    ['app/api/club/bxh/share-image/route.js', /await requireClubReadScope\(\)/],
   ];
   for (const [file, pattern] of readRoutes) {
     assert.ok(pattern.test(readSource(file)), `${file} phải lấy scope đọc qua clubReadContext`);

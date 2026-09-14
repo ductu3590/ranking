@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { requireValidatedGroupAdmin } from '@/lib/groupSession';
-import { getClubReadScopeId } from '@/lib/clubReadContext';
+import { requireClubReadScope } from '@/lib/clubReadContext';
 
 export async function GET() {
-    const groupId = await getClubReadScopeId();
+    const scope = await requireClubReadScope();
+    if (!scope.ok) return scope.response;
+    const groupId = scope.groupId;
     const { data, error } = await supabaseAdmin
         .from('club_members')
         .select('*')

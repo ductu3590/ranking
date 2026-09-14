@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { getGroupSessionFromCookies, requireValidatedGroupAdmin } from '@/lib/groupSession';
-import { getClubReadScopeId } from '@/lib/clubReadContext';
+import { requireClubReadScope } from '@/lib/clubReadContext';
 import { createFundEventShareToken } from '@/lib/fundEventShare';
 
 const EVENT_SELECT = `
@@ -17,7 +17,9 @@ const EVENT_SELECT = `
 `;
 
 export async function GET() {
-    const groupId = await getClubReadScopeId();
+    const scope = await requireClubReadScope();
+    if (!scope.ok) return scope.response;
+    const groupId = scope.groupId;
     const { data, error } = await supabaseAdmin
         .from('fund_events')
         .select(EVENT_SELECT)

@@ -4,7 +4,7 @@ import path from 'node:path';
 import { ImageResponse } from 'next/og';
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
-import { getClubReadContext } from '@/lib/clubReadContext';
+import { requireClubReadScope } from '@/lib/clubReadContext';
 import { loadContributionInputs } from '@/lib/fundContributions';
 import { buildContributionLeaderboard } from '@/lib/fundLeaderboard';
 
@@ -70,9 +70,13 @@ function renderShareCard(result, clubName, period) {
 }
 
 export async function GET(request) {
-    const context = await getClubReadContext();
-    const groupId = context.group_id;
-    if (!groupId) return NextResponse.json({ error: 'Cần phiên CLB hợp lệ.' }, { status: 403 });
+    // Ngữ cảnh mặc định có group_id = 1 (truthy), nên guard `if (!groupId)` cũ
+    // không bao giờ chặn được người gọi ẩn danh: họ nhận về ảnh BXH kèm tên và
+    // số tiền đóng góp thật của CLB #1.
+    const scope = await requireClubReadScope();
+    if (!scope.ok) return scope.response;
+    const groupId = scope.groupId;
+    const context = scope.context;
     const period = new URL(request.url).searchParams.get('period') || 'week';
     if (!PERIODS.has(period)) return NextResponse.json({ error: 'Kỳ không hợp lệ.' }, { status: 400 });
 

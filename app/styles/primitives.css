@@ -70,6 +70,24 @@
 .ph-modal__close:hover, .ph-modal__close:focus-visible { background: var(--ph-tint-neutral-strong); color: var(--ph-ink); outline: none; }
 .ph-modal__actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: var(--ph-space-6); }
 
+/* Stepper: chip buoc + duong noi. Port tu .w3-stepchip cua module giai dau de
+   dung chung. Chip co white-space:nowrap nen o man hinh hep phai bo duong noi
+   va cho chip xuong dong, neu khong se tran ngang. */
+.ph-stepper { display: flex; align-items: center; gap: 6px; margin-bottom: var(--ph-space-6); }
+.ph-stepchip { display: inline-flex; align-items: center; gap: 7px; padding: 5px 11px; border-radius: 999px; background: var(--ph-tint-neutral); color: var(--ph-muted); font-size: 12px; font-weight: 700; white-space: nowrap; }
+.ph-stepchip__n { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 999px; background: var(--ph-card); color: var(--ph-muted); font-size: 11px; font-weight: 800; }
+.ph-stepchip.is-active { background: var(--ph-indigo); color: var(--ph-card); }
+.ph-stepchip.is-active .ph-stepchip__n { background: rgba(255, 255, 255, .24); color: var(--ph-card); }
+.ph-stepchip.is-done { background: var(--ph-tint-positive); color: var(--ph-positive); }
+.ph-stepchip.is-done .ph-stepchip__n { background: var(--ph-positive); color: var(--ph-card); }
+.ph-stepline { flex: 1; height: 2px; min-width: 10px; background: var(--ph-line); border-radius: 2px; }
+.ph-stepline.is-done { background: var(--ph-positive); }
+@media (max-width: 560px) {
+	.ph-stepper { flex-wrap: wrap; margin-bottom: var(--ph-space-4); }
+	.ph-stepline { display: none; }
+	.ph-stepchip { font-size: 11px; padding: 4px 9px; }
+}
+
 /* Truong nhap */
 .ph-field { display: grid; gap: 6px; margin-bottom: var(--ph-space-4); }
 .ph-field__label { font-size: 12px; font-weight: 700; color: var(--ph-ink); }

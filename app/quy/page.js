@@ -5,6 +5,7 @@ import FundTransactionList from '@/components/pickhub/fund/FundTransactionList';
 import FundEntryForm from '@/components/pickhub/fund/FundEntryForm';
 import FundTransactionEditor from '@/components/pickhub/fund/FundTransactionEditor';
 import AssignTransactionDialog from '@/components/pickhub/AssignTransactionDialog';
+import SetupChecklist from '@/components/pickhub/SetupChecklist';
 import './page.css';
 
 const { buildFundEventPanel } = fundDashboardUtils;
@@ -313,6 +314,11 @@ export default function HomePage() {
     return (
         <div className="home-dark">
             <div className="home-main">
+
+                {/* Checklist thiet lap CLB: chi admin thay, tu an khi xong hoac bi an.
+                    Wizard chao mung chi dat o /admin (noi admin dap xuong sau khi dang
+                    nhap) de khong bung len giua trang quy. */}
+                {isAdmin && <SetupChecklist />}
 
                 <header className="dashboard-header">
                     <div>

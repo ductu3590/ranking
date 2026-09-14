@@ -1,0 +1,12 @@
+/* Wizard chao mung. Stepper dung .ph-step* trong primitives.css. */
+
+.onb__lead { margin: 0; font-size: 13.5px; line-height: 1.7; color: var(--ph-ink-2); }
+.onb__lead b { color: var(--ph-ink); }
+
+.onb__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.onb__list li { display: flex; gap: 12px; align-items: flex-start; font-size: 13px; line-height: 1.6; color: var(--ph-text); }
+.onb__list b { color: var(--ph-ink); }
+.onb__emo { flex: none; font-size: 20px; line-height: 1.2; }
+
+/* PhModal dat nut dong o goc phai tren; chua cho no de chip cuoi khong bi de len. */
+.ph-modal .ph-stepper { padding-right: 36px; }

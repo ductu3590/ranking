@@ -1,0 +1,96 @@
+/* Thanh gon "Thiet lap CLB" + panel bung ra.
+   Chi dung token --ph-*, khong hardcode mau. */
+
+/* Thu tu lop cua du an: header AppShell 1000 > thanh nay 40 > sub-nav .set-nav 30
+   > noi dung. Dat bang 30 thi nav "Di toi" de len panel va che mat buoc dau tien. */
+.setupbar {
+	position: sticky;
+	top: 0;
+	z-index: 40;
+	margin-bottom: var(--ph-space-4);
+	border: 1px solid var(--ph-line);
+	border-radius: var(--ph-radius-sm);
+	background: var(--ph-card);
+	box-shadow: var(--ph-shadow-soft);
+}
+.setupbar.is-warning { border-color: var(--ph-tint-gold-line); background: var(--ph-tint-gold); }
+.setupbar.is-complete { border-color: var(--ph-positive); background: var(--ph-tint-positive); }
+
+.setupbar__row { display: flex; align-items: center; gap: var(--ph-space-3); min-height: 52px; padding: 6px var(--ph-space-4); flex-wrap: wrap; }
+
+.setupbar__dot { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 999px; background: var(--ph-lavender); color: var(--ph-indigo); font-size: 12px; font-weight: 800; }
+.setupbar.is-warning .setupbar__dot { background: var(--ph-gold); color: var(--ph-tint-gold-text); }
+.setupbar.is-complete .setupbar__dot { background: var(--ph-positive); color: var(--ph-card); }
+
+.setupbar__label { font-size: 13px; font-weight: 800; letter-spacing: -.01em; color: var(--ph-ink); white-space: nowrap; }
+.setupbar.is-complete .setupbar__label { color: var(--ph-positive); }
+
+.setupbar__count { font-size: 12px; font-weight: 800; color: var(--ph-ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.setupbar__bar { flex: 1; min-width: 60px; height: 6px; border-radius: 999px; background: var(--ph-tint-neutral); overflow: hidden; }
+.setupbar__bar > i { display: block; height: 100%; border-radius: 999px; background: var(--ph-indigo); }
+.setupbar.is-warning .setupbar__bar { background: rgba(255, 255, 255, .55); }
+
+.setupbar__actions { flex: none; display: flex; gap: 6px; margin-left: auto; }
+
+/* Panel DE LEN noi dung thay vi day noi dung xuong — day thi lai quay ve dung
+   van de cua ban the day du. */
+.setupbar__panel {
+	position: absolute;
+	top: calc(100% + 6px);
+	left: 0;
+	right: 0;
+	z-index: 1;
+	max-height: min(70vh, 560px);
+	overflow-y: auto;
+	padding: var(--ph-space-4);
+	border: 1px solid var(--ph-line);
+	border-radius: var(--ph-radius-md);
+	background: var(--ph-card);
+	box-shadow: var(--ph-shadow);
+}
+.setupbar__panelhint { margin: 0 0 var(--ph-space-3); font-size: 12.5px; line-height: 1.55; color: var(--ph-muted); }
+.setupbar__panelfoot { display: flex; gap: 8px; flex-wrap: wrap; margin-top: var(--ph-space-3); padding-top: var(--ph-space-3); border-top: 1px solid var(--ph-line); }
+
+/* ---- Danh sach buoc (dung chung trong panel) ---- */
+.setup__list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--ph-space-2); }
+.setup__item { display: flex; align-items: flex-start; gap: var(--ph-space-3); padding: var(--ph-space-3); border: 1px solid var(--ph-line); border-radius: var(--ph-radius-sm); background: var(--ph-card); }
+.setup__item.is-done { background: var(--ph-tint-neutral-strong); }
+.setup__item.is-warning { background: var(--ph-tint-gold); border-color: var(--ph-tint-gold-line); }
+
+.setup__tick { flex: none; display: grid; place-items: center; width: 26px; height: 26px; margin-top: 1px; border-radius: 999px; border: 2px solid var(--ph-line); background: var(--ph-card); color: var(--ph-muted); font-size: 13px; font-weight: 800; }
+.setup__item.is-done .setup__tick { background: var(--ph-positive); border-color: var(--ph-positive); color: var(--ph-card); }
+.setup__item.is-warning .setup__tick { background: var(--ph-gold); border-color: var(--ph-gold); color: var(--ph-tint-gold-text); }
+
+.setup__body { flex: 1; min-width: 0; }
+.setup__name { margin: 0; font-size: 14px; font-weight: 800; color: var(--ph-ink); letter-spacing: -.01em; }
+.setup__item.is-done .setup__name { color: var(--ph-muted); text-decoration: line-through; text-decoration-thickness: 1px; }
+.setup__desc { margin: 3px 0 0; font-size: 12px; color: var(--ph-muted); line-height: 1.55; }
+.setup__warn { margin: 6px 0 0; font-size: 12px; font-weight: 700; color: var(--ph-tint-gold-text); line-height: 1.55; }
+
+.setup__cta { flex: none; align-self: center; }
+
+/* Section duoc checklist chi toi: vien sang vai giay de admin biet minh vua
+   duoc dua di dau. */
+.is-onboarding-target { box-shadow: var(--ph-focus-ring); border-color: var(--ph-indigo) !important; transition: box-shadow .2s ease; }
+@media (prefers-reduced-motion: reduce) {
+	.is-onboarding-target { transition: none; }
+}
+
+/* .setup__cta nhan width:100% de de bam bang ngon cai. Rule nay BAT BUOC di kem
+   flex-wrap:wrap tren hang cha: trong mot hang nowrap, nut doi 100% chieu rong
+   se bop .setup__body ve 0px (ten buoc bien mat) roi tran ra ngoai the. */
+@media (max-width: 640px) {
+	.setupbar__row { gap: var(--ph-space-2); padding: 8px var(--ph-space-3); }
+	.setupbar__bar { order: 3; flex-basis: 100%; min-width: 0; }
+	.setupbar__actions { margin-left: auto; }
+	/* Man hinh hep: bo thanh tien do, chu "1/5" da noi du. Giu lai thi thanh
+	   chiem 100px — di nguoc muc dich cua ban thu gon nay. */
+	@media (max-width: 480px) {
+		.setupbar__bar { display: none; }
+	}
+	.setupbar__panel { padding: var(--ph-space-3); }
+	.setup__item { flex-wrap: wrap; }
+	.setup__cta { align-self: stretch; width: 100%; }
+	.setup__cta .ph-btn { width: 100%; }
+}

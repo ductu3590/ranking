@@ -253,7 +253,11 @@ export default function HomePage() {
 
     async function handleShareEvent(e, eventId) {
         e.stopPropagation();
-        const url = `${window.location.origin}/quy/su-kien/${eventId}`;
+        // Link chia sẻ mang theo token của sự kiện; thiếu token thì người ngoài
+        // CLB mở link sẽ không đọc được gì.
+        const shareToken = events.find(ev => ev.id === eventId)?.share_token;
+        const base = `${window.location.origin}/quy/su-kien/${eventId}`;
+        const url = shareToken ? `${base}?t=${encodeURIComponent(shareToken)}` : base;
         try {
             await navigator.clipboard.writeText(url);
         } catch {

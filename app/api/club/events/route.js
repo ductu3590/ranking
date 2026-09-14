@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
-import { requireValidatedGroupAdmin } from '@/lib/groupSession';
+import { getGroupSessionFromCookies, requireValidatedGroupAdmin } from '@/lib/groupSession';
 import { getClubReadScopeId } from '@/lib/clubReadContext';
+import { createFundEventShareToken } from '@/lib/fundEventShare';
 
 const EVENT_SELECT = `
     *,
@@ -25,7 +26,19 @@ export async function GET() {
     if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
-    return NextResponse.json({ events: data || [] });
+
+    // Token chia sẻ là một "chìa khoá" nên chỉ phát cho phiên group_session ký
+    // đúng CLB này. Người gọi ẩn danh (rơi về CLB mặc định) và vé VĐV chỉ-đọc
+    // vẫn đọc được danh sách nhưng không được cấp link chia sẻ.
+    const session = getGroupSessionFromCookies();
+    const secret = process.env.GROUP_SESSION_SECRET || '';
+    const canIssueShareLinks = Boolean(secret) && Number(session?.group_id) === Number(groupId);
+    const events = (data || []).map((event) => (
+        canIssueShareLinks
+            ? { ...event, share_token: createFundEventShareToken({ groupId, eventId: event.id }, secret) }
+            : event
+    ));
+    return NextResponse.json({ events });
 }
 
 export async function POST(request) {

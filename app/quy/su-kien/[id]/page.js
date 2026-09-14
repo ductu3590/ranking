@@ -15,7 +15,10 @@ export default function ShareEventPage() {
         async function load() {
             setLoading(true);
             try {
-                const res = await fetch(`/api/club/events/${id}`);
+                const token = new URLSearchParams(window.location.search).get('t');
+                const res = await fetch(
+                    `/api/club/events/${id}${token ? `?t=${encodeURIComponent(token)}` : ''}`
+                );
                 if (!res.ok) throw new Error('Không tìm thấy sự kiện');
                 const data = await res.json();
                 setEvent(data.event);
@@ -171,7 +174,7 @@ export default function ShareEventPage() {
                                     <div key={p.id} className="share-member-row unpaid">
                                         <span className="share-member-index">{i + 1}</span>
                                         <span className="share-member-name">
-                                            {p.club_members?.full_name || 'N/A'}
+                                            {p.display_name || 'N/A'}
                                         </span>
                                         {event.amount_per_person > 0 && (
                                             <span className="share-member-amount unpaid">
@@ -199,7 +202,7 @@ export default function ShareEventPage() {
                                     <div key={p.id} className="share-member-row paid">
                                         <span className="share-member-index">{i + 1}</span>
                                         <span className="share-member-name">
-                                            {p.club_members?.full_name || 'N/A'}
+                                            {p.display_name || 'N/A'}
                                         </span>
                                         <div className="share-member-right">
                                             {p.paid_at && (

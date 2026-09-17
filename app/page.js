@@ -532,22 +532,22 @@ export default function PickhubHomePage() {
                         <form className="teamfund-form teamfund-create-form" onSubmit={handleCreateGroup}>
                             <FormError message={error} />
 
-                            <div className="teamfund-create-grid">
-                                <label className="teamfund-field">
-                                    <span className="teamfund-field__label">
-                                        Tên Câu Lạc Bộ <em>*</em>
-                                    </span>
-                                    <span className="teamfund-field__control">
-                                        <span className="teamfund-field__icon" aria-hidden="true"><PaddleIcon /></span>
-                                        <input
-                                            value={createForm.name}
-                                            onChange={(event) => updateCreateForm('name', event.target.value)}
-                                            placeholder="Ví dụ: Pickleball Tân Bình Club"
-                                            required
-                                        />
-                                    </span>
-                                </label>
+                            <label className="teamfund-field">
+                                <span className="teamfund-field__label">
+                                    Tên Câu Lạc Bộ <em>*</em>
+                                </span>
+                                <span className="teamfund-field__control">
+                                    <span className="teamfund-field__icon" aria-hidden="true"><PaddleIcon /></span>
+                                    <input
+                                        value={createForm.name}
+                                        onChange={(event) => updateCreateForm('name', event.target.value)}
+                                        placeholder="Ví dụ: Pickleball Tân Bình Club"
+                                        required
+                                    />
+                                </span>
+                            </label>
 
+                            <div className="teamfund-create-grid">
                                 <label className="teamfund-field">
                                     <span className="teamfund-field__label">
                                         Mã CLB / ID
@@ -571,22 +571,23 @@ export default function PickhubHomePage() {
                                             Sinh mã
                                         </button>
                                     </span>
+                                    <span className="teamfund-field__hint">3–16 ký tự A–Z / 0–9. Để trống nếu muốn hệ thống tự tạo.</span>
+                                </label>
+
+                                <label className="teamfund-field">
+                                    <span className="teamfund-field__label">
+                                        Sân sinh hoạt chính / Địa bàn
+                                    </span>
+                                    <span className="teamfund-field__control">
+                                        <span className="teamfund-field__icon" aria-hidden="true"><LocationIcon /></span>
+                                        <input
+                                            value={createForm.venue}
+                                            onChange={(event) => updateCreateForm('venue', event.target.value)}
+                                            placeholder="Ví dụ: Sân 246 Hoàng Hoa Thám"
+                                        />
+                                    </span>
                                 </label>
                             </div>
-
-                            <label className="teamfund-field">
-                                <span className="teamfund-field__label">
-                                    Sân sinh hoạt chính / Địa bàn
-                                </span>
-                                <span className="teamfund-field__control">
-                                    <span className="teamfund-field__icon" aria-hidden="true"><LocationIcon /></span>
-                                    <input
-                                        value={createForm.venue}
-                                        onChange={(event) => updateCreateForm('venue', event.target.value)}
-                                        placeholder="Ví dụ: Sân 246 Hoàng Hoa Thám"
-                                    />
-                                </span>
-                            </label>
 
                             <div className="teamfund-pass-card">
                                 <div className="teamfund-pass-card__head">

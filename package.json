@@ -9,6 +9,7 @@
     "lint": "next lint",
     "test:phase1": "node tests/phase1/progress.test.js && node tests/phase1/navigation-role.test.js && node tests/phase1/migration-ledger.test.js && node tests/phase1/public-snapshot.test.js && node tests/phase1/polling-backoff.test.js && node tests/phase1/public-identity-migration.test.js && node tests/phase1/auth-boundary.test.js && node tests/phase1/atomic-mutations.test.js && node tests/phase1/tenant-constraints.test.js && node tests/phase1/tournament-member-origin.test.js && node tests/phase1/member-origin-trigger-hardening.test.js && node tests/phase1/member-origin-index.test.js && node tests/phase1/snapshot-tenant-scope.test.js && node tests/phase1/rls-hardening.test.js && node tests/phase1/fund-participant-tenancy.test.js && node tests/phase1/fund-event-share-access.test.js && node tests/phase1/club-read-scope.test.js && node tests/phase1/rate-limit.test.js && node tests/phase1/webhook-idempotency.test.js && node tests/phase1/advance-atomicity.test.js",
     "migration:ledger": "node scripts/migration-ledger.js --directory database/migrations",
+    "test:sepay-verify": "node tests/sepay-verify.test.js",
     "test:onboarding": "node tests/club-onboarding.test.js",
     "test:ph-ui": "node tests/ph-design-system.test.js",
     "test:mobile-nav": "node tests/mobile-bottom-tabs.test.js",
@@ -45,7 +46,7 @@
     "test:tournament": "npm run test:t-migration && npm run test:t-lifecycle && npm run test:t-round-scoring && npm run test:t-operations && npm run test:t-ops-ui && npm run test:t-draw && npm run test:t-engines && npm run test:t-api && npm run test:t-ui",
     "test:open-registration": "node tests/open-registration/domain.test.js && node tests/open-registration/api.contract.test.js && node tests/open-registration/ui.contract.test.js",
     "test:open-registration-live": "node tests/open-registration/live.integration.test.js",
-    "test:regression": "npm run test:phase1 && npm run test:teamfund && npm run test:phase2 && npm run test:phase3 && npm run test:phase3-interclub && npm run test:phase4 && npm run test:phase5 && npm run test:phase6 && npm run test:mobile-nav && npm run test:leaderboard && npm run test:debug-guard && npm run test:admin-auth && npm run test:ph-ui && npm run test:onboarding && npm run test:athlete-accounts && npm run test:athlete-sessions && npm run test:tournament && npm run test:open-registration",
+    "test:regression": "npm run test:phase1 && npm run test:teamfund && npm run test:phase2 && npm run test:phase3 && npm run test:phase3-interclub && npm run test:phase4 && npm run test:phase5 && npm run test:phase6 && npm run test:mobile-nav && npm run test:leaderboard && npm run test:debug-guard && npm run test:admin-auth && npm run test:ph-ui && npm run test:onboarding && npm run test:sepay-verify && npm run test:athlete-accounts && npm run test:athlete-sessions && npm run test:tournament && npm run test:open-registration",
     "test:ci": "npm run test:regression && npm run build"
   },
   "dependencies": {

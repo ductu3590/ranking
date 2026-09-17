@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server';
-import crypto from 'crypto';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { parseTransaction } from '@/lib/transaction-parser';
+import sepayWebhookAuth from '@/lib/sepayWebhookAuth';
+import sepayVerify from '@/lib/sepayVerify';
+
+const { checkWebhookAuth } = sepayWebhookAuth;
+const { matchVerifyingGroup } = sepayVerify;
 
 export async function POST(req) {
     try {
@@ -9,11 +13,21 @@ export async function POST(req) {
         const data = JSON.parse(rawBody);
         const groupRouting = await resolveGroupFromBankAccount(data);
         if (!groupRouting) {
+            // Khong khop tai khoan nao. Truoc khi tra 422 nhu cu, thu xem co phai
+            // tin hieu "Gui thu" cua mot CLB dang kiem tra ket noi khong — payload
+            // "Gui thu" la payload MAU nen khong bao gio khop tai khoan that.
+            const verified = await tryMatchVerifySignal(req, rawBody);
+            if (verified) return verified;
             return NextResponse.json({ message: 'Unknown bank account' }, { status: 422 });
         }
 
         const authError = verifySePaySignature(req, rawBody, groupRouting.sepayWebhookSecret);
         if (authError) return authError;
+
+        // Giao dich that cung la bang chung duong ong dang chay: cap nhat moc de
+        // the "suc khoe ket noi" khong bao dong nham. Best-effort, khong duoc
+        // lam hong viec ghi so quy.
+        touchSepaySignal(groupRouting.groupId);
 
         console.log('=== SEPAY WEBHOOK RAW PAYLOAD ===');
         console.log(JSON.stringify(data, null, 2));
@@ -96,35 +110,71 @@ export async function POST(req) {
     }
 }
 
+// Thuat toan nam trong lib/sepayWebhookAuth.js — nguon duy nhat, dung chung voi
+// nhanh kiem tra ket noi. Hanh vi giu nguyen 100%: secret NULL thi bo qua xac
+// thuc (tuong thich nguoc voi cac CLB chua bat khoa bao mat).
 function verifySePaySignature(req, rawBody, sepayWebhookSecret) {
-    if (!sepayWebhookSecret) {
+    const failure = checkWebhookAuth(req.headers, rawBody, sepayWebhookSecret);
+    if (!failure) return null;
+    return NextResponse.json({ message: failure.message }, { status: failure.status });
+}
+
+// Ghi moc "lan cuoi nhan tin hieu tu SePay". Best-effort: loi o day khong duoc
+// anh huong viec ghi so quy.
+function touchSepaySignal(groupId) {
+    supabaseServer
+        .from('groups')
+        .update({ sepay_last_signal_at: new Date().toISOString(), sepay_verify_hint: null })
+        .eq('id', groupId)
+        .then(({ error }) => {
+            if (error) console.error('Khong cap nhat duoc sepay_last_signal_at:', error.message);
+        }, (err) => console.error('Khong cap nhat duoc sepay_last_signal_at:', err));
+}
+
+// Nhanh KIEM TRA KET NOI. Chay khi payload khong khop tai khoan nao.
+// Chu ky HMAC la bang chung duy nhat: KHONG suy ra gi tu payload, nen khong co
+// rui ro gan nham tai khoan cho CLB khac.
+async function tryMatchVerifySignal(req, rawBody) {
+    const nowIso = new Date().toISOString();
+
+    const { data: candidates, error } = await supabaseServer
+        .from('groups')
+        .select('id, sepay_webhook_secret')
+        .gt('sepay_verify_until', nowIso)
+        .not('sepay_webhook_secret', 'is', null)
+        .limit(sepayVerify.MAX_VERIFYING_GROUPS + 1);
+
+    if (error) {
+        console.error('Khong tra duoc danh sach CLB dang kiem tra ket noi:', error.message);
         return null;
     }
 
-    const signature = req.headers.get('X-SePay-Signature') || '';
-    const timestamp = req.headers.get('X-SePay-Timestamp') || '';
-    if (!signature || !timestamp) {
-        return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    const { matched, candidates: checked } = matchVerifyingGroup(candidates, req.headers, rawBody);
+
+    if (matched) {
+        // KHONG log khoa bao mat — chi log id CLB.
+        console.log(`[sepay-verify] CLB ${matched.id} da nhan tin hieu Gui thu hop le.`);
+        const { error: updateError } = await supabaseServer
+            .from('groups')
+            .update({ sepay_last_signal_at: new Date().toISOString(), sepay_verify_hint: null })
+            .eq('id', matched.id);
+        if (updateError) console.error('Khong ghi duoc moc tin hieu:', updateError.message);
+        return NextResponse.json({ message: 'Verify signal accepted' }, { status: 200 });
     }
 
-    const timestampSeconds = Number(timestamp);
-    const nowSeconds = Math.floor(Date.now() / 1000);
-    if (!Number.isFinite(timestampSeconds) || Math.abs(nowSeconds - timestampSeconds) > 300) {
-        return NextResponse.json({ message: 'Request expired' }, { status: 401 });
+    if (checked.length === 0) return null; // khong ai dang cho -> 422 nhu cu
+
+    // Co CLB dang cho nhung khong chu ky nao khop. Chi ghi goi y khi dung MOT
+    // CLB dang cho; nhieu CLB thi khong biet gan cho ai.
+    // Chu ky sai KHONG dong cua so — ke la gui rac khong pha duoc phien cua admin.
+    if (checked.length === 1) {
+        const { error: hintError } = await supabaseServer
+            .from('groups')
+            .update({ sepay_verify_hint: 'signature_mismatch' })
+            .eq('id', checked[0].id);
+        if (hintError) console.error('Khong ghi duoc goi y chan doan:', hintError.message);
     }
-
-    const expectedSignature = 'sha256=' + crypto
-        .createHmac('sha256', sepayWebhookSecret)
-        .update(`${timestamp}.${rawBody}`)
-        .digest('hex');
-
-    const received = Buffer.from(signature);
-    const expected = Buffer.from(expectedSignature);
-    if (received.length !== expected.length || !crypto.timingSafeEqual(received, expected)) {
-        return NextResponse.json({ message: 'Invalid signature' }, { status: 401 });
-    }
-
-    return null;
+    return NextResponse.json({ message: 'Invalid signature' }, { status: 401 });
 }
 
 async function resolveGroupFromBankAccount(data) {

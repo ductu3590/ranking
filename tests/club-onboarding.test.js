@@ -259,4 +259,33 @@ const FULL_CLUB = {
     }
 }
 
+// Luu mot thay doi xong thi giao dien phai tu cap nhat, khong bat admin F5;
+// va ket qua thao tac phai hien bang toast noi (truoc day la banner o DAU trang,
+// bam Luu o cuoi trang thi khong ai thay).
+{
+    assert(exists('lib/clubSettingsEvents.js'), 'thieu lib/clubSettingsEvents.js');
+    const ev = read('lib/clubSettingsEvents.js');
+    assert(ev.includes('notifyClubSettingsChanged') && ev.includes('onClubSettingsChanged'),
+        'lib su kien phai co ca ben phat va ben dang ky');
+
+    const settings = read('app/admin/ClubSettings.js');
+    assert(settings.includes('notifyClubSettingsChanged'), 'ClubSettings phai bao khi luu xong');
+    assert(!settings.includes('club-settings-msg'), 'banner thong bao o dau trang phai bo');
+    assert(settings.includes('PhToast') && settings.includes('showToast'), 'ClubSettings phai dung toast');
+    assert(!/setNotice\(/.test(settings) && !/setError\(/.test(settings), 'khong con state notice/error cu');
+
+    const checklist = read('components/pickhub/SetupChecklist.js');
+    assert(checklist.includes('onClubSettingsChanged(load)'),
+        'checklist phai tu tai lai khi cai dat doi — neu khong, tien do van hien so cu cho toi khi F5');
+
+    const sepay = read('components/pickhub/SepayConnect.js');
+    assert(sepay.includes('notifyClubSettingsChanged'), 'SepayConnect phai bao khi trang thai ket noi doi');
+
+    assert(exists('components/pickhub/PhToast.js'), 'thieu PhToast.js');
+    assert(exists('components/pickhub/PhToast.css'), 'thieu PhToast.css');
+    const toastCss = read('components/pickhub/PhToast.css');
+    assert(/position:\s*fixed/.test(toastCss), 'toast phai co dinh de luon nhin thay du dang o cuoi trang');
+    assert(toastCss.includes('--ph-bottom-nav-height'), 'toast phai ngoi tren thanh dieu huong duoi cung o mobile');
+}
+
 console.log('club-onboarding: ok');

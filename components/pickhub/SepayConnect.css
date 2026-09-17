@@ -1,0 +1,107 @@
+/* Auto Quy — ket noi SePay. Mobile-first ~380px, chi dung token --ph-*. */
+
+.spc { display: grid; gap: var(--ph-space-4); }
+.spc__loading { margin: 0; font-size: 13px; color: var(--ph-muted); }
+.spc__error { margin: 0; padding: 10px 12px; border-radius: var(--ph-radius-sm); background: var(--ph-tint-negative); border: 1px solid var(--ph-negative); color: var(--ph-negative); font-size: 12.5px; font-weight: 600; line-height: 1.55; }
+.spc__note { margin: 0; font-size: 12px; color: var(--ph-muted); line-height: 1.6; }
+.spc__actions { display: flex; align-items: center; gap: var(--ph-space-3); flex-wrap: wrap; }
+.spc__muted { font-size: 12px; font-weight: 700; color: var(--ph-ink-2); text-decoration: underline; }
+
+/* ---- Man gioi thieu ---- */
+.spc__pitch { padding: var(--ph-space-6); border-radius: var(--ph-radius-md); background: linear-gradient(135deg, var(--ph-tint-indigo), var(--ph-tint-cyan)); border: 1px solid var(--ph-tint-indigo-line); }
+.spc__pitch h2 { margin: 0; font-size: clamp(18px, 3vw, 22px); font-weight: 800; letter-spacing: -.035em; color: var(--ph-ink); text-wrap: balance; }
+.spc__pills { display: flex; gap: 8px; flex-wrap: wrap; margin-top: var(--ph-space-4); }
+.spc__pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: var(--ph-card); border: 1px solid var(--ph-tint-indigo-line); font-size: 12px; font-weight: 700; color: var(--ph-ink); }
+
+.spc__benefits { list-style: none; margin: var(--ph-space-4) 0 0; padding: 0; display: grid; gap: 10px; }
+.spc__benefits li { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; line-height: 1.6; color: var(--ph-ink-2); }
+.spc__benefits b { color: var(--ph-ink); }
+.spc__check { flex: none; display: grid; place-items: center; width: 22px; height: 22px; margin-top: 1px; border-radius: 999px; background: var(--ph-positive); color: var(--ph-card); font-size: 12px; font-weight: 800; }
+
+/* ---- Bon buoc chuan bi ---- */
+.spc__prep { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--ph-space-3); }
+.spc__prepitem { display: flex; gap: var(--ph-space-4); align-items: flex-start; padding: var(--ph-space-4); border: 1px solid var(--ph-line); border-radius: var(--ph-radius-sm); background: var(--ph-card); }
+.spc__prepfig { flex: none; position: relative; display: grid; place-items: center; width: 56px; height: 56px; border-radius: var(--ph-radius-card); background: var(--ph-lavender); border: 1px solid var(--ph-tint-indigo-line); font-size: 26px; line-height: 1; }
+.spc__prepfig i { position: absolute; top: -7px; left: -7px; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 999px; background: var(--ph-indigo); color: var(--ph-card); font-size: 11px; font-weight: 800; font-style: normal; }
+.spc__prepbody { flex: 1; min-width: 0; }
+.spc__prepbody h3 { margin: 0 0 3px; font-size: 14px; font-weight: 800; color: var(--ph-ink); letter-spacing: -.01em; }
+.spc__prepbody p { margin: 0; font-size: 12.5px; line-height: 1.6; color: var(--ph-muted); }
+.spc__prepside { flex: none; align-self: center; display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ---- Truong nhap & hang copy ---- */
+.spc__field { display: grid; gap: 6px; }
+.spc__label { font-size: 12px; font-weight: 700; color: var(--ph-ink); }
+.spc__input { width: 100%; min-height: 44px; padding: 0 12px; border: 1px solid var(--ph-line); border-radius: var(--ph-radius-sm); background: var(--ph-card); font: inherit; font-size: 15px; font-weight: 700; color: var(--ph-ink); font-variant-numeric: tabular-nums; }
+.spc__input:focus-visible { outline: none; box-shadow: var(--ph-focus-ring); border-color: var(--ph-indigo); }
+.spc__saved { margin: 0; font-size: 14px; font-weight: 700; color: var(--ph-positive); }
+.spc__hintline { margin: 0; font-size: 11.5px; color: var(--ph-muted); line-height: 1.55; }
+
+.spc__copyrow { display: flex; align-items: stretch; gap: 8px; }
+.spc__copyrow code { flex: 1; min-width: 0; max-width: 100%; display: flex; align-items: center; padding: 0 12px; min-height: 44px; border: 1px solid var(--ph-line); border-radius: var(--ph-radius-sm); background: var(--ph-tint-neutral-strong); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; color: var(--ph-ink); overflow-x: auto; white-space: nowrap; }
+
+/* Dieu kien tien quyet truoc khi khai bao webhook: phai lien ket ngan hang vao
+   SePay truoc, neu khong o "Tai khoan" trong form webhook se trong. */
+.spc__prereq { display: flex; gap: var(--ph-space-3); padding: var(--ph-space-3) var(--ph-space-4); border-radius: var(--ph-radius-sm); background: var(--ph-tint-cyan); border: 1px solid var(--ph-tint-cyan-line); font-size: 12.5px; line-height: 1.6; color: var(--ph-ink-2); }
+.spc__prereq > span { flex: none; font-size: 18px; line-height: 1.3; }
+.spc__prereq b { display: block; margin-bottom: 4px; color: var(--ph-ink); }
+
+/* ---- Huong dan 5 buoc ---- */
+.spc__guide { margin: 0; padding-left: 20px; display: grid; gap: 10px; font-size: 13px; line-height: 1.65; color: var(--ph-text); }
+.spc__guide b { color: var(--ph-ink); }
+
+.spc__shot { display: grid; place-items: center; min-height: 104px; padding: 12px; border: 1px dashed var(--ph-line); border-radius: var(--ph-radius-xs); background: var(--ph-tint-neutral-strong); color: var(--ph-muted); font-size: 11.5px; text-align: center; line-height: 1.6; }
+
+/* ---- Khoi cho tin hieu ---- */
+.spc__wait { padding: var(--ph-space-4); border-radius: var(--ph-radius-sm); background: var(--ph-tint-indigo); border: 1px solid var(--ph-tint-indigo-line); }
+.spc__wait-cap { font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--ph-indigo); }
+.spc__wait-title { margin: 6px 0 8px; font-size: 19px; font-weight: 800; letter-spacing: -.03em; color: var(--ph-ink); }
+.spc__wait-note { margin: 0 0 var(--ph-space-3); font-size: 13px; line-height: 1.65; color: var(--ph-ink-2); }
+.spc__countdown { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: var(--ph-space-4); padding-top: var(--ph-space-4); border-top: 1px solid var(--ph-tint-indigo-line); font-size: 13px; font-weight: 700; color: var(--ph-ink-2); }
+.spc__clock { font-variant-numeric: tabular-nums; font-size: 18px; font-weight: 800; color: var(--ph-indigo); }
+.spc__countdown-note { color: var(--ph-muted); font-weight: 600; }
+
+.spc__hintbox { display: flex; gap: var(--ph-space-3); padding: var(--ph-space-3) var(--ph-space-4); border-radius: var(--ph-radius-sm); background: var(--ph-tint-gold); border: 1px solid var(--ph-tint-gold-line); font-size: 12.5px; line-height: 1.6; color: var(--ph-tint-gold-text); }
+.spc__errbox { display: flex; gap: var(--ph-space-3); padding: var(--ph-space-4); border-radius: var(--ph-radius-sm); background: var(--ph-tint-gold); border: 1px solid var(--ph-tint-gold-line); font-size: 13px; line-height: 1.6; color: var(--ph-tint-gold-text); }
+.spc__errbox b { display: block; margin-bottom: 4px; }
+
+/* ---- Khoi tu van goi ---- */
+.spc__free { padding: var(--ph-space-4); border-radius: var(--ph-radius-sm); background: var(--ph-tint-cyan); border: 1px solid var(--ph-tint-cyan-line); }
+.spc__free h3 { margin: 0; font-size: 14px; font-weight: 800; color: var(--ph-ink); }
+.spc__free .spc__benefits { margin-top: var(--ph-space-3); }
+.spc__freenote { margin: var(--ph-space-3) 0; font-size: 13px; line-height: 1.6; color: var(--ph-ink-2); }
+.spc__freeactions { display: flex; align-items: center; gap: var(--ph-space-3); flex-wrap: wrap; }
+
+/* ---- Da ket noi ---- */
+.spc__ok { display: flex; align-items: center; gap: var(--ph-space-4); padding: var(--ph-space-4); border-radius: var(--ph-radius-sm); background: var(--ph-tint-positive); border: 1px solid var(--ph-positive); }
+.spc__ok-emo { flex: none; font-size: 28px; line-height: 1; }
+.spc__ok b { display: block; font-size: 14px; font-weight: 800; color: var(--ph-positive); }
+.spc__ok span { display: block; margin-top: 3px; font-size: 13px; color: var(--ph-ink-2); }
+
+.spc__grid2 { display: grid; gap: var(--ph-space-3); grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+.spc__stat { padding: var(--ph-space-4); border-radius: var(--ph-radius-sm); border: 1px solid var(--ph-line); background: var(--ph-card); }
+.spc__stat.is-warn { background: var(--ph-tint-gold); border-color: var(--ph-tint-gold-line); }
+.spc__stat.is-bad { background: var(--ph-tint-negative); border-color: var(--ph-negative); }
+.spc__stat-lab { display: block; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ph-muted); }
+.spc__stat-val { display: block; margin-top: 6px; font-size: 19px; font-weight: 800; letter-spacing: -.03em; color: var(--ph-ink); font-variant-numeric: tabular-nums; }
+.spc__stat.is-bad .spc__stat-val { color: var(--ph-negative); }
+.spc__stat-sub { display: block; margin-top: 6px; font-size: 12px; color: var(--ph-muted); line-height: 1.55; }
+.spc__stat.is-warn .spc__stat-sub { color: var(--ph-tint-gold-text); }
+.spc__stat.is-bad .spc__stat-sub { color: var(--ph-negative); }
+.spc__stat-sub a { font-weight: 700; color: inherit; }
+.spc__quota { margin-top: 10px; height: 8px; border-radius: 999px; background: var(--ph-tint-neutral); overflow: hidden; }
+.spc__quota > i { display: block; height: 100%; border-radius: 999px; background: var(--ph-positive); }
+.spc__quota.is-warn > i { background: var(--ph-gold); }
+
+@media (max-width: 640px) {
+	.spc__pitch { padding: var(--ph-space-4); }
+	.spc__prepitem { flex-wrap: wrap; }
+	.spc__prepside { align-self: stretch; width: 100%; }
+	.spc__prepside .ph-btn { width: 100%; }
+	/* Khoa bao mat 64 ky tu: cho xuong dong han thay vi cuon ngang.
+	   white-space:nowrap tao ap luc min-content lam tran ca trang o man hinh hep. */
+	.spc__copyrow { flex-direction: column; align-items: stretch; }
+	.spc__copyrow .ph-btn { width: 100%; }
+	.spc__copyrow code { display: block; white-space: normal; word-break: break-all; line-height: 1.55; padding: 10px 12px; min-height: 0; }
+	.spc__freeactions .ph-btn { width: 100%; }
+	.spc__actions .ph-btn { width: 100%; }
+}

@@ -39,15 +39,25 @@ assert(
     webhook.includes('{ status: 422 }'),
     'Webhook should reject unknown bank accounts instead of falling back to the default group.'
 );
+// Thuat toan chu ky da duoc tach sang lib/sepayWebhookAuth.js de nhanh "Gui thu"
+// dung chung mot nguon, tranh hai nhanh lech nhau. Kiem o dung noi no nam,
+// nhung van khoa bat bien: webhook xac thuc HMAC bang secret cua dung CLB.
+const webhookAuth = read('lib/sepayWebhookAuth.js');
 assert(
-    webhook.includes("import crypto from 'crypto'") &&
+    webhook.includes('checkWebhookAuth') &&
+    !webhook.includes('createHmac') &&
     !webhook.includes('SEPAY_WEBHOOK_SECRET') &&
     webhook.includes('sepay_webhook_secret') &&
-    webhook.includes('X-SePay-Signature') &&
-    webhook.includes('X-SePay-Timestamp') &&
-    webhook.includes('timingSafeEqual') &&
     webhook.includes('rawBody'),
-    'Webhook should verify SePay HMAC-SHA256 signatures with the matched group secret.'
+    'Webhook should verify signatures through the shared auth module using the matched group secret.'
+);
+assert(
+    webhookAuth.includes('X-SePay-Signature') &&
+    webhookAuth.includes('X-SePay-Timestamp') &&
+    webhookAuth.includes('createHmac') &&
+    webhookAuth.includes('timingSafeEqual') &&
+    webhookAuth.includes('rawBody'),
+    'Shared auth module should implement SePay HMAC-SHA256 verification.'
 );
 
 const bankApi = read('app/api/club/bank-accounts/route.js');
@@ -60,24 +70,37 @@ assert(
     'Bank-accounts route should expose admin-guarded GET/POST/DELETE on group_bank_accounts.'
 );
 
+// Phan SePay da chuyen sang components/pickhub/SepayConnect.js: khoa bao mat do
+// he thong sinh (randomBytes 32) thay vi admin tu nghi ra, va xac minh bang
+// chuc nang "Gui thu" cua SePay. Nut "Tat bao mat" da bo khoi UI — muc tieu la
+// moi CLB deu co khoa; API /api/club/settings van con clearSepayWebhookSecret.
 const settingsUi = read('app/admin/ClubSettings.js');
+const sepayConnectUi = read('components/pickhub/SepayConnect.js');
+const verifyApi = read('app/api/club/sepay/verify/route.js');
 assert(
     settingsUi.includes('/api/club/bank-accounts') &&
     settingsUi.includes('Tài khoản ngân hàng') &&
-    settingsUi.includes('sepayWebhookSecret') &&
-    settingsUi.includes('clearSepayWebhookSecret'),
-    'ClubSettings should manage bank accounts and per-club SePay webhook secret for auto fund collection.'
+    settingsUi.includes('SepayConnect'),
+    'ClubSettings should manage bank accounts and mount the SePay connection flow.'
+);
+assert(
+    sepayConnectUi.includes('/api/club/sepay/verify') &&
+    sepayConnectUi.includes('/api/club/bank-accounts') &&
+    sepayConnectUi.includes('HMAC-SHA256') &&
+    verifyApi.includes('randomBytes(32)'),
+    'SePay connection flow should own the per-club webhook secret and bank account wiring.'
 );
 
-const sepayUi = read('app/admin/ClubSettings.js');
+// Huong dan SePay da chuyen han sang SepayConnect. Khoa bat bien moi: co huong
+// dan tung buoc, co kieu xac thuc HMAC-SHA256, va co duong lui nhap tay so tai
+// khoan. Khoi "Secret webhook rieng cua CLB" bi bo vi khoa gio do he thong sinh.
+const sepayGuideUi = read('components/pickhub/SepayConnect.js');
 assert(
-    sepayUi.includes('/api/webhook') &&
-    sepayUi.includes('SePay') &&
-    sepayUi.includes('developer.sepay.vn') &&
-    sepayUi.includes('HMAC-SHA256') &&
-    sepayUi.includes('Secret webhook riêng của CLB') &&
-    sepayUi.includes('thủ công'),
-    'ClubSettings should show SePay setup guidance for optional per-club HMAC secret.'
+    sepayGuideUi.includes('SePay') &&
+    sepayGuideUi.includes('HMAC-SHA256') &&
+    sepayGuideUi.includes('Gửi thử') &&
+    sepayGuideUi.includes('my.sepay.vn'),
+    'SepayConnect should show step-by-step SePay setup guidance.'
 );
 
 const settingsRoute = read('app/api/club/settings/route.js');

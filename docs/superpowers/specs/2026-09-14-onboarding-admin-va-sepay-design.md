@@ -4,6 +4,7 @@
 - **Trạng thái:** Thiết kế — chưa thực thi, chưa apply migration
 - **Sửa đổi 2026-09-14 (lần 2):** việt hoá 100% giao diện (§3.17), **đổi cơ chế xác minh sang "Gửi thử" của SePay** thay cho chuyển tiền thật (§3.5) — bỏ được bảng phiên ghép nối, RPC và cột `is_pairing_probe`
 - **Sửa đổi 2026-09-14 (lần 3):** tách màn giới thiệu (thuyết phục, không ô nhập) khỏi màn thiết lập (§3.3–3.4, §3.15); lợi ích viết thành danh sách tích xanh; bốn bước chuẩn bị dùng icon tượng hình; **gỡ thông tin ưu đãi VPBank vì không kiểm chứng được** và rút gọn copy tư vấn gói (§3.1)
+- **Sửa đổi 2026-09-15:** bổ sung bước **liên kết tài khoản ngân hàng vào SePay** (§3.4) — mắt xích bắt buộc bị bỏ sót; chưa làm thì ô Tài khoản khi tạo webhook sẽ trống
 - **Mockup:** `_workspace/mockup-onboarding-sepay-2026-09-14.html`
 - **Liên quan:** `app/admin/ClubSettings.js`, `app/api/webhook/route.js`, `app/api/club/settings/route.js`, `app/api/club/bank-accounts/route.js`
 
@@ -339,7 +340,7 @@ Ba chip cuối mỗi cái phản bác đúng một lý do bỏ cuộc. Chip *"Sa
 
 Nút này cố ý là một **câu hỏi** chứ không phải mệnh lệnh. Nó vừa mời đi tiếp vừa nói rõ điều kiện vào — admin chưa có tài khoản ngân hàng sẽ tự biết mình phải quay lại làm bước 1 trước, không phải đi vào rồi mới bị chặn. Dòng dưới nút: *"Chưa có cũng không sao — đóng lại lúc nào cũng được, PickHub nhớ bạn đang làm tới đâu."*
 
-### 3.4 Bốn bước chuẩn bị — tượng hình, hiện hết một lượt
+### 3.4 Năm bước chuẩn bị — tượng hình, hiện hết một lượt
 
 Liệt kê **toàn bộ** những gì cần có, không giấu bước nào để bung ra giữa chừng. Mỗi bước có **một icon lớn trong ô bo góc** (56px) với số thứ tự nhỏ ở góc trên trái — icon để nhận ra bằng mắt, số để biết trình tự. Số trần không nói được bước đó là *loại việc gì*.
 
@@ -347,10 +348,19 @@ Liệt kê **toàn bộ** những gì cần có, không giấu bước nào đ�
 |---|---|---|---|---|
 | 1 | 🏦 | **Tài khoản ngân hàng riêng của quỹ** | `Làm ở app ngân hàng` | Tài khoản mới, đứng tên thủ quỹ, chỉ dùng cho quỹ CLB. Mở trên app ~5 phút, miễn phí. Lý do đầy đủ ở §3.16 |
 | 2 | 📱 | **Tài khoản SePay** | nút `Đăng ký SePay ↗` | Dịch vụ báo cho PickHub biết khi có tiền vào. Đăng ký bằng số điện thoại — **link affiliate đặt ở đây** |
-| 3 | 🎁 | **Chọn gói dịch vụ** | nút `Xem khuyến mãi ↗` | "Cứ chọn gói miễn phí trước — 50 giao dịch mỗi tháng." |
-| 4 | 🔗 | **Kết nối SePay với PickHub** | badge `PickHub lo phần này` | Copy hai dòng chữ dán sang SePay rồi bấm một nút. Có ảnh từng bước |
+| 3 | 🎁 | **Gói dịch vụ** | nút `Xem khuyến mãi ↗` | Đăng ký xong **mặc định là gói miễn phí**, liên kết được mọi ngân hàng SePay hỗ trợ. Bước này thường không phải làm gì |
+| 4 | 🔌 | **Liên kết tài khoản ngân hàng vào SePay** | nút `Mở mục Ngân hàng ↗` | SePay → menu **Ngân hàng** → **Kết nối mới** |
+| 5 | 🔗 | **Kết nối SePay với PickHub** | badge `PickHub lo phần này` | Copy hai dòng chữ dán sang SePay rồi bấm một nút. Có ảnh từng bước |
 
-Bước 4 mang **badge trấn an** chứ không phải nút — để admin thấy phần nghe có vẻ khó nhất đã có người lo.
+Bước 5 mang **badge trấn an** chứ không phải nút — để admin thấy phần nghe có vẻ khó nhất đã có người lo.
+
+**Bước 4 từng bị bỏ sót** ở bản thiết kế đầu. Đây là mắt xích bắt buộc: chưa liên kết tài khoản ngân hàng vào SePay thì SePay không nhìn thấy biến động số dư, và ô **Tài khoản** trong form tạo webhook sẽ **trống** — admin sẽ kẹt ở đó mà không hiểu vì sao. Vì vậy màn khai báo webhook (§3.15, trạng thái `waiting`) còn có thêm một khối nhắc điều kiện tiên quyết ngay trên danh sách 5 bước.
+
+> **Đính chính lần ba — cùng một loại lỗi.** Bản trước ghi *"gói quyết định được liên kết ngân hàng nào"*, suy ra từ một ảnh chụp màn hình SePay có dòng *"chỉ có thể kết nối với tài khoản ngân hàng BIDV cá nhân"*. Người dùng đính chính: đó là **gói khuyến mãi BIDV riêng của tài khoản đó**, không phải quy tắc chung. Khách đăng ký mới dùng **gói FREE mặc định thì liên kết được mọi ngân hàng nằm trong danh sách SePay hỗ trợ**.
+>
+> Đây là lần thứ ba mắc cùng một lỗi (trước đó: ưu đãi VPBank ở §3.1). **Quy tắc rút ra: không suy quy tắc chung từ màn hình của một tài khoản cụ thể.** Màn hình SePay phản ánh gói của chính tài khoản đang đăng nhập, không phải mặc định của mọi người dùng.
+
+**Thứ tự 3 trước 4 không còn bắt buộc** sau đính chính trên, nhưng vẫn giữ: gói là thứ admin gặp ngay sau khi đăng ký, và biết mình đang ở gói nào trước khi liên kết ngân hàng vẫn tự nhiên hơn.
 
 **Khuyến cáo tài khoản riêng chỉ xuất hiện ở đây và trong checklist**, không lặp lại ở màn thiết lập (§3.15): tới lúc đó admin đã có tài khoản rồi, nhắc lại chỉ làm dài màn hình và trì hoãn việc họ đang muốn làm.
 
@@ -616,7 +626,7 @@ Năm trạng thái:
 
 | Trạng thái | Hiển thị |
 |---|---|
-| **Chưa kết nối** (`idle`) — màn giới thiệu | Khối lợi ích tích xanh (§3.3) + 4 bước chuẩn bị tượng hình (§3.4) · **không có ô nhập nào** · CTA *"Bạn đã có tài khoản ngân hàng? Bắt đầu kết nối"* |
+| **Chưa kết nối** (`idle`) — màn giới thiệu | Khối lợi ích tích xanh (§3.3) + 5 bước chuẩn bị tượng hình (§3.4) · **không có ô nhập nào** · CTA *"Bạn đã có tài khoản ngân hàng? Bắt đầu kết nối"* |
 | **Bước 1** — vào việc | Ô nhập **số tài khoản quỹ** · khối *"Chưa có tài khoản SePay?"* (§3.1) với nút affiliate + nút khuyến mãi · **không lặp lại khuyến cáo tài khoản riêng** — admin tới đây là đã có rồi · nút *"Lưu và khai báo với SePay"* · link nhỏ *"Tôi muốn nhập số tài khoản thủ công"* |
 | **Đang kiểm tra** (`waiting`) | Ô số tài khoản đã xác nhận · URL + Copy · Khoá bảo mật + Copy (kèm cảnh báo "chỉ hiện một lần") · 5 bước có ảnh · khối nổi bật **"Bấm Gửi thử trong SePay"** + nút mở SePay ở tab mới · đồng hồ đếm ngược · ô `hint` nếu chữ ký sai · nút *"Huỷ"* |
 | **Đã kết nối** (`connected`) | *"Đã kết nối! Tài khoản 1907••••7890 (BIDV)"* · đồng hồ hạn mức gói miễn phí · sức khoẻ kết nối · nút *"Kiểm tra lại kết nối"* |

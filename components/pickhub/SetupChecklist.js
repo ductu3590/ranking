@@ -15,6 +15,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
+import { onClubSettingsChanged } from '@/lib/clubSettingsEvents';
 import './SetupChecklist.css';
 
 const TICK_BY_STATE = { done: '✓', warning: '!' };
@@ -34,14 +35,22 @@ export default function SetupChecklist({ onShareClub }) {
     const rootRef = useRef(null);
     const pathname = usePathname();
 
-    useEffect(() => {
-        let active = true;
-        fetch('/api/club/onboarding', { cache: 'no-store' })
-            .then((res) => (res.ok ? res.json() : null))
-            .then((payload) => { if (active && payload?.onboarding) setOnboarding(payload.onboarding); })
-            .catch(() => { /* khong phai admin hoac loi mang: an thang, khong bao loi */ });
-        return () => { active = false; };
+    const load = useCallback(async () => {
+        try {
+            const res = await fetch('/api/club/onboarding', { cache: 'no-store' });
+            if (!res.ok) return;
+            const payload = await res.json();
+            if (payload?.onboarding) setOnboarding(payload.onboarding);
+        } catch {
+            /* khong phai admin hoac loi mang: an thang, khong bao loi */
+        }
     }, []);
+
+    useEffect(() => { load(); }, [load]);
+
+    // Luu logo / QR quy / tai khoan ngan hang / ket noi SePay xong thi tien do
+    // phai doi ngay, khong bat admin F5.
+    useEffect(() => onClubSettingsChanged(load), [load]);
 
     // Dong panel khi bam ra ngoai hoac bam Esc.
     useEffect(() => {

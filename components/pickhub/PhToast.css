@@ -1,0 +1,46 @@
+/* Toast ket qua thao tac. Chi dung token --ph-*. */
+
+.ph-toastwrap {
+	position: fixed;
+	left: 50%;
+	transform: translateX(-50%);
+	/* Ngoi tren thanh dieu huong duoi cung o mobile, khong de len no. */
+	bottom: calc(var(--ph-bottom-nav-height) + 16px);
+	z-index: 1200; /* tren header AppShell (1000) vi la phan hoi tuc thi */
+	width: min(440px, calc(100vw - 32px));
+	pointer-events: none;
+}
+@media (min-width: 1120px) {
+	.ph-toastwrap { bottom: 28px; }
+}
+
+.ph-toast {
+	pointer-events: auto;
+	display: flex;
+	align-items: flex-start;
+	gap: var(--ph-space-3);
+	padding: var(--ph-space-3) var(--ph-space-4);
+	border-radius: var(--ph-radius-sm);
+	background: var(--ph-ink);
+	color: var(--ph-card);
+	box-shadow: var(--ph-shadow);
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1.55;
+	animation: ph-toast-in .18s ease-out;
+}
+.ph-toast.is-success { background: var(--ph-positive); }
+.ph-toast.is-error { background: var(--ph-negative); }
+
+.ph-toast__icon { flex: none; display: grid; place-items: center; width: 20px; height: 20px; margin-top: 1px; border-radius: 999px; background: rgba(255, 255, 255, .22); font-size: 12px; font-weight: 800; }
+.ph-toast__text { flex: 1; min-width: 0; }
+.ph-toast__close { flex: none; margin: -4px -6px 0 0; padding: 0 6px; border: 0; background: transparent; color: inherit; font-size: 20px; line-height: 1.2; cursor: pointer; opacity: .8; }
+.ph-toast__close:hover, .ph-toast__close:focus-visible { opacity: 1; outline: none; }
+
+@keyframes ph-toast-in {
+	from { opacity: 0; transform: translateY(8px); }
+	to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+	.ph-toast { animation: none; }
+}

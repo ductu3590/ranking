@@ -2,13 +2,17 @@
 
 import { useEffect, useState } from 'react';
 import ClubSettingsNav from '@/components/pickhub/ClubSettingsNav';
+import SepayConnect from '@/components/pickhub/SepayConnect';
+import PhToast, { useToast } from '@/components/pickhub/PhToast';
+import { notifyClubSettingsChanged, onClubSettingsChanged } from '@/lib/clubSettingsEvents';
 import './club-settings.css';
 
 export default function ClubSettings() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [error, setError] = useState('');
-    const [notice, setNotice] = useState('');
+    // Ket qua thao tac hien bang toast noi giua-duoi man hinh. Truoc day la mot
+    // banner o DAU trang: bam Luu o cuoi trang thi khong ai thay thong bao.
+    const { toast, showToast, hideToast } = useToast();
     const [group, setGroup] = useState(null);
     const [qr, setQr] = useState({ joinUrl: '', qrCodeDataUrl: '' });
     const [form, setForm] = useState({ name: '', description: '', shameBadgesEnabled: true });
@@ -20,19 +24,25 @@ export default function ClubSettings() {
     const [changingMemberPassword, setChangingMemberPassword] = useState(false);
     const [bankAccounts, setBankAccounts] = useState([]);
     const [bankForm, setBankForm] = useState({ accountNumber: '' });
-    const [sepayForm, setSepayForm] = useState({ sepayWebhookSecret: '' });
-    const [webhookUrl, setWebhookUrl] = useState('');
 
     useEffect(() => {
-        if (typeof window !== 'undefined') {
-            setWebhookUrl(`${window.location.origin}/api/webhook`);
-        }
         loadSettings();
         loadBankAccounts();
     }, []);
 
-    async function loadSettings() {
-        setLoading(true);
+    // Phan SePay nam trong component rieng; khi no ket noi xong thi badge o tieu
+    // de va danh sach tai khoan o day phai doi theo, khong bat admin F5.
+    // loadSettings/loadBankAccounts khong phat su kien nen khong co vong lap.
+    useEffect(() => onClubSettingsChanged(() => {
+        loadSettings({ silent: true });
+        loadBankAccounts();
+    }), []);
+
+    // silent=true: tai lai ngam khi co su kien cai dat doi. KHONG bat loading,
+    // vi bat loading se thay ca cay con bang mot div "Dang tai" -> SepayConnect
+    // bi unmount va mat sach state (dang o buoc nao cua wizard).
+    async function loadSettings({ silent = false } = {}) {
+        if (!silent) setLoading(true);
         const res = await fetch('/api/club/settings');
         const data = await res.json();
         if (res.ok) {
@@ -45,18 +55,16 @@ export default function ClubSettings() {
             });
             setLogoUrl(data.group.logo_url || null);
             setFundQrUrl(data.group.fund_qr_url || null);
-            setSepayForm({ sepayWebhookSecret: '' });
         } else {
-            setError(data.error || 'Không tải được cài đặt.');
+            showToast(data.error || 'Không tải được cài đặt.', 'error');
         }
-        setLoading(false);
+        if (!silent) setLoading(false);
     }
 
     async function handleSave(event) {
         event.preventDefault();
         setSaving(true);
-        setError('');
-        setNotice('');
+                showToast('');
         const payload = {
             name: form.name,
             description: form.description,
@@ -72,23 +80,23 @@ export default function ClubSettings() {
         if (res.ok) {
             setGroup(data.group);
             window.dispatchEvent(new Event('branding-updated'));
-            setNotice('Đã lưu thay đổi.');
+            notifyClubSettingsChanged();
+            showToast('Đã lưu thay đổi.');
         } else {
-            setError(data.error || 'Không lưu được.');
+            showToast(data.error || 'Không lưu được.', 'error');
         }
         setSaving(false);
     }
 
     async function handleChangeMemberPassword(event) {
         event.preventDefault();
-        setError('');
-        setNotice('');
+                showToast('');
         if (memberPasswordForm.next.length < 4) {
-            setError('Mật khẩu thành viên cần ít nhất 4 ký tự.');
+            showToast('Mật khẩu thành viên cần ít nhất 4 ký tự.', 'error');
             return;
         }
         if (memberPasswordForm.next !== memberPasswordForm.confirm) {
-            setError('Hai lần nhập mật khẩu thành viên không khớp.');
+            showToast('Hai lần nhập mật khẩu thành viên không khớp.', 'error');
             return;
         }
         setChangingMemberPassword(true);
@@ -101,9 +109,9 @@ export default function ClubSettings() {
         setChangingMemberPassword(false);
         if (res.ok) {
             setMemberPasswordForm({ next: '', confirm: '' });
-            setNotice('Đã đặt mật khẩu thành viên mới. Hãy gửi lại mã CLB và mật khẩu cho cả nhóm.');
+            showToast('Đã đặt mật khẩu thành viên mới. Hãy gửi lại mã CLB và mật khẩu cho cả nhóm.');
         } else {
-            setError(data.error || 'Không đặt được mật khẩu thành viên.');
+            showToast(data.error || 'Không đặt được mật khẩu thành viên.', 'error');
         }
     }
 
@@ -123,12 +131,11 @@ export default function ClubSettings() {
                 // PNG chu khong WebP: QR nen mat du lieu bi ro canh, may quet doc loi.
                 const dataUrl = canvas.toDataURL('image/png');
                 if (dataUrl.length > 280000) {
-                    setError('Ảnh QR quá lớn, hãy chọn ảnh nhỏ hơn 200KB.');
+                    showToast('Ảnh QR quá lớn, hãy chọn ảnh nhỏ hơn 200KB.', 'error');
                     return;
                 }
-                setError('');
-                setFundQrUrl(dataUrl);
-                setNotice('Đã chọn ảnh QR, bấm "Lưu QR" để áp dụng.');
+                                setFundQrUrl(dataUrl);
+                showToast('Đã chọn ảnh QR, bấm "Lưu QR" để áp dụng.');
             };
             img.src = reader.result;
         };
@@ -136,8 +143,7 @@ export default function ClubSettings() {
     }
 
     async function handleSaveFundQr(nextValue) {
-        setError('');
-        setNotice('');
+                showToast('');
         const res = await fetch('/api/club/settings', {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
@@ -147,9 +153,10 @@ export default function ClubSettings() {
         if (res.ok) {
             setGroup(data.group);
             setFundQrUrl(data.group.fund_qr_url || null);
-            setNotice(nextValue ? 'Đã lưu ảnh QR nhận quỹ.' : 'Đã xoá ảnh QR nhận quỹ.');
+            notifyClubSettingsChanged();
+            showToast(nextValue ? 'Đã lưu ảnh QR nhận quỹ.' : 'Đã xoá ảnh QR nhận quỹ.');
         } else {
-            setError(data.error || 'Không lưu được ảnh QR.');
+            showToast(data.error || 'Không lưu được ảnh QR.', 'error');
         }
     }
 
@@ -162,8 +169,7 @@ export default function ClubSettings() {
     async function handleAddBank(event) {
         event.preventDefault();
         if (!bankForm.accountNumber.trim()) return;
-        setError('');
-        setNotice('');
+                showToast('');
         const res = await fetch('/api/club/bank-accounts', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -173,18 +179,10 @@ export default function ClubSettings() {
         if (res.ok) {
             setBankAccounts((prev) => [...prev, data.account]);
             setBankForm({ accountNumber: '' });
-            setNotice('Đã thêm tài khoản ngân hàng.');
+            notifyClubSettingsChanged();
+            showToast('Đã thêm tài khoản ngân hàng.');
         } else {
-            setError(data.error || 'Không thêm được tài khoản.');
-        }
-    }
-
-    async function copyWebhookUrl() {
-        try {
-            await navigator.clipboard.writeText(webhookUrl);
-            setNotice('Đã sao chép URL webhook.');
-        } catch {
-            setError('Không sao chép được, hãy copy thủ công.');
+            showToast(data.error || 'Không thêm được tài khoản.', 'error');
         }
     }
 
@@ -193,54 +191,9 @@ export default function ClubSettings() {
         const res = await fetch(`/api/club/bank-accounts?id=${id}`, { method: 'DELETE' });
         if (res.ok) {
             setBankAccounts((prev) => prev.filter((a) => a.id !== id));
+            notifyClubSettingsChanged();
+            showToast('Đã xoá tài khoản ngân hàng.');
         }
-    }
-
-    async function handleSaveSepaySecret(event) {
-        event.preventDefault();
-        const secret = sepayForm.sepayWebhookSecret.trim();
-        if (secret.length < 16) {
-            setError('Secret webhook SePay cần ít nhất 16 ký tự.');
-            return;
-        }
-        setSaving(true);
-        setError('');
-        setNotice('');
-        const res = await fetch('/api/club/settings', {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ sepayWebhookSecret: secret }),
-        });
-        const data = await res.json();
-        if (res.ok) {
-            setGroup(data.group);
-            setSepayForm({ sepayWebhookSecret: '' });
-            setNotice('Đã lưu secret webhook SePay cho CLB.');
-        } else {
-            setError(data.error || 'Không lưu được secret webhook SePay.');
-        }
-        setSaving(false);
-    }
-
-    async function handleClearSepaySecret() {
-        if (!confirm('Tắt xác thực HMAC-SHA256 cho webhook SePay của CLB này?')) return;
-        setSaving(true);
-        setError('');
-        setNotice('');
-        const res = await fetch('/api/club/settings', {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ clearSepayWebhookSecret: true }),
-        });
-        const data = await res.json();
-        if (res.ok) {
-            setGroup(data.group);
-            setSepayForm({ sepayWebhookSecret: '' });
-            setNotice('Đã tắt xác thực webhook SePay cho CLB.');
-        } else {
-            setError(data.error || 'Không tắt được xác thực webhook SePay.');
-        }
-        setSaving(false);
     }
 
     function handleLogoFile(event) {
@@ -262,12 +215,11 @@ export default function ClubSettings() {
                     dataUrl = canvas.toDataURL('image/png');
                 }
                 if (dataUrl.length > 100000) {
-                    setError('Logo quá lớn sau khi nén, hãy chọn ảnh đơn giản hơn.');
+                    showToast('Logo quá lớn sau khi nén, hãy chọn ảnh đơn giản hơn.', 'error');
                     return;
                 }
-                setError('');
-                setLogoUrl(dataUrl);
-                setNotice('Đã chọn logo, bấm "Lưu thay đổi" để áp dụng.');
+                                setLogoUrl(dataUrl);
+                showToast('Đã chọn logo, bấm "Lưu thay đổi" để áp dụng.');
             };
             img.src = reader.result;
         };
@@ -276,14 +228,13 @@ export default function ClubSettings() {
 
     async function handleChangePassword(event) {
         event.preventDefault();
-        setError('');
-        setNotice('');
+                showToast('');
         if (passwordForm.next.length < 6) {
-            setError('Mật khẩu đăng nhập cần ít nhất 6 ký tự.');
+            showToast('Mật khẩu đăng nhập cần ít nhất 6 ký tự.', 'error');
             return;
         }
         if (passwordForm.next !== passwordForm.confirm) {
-            setError('Mật khẩu xác nhận không khớp.');
+            showToast('Mật khẩu xác nhận không khớp.', 'error');
             return;
         }
         setChangingPassword(true);
@@ -294,10 +245,10 @@ export default function ClubSettings() {
         });
         if (!res.ok) {
             const data = await res.json();
-            setError(data.error || 'Không đổi được mật khẩu.');
+            showToast(data.error || 'Không đổi được mật khẩu.', 'error');
         } else {
             setPasswordForm({ next: '', confirm: '' });
-            setNotice('Đã đổi mật khẩu đăng nhập admin.');
+            showToast('Đã đổi mật khẩu đăng nhập admin.');
         }
         setChangingPassword(false);
     }
@@ -306,15 +257,14 @@ export default function ClubSettings() {
         return <div className="club-settings-loading">Đang tải cài đặt...</div>;
     }
     if (!group) {
-        return <div className="club-settings-error">{error || 'Không có dữ liệu.'}</div>;
+        return <div className="club-settings-error">Không tải được cài đặt CLB. Vui lòng tải lại trang.</div>;
     }
 
     return (
         <div className="club-settings">
+            <PhToast toast={toast} onClose={hideToast} />
             <ClubSettingsNav />
 
-            {error && <p className="club-settings-msg error">{error}</p>}
-            {notice && <p className="club-settings-msg ok">{notice}</p>}
 
             <div className="club-settings__grid">
                 <div className="club-settings__left">
@@ -324,7 +274,7 @@ export default function ClubSettings() {
                             <label>Tên CLB<input value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} required /></label>
                             <label>Mô tả<textarea rows="3" value={form.description} onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))} /></label>
                             <label>Huy hiệu &quot;Trắng tay&quot; trên BXH<select value={form.shameBadgesEnabled ? 'on' : 'off'} onChange={(e) => setForm((p) => ({ ...p, shameBadgesEnabled: e.target.value === 'on' }))}><option value="on">Bật — nêu tên người chưa đóng nhiều kỳ liền</option><option value="off">Tắt — không nêu tên ai</option></select><small>Giúp nhắc thành viên hoàn thành quỹ đúng kỳ hạn.</small></label>
-                            <div className="club-settings-logo"><span>Logo CLB</span><div className="club-settings-logo-row">{logoUrl ? <img className="club-settings-logo-preview" src={logoUrl} alt="Logo CLB" /> : <span className="club-settings-logo-empty">Chưa có logo</span>}<div className="club-settings-logo-actions"><label className="club-settings-logo-pick">Chọn ảnh<input type="file" accept="image/*" onChange={handleLogoFile} hidden /></label>{logoUrl && <button type="button" className="club-settings-logo-remove" onClick={() => { setLogoUrl(null); setNotice('Đã bỏ logo, bấm "Lưu thay đổi" để áp dụng.'); }}>Xóa logo</button>}</div></div></div>
+                            <div className="club-settings-logo"><span>Logo CLB</span><div className="club-settings-logo-row">{logoUrl ? <img className="club-settings-logo-preview" src={logoUrl} alt="Logo CLB" /> : <span className="club-settings-logo-empty">Chưa có logo</span>}<div className="club-settings-logo-actions"><label className="club-settings-logo-pick">Chọn ảnh<input type="file" accept="image/*" onChange={handleLogoFile} hidden /></label>{logoUrl && <button type="button" className="club-settings-logo-remove" onClick={() => { setLogoUrl(null); showToast('Đã bỏ logo, bấm "Lưu thay đổi" để áp dụng.'); }}>Xóa logo</button>}</div></div></div>
                             <div className="club-settings-card__action"><button type="submit" className="club-settings-save" disabled={saving}>{saving ? 'Đang lưu...' : 'Lưu thay đổi nhận diện'}</button></div>
                         </form>
                     </section>
@@ -336,7 +286,7 @@ export default function ClubSettings() {
             </div>
             <section className="set-group club-settings__security"><SettingsCardHeading title="Mật khẩu & phân quyền" description="Bảo mật tài khoản quản trị và mã vào cho thành viên" badge="Bảo mật CLB" /><div className="club-settings__password-grid"><form className="club-settings-account" id="set-pw-admin" onSubmit={handleChangePassword}><h3>1. Mật khẩu quản trị viên</h3><p>Đổi mật khẩu đăng nhập tài khoản quản trị của bạn.</p><label>Mật khẩu mới<input type="password" value={passwordForm.next} onChange={(e) => setPasswordForm((p) => ({ ...p, next: e.target.value }))} minLength="6" placeholder="••••••" /></label><label>Xác nhận mật khẩu<input type="password" value={passwordForm.confirm} onChange={(e) => setPasswordForm((p) => ({ ...p, confirm: e.target.value }))} minLength="6" placeholder="••••••" /></label><button type="submit" className="club-settings-save" disabled={changingPassword}>{changingPassword ? 'Đang đổi...' : 'Đổi mật khẩu quản trị'}</button></form><form className="club-settings-account" id="set-pw-member" onSubmit={handleChangeMemberPassword}><h3>2. Mật khẩu thành viên chung</h3><p>Mật khẩu dùng chung khi thành viên truy cập qua mã CLB.</p><label>Mật khẩu mới<input type="password" value={memberPasswordForm.next} onChange={(e) => setMemberPasswordForm((p) => ({ ...p, next: e.target.value }))} minLength="4" placeholder="••••" /></label><label>Xác nhận mật khẩu<input type="password" value={memberPasswordForm.confirm} onChange={(e) => setMemberPasswordForm((p) => ({ ...p, confirm: e.target.value }))} minLength="4" placeholder="••••" /></label><button type="submit" className="club-settings-save" disabled={changingMemberPassword}>{changingMemberPassword ? 'Đang đổi...' : 'Đổi mật khẩu thành viên'}</button></form></div></section>
             <div className="club-settings__automation">
-                <section className="set-group" id="set-sepay"><SettingsCardHeading title="Thu quỹ tự động qua SePay" description="Tự động nhận diện giao dịch chuyển khoản vào quỹ" badge={group.hasSepayWebhookSecret ? 'HMAC đang bật' : 'Tuỳ chọn'} /><p className="set-note">Kết nối SePay để mọi chuyển khoản vào tài khoản CLB được tự động ghi nhận. Nếu chưa cấu hình, trưởng nhóm vẫn có thể tạo giao dịch thủ công ở trang Quỹ.</p><ol className="club-settings-sepay-steps"><li>Tạo tài khoản tại <a href="https://my.sepay.vn" target="_blank" rel="noreferrer">SePay</a> và liên kết tài khoản ngân hàng của CLB.</li><li>Trong SePay, vào <strong>Webhooks → Thêm webhook</strong>, dán URL bên dưới. Chọn <strong>HMAC-SHA256</strong> nếu dùng Secret webhook riêng của CLB.</li><li>Chọn giao dịch và tài khoản là <em>Tất cả</em>, rồi gửi thử để kiểm tra.</li><li>Khai đúng số tài khoản ở mục Tài khoản ngân hàng bên cạnh.</li></ol><div className="club-settings-sepay-url"><code>{webhookUrl}</code><button type="button" onClick={copyWebhookUrl}>Sao chép</button></div><form className="club-settings-bank-form" onSubmit={handleSaveSepaySecret}><label>Secret webhook riêng của CLB (tuỳ chọn)<input value={sepayForm.sepayWebhookSecret} onChange={(e) => setSepayForm({ sepayWebhookSecret: e.target.value })} placeholder={group.hasSepayWebhookSecret ? 'Đã có secret, nhập secret mới nếu muốn đổi' : 'Nhập webhook secret...'} /></label><div><button type="submit" disabled={saving}>Lưu secret</button>{group.hasSepayWebhookSecret && <button type="button" onClick={handleClearSepaySecret} disabled={saving}>Tắt bảo mật</button>}</div></form><a className="club-settings-sepay-doc" href="https://developer.sepay.vn/vi/sepay-webhooks/bat-dau-nhanh" target="_blank" rel="noreferrer">Xem hướng dẫn chi tiết của SePay ↗</a></section>
+                <section className="set-group" id="set-sepay"><SettingsCardHeading title="Auto Quỹ — tiền vào tự động lên sổ" description="Ai chuyển tiền vào quỹ là PickHub ghi sổ và gán đúng tên" badge={group.hasSepayWebhookSecret ? 'Đã bật khoá bảo mật' : 'Chưa kết nối'} /><SepayConnect /></section>
                 <section className="set-group" id="set-bank"><SettingsCardHeading title="Tài khoản ngân hàng" description="Định tuyến biến động số dư cho thu quỹ tự động" /><p className="set-note set-note--warn">Đây không phải thông tin hiển thị thành viên quét. Webhook SePay tra đúng số tài khoản này để biết tiền vào thuộc CLB nào; nhập sai thì quỹ không cập nhật tự động.</p><div className="club-settings-bank"><span className="club-settings-bank-title">Tài khoản đang liên kết</span>{bankAccounts.length > 0 ? <ul className="club-settings-bank-list">{bankAccounts.map((a) => <li key={a.id}><span><strong className="bank-acc-number">{a.account_number}</strong>{a.bank_name && <small className="bank-acc-name">{a.bank_name}</small>}</span><button type="button" className="bank-acc-del" onClick={() => handleDeleteBank(a.id)}>Xóa</button></li>)}</ul> : <p className="club-settings-bank-empty">Chưa có tài khoản nào, thu quỹ tự động đang tắt.</p>}<form className="club-settings-bank-form" onSubmit={handleAddBank}><label>Thêm tài khoản thu quỹ mới<input value={bankForm.accountNumber} onChange={(e) => setBankForm((p) => ({ ...p, accountNumber: e.target.value }))} placeholder="Số tài khoản" /></label><button type="submit">Thêm tài khoản</button></form></div></section>
             </div>
         </div>

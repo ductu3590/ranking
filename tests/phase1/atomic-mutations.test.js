@@ -20,7 +20,17 @@ assert.match(migration, /FOR UPDATE/);
 assert.match(migration, /idempotency_key/);
 assert.match(migration, /RAISE EXCEPTION.*40001/s);
 assert.match(migration, /REVOKE ALL ON FUNCTION/);
-assert(games.includes("rpc('replace_tournament_games'"), 'games route delegate atomic RPC');
+// Route `games` nay goi `replace_tournament_games_with_transitions` (migration
+// 068): van la MOT RPC nguyen tu, nhung lam them viec dinh tuyen ket qua sang
+// tran vong sau trong cung transaction. Khang dinh can bao ve khong doi — "route
+// uy quyen cho mot RPC nguyen tu, khong tu ghi bang" — nen o day chap nhan ca hai
+// ten va SIET them: bat buoc co CAS `p_expected_version` va idempotency key.
+assert(
+  /rpc\('replace_tournament_games(_with_transitions)?'/.test(games),
+  'games route delegate atomic RPC',
+);
+assert(games.includes('p_expected_version'), 'games route gui CAS version');
+assert(games.includes('p_idempotency_key'), 'games route gui idempotency key');
 assert(generateLib.includes("'replace_tournament_schedule'"), 'sinh lịch delegate atomic RPC');
 assert(generateLib.includes('p_idempotency_key'), 'sinh lịch gửi idempotency key');
 assert(generate.includes('generateAndPersistSchedule'), 'generate route đi qua module dùng chung');

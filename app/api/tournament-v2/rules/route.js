@@ -11,6 +11,29 @@ const db = supabaseAdmin || supabaseServer;
 
 const LOCKED_STAGE_STATUSES = new Set(['active', 'completed']);
 
+// Guard 084 raise 'PH409' khi suất vòng sau đã seed từ hạng bảng (migration 078
+// đổi mọi xung đột nghiệp vụ sang PH409 vì '40001' bị tầng PostgREST tự retry
+// làm treo request). Vẫn nhận '40001' để tương thích ngược với hàm cũ.
+const CONFLICT_CODES = ['PH409', '40001'];
+
+function rulesMutationError(error) {
+    const code = error?.code;
+    if (!CONFLICT_CODES.includes(code)) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+    const raised = String(error?.message || '');
+    if (raised.includes('TIEBREAK_CHANGE_BLOCKED_QUALIFICATION_SEEDED')) {
+        return NextResponse.json({
+            error: 'Suất vòng sau đã được seed từ hạng bảng. Hãy gỡ seed play-off rồi mới đổi luật tie-break.',
+            code: 'TIEBREAK_CHANGE_BLOCKED_QUALIFICATION_SEEDED',
+        }, { status: 409 });
+    }
+    return NextResponse.json({
+        error: 'Cấu hình vừa thay đổi hoặc đang bị khoá. Hãy tải lại rồi thử lại.',
+        code: code || 'MUTATION_FAILED',
+    }, { status: 409 });
+}
+
 async function loadContext(tournamentId, groupId) {
     const [tournamentResult, divisionResult, stageResult] = await Promise.all([
         db.from('tournaments').select('id, name, default_scoring, tiebreak_policy').eq('id', tournamentId).eq('group_id', groupId).maybeSingle(),
@@ -101,14 +124,14 @@ export async function PATCH(request) {
             if (!Object.keys(patch).length) return NextResponse.json({ error: 'Không có thay đổi' }, { status: 400 });
             const { error } = await db.from('tournaments').update({ ...patch, updated_at: new Date().toISOString() })
                 .eq('id', tournamentId).eq('group_id', groupId);
-            if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+            if (error) return rulesMutationError(error);
         } else {
             if (scoringPreset) patch.scoring_override = scoringPreset === 'inherit' ? null : SCORING_PRESETS[scoringPreset];
             if (tiebreakPreset) patch.tiebreak_override = tiebreakPreset === 'inherit' ? null : TIEBREAK_PRESETS[tiebreakPreset];
             if (!Object.keys(patch).length) return NextResponse.json({ error: 'Không có thay đổi' }, { status: 400 });
             const { error } = await db.from('tournament_divisions').update({ ...patch, updated_at: new Date().toISOString() })
                 .eq('id', body.division_id).eq('group_id', groupId).eq('tournament_id', tournamentId);
-            if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+            if (error) return rulesMutationError(error);
         }
 
         const updated = await loadContext(tournamentId, groupId);

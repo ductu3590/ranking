@@ -11,7 +11,7 @@ assert(s.includes('getMatchEngine') && s.includes('resolveMatch'), 'gọi match 
 assert(s.includes('advanceWinner'), 'đẩy winner lên bracket cha');
 assert(s.includes('tournament_games') && s.includes('tournament_matches'), 'thao tác games + matches');
 assert(s.includes('winner_entrant_id'), 'set winner');
-assert(s.includes("rpc('replace_tournament_games'"), 'replace games qua database transaction RPC');
+assert(s.includes("rpc('replace_tournament_games_with_transitions'"), 'replace games qua database transaction RPC');
 
 const gamesSrc = read('app/api/tournament-v2/games/route.js');
 assert(!/p_status:\s*resolved\.complete\s*\?\s*'done'/.test(gamesSrc),

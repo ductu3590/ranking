@@ -7,12 +7,13 @@ const assert = (c, m) => { if (!c) { console.error(`FAIL: ${m}`); process.exit(1
 const f = 'app/api/tournament-v2/draw/route.js';
 assert(exists(f), 'route draw tồn tại');
 const s = read(f);
+const unlockMigration = read('database/migrations/056_atomic_draw_unlock.sql');
 
 assert(/buildDrawSlots/.test(s), 'bốc thăm dùng module thuần');
 assert(/validateDraw/.test(s), 'kiểm trước khi chốt');
 assert(/swapDrawSlots/.test(s), 'đổi chỗ dùng module thuần');
 assert(/DRAW_ALREADY_LOCKED/.test(s), 'chốt hai lần bị chặn');
-assert(/DRAW_HAS_PLAYED_MATCHES/.test(s), 'huỷ chốt khi đã có trận đấu bị chặn');
+assert(/DRAW_HAS_PLAYED_MATCHES/.test(unlockMigration), 'RPC huỷ chốt chặn khi đã có trận đấu');
 assert(/DRAW_NOT_DRAFT/.test(s), 'sửa tay khi đã chốt bị chặn');
 assert(/REASON_REQUIRED/.test(s), 'huỷ chốt bắt lý do');
 assert(/writeOperationLog/.test(s), 'ghi nhật ký');
@@ -28,8 +29,9 @@ assert(!/getScheduleEngine/.test(s), 'không tự gọi engine — đi qua modul
 assert(/tournament_club_id/.test(s), 'dùng đúng tên cột CLB');
 assert(!/select\('id, seed, club_id'\)/.test(s), 'không dùng tên cột club_id không tồn tại');
 
-// Huỷ chốt xoá trận của ĐÚNG giai đoạn, có scope group.
-assert(/from\('tournament_matches'\)[\s\S]{0,120}\.delete\(\)/.test(s), 'huỷ chốt xoá trận');
+// Huỷ chốt phải đi qua RPC transaction, không được xoá fixture từ route.
+assert(/rpc\('unlock_tournament_draw'/.test(s), 'huỷ chốt qua RPC nguyên tử');
+assert(!/from\('tournament_matches'\)[\s\S]{0,120}\.delete\(\)/.test(s), 'route không tự xoá fixture');
 
 const shared = 'lib/tournament/generateSchedule.js';
 assert(exists(shared), 'module sinh lịch dùng chung tồn tại');

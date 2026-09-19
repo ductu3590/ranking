@@ -6,6 +6,7 @@ import { validateTournamentAthlete } from '@/lib/tournament/interclub';
 import { buildGuestAthletePayload, buildClubMemberAthletePayload } from '@/lib/tournament/wizardModel';
 import { requireTournamentAccess } from '@/lib/tournament/accessRuntime';
 import { getClubReadScope } from '@/lib/clubReadContext';
+import { normalizeOptionalClientRef } from '@/lib/tournament/setupParticipants';
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -79,6 +80,29 @@ export async function POST(request) {
         const access = await requireTournamentAccess({ tournamentId: body.tournament_id, need: 'write' });
         if (!access.ok) return access.response;
 
+        // client_ref la tuy chon. Co client_ref thi lan tao lai voi cung token phai
+        // tra ve chinh hang da tao, khong duoc 409 va khong duoc tao ban trung.
+        let clientRef = null;
+        try {
+            clientRef = normalizeOptionalClientRef(body.client_ref ?? body.clientRef);
+        } catch (error) {
+            return NextResponse.json({ error: error.message, code: 'SETUP_PAYLOAD_INVALID' }, { status: 400 });
+        }
+        if (clientRef) {
+            const { data: replayed, error: replayError } = await db
+                .from('tournament_athletes')
+                .select(SELECT_FIELDS)
+                .eq('group_id', access.groupId)
+                .eq('tournament_id', body.tournament_id)
+                .eq('client_ref', clientRef)
+                .maybeSingle();
+            if (replayError) {
+                console.error('Tournament athletes client_ref lookup error:', replayError);
+                return NextResponse.json({ error: replayError.message }, { status: 500 });
+            }
+            if (replayed) return NextResponse.json({ success: true, athlete: replayed, reused: true });
+        }
+
         let payload;
         try {
             payload = body.athlete_id != null
@@ -102,13 +126,37 @@ export async function POST(request) {
             return NextResponse.json({ error: 'CLB tham dự không thuộc giải này' }, { status: 404 });
         }
 
+        const insertPayload = { ...payload, group_id: access.groupId };
+        if (clientRef) insertPayload.client_ref = clientRef;
         const { data, error } = await db
             .from('tournament_athletes')
-            .insert({ ...payload, group_id: access.groupId })
+            .insert(insertPayload)
             .select(SELECT_FIELDS)
             .single();
         if (error) {
             const duplicate = error.code === '23505';
+            // Hai request song song cung client_ref: doc lai hang da thang cuoc.
+            if (duplicate && clientRef) {
+                const { data: existing } = await db
+                    .from('tournament_athletes')
+                    .select(SELECT_FIELDS)
+                    .eq('group_id', access.groupId)
+                    .eq('tournament_id', body.tournament_id)
+                    .eq('client_ref', clientRef)
+                    .maybeSingle();
+                if (existing) return NextResponse.json({ success: true, athlete: existing, reused: true });
+                if (payload.athlete_id != null) {
+                    const { data: linked } = await db
+                        .from('tournament_athletes')
+                        .select(SELECT_FIELDS)
+                        .eq('group_id', access.groupId)
+                        .eq('tournament_id', body.tournament_id)
+                        .eq('athlete_id', payload.athlete_id)
+                        .maybeSingle();
+                    if (linked) return NextResponse.json({ success: true, athlete: linked, reused: true });
+                }
+            }
+            if (!duplicate) console.error('Tournament athletes insert error:', error);
             return NextResponse.json(
                 { error: duplicate ? 'VĐV đã có trong giải' : error.message },
                 { status: duplicate ? 409 : 500 },

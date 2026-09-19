@@ -117,15 +117,24 @@ export async function GET(request) {
             stage.id,
             await computeStageStandings(db, stage),
         ]));
+        const standingsByStage = Object.fromEntries(standingsEntries);
+        // buildPublicSnapshot chiếu nhãn tie-break ra từ `stage.config.tiebreak`.
+        // Giai đoạn chưa có snapshot thì chính sách hiệu lực nằm ở giải/nội dung,
+        // nên phải gắn chính sách VỪA DÙNG ĐỂ XẾP HẠNG vào đây — nếu không, trang
+        // công khai sẽ hiện một thứ tự tiêu chí khác với số liệu bên cạnh.
+        const stagesWithPolicy = stages.map((stage) => {
+            const tiebreak = standingsByStage[stage.id]?.tiebreak;
+            return tiebreak ? { ...stage, config: { ...(stage.config || {}), tiebreak } } : stage;
+        });
 
         return NextResponse.json(buildPublicSnapshot({
             tournament,
             divisions,
-            stages,
+            stages: stagesWithPolicy,
             entrants,
             matches,
             games,
-            standingsByStage: Object.fromEntries(standingsEntries),
+            standingsByStage,
         }));
     } catch (err) {
         console.error('Public v2 GET error:', err);

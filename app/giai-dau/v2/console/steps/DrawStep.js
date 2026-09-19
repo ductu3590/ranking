@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { getDraw, rollDraw, swapDrawEntries, lockDraw, unlockDraw } from '@/lib/tournamentV2Client';
+import { getDraw, getSetupReadiness, rollDraw, swapDrawEntries, lockDraw, unlockDraw } from '@/lib/tournamentV2Client';
 
 function nameOf(entrants, entryId) {
     const found = entrants.find((e) => String(e.id) === String(entryId));
@@ -9,31 +9,44 @@ function nameOf(entrants, entryId) {
     return found.name || found.name_snapshot || `Đội #${entryId}`;
 }
 
-export default function DrawStep({ stageId, isAdmin, reload }) {
+export default function DrawStep({ tournamentId, stageId, stage, isAdmin, reload }) {
     const [data, setData] = useState(null);
+    const [readiness, setReadiness] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [notice, setNotice] = useState('');
     const [busy, setBusy] = useState(false);
     const [picked, setPicked] = useState([]);
+    const [dialog, setDialog] = useState(null);
+    const [unlockReason, setUnlockReason] = useState('');
 
     const load = useCallback(async () => {
-        if (!stageId) { setData(null); setLoading(false); return; }
+        if (!stageId) { setData(null); setReadiness(null); setLoading(false); return; }
         setLoading(true); setError('');
         try {
             setData(await getDraw(stageId));
+            const divisionId = stage?.division_id;
+            if (isAdmin && Number(tournamentId) > 0 && Number(divisionId) > 0) {
+                getSetupReadiness(tournamentId, divisionId)
+                    .then((result) => setReadiness(result?.readiness || null))
+                    .catch(() => setReadiness(null));
+            } else {
+                setReadiness(null);
+            }
         } catch (err) {
             setError(err.message || 'Không tải được bốc thăm.');
         } finally {
             setLoading(false);
         }
-    }, [stageId]);
+    }, [stageId, stage?.division_id, isAdmin, tournamentId]);
 
     useEffect(() => { load(); }, [load]);
 
     const draw = data?.draw || { status: 'none', slots: [] };
     const entrants = data?.entrants || [];
     const locked = draw.status === 'locked';
+    const readinessReasons = readiness?.reasons || [];
+    const setupBlocked = Boolean(stage?.division_id) && readiness?.status !== 'ready';
 
     // Gom theo bảng để vẽ; knockout không có bảng nên gom thành một cụm.
     const groups = useMemo(() => {
@@ -75,22 +88,7 @@ export default function DrawStep({ stageId, isAdmin, reload }) {
         });
     }
 
-    function confirmLock() {
-        const warnings = data?.warnings || [];
-        const head = 'Chốt bốc thăm sẽ sinh lịch thi đấu. Sau khi chốt phải huỷ chốt mới sửa được.';
-        const body = warnings.length
-            ? `\n\nCảnh báo:\n- ${warnings.map((w) => w.message).join('\n- ')}\n\nChốt luôn?`
-            : '\n\nTiếp tục?';
-        // window.confirm là bản tạm; thay bằng modal khi app/styles/primitives.css có sẵn.
-        if (!window.confirm(head + body)) return;
-        run(() => lockDraw({ stage_id: stageId }), 'Đã chốt bốc thăm và sinh lịch.');
-    }
-
-    function confirmUnlock() {
-        const reason = window.prompt('Huỷ chốt sẽ xoá toàn bộ lịch đã sinh. Lý do?');
-        if (!reason || !reason.trim()) return;
-        run(() => unlockDraw({ stage_id: stageId, reason }), 'Đã huỷ chốt, lịch đã xoá.');
-    }
+    function closeDialog() { setDialog(null); setUnlockReason(''); }
 
     if (loading) return <p className="ops-muted">Đang tải bốc thăm…</p>;
     if (error && !data) {
@@ -110,12 +108,19 @@ export default function DrawStep({ stageId, isAdmin, reload }) {
                     <b> Chốt &amp; sinh lịch</b> thì lịch thi đấu mới được tạo.
                 </p>
 
+                {readiness ? (
+                    <div className={`ops-readiness ${readiness.status === 'ready' ? 'is-ready' : 'is-blocked'}`}>
+                        <div><b>Kiểm tra chuẩn bị từ máy chủ</b><span>Phiên bản thiết lập {readiness.revision}</span></div>
+                        {readiness.status === 'ready' ? <p>Đội hình và suất thi đấu đã sẵn sàng.</p> : <><p>Cần xử lý trước khi hoàn tất thiết lập:</p><ul>{readinessReasons.map((reason, index) => <li key={`${reason.code || 'reason'}-${reason.entity_id || index}`}>{reason.message || reason.code || 'Thiết lập chưa hợp lệ.'}</li>)}</ul></>}
+                    </div>
+                ) : null}
+
                 {isAdmin ? (
                     <div className="ops-draw-actions">
                         <button
                             type="button"
                             className="ops-control-button"
-                            disabled={busy || locked}
+                            disabled={busy || locked || setupBlocked}
                             onClick={() => run(() => rollDraw({ stage_id: stageId }), 'Đã bốc thăm.')}
                         >
                             {draw.status === 'none' ? 'Bốc thăm' : 'Bốc lại'}
@@ -123,7 +128,7 @@ export default function DrawStep({ stageId, isAdmin, reload }) {
                         <button
                             type="button"
                             className="ops-control-button"
-                            disabled={busy || locked || picked.length !== 2}
+                            disabled={busy || locked || setupBlocked || picked.length !== 2}
                             onClick={() => run(
                                 () => swapDrawEntries({ stage_id: stageId, entry_a: picked[0], entry_b: picked[1] }),
                                 'Đã đổi chỗ hai đội.',
@@ -132,15 +137,15 @@ export default function DrawStep({ stageId, isAdmin, reload }) {
                             Đổi chỗ {picked.length === 2 ? '' : `(chọn 2 đội — đang chọn ${picked.length})`}
                         </button>
                         {locked ? (
-                            <button type="button" className="ops-control-button" disabled={busy} onClick={confirmUnlock}>
+                            <button type="button" className="ops-control-button" disabled={busy} onClick={() => setDialog('unlock')}>
                                 Huỷ chốt
                             </button>
                         ) : (
                             <button
                                 type="button"
                                 className="ops-control-button is-primary"
-                                disabled={busy || draw.status !== 'draft'}
-                                onClick={confirmLock}
+                                disabled={busy || setupBlocked || draw.status !== 'draft'}
+                                onClick={() => setDialog('lock')}
                             >
                                 Chốt &amp; sinh lịch
                             </button>
@@ -198,6 +203,7 @@ export default function DrawStep({ stageId, isAdmin, reload }) {
                     ))}
                 </div>
             )}
+            {dialog ? <div className="ops-dialog-backdrop" role="presentation"><section className="ops-dialog" role="dialog" aria-modal="true" aria-labelledby="draw-dialog-title"><h3 id="draw-dialog-title">{dialog === 'lock' ? 'Chốt bốc thăm?' : 'Huỷ chốt lịch?'}</h3>{dialog === 'lock' ? <><p>Chốt bốc thăm sẽ sinh lịch thi đấu. Muốn sửa sau đó cần huỷ chốt.</p>{(data.warnings || []).length ? <ul>{data.warnings.map((warning) => <li key={warning.code}>{warning.message}</li>)}</ul> : null}</> : <><p>Huỷ chốt sẽ xoá toàn bộ lịch đã sinh. Nhập lý do để tiếp tục.</p><input autoFocus value={unlockReason} onChange={(event) => setUnlockReason(event.target.value)} placeholder="Lý do huỷ chốt" /></>}<div className="ops-draw-actions"><button type="button" className="ops-control-button" onClick={closeDialog}>Quay lại</button><button type="button" className="ops-control-button is-primary" disabled={busy || (dialog === 'unlock' && !unlockReason.trim())} onClick={() => { const kind = dialog; const reason = unlockReason.trim(); closeDialog(); run(() => kind === 'lock' ? lockDraw({ stage_id: stageId }) : unlockDraw({ stage_id: stageId, reason }), kind === 'lock' ? 'Đã chốt bốc thăm và sinh lịch.' : 'Đã huỷ chốt, lịch đã xoá.'); }}>{dialog === 'lock' ? 'Chốt lịch' : 'Huỷ chốt'}</button></div></section></div> : null}
         </div>
     );
 }

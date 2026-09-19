@@ -11,7 +11,7 @@ assert(migration.includes('CREATE OR REPLACE FUNCTION public.create_tournament_e
 assert(migration.includes('CREATE OR REPLACE FUNCTION public.create_tournament_pairs_atomic'), 'pair RPC exists');
 assert(migration.includes('pg_advisory_xact_lock'), 'RPC idempotency is serialized');
 assert(entries.includes("db.rpc('create_tournament_entry_atomic'"), 'entries route uses atomic RPC');
-assert(pairs.includes("db.rpc('create_tournament_pairs_atomic'"), 'pairings route uses atomic RPC');
+assert(pairs.includes("db.rpc('confirm_tournament_pairs_revisioned'"), 'pairings route uses revision-aware atomic RPC');
 assert(registrations.includes("body.action === 'confirm_club'"), 'registration has independent club confirmation action');
 assert(registrations.includes("db.rpc('confirm_tournament_registration_club'"), 'confirmation uses versioned RPC');
 assert(!registrations.includes("patch.club_confirmation_status = 'confirmed'"), 'BTC approval does not auto-confirm club');

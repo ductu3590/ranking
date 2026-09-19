@@ -1,4 +1,6 @@
 // Bước 3: Đăng ký — rẽ theo phạm vi.
+// players/pairs là ĐỐI TƯỢNG người chơi { client_ref, display_name, athlete_id, source }
+// do wizard cấp; client_ref sinh một lần lúc thêm tên và giữ nguyên tới lúc lưu.
 //  - Nội bộ: nhập tay + thêm nhanh từ roster CLB THẬT; ghép cặp/chia đội.
 //  - Giao hữu: mời CLB PickHub THẬT (chọn từ danh sách) hoặc CLB ngoài (nhập tên).
 //  - Cộng đồng: thiết lập link mở (mặt công khai thuộc spec tournament-open-registration).
@@ -35,7 +37,12 @@ export default function StepRegister(props) {
     }[scope];
 
     // Thành viên CLB (đang hoạt động) chưa được thêm vào danh sách chơi.
-    const rosterToAdd = (roster || []).filter((member) => member.is_active && !players.includes(member.full_name));
+    // So khớp theo athlete_id thật khi có; chỉ khi không có mới so theo tên hiển thị.
+    const pickedAthleteIds = new Set(players.filter((p) => p.athlete_id != null).map((p) => Number(p.athlete_id)));
+    const pickedNames = new Set(players.map((p) => p.display_name));
+    const rosterToAdd = (roster || []).filter((member) => member.is_active && (
+        member.athlete_id != null ? !pickedAthleteIds.has(Number(member.athlete_id)) : !pickedNames.has(member.full_name)
+    ));
     // CLB PickHub chưa được mời (loại các CLB đã có club_id trong danh sách mời).
     const invitedClubIds = new Set(inviteClubs.filter((c) => c.club_id != null).map((c) => String(c.club_id)));
     const pickhubToAdd = (pickhubClubs || []).filter((club) => !invitedClubIds.has(String(club.id)));
@@ -56,10 +63,10 @@ export default function StepRegister(props) {
                 <div>
                     <p className="w3-cflbl" style={{ textTransform: 'none' }}>Người chơi <span className="w3-count">· {players.length}</span></p>
                     <div className="w3-chips">
-                        {players.map((name, index) => (
-                            <span key={`${name}-${index}`} className="w3-chip">
-                                {name}
-                                <button type="button" aria-label={`Bỏ ${name}`} onClick={() => removePlayer(index)}>×</button>
+                        {players.map((person, index) => (
+                            <span key={person.client_ref} className="w3-chip">
+                                {person.display_name}
+                                <button type="button" aria-label={`Bỏ ${person.display_name}`} onClick={() => removePlayer(index)}>×</button>
                             </span>
                         ))}
                     </div>
@@ -82,7 +89,7 @@ export default function StepRegister(props) {
                             <>
                                 <span>Thêm nhanh từ thành viên CLB:</span>{' '}
                                 {rosterToAdd.map((member) => (
-                                    <button key={member.member_id} type="button" className="w3-pill" onClick={() => addRosterMember(member.full_name)}>
+                                    <button key={member.member_id} type="button" className="w3-pill" onClick={() => addRosterMember(member)}>
                                         + {member.full_name}
                                     </button>
                                 ))}
@@ -104,12 +111,12 @@ export default function StepRegister(props) {
                                     return (
                                         <div key={pi} className={`w3-pair ${miss ? 'is-warn' : ''}`}>
                                             <span className="w3-pn">Cặp {pi + 1}</span>
-                                            <button type="button" className={`w3-mem ${sel && sel.p === pi && sel.k === 0 ? 'is-sel' : ''}`} onClick={() => tapMember(pi, 0)}>{pr[0]}</button>
+                                            <button type="button" className={`w3-mem ${sel && sel.p === pi && sel.k === 0 ? 'is-sel' : ''}`} onClick={() => tapMember(pi, 0)}>{pr[0]?.display_name}</button>
                                             <span className="w3-plus">+</span>
                                             {miss ? (
                                                 <span className="w3-mem is-empty">chọn người…</span>
                                             ) : (
-                                                <button type="button" className={`w3-mem ${sel && sel.p === pi && sel.k === 1 ? 'is-sel' : ''}`} onClick={() => tapMember(pi, 1)}>{pr[1]}</button>
+                                                <button type="button" className={`w3-mem ${sel && sel.p === pi && sel.k === 1 ? 'is-sel' : ''}`} onClick={() => tapMember(pi, 1)}>{pr[1]?.display_name}</button>
                                             )}
                                             {miss ? <span className="w3-tag w3-tag-warn">thiếu 1</span> : <span className="w3-tag">PHR: chưa gắn</span>}
                                         </div>
@@ -139,7 +146,7 @@ export default function StepRegister(props) {
                         {teams.map((members, i) => (
                             <div key={i} className="w3-team">
                                 <h4>Đội {i + 1} · {members.length}</h4>
-                                {members.map((name, j) => <div key={j} className="w3-m">{name}</div>)}
+                                {members.map((person) => <div key={person.client_ref} className="w3-m">{person.display_name}</div>)}
                             </div>
                         ))}
                     </div>

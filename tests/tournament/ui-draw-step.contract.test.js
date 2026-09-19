@@ -22,8 +22,20 @@ assert(!/draggable|onDragStart|onDrop/.test(s), 'không dùng kéo thả');
 
 assert(/picked/.test(s) && /prev\.length >= 2/.test(s), 'chỉ chọn tối đa hai đội');
 assert(/Cảnh báo/.test(s), 'hiện cảnh báo không chặn');
-assert(/Chốt luôn/.test(s), 'hộp xác nhận có nút Chốt luôn khi có cảnh báo');
-assert(/window\.prompt/.test(s), 'huỷ chốt bắt nhập lý do');
+// Trước đây bước chốt dùng window.confirm với chuỗi "Chốt luôn?". Nay là hộp thoại
+// modal có aria-modal, liệt kê cảnh báo và vẫn cho BTC chốt — khẳng định theo hợp
+// đồng hiện tại, không hạ yêu cầu: cảnh báo KHÔNG được chặn nút chốt.
+assert(/role="dialog"/.test(s) && /aria-modal="true"/.test(s), 'bước chốt dùng hộp thoại xác nhận có aria-modal');
+assert(/Chốt bốc thăm\?/.test(s), 'hộp thoại hỏi xác nhận trước khi sinh lịch');
+assert(/data\.warnings\.map\(\(warning\) => <li key=\{warning\.code\}>/.test(s), 'hộp thoại liệt kê cảnh báo');
+assert(/dialog === 'lock' \? 'Chốt lịch' : 'Huỷ chốt'/.test(s), 'hộp thoại có nút chốt lịch');
+// Nút chốt chỉ bị vô hiệu khi đang bận hoặc thiếu lý do huỷ chốt — KHÔNG vì có cảnh báo.
+assert(/disabled=\{busy \|\| \(dialog === 'unlock' && !unlockReason\.trim\(\)\)\}/.test(s),
+  'cảnh báo không chặn nút chốt (chỉ busy hoặc thiếu lý do huỷ chốt mới chặn)');
+// Huỷ chốt vẫn BẮT BUỘC có lý do, nhưng nay nhập trong hộp thoại (ô input +
+// nút bị vô hiệu khi bỏ trống) thay vì window.prompt, và lý do được gửi lên server.
+assert(/placeholder="Lý do huỷ chốt"/.test(s), 'huỷ chốt có ô nhập lý do');
+assert(/unlockDraw\(\{ stage_id: stageId, reason \}\)/.test(s), 'lý do huỷ chốt được gửi lên server');
 assert(!/#[0-9a-fA-F]{6}/.test(s), 'không hardcode màu, style qua CSS variable');
 
 const css = read('app/giai-dau/v2/console/shell.css');

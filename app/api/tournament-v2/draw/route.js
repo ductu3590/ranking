@@ -5,6 +5,14 @@ import { requireTournamentAccess } from '@/lib/tournament/accessRuntime';
 import { writeOperationLog } from '@/lib/tournament/operationLog';
 import { buildDrawSlots, swapDrawSlots, validateDraw } from '@/lib/tournament/draw';
 import { generateAndPersistSchedule } from '@/lib/tournament/generateSchedule';
+import { snapshotStageRules } from '@/lib/tournament/stageRulesSnapshot';
+import { saveDrawSnapshot } from '@/lib/tournament/saveDraw';
+import { randomUUID } from 'crypto';
+import { actorName } from '@/lib/tournament/actorName';
+
+// Xung dot nghiep vu nay ERRCODE 'PH409' (migration 078). Truoc day dung 40001,
+// nhung 40001 la serialization_failure nen tang tren tu dong retry va request treo.
+const CONFLICT_CODES = ['PH409', '40001'];
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -39,7 +47,8 @@ async function loadEntrants(stage, groupId) {
             .from('tournament_entries')
             .select('id, seed, tournament_club_id, name_snapshot')
             .eq('group_id', groupId)
-            .eq('division_id', stage.division_id);
+            .eq('division_id', stage.division_id)
+            .eq('status', 'approved');
         if (error) throw error;
         // UI bốc thăm đọc `name`; thiếu nó thì màn hình chỉ hiện "Đội #id".
         return (entries || []).map((r) => ({
@@ -94,17 +103,37 @@ function drawOf(stage) {
     return (stage.config || {}).draw || null;
 }
 
-async function saveDraw(stage, groupId, nextDraw) {
-    const nextConfig = { ...(stage.config || {}), draw: nextDraw };
-    const { data, error } = await db
-        .from('tournament_stages')
-        .update({ config: nextConfig })
-        .eq('id', stage.id)
+async function drawValidationOptions(stage, groupId) {
+    const { data, error } = await db.from('tournaments')
+        .select('settings')
         .eq('group_id', groupId)
-        .select('id, config')
+        .eq('id', stage.tournament_id)
         .maybeSingle();
     if (error) throw error;
+    return { stage, organizerMode: data?.settings?.organizer_mode };
+}
+
+async function loadSetupReadiness(stage, groupId) {
+    if (!stage.division_id) return null;
+    const { data, error } = await db.rpc('get_tournament_division_readiness', {
+        p_group_id: Number(groupId),
+        p_tournament_id: Number(stage.tournament_id),
+        p_division_id: Number(stage.division_id),
+    });
+    if (error) throw error;
     return data;
+}
+
+function setupBlockedResponse(readiness) {
+    return NextResponse.json({
+        error: 'Thiết lập nội dung chưa sẵn sàng để bốc thăm.',
+        code: 'SETUP_NOT_READY',
+        readiness,
+    }, { status: 409 });
+}
+
+async function saveDraw(stage, groupId, nextDraw) {
+    return saveDrawSnapshot(db, stage, groupId, nextDraw);
 }
 
 async function log(access, stage, action, before, after, reason) {
@@ -112,7 +141,7 @@ async function log(access, stage, action, before, after, reason) {
         groupId: access.groupId,
         tournamentId: stage.tournament_id,
         divisionId: stage.division_id,
-        actor: access.actor || 'admin',
+        actor: actorName(access),
         action,
         targetType: 'stage',
         targetId: stage.id,
@@ -139,8 +168,9 @@ export async function GET(request) {
 
         const entrants = await loadEntrants(stage, access.groupId);
         const draw = drawOf(stage);
+        const validationOptions = await drawValidationOptions(stage, access.groupId);
         const warnings = draw && Array.isArray(draw.slots)
-            ? validateDraw(draw.slots, entrants).warnings
+            ? validateDraw(draw.slots, entrants, validationOptions).warnings
             : [];
 
         return NextResponse.json({
@@ -180,6 +210,7 @@ export async function POST(request) {
 
         const entrants = await loadEntrants(stage, access.groupId);
         const current = drawOf(stage);
+        const validationOptions = await drawValidationOptions(stage, access.groupId);
         const status = current ? current.status : 'none';
 
         // ---- Bốc / bốc lại ----
@@ -196,20 +227,30 @@ export async function POST(request) {
                     code: 'DRAW_TOO_FEW_ENTRIES',
                 }, { status: 400 });
             }
+            const readiness = await loadSetupReadiness(stage, access.groupId);
+            if (readiness?.status !== 'ready') return setupBlockedResponse(readiness);
             const seed = Number(body?.seed) || Math.floor(Math.random() * 1000000) + 1;
+            let slots;
+            try {
+                slots = buildDrawSlots(stage, entrants, seed);
+            } catch (err) {
+                return NextResponse.json({ error: 'Cấu hình số bảng không hợp lệ. Hãy kiểm tra lại trước khi bốc thăm.', code: err.message }, { status: 400 });
+            }
             const nextDraw = {
                 status: 'draft',
                 seed,
-                slots: buildDrawSlots(stage, entrants, seed),
+                slots,
                 drawn_at: new Date().toISOString(),
                 locked_at: null,
             };
+            const verdict = validateDraw(nextDraw.slots, entrants, validationOptions);
+            if (!verdict.ok) return NextResponse.json({ error: verdict.message, code: verdict.code }, { status: 400 });
             await saveDraw(stage, access.groupId, nextDraw);
             await log(access, stage, 'draw_rolled', { seed: current?.seed ?? null }, { seed });
             return NextResponse.json({
                 success: true,
                 draw: nextDraw,
-                warnings: validateDraw(nextDraw.slots, entrants).warnings,
+                warnings: verdict.warnings,
             });
         }
 
@@ -223,6 +264,8 @@ export async function POST(request) {
                     code: 'DRAW_NOT_DRAFT',
                 }, { status: 409 });
             }
+            const readiness = await loadSetupReadiness(stage, access.groupId);
+            if (readiness?.status !== 'ready') return setupBlockedResponse(readiness);
             let slots;
             try {
                 slots = swapDrawSlots(current.slots, body?.entry_a, body?.entry_b);
@@ -230,18 +273,23 @@ export async function POST(request) {
                 return NextResponse.json({ error: err.message, code: 'DRAW_SWAP_INVALID' }, { status: 400 });
             }
             const nextDraw = { ...current, slots };
+            const verdict = validateDraw(slots, entrants, validationOptions);
+            if (!verdict.ok) return NextResponse.json({ error: verdict.message, code: verdict.code }, { status: 400 });
             await saveDraw(stage, access.groupId, nextDraw);
             await log(access, stage, 'draw_swapped', null, { entry_a: body?.entry_a, entry_b: body?.entry_b });
             return NextResponse.json({
                 success: true,
                 draw: nextDraw,
-                warnings: validateDraw(slots, entrants).warnings,
+                warnings: verdict.warnings,
             });
         }
 
         // ---- Chốt: nơi DUY NHẤT tạo trận ----
         if (action === 'lock') {
             if (status === 'locked') {
+                if (body?.idempotency_key && current.finalize_key === body.idempotency_key && current.finalize_result) {
+                    return NextResponse.json(current.finalize_result);
+                }
                 return NextResponse.json({
                     error: 'Bốc thăm đã chốt rồi.',
                     code: 'DRAW_ALREADY_LOCKED',
@@ -253,37 +301,30 @@ export async function POST(request) {
                     code: 'DRAW_NOT_DRAFT',
                 }, { status: 409 });
             }
-            const verdict = validateDraw(current.slots, entrants);
+            const readiness = await loadSetupReadiness(stage, access.groupId);
+            if (readiness?.status !== 'ready') return setupBlockedResponse(readiness);
+            const verdict = validateDraw(current.slots, entrants, validationOptions);
             if (!verdict.ok) {
                 return NextResponse.json({ error: verdict.message, code: verdict.code }, { status: 400 });
             }
-
-            // Ghi vị trí bốc thăm xuống stage_entrants để engine sinh lịch theo
-            // đúng bảng/nhánh BTC đã chốt.
-            const entryBased = Boolean(stage.division_id);
-            const { error: clearErr } = await db
-                .from('tournament_stage_entrants')
-                .delete()
-                .eq('group_id', access.groupId)
-                .eq('stage_id', stage.id);
-            if (clearErr) return NextResponse.json({ error: clearErr.message }, { status: 500 });
-
-            // division_id là NOT NULL từ migration 033 nên phải ghi kèm, không chỉ entry_id.
-            const rows = current.slots.map((slot) => ({
-                group_id: access.groupId,
-                stage_id: stage.id,
-                division_id: stage.division_id,
-                ...(entryBased ? { entry_id: slot.entry_id } : { entrant_id: slot.entry_id }),
-                group_label: slot.group_label,
-                seed_in_stage: slot.seed_in_stage,
-            }));
-            const { error: insertErr } = await db.from('tournament_stage_entrants').insert(rows);
-            if (insertErr) return NextResponse.json({ error: insertErr.message }, { status: 500 });
 
             const ordered = current.slots.map((slot) => {
                 const found = entrants.find((e) => String(e.id) === String(slot.entry_id)) || {};
                 return { id: slot.entry_id, seed: slot.seed_in_stage, group_label: slot.group_label, club_id: found.club_id ?? null };
             });
+
+            // Chốt lịch = chốt luôn luật điểm và tie-break đang hiệu lực vào
+            // giai đoạn. Nếu không, BTC đổi cấu hình giữa giải sẽ làm bảng xếp
+            // hạng đổi theo trong khi suất vòng sau đã cố định — đúng điều guard
+            // E5 cấm. `p_expected_config` bên dưới dùng chính config vừa chốt.
+            const rulesSnapshot = await snapshotStageRules(db, stage, access.groupId);
+            if (!rulesSnapshot.ok) {
+                return NextResponse.json(
+                    { error: rulesSnapshot.error, code: rulesSnapshot.code },
+                    { status: rulesSnapshot.code === 'STAGE_CONFIG_CHANGED' ? 409 : 500 },
+                );
+            }
+            stage.config = rulesSnapshot.stage.config;
 
             const result = await generateAndPersistSchedule(db, {
                 stage,
@@ -291,14 +332,13 @@ export async function POST(request) {
                 groupId: access.groupId,
                 seed: current.seed,
                 idempotencyKey: body?.idempotency_key,
+                finalizeDraw: true,
             });
             if (!result.ok) {
-                return NextResponse.json({ error: result.error, code: result.code }, { status: 400 });
+                return NextResponse.json({ error: result.error, code: result.code }, { status: CONFLICT_CODES.includes(result.code) ? 409 : 400 });
             }
 
-            const nextDraw = { ...current, status: 'locked', locked_at: new Date().toISOString() };
-            const fresh = await loadStage(stageId, access.groupId);
-            await saveDraw(fresh || stage, access.groupId, nextDraw);
+            const nextDraw = result.data.draw;
             await log(access, stage, 'draw_locked', { status: 'draft' }, { status: 'locked', matchCount: result.data.matchCount });
 
             return NextResponse.json({ success: true, draw: nextDraw, ...result.data });
@@ -307,42 +347,40 @@ export async function POST(request) {
         // ---- Huỷ chốt ----
         if (action === 'unlock') {
             const reason = String(body?.reason || '').trim();
-            if (status !== 'locked') {
-                return NextResponse.json({
-                    error: 'Bốc thăm chưa chốt nên không có gì để huỷ.',
-                    code: 'DRAW_NOT_LOCKED',
-                }, { status: 409 });
-            }
             if (!reason) {
                 return NextResponse.json({
                     error: 'Huỷ chốt sẽ xoá toàn bộ lịch đã sinh. Phải nói rõ lý do.',
                     code: 'REASON_REQUIRED',
                 }, { status: 400 });
             }
-            const played = await countPlayedMatches(stage.id, access.groupId);
-            if (played > 0) {
-                return NextResponse.json({
-                    error: `Giai đoạn đã có ${played} trận bắt đầu hoặc đã xong. Không huỷ chốt được — sửa kết quả phải qua nhật ký chỉnh sửa.`,
-                    code: 'DRAW_HAS_PLAYED_MATCHES',
-                }, { status: 409 });
+            const idempotencyKey = String(body?.idempotency_key || body?.idempotencyKey || randomUUID()).trim();
+            if (!idempotencyKey || idempotencyKey.length > 200) {
+                return NextResponse.json({ error: 'idempotency_key không hợp lệ', code: 'INVALID_IDEMPOTENCY_KEY' }, { status: 400 });
             }
-
-            const { error: delErr } = await db
-                .from('tournament_matches')
-                .delete()
-                .eq('group_id', access.groupId)
-                .eq('stage_id', stage.id);
-            if (delErr) return NextResponse.json({ error: delErr.message }, { status: 500 });
-
-            const nextDraw = { ...current, status: 'draft', locked_at: null };
-            await saveDraw(stage, access.groupId, nextDraw);
-            await log(access, stage, 'draw_unlocked', { status: 'locked' }, { status: 'draft' }, reason);
-            return NextResponse.json({ success: true, draw: nextDraw });
+            const { data, error } = await db.rpc('unlock_tournament_draw', {
+                p_group_id: access.groupId,
+                p_stage_id: stage.id,
+                // Giữ đúng snapshot nullable cho CAS `IS DISTINCT FROM` ở RPC.
+                p_expected_config: stage.config,
+                p_reason: reason,
+                p_idempotency_key: idempotencyKey,
+            });
+            if (error) {
+                return NextResponse.json({ error: error.message, code: error.code }, { status: CONFLICT_CODES.includes(error.code) ? 409 : 400 });
+            }
+            const nextDraw = data?.draw;
+            try {
+                await log(access, stage, 'draw_unlocked', { status: 'locked' }, { status: 'draft' }, reason);
+            } catch (logError) {
+                // RPC has committed. Do not tell the client it failed and trigger a duplicate retry.
+                console.error('Draw unlock audit log failed:', logError);
+            }
+            return NextResponse.json({ success: true, ...(data || {}), draw: nextDraw });
         }
 
         return NextResponse.json({ error: 'action không hợp lệ', code: 'INVALID_ACTION' }, { status: 400 });
     } catch (err) {
         console.error('Draw POST error:', err);
-        return NextResponse.json({ error: err.message }, { status: 500 });
+        return NextResponse.json({ error: err.message, code: err.code }, { status: CONFLICT_CODES.includes(err.code) ? 409 : 500 });
     }
 }

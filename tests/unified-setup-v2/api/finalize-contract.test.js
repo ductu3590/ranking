@@ -1,0 +1,15 @@
+const fs = require('fs');
+const path = require('path');
+const root = path.join(__dirname, '../../..');
+const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
+const assert = (value, message) => { if (!value) throw new Error(message); };
+const route = read('app/api/tournament-v2/setup/finalize/route.js');
+const useCase = read('lib/tournament/setupFinalize.js');
+assert(route.includes('requireValidatedGroupAdmin'), 'finalize must require admin');
+assert(route.includes("'finalize_unified_setup_v2'"), 'finalize must use atomic wrapper RPC');
+assert(useCase.includes('FINALIZE_NOT_ATOMIC'), 'finalize must expose atomic failure code');
+assert(route.includes('p_group_id'), 'finalize must scope group');
+assert(!route.includes('tournament_draw_slots'), 'finalize must not use draw slots');
+assert(useCase.includes('IDEMPOTENCY_KEY_REUSED'), 'idempotency error must be stable');
+assert(useCase.includes('REVISION_CONFLICT'), 'revision error must be stable');
+console.log('unified setup finalize API contract ok');

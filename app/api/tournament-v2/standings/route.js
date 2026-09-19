@@ -3,7 +3,6 @@ import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { computeStageStandings } from '@/lib/tournament/standingsService';
 import { qualificationOutlook } from '@/lib/tournament/qualification';
-import { resolveTiebreak } from '@/lib/tournament/rules/tiebreak';
 import { getClubReadScope } from '@/lib/clubReadContext';
 
 const db = supabaseAdmin || supabaseServer;
@@ -61,7 +60,11 @@ export async function GET(request) {
             match_points: 'Điểm', diff: 'Hiệu số', point_diff: 'Hiệu số điểm', game_diff: 'Hiệu số ván',
             head_to_head: 'Đối đầu trực tiếp', points_for: 'Điểm ghi được', seed: 'Hạt giống', draw_lot: 'Bốc thăm',
         };
-        const policy = resolveTiebreak({}, {}, stage);
+        // Nhãn luật PHẢI là chính sách mà service vừa dùng để xếp hạng. Trước
+        // đây route resolve lại với context RỖNG, nên bỏ mất
+        // division.tiebreak_override và tournament.tiebreak_policy: số liệu và
+        // nhãn có thể nói hai chuyện khác nhau.
+        const policy = result.tiebreak;
         return NextResponse.json({
             ...result,
             outlook,

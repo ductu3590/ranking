@@ -12,6 +12,8 @@ assert(s.includes('isStageComplete') && s.includes('seedNextStage'), 'dùng orch
 // vốn nằm trong khối ĐỌC của route, trong khi việc GHI stage kế thật ra nằm trong
 // RPC nguyên tử. Nay kiểm đúng thứ nó tuyên bố: route giao việc ghi cho RPC.
 assert(s.includes('advance_tournament_stage') && s.includes('p_seeded'), 'ghi stage_entrants kế qua RPC nguyên tử');
+assert(s.includes('advance_division_entry_stage'), 'stage division chọn RPC entry-aware riêng');
+assert(s.includes('entry_id: entrant_id'), 'seed entry cho RPC division dùng entry_id');
 assert(s.includes('p_idempotency_key'), 'advance có idempotency key');
 // Nạp dữ liệu vòng phải dùng hàm chung đã hiểu entry theo nội dung thi đấu,
 // không giữ bản sao chỉ đọc entrant cũ.

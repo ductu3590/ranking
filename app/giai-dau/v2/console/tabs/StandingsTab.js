@@ -1,16 +1,18 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { getStandings, listEntrants } from '@/lib/tournamentV2Client';
+import { getStandings, listEntrants, advanceStage } from '@/lib/tournamentV2Client';
 import { StandingsView } from '../standingsRender';
 import '../bracket.css';
 
 // Tab Bảng xếp hạng — nhánh theo schedule_format (round_robin | knockout).
-export default function StandingsTab({ tournamentId, stageId, stages }) {
+export default function StandingsTab({ tournamentId, stageId, stages, isAdmin, reload }) {
     const [data, setData] = useState(null); // { schedule_format, standings }
     const [entrantsById, setEntrantsById] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [advancing, setAdvancing] = useState(false);
+    const [advanceNotice, setAdvanceNotice] = useState('');
 
     const stage = (stages || []).find((s) => String(s.id) === String(stageId)) || null;
 
@@ -68,7 +70,40 @@ export default function StandingsTab({ tournamentId, stageId, stages }) {
         );
     }
 
+    // Tiến cấp vòng bảng -> play-off. Hành động này đã có sẵn RPC/route nhưng
+    // trước đây không có lối vào nào trên giao diện (OverviewTab không được mount),
+    // nên BTC không thể seed bán kết từ UI.
+    async function handleAdvance() {
+        if (!stageId || advancing) return;
+        setAdvancing(true);
+        setAdvanceNotice('');
+        try {
+            const res = await advanceStage(stageId);
+            setAdvanceNotice(res?.final
+                ? 'Đã hoàn tất giai đoạn cuối.'
+                : `Đã tiến cấp ${res?.advanced ?? 0} suất sang vòng sau.`);
+            if (reload) await reload();
+            await load();
+        } catch (advanceError) {
+            setAdvanceNotice(advanceError?.message || 'Không tiến cấp được.');
+        } finally {
+            setAdvancing(false);
+        }
+    }
+
+    const canAdvance = Boolean(isAdmin && stageId
+        && (data.schedule_format || stage?.schedule_format) === 'round_robin');
+
     return (
+        <>
+            {canAdvance ? (
+                <div className="v2-settings-block" style={{ marginBottom: 12 }}>
+                    <button type="button" className="v2-btn-primary" disabled={advancing} onClick={handleAdvance}>
+                        {advancing ? 'Đang tiến cấp...' : 'Tiến cấp vào play-off'}
+                    </button>
+                    {advanceNotice ? <p className="v2-notice">{advanceNotice}</p> : null}
+                </div>
+            ) : null}
         <StandingsView
             scheduleFormat={data.schedule_format || stage?.schedule_format}
             rows={data.standings}
@@ -77,5 +112,6 @@ export default function StandingsTab({ tournamentId, stageId, stages }) {
             tiebreakCriteria={data.tiebreak_criteria}
             criteriaLabel="Tiêu chí xếp hạng"
         />
+        </>
     );
 }

@@ -10,12 +10,16 @@ import { resolveMatchScoring } from '@/lib/tournament/rules/roundScoring';
 
 import { hashScorekeeperToken, validateScorekeeperToken } from '@/lib/tournament/scorekeeperToken';
 
+// Xung dot nghiep vu nay ERRCODE 'PH409' (migration 078). Truoc day dung 40001,
+// nhung 40001 la serialization_failure nen tang tren tu dong retry va request treo.
+const CONFLICT_CODES = ['PH409', '40001'];
+
 const db = supabaseAdmin || supabaseServer;
 
 function rpcErrorResponse(error) {
     const code = error?.code;
-    const status = code === '40001' ? 409 : code === '22023' ? 400 : code === 'P0002' ? 404 : 500;
-    const message = code === '40001' ? 'Dữ liệu trận đã thay đổi, hãy tải lại.' : error?.message || 'Không lưu được tỉ số.';
+    const status = CONFLICT_CODES.includes(code) ? 409 : code === '22023' ? 400 : code === 'P0002' ? 404 : 500;
+    const message = CONFLICT_CODES.includes(code) ? 'Dữ liệu trận đã thay đổi, hãy tải lại.' : error?.message || 'Không lưu được tỉ số.';
     return NextResponse.json({ error: message, code: code || 'MUTATION_FAILED' }, { status });
 }
 
@@ -149,7 +153,10 @@ async function handleGames(request) {
             return NextResponse.json({ error: 'expected_version không hợp lệ' }, { status: 400 });
         }
 
-        const { data, error } = await db.rpc('replace_tournament_games', {
+        // The database performs explicit winner/loser playoff routing while it
+        // still holds the score and target-fixture locks. Legacy parent routing
+        // remains an argument of the same mutation contract.
+        const { data, error } = await db.rpc('replace_tournament_games_with_transitions', {
             p_group_id: groupId,
             p_match_id: matchId,
             p_games: normalizedGames,

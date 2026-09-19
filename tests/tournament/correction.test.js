@@ -23,6 +23,12 @@ impact = C.correctionImpact(match, { id: 9, status: 'finalized' }, { winnerChang
 assert(impact.blocked === true, 'trận sau finalized thì chặn');
 assert(/huỷ chốt/.test(impact.message), 'nói rõ phải huỷ chốt trận sau trước');
 
+impact = C.correctionImpact(match, [{ id: 9, status: 'pending' }, { id: 10, status: 'live' }], { winnerChanged: true });
+assert(impact.blocked === true && impact.downstream.length === 2, 'một trong nhiều trận graph đang chạy thì chặn toàn bộ correction');
+
+impact = C.correctionImpact(match, [{ id: 9, status: 'pending' }, { id: 10, status: 'warmup' }], { winnerChanged: true });
+assert(impact.blocked === true, 'bronze hoặc chung kết warmup cũng chặn đổi đội thắng bán kết');
+
 // Không đổi đội thắng thì không đụng vòng sau.
 impact = C.correctionImpact(match, { id: 9, status: 'finalized' }, { winnerChanged: false });
 assert(impact.blocked === false, 'chỉ sửa tỉ số, không đổi đội thắng -> không chặn');

@@ -8,6 +8,10 @@ import { transitionRegistration } from '@/lib/tournament/interclub';
 import { buildRosterAudit, canApproveRoster } from '@/lib/tournament/wizardModel';
 import { transitionOpenRegistration, canAdmit, buildPairFromSolos, OpenRegError } from '@/lib/tournament/openRegistration';
 
+// Xung dot nghiep vu nay ERRCODE 'PH409' (migration 078). Truoc day dung 40001,
+// nhung 40001 la serialization_failure nen tang tren tu dong retry va request treo.
+const CONFLICT_CODES = ['PH409', '40001'];
+
 // Các hành động duyệt đăng ký mở (open registration) do BTC thực hiện.
 const OPEN_ACTIONS = ['admit', 'remove', 'restore', 'reject_open', 'withdraw_open', 'pair', 'approve_pair'];
 
@@ -250,7 +254,7 @@ export async function PATCH(request) {
                 p_actor: String(body.actor || 'club_admin'),
             });
             if (error) {
-                const status = error.code === '40001' ? 409 : error.code === 'P0002' ? 404 : 500;
+                const status = CONFLICT_CODES.includes(error.code) ? 409 : error.code === 'P0002' ? 404 : 500;
                 return NextResponse.json({ error: error.message }, { status });
             }
             return NextResponse.json({ success: true, ...(data || {}) });

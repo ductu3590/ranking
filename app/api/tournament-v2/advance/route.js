@@ -5,15 +5,20 @@ import { supabaseServer } from '@/lib/supabaseServer';
 import { requireValidatedGroupAdmin } from '@/lib/groupSession';
 import { requireTournamentAccess } from '@/lib/tournament/accessRuntime';
 import { getScheduleEngine } from '@/lib/tournament/engines';
-import { loadStageData } from '@/lib/tournament/standingsService';
+import { loadStageData, loadScoringContext, stageWithResolvedTiebreak } from '@/lib/tournament/standingsService';
 import { isStageComplete, seedNextStage } from '@/lib/tournament/orchestrator';
+import { findNextStage } from '@/lib/tournament/nextStage';
+
+// Xung dot nghiep vu nay ERRCODE 'PH409' (migration 078). Truoc day dung 40001,
+// nhung 40001 la serialization_failure nen tang tren tu dong retry va request treo.
+const CONFLICT_CODES = ['PH409', '40001'];
 
 const db = supabaseAdmin || supabaseServer;
 
 function rpcErrorResponse(error) {
     const code = error?.code;
-    const status = code === '40001' ? 409 : code === '22023' ? 400 : code === 'P0002' ? 404 : 500;
-    const message = code === '40001'
+    const status = CONFLICT_CODES.includes(code) ? 409 : code === '22023' ? 400 : code === 'P0002' ? 404 : 500;
+    const message = CONFLICT_CODES.includes(code)
         ? 'Stage đã thay đổi, hãy tải lại.'
         : error?.message || 'Không thể chuyển stage.';
     return NextResponse.json({ error: message, code: code || 'MUTATION_FAILED' }, { status });
@@ -51,11 +56,31 @@ export async function POST(request) {
 
         // 2. Build entrants + resolvedMatches + matches
         let loaded;
+        let expectedResultsFingerprint = null;
+        // Stage đã gắn chính sách tie-break hiệu lực. Suất tiến cấp phải được
+        // tính bằng ĐÚNG chính sách mà bảng xếp hạng đang hiển thị.
+        let effectiveStage = stage;
         try {
-            loaded = await loadStageData(db, stage, groupId);
+            // Chụp fingerprint TRƯỚC khi đọc policy và tính BXH. Fingerprint DB gồm
+            // cả kết quả lẫn effective tie-break; nếu một trong hai đổi trong cửa
+            // sổ này, RPC sẽ từ chối thay vì seed bằng BXH stale.
+            if (stage.division_id != null) {
+                const fingerprintResult = await db.rpc('group_stage_results_fingerprint', {
+                    p_group_id: groupId,
+                    p_stage_id: stage.id,
+                });
+                if (fingerprintResult.error) return rpcErrorResponse(fingerprintResult.error);
+                expectedResultsFingerprint = fingerprintResult.data;
+            }
+            // Phải kèm context luật điểm: thiếu nó thì trận BO1 bị resolve theo BO3,
+            // coi như chưa xong, không có người thắng -> standings rỗng group_label và
+            // advance bị RPC từ chối bằng INVALID_GROUP_RANKINGS.
+            const scoringContext = await loadScoringContext(db, stage, groupId);
+            loaded = await loadStageData(db, stage, groupId, scoringContext);
+            effectiveStage = stageWithResolvedTiebreak(stage, scoringContext).stage;
         } catch (e) {
             console.error('Advance load/match-engine error:', e);
-            return NextResponse.json({ error: e.message }, { status: 400 });
+            return NextResponse.json({ error: e.message, code: e.code || 'ADVANCE_READ_FAILED' }, { status: e.status || 400 });
         }
         if (loaded.error) {
             return NextResponse.json({ error: loaded.error.message }, { status: loaded.error.status });
@@ -77,13 +102,13 @@ export async function POST(request) {
         let seeded;
         try {
             standings = scheduleEngine.computeStandings(
-                { schedule_format: stage.schedule_format, config: stage.config || {} },
+                { schedule_format: stage.schedule_format, config: effectiveStage.config || {} },
                 loaded.entrants,
                 loaded.resolved,
             );
             // 4. Seed next stage from standings
             seeded = seedNextStage(
-                { schedule_format: stage.schedule_format, config: stage.config || {} },
+                { schedule_format: stage.schedule_format, config: effectiveStage.config || {} },
                 standings,
             );
         } catch (e) {
@@ -91,27 +116,65 @@ export async function POST(request) {
             return NextResponse.json({ error: e.message }, { status: 400 });
         }
 
-        // 5. Find next stage
-        const { data: nextStage, error: nextErr } = await db
-            .from('tournament_stages')
-            .select('id, stage_order')
-            .eq('group_id', groupId)
-            .eq('tournament_id', stage.tournament_id)
-            .eq('stage_order', stage.stage_order + 1)
-            .single();
+        // Unified group-to-playoff plans own their destination slots explicitly.
+        // Legacy stages continue to use the adjacent-stage advance contract below.
+        if (stage.division_id != null) {
+            const { data: transitionRows, error: transitionError } = await db
+                .from('tournament_stage_transitions')
+                .select('id')
+                .eq('group_id', groupId)
+                .eq('source_stage_id', stage.id)
+                .eq('source_kind', 'group_rank')
+                .limit(1);
+            if (transitionError) return NextResponse.json({ error: transitionError.message }, { status: 500 });
+            if (transitionRows?.length) {
+                const ranked = standings.map(({ entrant_id, group_label, rank }) => ({
+                    entry_id: entrant_id,
+                    group_label,
+                    rank,
+                }));
+                // CAS tren ket qua vong bang: standings vua tinh o tren duoc chup lai
+                // bang mot van tay; neu co correction chen vao giua thi RPC tu choi
+                // thay vi seed bang hang da cu.
+                const { data, error } = await db.rpc('advance_division_group_rank_transitions', {
+                    p_group_id: groupId,
+                    p_stage_id: stage.id,
+                    p_ranked: ranked,
+                    p_idempotency_key: idempotencyKey,
+                    p_expected_results_fingerprint: expectedResultsFingerprint,
+                });
+                if (error) return rpcErrorResponse(error);
+                return NextResponse.json(data || { success: true, transitioned: true });
+            }
+        }
 
-        if (nextErr && nextErr.code !== 'PGRST116') {
+        // 5. Find next stage
+        const { data: nextStage, error: nextErr } = await findNextStage(db, stage, groupId);
+
+        if (nextErr) {
             return NextResponse.json({ error: nextErr.message }, { status: 500 });
         }
 
-        // 6. Commit finalization + next-stage seedings atomically in PostgreSQL.
-        const { data, error } = await db.rpc('advance_tournament_stage', {
+        // Division stages use entry identity. Legacy stages retain their existing RPC.
+        const isDivisionStage = stage.division_id != null;
+        const rpcSeeded = isDivisionStage
+            ? seeded.map(({ entrant_id, seed_in_stage }) => ({
+                entry_id: entrant_id,
+                seed_in_stage,
+            }))
+            : seeded;
+        const rpcArgs = {
             p_group_id: groupId,
             p_stage_id: stage.id,
             p_next_stage_id: nextStage?.id || null,
-            p_seeded: seeded,
+            p_seeded: rpcSeeded,
             p_idempotency_key: idempotencyKey,
-        });
+        };
+
+        // 6. Commit finalization + next-stage seedings atomically in PostgreSQL.
+        const { data, error } = isDivisionStage
+            ? await db.rpc('advance_division_entry_stage', rpcArgs)
+            : await db.rpc('advance_tournament_stage', rpcArgs);
         if (error) return rpcErrorResponse(error);
 
         return NextResponse.json(data || {

@@ -221,11 +221,27 @@ function normalizeVisibility(value, fallback) {
     return VISIBILITIES.has(visibility) ? visibility : null;
 }
 
+// Tao lai an toan: cung mot ban nhap wizard gui lai chi tao DUNG mot giai.
+function isClientDraftKeyConflict(error) {
+    if (error?.code !== '23505') return false;
+    const text = `${error?.message || ''} ${error?.details || ''} ${error?.constraint || ''}`;
+    return /client_draft_key/i.test(text);
+}
+
+function isMissingClientDraftKeyColumn(error) {
+    return error?.code === '42703' && /client_draft_key/i.test(String(error?.message || ''));
+}
+
+async function findTournamentByDraftKey(groupId, clientDraftKey) {
+    return db.from('tournaments').select('*').eq('group_id', groupId).eq('client_draft_key', clientDraftKey).maybeSingle();
+}
+
 async function insertWithSlugRetry(payload) {
     for (let attempt = 0; attempt < 3; attempt += 1) {
         const { data, error } = await db.from('tournaments').insert(payload).select().single();
         if (!error) return { data, error: null };
-        if (error.code !== '23505' || attempt === 2) return { data: null, error };
+        // Chi doi slug khi dung slug. Dung client_draft_key phai tra ve de doc lai ban ghi cu.
+        if (error.code !== '23505' || isClientDraftKeyConflict(error) || attempt === 2) return { data: null, error };
         payload = { ...payload, public_slug: generateSlug(payload.name) };
     }
     return { data: null, error: new Error('Unable to generate a unique public slug') };
@@ -458,13 +474,45 @@ export async function POST(request) {
         if (platformAccountId) payload.created_by_platform_account_id = platformAccountId;
         payload.public_slug = generateSlug(name);
 
+        // client_draft_key (tuy chon): ma ban nhap on dinh do wizard sinh mot lan.
+        // Gui lai sau loi mang mo ho phai tra ve dung giai cu, khong tao giai thu hai.
+        const rawDraftKey = body?.client_draft_key ?? body?.clientDraftKey;
+        let clientDraftKey = '';
+        if (rawDraftKey != null) {
+            clientDraftKey = String(rawDraftKey).trim();
+            if (!clientDraftKey || clientDraftKey.length > 200) {
+                return NextResponse.json({ error: 'client_draft_key khong hop le', code: 'CLIENT_DRAFT_KEY_INVALID' }, { status: 400 });
+            }
+            const existing = await findTournamentByDraftKey(tenantGroupId, clientDraftKey);
+            if (existing.error) {
+                if (isMissingClientDraftKeyColumn(existing.error)) {
+                    return NextResponse.json({
+                        error: 'May chu chua ap dung migration 074 nen chua ho tro tao lai an toan.',
+                        code: 'CLIENT_DRAFT_KEY_UNSUPPORTED',
+                    }, { status: 409 });
+                }
+                return NextResponse.json({ error: existing.error.message }, { status: 500 });
+            }
+            if (existing.data) {
+                return NextResponse.json({ success: true, reused: true, tournament: existing.data });
+            }
+            payload.client_draft_key = clientDraftKey;
+        }
+
         const { data, error } = await insertWithSlugRetry(payload);
 
         if (error) {
+            // Hai request song song cung ban nhap: doc lai ban ghi da thang cuoc.
+            if (clientDraftKey && isClientDraftKeyConflict(error)) {
+                const raced = await findTournamentByDraftKey(tenantGroupId, clientDraftKey);
+                if (!raced.error && raced.data) {
+                    return NextResponse.json({ success: true, reused: true, tournament: raced.data });
+                }
+            }
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
 
-        return NextResponse.json({ success: true, tournament: data });
+        return NextResponse.json({ success: true, reused: false, tournament: data });
     } catch (err) {
         console.error('Tournaments v2 POST error:', err);
         return NextResponse.json({ error: err.message }, { status: 500 });

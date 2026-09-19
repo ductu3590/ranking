@@ -3,10 +3,19 @@ import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { requireTournamentAccess } from '@/lib/tournament/accessRuntime';
 import { writeOperationLog } from '@/lib/tournament/operationLog';
-import { correctionImpact, buildCorrectionRow } from '@/lib/tournament/correction';
+import { correctionImpact } from '@/lib/tournament/correction';
 import { resolveMatchScoring } from '@/lib/tournament/rules/roundScoring';
 import { validateGameScore } from '@/lib/tournament/rules/scoring';
 import { getMatchEngine } from '@/lib/tournament/engines';
+import { actorName } from '@/lib/tournament/actorName';
+
+// Xung dot nghiep vu nay ERRCODE 'PH409' (migration 078). Truoc day dung 40001,
+// nhung 40001 la serialization_failure nen tang tren tu dong retry va request treo.
+const CONFLICT_CODES = ['PH409', '40001'];
+// 55P03 = lock_not_available (het lock_timeout, migration 081), 57014 = statement
+// timeout. Ca hai o day deu nghia la co thao tac tien cap/seed dang chay tren cung
+// giai doan, khong phai loi may chu -> tra 409 kem huong dan, khong phai 500.
+const LOCK_BUSY_CODES = ['55P03', '57014'];
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -85,8 +94,13 @@ export async function POST(request) {
         const games = Array.isArray(body?.games) ? body.games : null;
         const preview = body?.preview === true;
         const reason = String(body?.reason || '').trim();
+        const expectedVersion = body?.expected_version == null ? null : Number(body.expected_version);
+        const idempotencyKey = String(body?.idempotency_key || body?.idempotencyKey || '').trim();
         if (!matchId || !games) {
             return NextResponse.json({ error: 'match_id và games là bắt buộc' }, { status: 400 });
+        }
+        if (!preview && (!Number.isInteger(expectedVersion) || expectedVersion < 1 || !idempotencyKey || idempotencyKey.length > 200)) {
+            return NextResponse.json({ error: 'expected_version và idempotency_key hợp lệ là bắt buộc', code: 'CORRECTION_PAYLOAD_INVALID' }, { status: 400 });
         }
 
         const ctx = await loadContext(matchId);
@@ -141,9 +155,15 @@ export async function POST(request) {
         );
 
         const previousWinner = match.winner_entry_id ?? match.winner_entrant_id ?? null;
+        if (!preview && (!resolved.complete || resolved.winner_entrant_id == null)) {
+            return NextResponse.json({
+                error: 'Tỉ số sửa phải xác định được đội thắng của trận đã chốt.',
+                code: 'MATCH_OUTCOME_UNRESOLVABLE',
+            }, { status: 409 });
+        }
         const winnerChanged = String(resolved.winner_entrant_id ?? '') !== String(previousWinner ?? '');
 
-        let downstreamMatch = null;
+        const downstreamMatches = [];
         if (match.parent_match_id) {
             const { data } = await db
                 .from('tournament_matches')
@@ -151,9 +171,27 @@ export async function POST(request) {
                 .eq('id', match.parent_match_id)
                 .eq('group_id', access.groupId)
                 .maybeSingle();
-            downstreamMatch = data || null;
+            if (data) downstreamMatches.push(data);
         }
-        const impact = correctionImpact(match, downstreamMatch, { winnerChanged });
+        const { data: transitionRows, error: transitionErr } = await db
+            .from('tournament_stage_transitions')
+            .select('target_match_id')
+            .eq('group_id', access.groupId)
+            .eq('source_kind', 'match_outcome')
+            .eq('source_match_id', match.id);
+        if (transitionErr) return NextResponse.json({ error: transitionErr.message }, { status: 500 });
+        const targetIds = (transitionRows || []).map((row) => row.target_match_id);
+        let graphTargets = [];
+        if (targetIds.length) {
+            const { data, error } = await db.from('tournament_matches').select('id, status')
+                .eq('group_id', access.groupId).in('id', targetIds);
+            if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+            graphTargets = data || [];
+        }
+        for (const target of graphTargets) {
+            if (target && !downstreamMatches.some((item) => Number(item.id) === Number(target.id))) downstreamMatches.push(target);
+        }
+        const impact = correctionImpact(match, downstreamMatches, { winnerChanged });
 
         const { data: oldGames } = await db
             .from('tournament_games')
@@ -192,71 +230,32 @@ export async function POST(request) {
             }, { status: 409 });
         }
 
-        // Ghi lại ván: xoá rồi chèn, trong phạm vi đúng một trận.
-        const { error: delErr } = await db
-            .from('tournament_games')
-            .delete()
-            .eq('group_id', access.groupId)
-            .eq('match_id', matchId);
-        if (delErr) return NextResponse.json({ error: delErr.message }, { status: 500 });
-
-        const { error: insErr } = await db.from('tournament_games').insert(
-            normalized.map((g) => ({ ...g, group_id: access.groupId, match_id: Number(matchId) })),
-        );
-        if (insErr) return NextResponse.json({ error: insErr.message }, { status: 500 });
-
-        const patch = { version: Number(match.version) + 1 };
-        if (match.entry_a_id != null) patch.winner_entry_id = resolved.winner_entrant_id;
-        else patch.winner_entrant_id = resolved.winner_entrant_id;
-
-        const { data: updated, error: updErr } = await db
-            .from('tournament_matches')
-            .update(patch)
-            .eq('id', matchId)
-            .eq('group_id', access.groupId)
-            .eq('version', match.version)
-            .select()
-            .maybeSingle();
-        if (updErr) return NextResponse.json({ error: updErr.message }, { status: 500 });
-        if (!updated) {
-            return NextResponse.json({
-                error: 'Trận này vừa được người khác cập nhật. Tải lại rồi thử lại.',
-                code: 'MATCH_VERSION_CONFLICT',
-            }, { status: 409 });
-        }
-
-        // Đội thắng đổi thì đội ở trận vòng sau phải đổi theo. Chỉ tới đây khi
-        // trận sau còn `pending` — mọi trạng thái khác đã bị chặn ở trên.
-        if (winnerChanged && downstreamMatch && match.parent_match_id) {
-            const field = match.bracket_slot % 2 === 0 ? 'entry_a_id' : 'entry_b_id';
-            const legacyField = match.bracket_slot % 2 === 0 ? 'entrant_a_id' : 'entrant_b_id';
-            const target = match.entry_a_id != null ? field : legacyField;
-            const { error: advErr } = await db
-                .from('tournament_matches')
-                .update({ [target]: resolved.winner_entrant_id })
-                .eq('id', match.parent_match_id)
-                .eq('group_id', access.groupId);
-            if (advErr) console.error('Cập nhật trận vòng sau lỗi:', advErr.message);
-        }
-
-        const row = buildCorrectionRow({
-            groupId: access.groupId,
-            tournamentId: stage.tournament_id,
-            divisionId: stage.division_id,
-            matchId: Number(matchId),
-            before: { games: oldGames || [], winner: previousWinner },
-            after: { games: normalized, winner: resolved.winner_entrant_id },
-            reason,
-            actor: access.actor || 'admin',
+        const { data: mutation, error: mutationError } = await db.rpc('apply_tournament_result_correction_graph_aware', {
+            p_group_id: access.groupId,
+            p_match_id: Number(matchId),
+            p_games: normalized,
+            p_winner_entrant_id: resolved.winner_entrant_id,
+            p_expected_version: expectedVersion,
+            p_reason: reason,
+            p_actor: actorName(access),
+            p_idempotency_key: idempotencyKey,
         });
-        const { error: corrErr } = await db.from('tournament_result_corrections').insert(row);
-        if (corrErr) console.error('Ghi bản ghi correction lỗi:', corrErr.message);
+        if (mutationError) {
+            const busy = LOCK_BUSY_CODES.includes(mutationError.code);
+            const status = busy || CONFLICT_CODES.includes(mutationError.code) ? 409 : mutationError.code === '22023' ? 400 : mutationError.code === 'P0002' ? 404 : 500;
+            return NextResponse.json({
+                error: busy
+                    ? 'Dang có thao tác tiến cấp vòng bảng lên play-off. Hãy đợi thao tác đó xong rồi thử lại.'
+                    : mutationError.message,
+                code: busy ? 'GROUP_SEEDING_IN_PROGRESS' : (mutationError.code || 'CORRECTION_FAILED'),
+            }, { status });
+        }
 
         const logged = await writeOperationLog(db, {
             groupId: access.groupId,
             tournamentId: stage.tournament_id,
             divisionId: stage.division_id,
-            actor: access.actor || 'admin',
+            actor: actorName(access),
             action: 'result_corrected',
             targetType: 'match',
             targetId: Number(matchId),
@@ -266,24 +265,9 @@ export async function POST(request) {
         });
         if (!logged.ok) console.error('Ghi nhật ký sửa kết quả lỗi:', logged.error);
 
-        // Giải đã chốt mà sửa kết quả thì hạng chung cuộc không còn đúng nữa.
-        let finalStandingsCleared = false;
-        if (stage.division_id) {
-            const { data: t } = await db
-                .from('tournaments').select('status')
-                .eq('id', stage.tournament_id).eq('group_id', access.groupId).maybeSingle();
-            if (t && t.status === 'completed') {
-                await db.from('tournament_divisions')
-                    .update({ final_standings: null })
-                    .eq('id', stage.division_id).eq('group_id', access.groupId);
-                finalStandingsCleared = true;
-            }
-        }
-
         return NextResponse.json({
-            success: true,
+            ...(mutation || { success: true }),
             winner_changed: winnerChanged,
-            final_standings_cleared: finalStandingsCleared,
         });
     } catch (err) {
         console.error('Corrections POST error:', err);

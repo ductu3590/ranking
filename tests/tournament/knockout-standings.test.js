@@ -12,4 +12,14 @@ assert(st[1].entrant_id === 2 && st[1].rank === 2, 'á quân E2');
 assert(st.find((r) => r.entrant_id === 3).rank === 3 && st.find((r) => r.entrant_id === 4).rank === 3, 'thua vòng 1 = hạng 3');
 const champ = advance({ config: {} }, st);
 assert(champ.length === 1 && champ[0].entrant_id === 1, 'advance trả nhà vô địch');
+
+const playoffMatches = [
+  { round: 1, match_key: 'SF1', entrant_a_id: 1, entrant_b_id: 4, winner_entrant_id: 1, status: 'done' },
+  { round: 1, match_key: 'SF2', entrant_a_id: 2, entrant_b_id: 3, winner_entrant_id: 2, status: 'done' },
+  { round: 2, match_key: 'BRONZE', entrant_a_id: 4, entrant_b_id: 3, winner_entrant_id: 3, status: 'done' },
+  { round: 2, match_key: 'F', entrant_a_id: 1, entrant_b_id: 2, winner_entrant_id: 2, status: 'done' },
+];
+const playoffStandings = computeStandings({ config: {} }, entrants, playoffMatches);
+assert(playoffStandings.map((row) => row.entrant_id).join(',') === '2,1,3,4', 'F và BRONZE xếp hạng đúng dù bronze đứng trước final');
+assert(playoffStandings.map((row) => row.rank).join(',') === '1,2,3,4', 'playoff bronze có hạng 1 đến 4 riêng biệt');
 console.log('knockout-standings ok');

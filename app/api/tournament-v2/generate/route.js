@@ -4,15 +4,20 @@ import { supabaseServer } from '@/lib/supabaseServer';
 import { requireValidatedGroupAdmin } from '@/lib/groupSession';
 import { requireTournamentAccess } from '@/lib/tournament/accessRuntime';
 import { generateAndPersistSchedule } from '@/lib/tournament/generateSchedule';
+import { snapshotStageRules } from '@/lib/tournament/stageRulesSnapshot';
 import { resolveStageScoring } from '@/lib/tournament/rules/scoring';
 import { resolveTiebreak } from '@/lib/tournament/rules/tiebreak';
+
+// Xung dot nghiep vu nay ERRCODE 'PH409' (migration 078). Truoc day dung 40001,
+// nhung 40001 la serialization_failure nen tang tren tu dong retry va request treo.
+const CONFLICT_CODES = ['PH409', '40001'];
 
 const db = supabaseAdmin || supabaseServer;
 
 function rpcErrorResponse(error) {
     const code = error?.code;
-    const status = code === '40001' ? 409 : code === '22023' ? 400 : code === 'P0002' ? 404 : 500;
-    const message = code === '40001' ? 'Lịch thi đấu đã thay đổi, hãy tải lại.' : error?.message || 'Không sinh được lịch.';
+    const status = CONFLICT_CODES.includes(code) ? 409 : code === '22023' ? 400 : code === 'P0002' ? 404 : 500;
+    const message = CONFLICT_CODES.includes(code) ? 'Lịch thi đấu đã thay đổi, hãy tải lại.' : error?.message || 'Không sinh được lịch.';
     return NextResponse.json({ error: message, code: code || 'MUTATION_FAILED' }, { status });
 }
 
@@ -41,22 +46,15 @@ export async function POST(request) {
 
         // Commit the resolved, versioned policies with the draw snapshot. Later
         // tournament/division edits cannot change this stage's interpretation.
-        if (!stage.config?.scoring || !stage.config?.tiebreak) {
-            const [{ data: tournament, error: tournamentErr }, { data: division, error: divisionErr }] = await Promise.all([
-                db.from('tournaments').select('default_scoring, tiebreak_policy').eq('id', stage.tournament_id).eq('group_id', groupId).single(),
-                stage.division_id
-                    ? db.from('tournament_divisions').select('scoring_override, tiebreak_override').eq('id', stage.division_id).eq('group_id', groupId).single()
-                    : Promise.resolve({ data: {}, error: null }),
-            ]);
-            if (tournamentErr || divisionErr) return NextResponse.json({ error: tournamentErr?.message || divisionErr?.message }, { status: 500 });
-            stage.config = {
-                ...(stage.config || {}),
-                scoring: resolveStageScoring(tournament || {}, division || {}, stage),
-                tiebreak: resolveTiebreak(tournament || {}, division || {}, stage),
-            };
-            const { error: snapshotErr } = await db.from('tournament_stages').update({ config: stage.config }).eq('id', stageId).eq('group_id', groupId);
-            if (snapshotErr) return NextResponse.json({ error: snapshotErr.message }, { status: 500 });
+        // Dùng chung một hàm với route `draw` để hai đường không lệch nhau.
+        const snapshot = await snapshotStageRules(db, stage, groupId);
+        if (!snapshot.ok) {
+            return NextResponse.json(
+                { error: snapshot.error, code: snapshot.code },
+                { status: snapshot.code === 'STAGE_CONFIG_CHANGED' ? 409 : 500 },
+            );
         }
+        stage.config = snapshot.stage.config;
 
         // 2. Get entrants for the stage
         let entrants = [];

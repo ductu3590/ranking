@@ -5,6 +5,7 @@ import { requireValidatedGroupAdmin } from '@/lib/groupSession';
 import { previewPairing, confirmPairing } from '@/lib/tournament/interclub';
 import { summarizeRosterWarnings } from '@/lib/tournament/wizardModel';
 import { randomUUID } from 'crypto';
+import { validatePairDraft } from '@/lib/tournament/participantContract';
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -18,6 +19,9 @@ function atomicPairingError(error) {
     const stableCode = /\b(IDEMPOTENCY_KEY_REUSED|LEGACY_IDEMPOTENCY_RECORD_UNSAFE|SETUP_REVISION_CONFLICT|ROSTER_LOCKED|ATHLETE_ALREADY_PAIRED_IN_DIVISION|PAIR_ENTRY_SCOPE_MISMATCH|PAIR_MEMBER_SCOPE_MISMATCH|PAIR_ATHLETE_SCOPE_MISMATCH)\b/.exec(message)?.[1];
     if (stableCode) {
         return NextResponse.json({ error: message, code: stableCode }, { status: 409 });
+    }
+    if (error?.code === 'DUPLICATE_PAIR_MEMBER' || error?.code === 'PAIR_MEMBER_COUNT_INVALID') {
+        return NextResponse.json({ error: message, code: error.code }, { status: 400 });
     }
     if (error?.code === '23505') {
         return NextResponse.json({ error: message, code: 'PAIR_CONFLICT' }, { status: 409 });
@@ -136,6 +140,7 @@ export async function POST(request) {
         }
         let locked;
         try {
+            validatePairDraft(body?.pairs || []);
             locked = confirmPairing(body?.pairs || []);
         } catch (error) {
             const response = domainError(error);

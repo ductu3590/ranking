@@ -1,6 +1,6 @@
 # Đánh giá khả năng áp dụng 3 opensource vào module giải đấu PickHub
 
-**Ngày:** 19/9/2026
+**Ngày:** 19/9/2026 (số liệu đo trên `main` tại commit `943e539`)
 **Phạm vi:** `evroon/bracket`, `bbtheo/bracketeer`, `skrodahl/NewTon`
 **Câu hỏi:** Hệ thống giải đấu PickHub đang phức tạp — có thể thay/bổ sung bằng opensource không?
 
@@ -15,7 +15,7 @@ giấy phép, hoặc sai stack, hoặc yếu hơn PickHub về nghiệp vụ.
 
 | | PickHub | bracket | bracketeer | NewTon |
 |---|---|---|---|---|
-| LOC logic thể thức | 4.706 (`lib/tournament`) | 1.447 (Python) | ~65 file R | 25.310 (vanilla JS, dính DOM) |
+| LOC logic thể thức | **6.179** (`lib/tournament`, 50 file) | 1.447 (Python) | ~65 file R | 25.310 (vanilla JS, dính DOM) |
 | Vòng tròn + chia bảng | ✅ | ✅ | ✅ | ❌ |
 | Loại trực tiếp | ✅ | ✅ | ✅ | ✅ |
 | Loại kép (double elim) | ✅ | ❌ | ✅ | ✅ |
@@ -25,8 +25,8 @@ giấy phép, hoặc sai stack, hoặc yếu hơn PickHub về nghiệp vụ.
 | Multi-tenant `group_id` + RLS | ✅ | ❌ | ❌ | ❌ |
 
 Cái làm hệ thống "phức tạp" **không phải engine thể thức** — engine chỉ chiếm
-4.706 dòng. Phức tạp nằm ở 15.109 dòng trải trên 33 API route, 36 file UI,
-59 migration và 53 file test. Không opensource nào giải quyết được phần đó,
+6.179 dòng. Phức tạp nằm ở **18.313 dòng** trải trên **34 API route, 37 file UI,
+93 migration và 112 file test**. Không opensource nào giải quyết được phần đó,
 vì phần đó chính là nghiệp vụ riêng của PickHub.
 
 **Khuyến nghị: giữ engine hiện tại, học có chọn lọc 3 ý tưởng cụ thể (mục 5).**
@@ -146,6 +146,13 @@ họ đã giải cho nhiều kích thước bracket. Chỉ tham khảo hình h�
    trống thể thức duy nhất so với cả ba dự án.
 2. **Cảnh báo xung đột lịch** → mở rộng `courtBoard.js`: cờ đỏ khi một VĐV/đội
    bị xếp hai trận chồng giờ. Dùng công thức chồng lấn đúng, không theo bracket.
+
+   > Lưu ý phân biệt: commit `943e539` trên `main` có phần "chống xung đột",
+   > nhưng đó là **xung đột nghiệp vụ ở tầng database** (CAS/khoá, ERRCODE
+   > PH409, `080_seed_guard_nowait_conflict.sql`) — hai request ghi đè nhau.
+   > Hoàn toàn khác với **xung đột lịch thi đấu** nói ở đây: một VĐV bị xếp
+   > hai trận trùng giờ trên hai sân. Đã kiểm tra trên `main` hiện tại: chưa
+   > có phần này.
 3. **Cải thiện sơ đồ loại kép trên mobile** → tham khảo hình học nối nhánh của
    NewTon, viết lại bằng React/SVG.
 
@@ -153,14 +160,14 @@ họ đã giải cho nhiều kích thước bracket. Chỉ tham khảo hình h�
 
 - Không nhúng code bracket (AGPL sẽ kéo theo toàn bộ PickHub).
 - Không dựng thêm backend Python hay R bên cạnh Vercel + Supabase.
-- Không thay engine hiện tại — 53 file test đang phủ nó, thay đi là mất hết
+- Không thay engine hiện tại — 112 file test đang phủ nó, thay đi là mất hết
   phần tie-break và MLP mà không dự án nào có.
 
 ### Về cảm giác "hệ thống phức tạp"
 
 Nếu điều thực sự làm anh mệt là **độ phức tạp vận hành** chứ không phải thiếu
 thể thức, thì hướng xử lý nằm ở kiến trúc PickHub chứ không ở opensource:
-33 API route và 36 file UI cho một module là nhiều. Gom nhóm route, rút gọn
+34 API route, 37 file UI và 93 migration cho một module là rất nhiều. Gom nhóm route, rút gọn
 luồng wizard, hoặc tách bớt tính năng ít dùng sẽ hiệu quả hơn nhiều so với
 thay engine. Nếu anh muốn, em có thể rà soát riêng phần này và đề xuất phương
 án gom gọn.

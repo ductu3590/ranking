@@ -30,4 +30,13 @@ const original = [
 const applied = applyPairDraft(original, original);
 assert.deepStrictEqual(applied.pairs.map((pair) => pair.pairId), ['stable-a', 'stable-b']);
 assert.deepStrictEqual(applied.unpairedMemberIds, []);
+
+const fs = require('fs');
+const path = require('path');
+const advanceRoute = fs.readFileSync(path.join(__dirname, '../../../app/api/tournament-v2/advance/route.js'), 'utf8');
+assert.match(
+  advanceRoute,
+  /code:\s*'ADVANCE_RESULTS_INCOMPLETE'[\s\S]*message:\s*'Stage chưa hoàn tất'[\s\S]*\},\s*\{ status: 400 \}/,
+  'incomplete source results must return the stable advance error code with status 400',
+);
 console.log('participant contract red/green test ok');

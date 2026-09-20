@@ -36,6 +36,12 @@
     background: #ffffff;
     padding: 10px 12px;
     font-weight: 800;
+    min-height: 44px;
+}
+
+.pairing-card button:focus-visible {
+    outline: 3px solid var(--primary, #0f766e);
+    outline-offset: 3px;
 }
 
 .pairing-mode button[aria-pressed="true"],
@@ -101,6 +107,16 @@
     gap: 8px;
     background: #fff7ed;
     color: #9a3412;
+}
+
+.pairing-odd-options {
+    display: grid;
+    gap: 8px;
+}
+
+.pairing-odd button:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
 }
 
 @media (min-width: 760px) {

@@ -8,9 +8,22 @@ export default function FormatPairingStep({ draft = {}, roster = [], onDraftChan
     const selectedMemberIds = participants.selectedMemberIds || [];
     const entrantType = format.entrantType || 'doubles';
 
-    function updatePairs(pairingDraft) {
+    function updatePairs(pairingDraft, change = {}) {
+        const selectedIds = selectedMemberIds.map(String);
+        const nextSelectedMemberIds = change.type === 'add_member'
+            ? Array.from(new Set([...selectedIds, String(change.memberId)]))
+            : change.type === 'reserve_member'
+                ? selectedIds.filter((memberId) => memberId !== String(change.memberId))
+                : selectedMemberIds;
         onDraftChange?.({
             ...draft,
+            participants: {
+                ...participants,
+                selectedMemberIds: nextSelectedMemberIds,
+            },
+            format: change.type === 'switch_format'
+                ? { ...format, entrantType: change.entrantType }
+                : format,
             pairs: pairingDraft.pairs,
             unpairedMemberIds: pairingDraft.unpairedMemberIds,
             reserveMemberIds: pairingDraft.reserveMemberIds,
@@ -31,6 +44,9 @@ export default function FormatPairingStep({ draft = {}, roster = [], onDraftChan
         nextPairNumber: (draft.pairs || []).length + 1,
     };
     const hasUnpaired = (pairingValue.unpairedMemberIds || []).length > 0;
+    const supportedEntrantTypes = Array.isArray(format.supportedEntrantTypes)
+        ? format.supportedEntrantTypes
+        : [];
 
     return (
         <div className="setup-step setup-step-format-pairing">
@@ -49,6 +65,7 @@ export default function FormatPairingStep({ draft = {}, roster = [], onDraftChan
                 value={pairingValue}
                 onChange={updatePairs}
                 entrantType={entrantType}
+                supportedEntrantTypes={supportedEntrantTypes}
             />
         </div>
     );

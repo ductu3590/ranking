@@ -15,7 +15,7 @@ function ensureDraft(value, selectedMemberIds) {
     return createPairingDraft({ memberIds: selectedMemberIds });
 }
 
-export default function PairingBoard({ roster = [], selectedMemberIds = [], value, onChange, entrantType = 'doubles' }) {
+export default function PairingBoard({ roster = [], selectedMemberIds = [], value, onChange, entrantType = 'doubles', supportedEntrantTypes = [] }) {
     const [mode, setMode] = useState('automatic');
     const [swapSource, setSwapSource] = useState(null);
     const draft = ensureDraft(value, selectedMemberIds.map(String));
@@ -23,12 +23,12 @@ export default function PairingBoard({ roster = [], selectedMemberIds = [], valu
     const blockers = createPairingDraft.finalizeBlockers(draft);
     const oddChoices = createPairingDraft.oddChoices(draft);
 
-    function update(next) {
-        onChange?.(next);
+    function update(next, change) {
+        onChange?.(next, change);
     }
 
     function addPerson(memberId) {
-        update(createPairingDraft.addMember(draft, memberId));
+        update(createPairingDraft.addMember(draft, memberId), { type: 'add_member', memberId: String(memberId) });
     }
 
     function removePerson(memberId) {
@@ -77,6 +77,24 @@ export default function PairingBoard({ roster = [], selectedMemberIds = [], valu
     }
 
     const missingSelected = selectedMemberIds.map(String).filter((id) => !draft.memberIds.includes(id));
+    const oddMemberId = draft.unpairedMemberIds.length % 2 ? draft.unpairedMemberIds[draft.unpairedMemberIds.length - 1] : null;
+    const availableMembers = roster.filter((member) => {
+        const memberId = String(member.member_id ?? member.memberId ?? member.id);
+        return memberId && !draft.memberIds.includes(memberId) && !draft.reserveMemberIds.includes(memberId);
+    });
+    const canSwitchToSingles = supportedEntrantTypes.includes('singles');
+
+    function reserveOddMember() {
+        if (!oddMemberId) return;
+        const next = createPairingDraft.removeMember(draft, oddMemberId);
+        next.reserveMemberIds = Array.from(new Set([...next.reserveMemberIds, oddMemberId]));
+        update(next, { type: 'reserve_member', memberId: oddMemberId });
+    }
+
+    function switchFormat() {
+        if (!canSwitchToSingles) return;
+        update(draft, { type: 'switch_format', entrantType: 'singles' });
+    }
 
     return (
         <section className="pairing-card" aria-label="Ghép cặp thi đấu">
@@ -141,9 +159,17 @@ export default function PairingBoard({ roster = [], selectedMemberIds = [], valu
             {entrantType === 'doubles' && oddChoices.length > 0 ? (
                 <div className="pairing-odd">
                     <strong>Số người lẻ: chọn một cách xử lý</strong>
-                    <button type="button" data-choice="add_member">add_member · Thêm một người cho đủ cặp</button>
-                    <button type="button" data-choice="reserve_member">reserve_member · Đưa một người vào dự bị ngoài danh sách thi đấu</button>
-                    <button type="button" data-choice="switch_format">switch_format · Đổi sang thể thức phù hợp nếu điều lệ cho phép</button>
+                    <span>Thành viên cần xử lý: {memberName(memberMap, oddMemberId)}</span>
+                    <div className="pairing-odd-options">
+                        <strong>add_member · Thêm một người cho đủ cặp</strong>
+                        {availableMembers.length ? availableMembers.map((member) => {
+                            const memberId = String(member.member_id ?? member.memberId ?? member.id);
+                            return <button key={memberId} type="button" data-choice="add_member" onClick={() => addPerson(memberId)}>Thêm {memberName(memberMap, memberId)}</button>;
+                        }) : <span>Không còn thành viên nào để thêm. Hãy quay lại Bước 1 để chọn thêm người.</span>}
+                    </div>
+                    <button type="button" data-choice="reserve_member" onClick={reserveOddMember}>reserve_member · Đưa {memberName(memberMap, oddMemberId)} vào dự bị ngoài danh sách thi đấu</button>
+                    <button type="button" data-choice="switch_format" disabled={!canSwitchToSingles} aria-describedby={!canSwitchToSingles ? 'pairing-switch-format-reason' : undefined} onClick={switchFormat}>switch_format · Đổi sang đánh đơn</button>
+                    {!canSwitchToSingles ? <span id="pairing-switch-format-reason">Đánh đơn chưa được hỗ trợ trong cấu hình giải này.</span> : null}
                 </div>
             ) : null}
         </section>

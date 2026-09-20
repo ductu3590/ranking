@@ -36,6 +36,11 @@ assert.match(pairing, /Ghép lại các cặp chưa khóa/, 'regenerate unlocked
 assert.match(pairing, /confirm\(/, 'regenerate unlocked pairs requires confirmation');
 assert.match(pairing, /Đổi người|swap/i, 'swap is an explicit action');
 assert.match(pairing, /add_member[\s\S]*reserve_member[\s\S]*switch_format/, 'odd-count choices are shown');
+assert.match(pairing, /data-choice="add_member"[\s\S]*onClick/, 'add-member remedy updates the pairing draft');
+assert.match(pairing, /data-choice="reserve_member"[\s\S]*onClick/, 'reserve remedy is actionable');
+assert.match(pairing, /reserveMemberIds/, 'reserve remedy removes the member from competition and records the reserve ID');
+assert.match(pairing, /disabled=\{!canSwitchToSingles\}/, 'format remedy is disabled when the format is unsupported');
+assert.match(pairing, /Đánh đơn chưa được hỗ trợ/, 'unsupported format has a Vietnamese reason');
 assert.match(pairing, /addPerson|addMember/, 'adding a person only sends them to unpaired');
 assert.match(pairing, /removePerson|removeMember/, 'removing a person preserves other pairs via domain function');
 assert.doesNotMatch(pairing, /draggable|onDragStart|react-beautiful-dnd|dnd-kit/, 'mobile UI does not depend on drag and drop');
@@ -43,5 +48,7 @@ assert.doesNotMatch(pairing, /draggable|onDragStart|react-beautiful-dnd|dnd-kit/
 assert.match(format, /PairingBoard/, 'format step uses pairing board');
 assert.match(format, /manual|automatic|Thủ công|Tự động/, 'manual and automatic preview/apply modes are present');
 assert.match(format, /UNPAIRED_MEMBER|chưa ghép/i, 'unpaired blocker is surfaced');
+assert.match(format, /change\.type === 'reserve_member'[\s\S]*selectedMemberIds/, 'reserving removes the member from the competition selection');
+assert.match(format, /change\.type === 'switch_format'[\s\S]*entrantType/, 'supported format switch updates draft format state');
 
 console.log('participants T2.B UI contract ok');

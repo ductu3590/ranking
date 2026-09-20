@@ -46,6 +46,7 @@
     background: linear-gradient(135deg, #0f766e, #16a34a);
     color: #ffffff;
     font-weight: 800;
+    min-height: 44px;
     padding: 14px 16px;
     box-shadow: 0 12px 24px rgba(15, 118, 110, 0.22);
 }
@@ -80,6 +81,7 @@
     border: 1px solid var(--border, #e5e7eb);
     border-radius: 999px;
     background: #ffffff;
+    min-height: 44px;
     padding: 10px 12px;
     font-weight: 700;
 }
@@ -103,6 +105,18 @@
     display: flex;
     align-items: center;
     gap: 10px;
+}
+
+.participants-card button:focus-visible,
+.participants-card input:focus-visible {
+    outline: 3px solid var(--primary, #0f766e);
+    outline-offset: 3px;
+}
+
+.participants-visible-action input,
+.participants-row input {
+    width: 20px;
+    height: 20px;
 }
 
 .participants-warning,

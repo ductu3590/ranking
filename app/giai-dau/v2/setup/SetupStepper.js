@@ -37,7 +37,8 @@ export default function SetupStepper({ steps, currentStep, highestAllowedStep, o
               >
                 <span className="setup-stepper__index" aria-hidden="true">{step.id}</span>
                 <span className="setup-stepper__copy">
-                  <span className="setup-stepper__label">{step.label}</span>
+                  <span className="setup-stepper__label setup-stepper__label--full">{step.label}</span>
+                  <span className="setup-stepper__label setup-stepper__label--short">{step.shortLabel}</span>
                   <span className="setup-stepper__description">{step.description}</span>
                 </span>
               </button>

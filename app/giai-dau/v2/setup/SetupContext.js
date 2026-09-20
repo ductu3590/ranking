@@ -3,10 +3,10 @@
 import { createContext, useCallback, useContext, useMemo, useReducer } from 'react';
 
 export const SETUP_STEPS = [
-  { id: 1, key: 'info', label: 'Thông tin & VĐV', shortLabel: 'Thông tin', description: 'Tên giải, ngày đấu và danh sách thành viên.' },
+  { id: 1, key: 'info', label: 'Thông tin & người tham gia', shortLabel: 'Thông tin', description: 'Tên giải, ngày đấu và danh sách thành viên.' },
   { id: 2, key: 'format', label: 'Thể thức & ghép cặp', shortLabel: 'Ghép cặp', description: 'Chọn thể thức, kiểm tra cặp và dự bị.' },
-  { id: 3, key: 'draw', label: 'Bốc thăm & lịch', shortLabel: 'Bốc thăm', description: 'Bảng đấu, nhánh loại trực tiếp và lịch nháp.' },
-  { id: 4, key: 'review', label: 'Rà soát & chốt', shortLabel: 'Chốt lịch', description: 'Kiểm tra blocker trước khi tạo lịch chính thức.' },
+  { id: 3, key: 'draw', label: 'Bốc thăm & xem trước lịch', shortLabel: 'Bốc thăm', description: 'Bảng đấu, nhánh loại trực tiếp và lịch nháp.' },
+  { id: 4, key: 'review', label: 'Kiểm tra và chốt', shortLabel: 'Chốt lịch', description: 'Kiểm tra blocker trước khi tạo lịch chính thức.' },
 ];
 
 const STEP_COUNT = SETUP_STEPS.length;

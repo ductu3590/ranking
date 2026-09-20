@@ -1,8 +1,15 @@
 'use strict';
 
 const { read, assert } = require('../unified-setup-v2/_harness');
-const wizard = read('app/giai-dau/v2/TournamentWizard.js');
-const source = wizard + '\n' + read('app/giai-dau/v2/wizard/StepRegister.js');
+const source = [
+    read('app/giai-dau/v2/TournamentWizard.js'),
+    read('app/giai-dau/v2/setup/SetupContext.js'),
+    read('app/giai-dau/v2/setup/SetupStepper.js'),
+    read('app/giai-dau/v2/setup/steps/InfoParticipantsStep.js'),
+    read('app/giai-dau/v2/setup/steps/FormatPairingStep.js'),
+    read('app/giai-dau/v2/setup/participants/ParticipantRosterPicker.js'),
+    read('app/giai-dau/v2/setup/pairing/PairingBoard.js'),
+].join('\n');
 
 for (const label of ['Thông tin & người tham gia', 'Thể thức & ghép cặp', 'Bốc thăm & xem trước lịch', 'Kiểm tra và chốt']) {
     assert(source.includes(label), `wizard has four-step label: ${label}`);

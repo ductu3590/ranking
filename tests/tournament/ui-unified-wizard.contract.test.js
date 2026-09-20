@@ -14,6 +14,7 @@ assert(/entrant|pairId|entry|draw/.test(wizard), 'preview is based on real entra
 assert(/save draft|Lưu nháp|saveDraft/i.test(wizard), 'save draft is distinct from finalize');
 assert(/schedule|Lịch thi đấu/.test(wizard), 'finalize redirects to schedule');
 assert(!/setLive|status\s*[:=]\s*["']LIVE/.test(wizard), 'finalize does not set LIVE');
-assert(!/setup|wizard|Thiết lập/i.test(consoleSource) || /redirect|workspace|finalized/i.test(consoleSource), 'console does not own an independent setup flow');
+assert(!/DivisionSetupPanel/.test(consoleSource), 'console khong render setup editor rieng');
+assert(/play_type === 'doubles' \? false/.test(consoleSource) || /isAdmin=\{[^}]*doubles[^}]*false/.test(consoleSource), 'TeamsTab read-only cho noi dung doi de khong co hai editor cung ghi');
 
 console.log('ui T0.2 red contract: draft, preview, finalize boundary checks');

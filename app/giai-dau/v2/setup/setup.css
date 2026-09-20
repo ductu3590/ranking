@@ -118,7 +118,13 @@
 .setup-stepper__label,
 .setup-stepper__description { display: block; }
 .setup-stepper__label { font-weight: 800; }
+.setup-stepper__label--short { display: none; }
 .setup-stepper__description { margin-top: 3px; color: var(--setup-muted); font-size: .78rem; line-height: 1.35; }
+
+@media (max-width: 540px) {
+  .setup-stepper__label--full { display: none; }
+  .setup-stepper__label--short { display: block; }
+}
 
 .setup-layout {
   display: grid;

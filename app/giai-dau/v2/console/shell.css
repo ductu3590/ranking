@@ -29,11 +29,6 @@
 .v2-console-live-dot i { width: 6px; height: 6px; border-radius: 50%; background: var(--danger); animation: v2-console-blip 1.6s infinite; }
 @keyframes v2-console-blip { 50% { opacity: .25; } }
 .v2-console-live-box button { border: 0; border-radius: 10px; padding: 8px 10px; min-height: 44px; cursor: pointer; font: 700 .8rem inherit; }
-.v2-console-stage-picker { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
-.v2-console-stage-picker::-webkit-scrollbar { display: none; }
-.v2-console-stage-picker button { flex: 0 0 auto; min-height: 44px; display: inline-flex; align-items: center; padding: 0 14px; border: 1px solid var(--border-color); border-radius: 999px; background: var(--bg-card); color: var(--text-secondary); cursor: pointer; white-space: nowrap; font: 600 .82rem inherit; }
-.v2-console-stage-picker button:hover { border-color: var(--primary); color: var(--primary); }
-.v2-console-stage-picker button[aria-pressed='true'] { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
 .v2-console-admin-card { display: flex; align-items: center; gap: 9px; margin-top: auto; padding: 11px 8px 3px; border-top: 1px solid var(--border-color); }
 .v2-console-admin-avatar { display: grid; width: 31px; height: 31px; flex: 0 0 auto; place-items: center; border-radius: 50%; background: var(--primary-light); color: var(--primary); font-size: .7rem; font-weight: 800; text-transform: uppercase; }
 .v2-console-admin-copy { display: grid; min-width: 0; gap: 2px; }

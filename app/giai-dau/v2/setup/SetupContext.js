@@ -32,9 +32,30 @@ function normalizeStep(step) {
   return clampStep(step);
 }
 
+function normalizeInvitedClub(row) {
+  const source = row && typeof row === 'object' ? row : {};
+  const clubId = source.clubId ?? source.club_id ?? null;
+  return {
+    clubId: clubId == null || clubId === '' ? null : Number(clubId),
+    name: String(source.name || source.clubName || '').trim(),
+    source: source.source === 'external' ? 'external' : 'system',
+    status: source.status || 'pending',
+  };
+}
+
+function withOrganizerReadiness(draft) {
+  const readiness = draft.readiness || { blockers: [], warnings: [] };
+  const blockers = Array.isArray(readiness.blockers) ? readiness.blockers.filter((item) => item?.code !== 'NO_CLUB_INVITED') : [];
+  if (draft.tournament?.organizerMode === 'friendly' && (!Array.isArray(draft.invitedClubs) || draft.invitedClubs.length === 0)) {
+    blockers.push({ code: 'NO_CLUB_INVITED', message: 'Hãy mời ít nhất một CLB.', severity: 'blocker' });
+  }
+  return { ...draft, readiness: { ...readiness, blockers } };
+}
+
 function normalizeDraft(draft) {
   const safeDraft = draft && typeof draft === 'object' ? draft : {};
-  return {
+  const tournament = safeDraft.tournament || {};
+  const normalized = {
     draftVersion: safeDraft.draftVersion || 2,
     draftId: safeDraft.draftId || null,
     tournamentId: safeDraft.tournamentId || null,
@@ -42,7 +63,8 @@ function normalizeDraft(draft) {
     state: safeDraft.state || 'local_only',
     revision: Number.isFinite(Number(safeDraft.revision)) ? Number(safeDraft.revision) : 0,
     currentStep: normalizeStep(safeDraft.currentStep || 1),
-    tournament: safeDraft.tournament || {},
+    tournament: { ...tournament, organizerMode: tournament.organizerMode === 'friendly' ? 'friendly' : 'internal' },
+    invitedClubs: Array.isArray(safeDraft.invitedClubs) ? safeDraft.invitedClubs.map(normalizeInvitedClub).filter((club) => club.name) : [],
     participants: safeDraft.participants || {},
     format: safeDraft.format || {},
     pairs: Array.isArray(safeDraft.pairs) ? safeDraft.pairs : [],
@@ -54,6 +76,7 @@ function normalizeDraft(draft) {
     savedAt: safeDraft.savedAt || null,
     finalizedAt: safeDraft.finalizedAt || null,
   };
+  return withOrganizerReadiness(normalized);
 }
 
 function getBlockers(draft) {

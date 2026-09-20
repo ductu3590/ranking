@@ -278,11 +278,11 @@ async function notLoading(page, what, timeout = 30000) {
 // phai mo ngan keo truoc khi bam — neu khong Playwright se cho mai mot phan tu
 // nam ngoai khung nhin.
 async function openDrawerIfNeeded(page) {
-    const burger = page.locator('.ops-burger');
+    const burger = page.locator('.v2-console-burger');
     if (!(await burger.count()) || !(await burger.first().isVisible())) return;
-    if (await page.locator('.ops-shell.is-drawer-open').count()) return;
+    if (await page.locator('.v2-console-shell.is-drawer-open').count()) return;
     await burger.first().click();
-    await waitUntil(async () => (await page.locator('.ops-shell.is-drawer-open').count()) > 0,
+    await waitUntil(async () => (await page.locator('.v2-console-shell.is-drawer-open').count()) > 0,
         { what: 'ngan keo dieu huong mo ra', timeout: 15000 });
 }
 
@@ -298,7 +298,7 @@ async function gotoStep(page, stepRx) {
 // doan moi. Thieu no, harness co the doc nham danh sach cua giai doan cu (nut da
 // doi trang thai nhung React chua render lai xong).
 async function pickStage(page, stageRx, expectedCards) {
-    const picker = page.locator('.ops-stage-picker button', { hasText: stageRx });
+    const picker = page.locator('.v2-stage-picker button', { hasText: stageRx });
     if (!(await picker.count())) return;
     const button = picker.first();
     const already = (await button.getAttribute('aria-pressed')) === 'true';
@@ -1151,7 +1151,7 @@ scenario({
             await gotoStep(page, RX.stepAthletes);
             // Doi bo chon giai doan render xong roi moi do: neu do som, cac nut
             // chua ton tai va phep do se "dat" ma khong kiem duoc gi.
-            await waitUntil(async () => (await page.locator('.ops-stage-picker button').count()) >= 2,
+            await waitUntil(async () => (await page.locator('.v2-stage-picker button').count()) >= 2,
                 { what: 'bo chon giai doan hien ra', timeout: 30000 });
             const measured = await measureTapTargets(page);
             assert(measured.overflow <= 1, `tran ngang ${measured.overflow}px o be ${width}`);

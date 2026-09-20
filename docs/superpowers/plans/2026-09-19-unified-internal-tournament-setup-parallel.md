@@ -381,6 +381,40 @@ Wave 0 T0.3 mới chỉ chốt khung đo và cấu hình máy; toàn bộ số l
 
 ---
 
+### T2.E — Giao hữu liên CLB trên workspace mới
+
+**Owner:** `tournament-ui-dev` (phối hợp integrator cho phần shared)
+**Depends:** T2.D
+**Lý do phát sinh:** T2.D thay toàn bộ `TournamentWizard.js` bằng workspace nội bộ và **xóa mất đường tạo giải giao hữu** — ngoài phạm vi plan. Bằng chứng: `inviteTournamentClub` và `listTournamentClubs` còn 0 caller trong `app/`; `CHECKPOINT.CLUB_INVITES` thành định nghĩa mồ côi; dashboard vẫn hiện nhãn `Giao hữu liên CLB` nhưng lối tạo duy nhất là `?create=internal`. `tests/phase3/interclub-ui.test.js` bắt đúng lỗi này.
+
+**Quyết định:** mở rộng workspace 4 bước để hỗ trợ giao hữu, **không** khôi phục wizard cũ — giữ đúng tinh thần "xóa setup kép".
+
+**Phải làm:**
+
+- Bước 1 có bộ chọn phạm vi: `Nội bộ CLB` / `Giao hữu liên CLB`. Ghi vào `draft.tournament.organizerMode`.
+- Khi `organizerMode === 'friendly'`: bước 1 đổi từ chọn thành viên sang **mời CLB** — tìm CLB trong hệ thống (`listTournamentClubs`), mời bằng `inviteTournamentClub`, thêm CLB ngoài hệ thống bằng `inviteExternalClub`.
+- Giữ nguyên xử lý 409 của luồng cũ: CLB đã có trong giải thì ghi nhận "đã mời", không ném lỗi.
+- Blocker `NO_CLUB_INVITED` khi giao hữu mà chưa mời CLB nào.
+- Checkpoint `CLUB_INVITES` được nối lại vào chuỗi finalize cho nhánh giao hữu.
+- Cảnh báo cùng CLB chung bảng: giao hữu **có** cảnh báo (`draw.js` đã xử lý đúng — chỉ bỏ qua khi `organizerMode === 'internal'`). Không sửa `draw.js`.
+
+**Contract:** `SetupDraftV2` hiện chỉ có `tournament.organizerMode`, chưa có chỗ cho danh sách CLB mời. Cần **ADR ngắn** mở rộng contract (thêm `invitedClubs`), không sửa ngầm.
+
+#### Phân chia ba phần — KHÔNG mở ownership `TournamentWizard.js`
+
+Khảo sát code cho thấy T2.E không cần chạm shared entry point nào:
+
+| Việc | Đã có sẵn / Ai làm |
+|---|---|
+| Liệt kê CLB mời được **trước khi có `tournamentId`** | **Đã có.** `GET /api/tournament-v2/clubs?mode=available` (comment trong route ghi rõ "wizard gọi trước khi giải tồn tại"), và client helper `listAvailableTournamentClubs(tournamentId?)` đã export ở `lib/tournamentV2Client.js:285`. T2.E chỉ việc gọi. |
+| Gửi `invitedClubs` tới finalize | **Đã có.** `finalize(draft)` POST nguyên `draft` lên `/setup/finalize`, nên `draft.invitedClubs` tự tới nơi. Không sửa adapter, không sửa `TournamentWizard.js`. |
+| **Ghi lời mời khi finalize** | **T1.B** — route `/setup/finalize` đọc `body.draft.invitedClubs` và tạo lời mời **trong transaction**. |
+| **Lưu `invitedClubs` khi lưu nháp** | **T1.B** thêm action `replace_invited_clubs` vào `/setup`; **integrator** thêm nhánh tương ứng vào `saveDraft` (`lib/tournamentV2Client.js`), vì `saveDraft` hiện chỉ gửi `athlete_ids`. |
+
+**Cấm tuyệt đối:** gọi `inviteTournamentClub` tuần tự trong vòng lặp phía UI như wizard cũ. Đó chính là lỗi E của `plan-1.md` — nhiều API nối tiếp, nuốt lỗi 409, giải tồn tại nhưng thiếu dữ liệu. Lời mời ghi server-side, nguyên tử, cùng đơn vị với stage và fixtures.
+
+**Exit gate:** `node tests/phase3/interclub-ui.test.js` xanh; tạo được cả giải nội bộ lẫn giao hữu qua workspace; lưu nháp giao hữu sống qua reload; `inviteTournamentClub` / `listAvailableTournamentClubs` có caller thật trở lại.
+
 ## 7. Wave 3 — Integration journeys và hardening
 
 ### T3.1 — Happy path internal doubles
@@ -537,6 +571,7 @@ Commit riêng; ghi handoff _workspace/unified-setup-ux/<ID>.md gồm files, API 
 - [ ] Domain/API contract suites xanh sau Wave 1.
 - [ ] Wave 2 không sửa shared entry points ngoài integrator.
 - [ ] Console setup kép đã bị loại khỏi đường dùng chính.
+- [ ] T2.E: tạo được giải giao hữu qua workspace; `interclub-ui.test.js` xanh.
 - [ ] Browser happy path xanh trên desktop và 390px.
 - [ ] Revision conflict, retry và idempotency xanh.
 - [ ] Preview/finalize match identities/count khớp.

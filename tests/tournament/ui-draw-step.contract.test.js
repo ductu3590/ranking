@@ -39,8 +39,8 @@ assert(/unlockDraw\(\{ stage_id: stageId, reason \}\)/.test(s), 'lý do huỷ ch
 assert(!/#[0-9a-fA-F]{6}/.test(s), 'không hardcode màu, style qua CSS variable');
 
 const css = read('app/giai-dau/v2/console/shell.css');
-assert(/\.ops-draw-slot/.test(css), 'có style cho ô đội');
-assert(/\.ops-draw-slot\.is-picked/.test(css), 'ô được chọn có trạng thái nhìn thấy được');
+assert(/\.v2-console-draw-slot/.test(css), 'có style cho ô đội');
+assert(/\.v2-console-draw-slot\.is-picked/.test(css), 'ô được chọn có trạng thái nhìn thấy được');
 
 const con = read('app/giai-dau/v2/console/TournamentConsoleV2.js');
 assert(/DrawStep/.test(con), 'bước 4 mount DrawStep');

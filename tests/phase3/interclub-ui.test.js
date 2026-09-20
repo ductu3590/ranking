@@ -8,16 +8,18 @@ const assert = (condition, message) => { if (!condition) { console.error(`FAIL: 
 assert(exists('app/api/tournament-v2/clubs/route.js'), 'có API tournament clubs');
 assert(read('lib/tournamentV2Client.js').includes('listTournamentClubs'), 'client có listTournamentClubs');
 assert(read('lib/tournamentV2Client.js').includes('inviteTournamentClub'), 'client có inviteTournamentClub');
-// Wizard đã tách thành nhiều file; đọc gộp toàn bộ nguồn wizard.
-let wizard = read('app/giai-dau/v2/TournamentWizard.js');
-const wizardDir = path.join(root, 'app/giai-dau/v2/wizard');
-if (fs.existsSync(wizardDir)) {
-    for (const file of fs.readdirSync(wizardDir)) {
-        if (file.endsWith('.js')) wizard += '\n' + fs.readFileSync(path.join(wizardDir, file), 'utf8');
-    }
+
+function readJavaScriptTree(directory) {
+    const fullDirectory = path.join(root, directory);
+    return fs.readdirSync(fullDirectory, { withFileTypes: true }).flatMap((entry) => {
+        const relativePath = path.join(directory, entry.name);
+        if (entry.isDirectory()) return readJavaScriptTree(relativePath);
+        return entry.name.endsWith('.js') ? [fs.readFileSync(path.join(root, relativePath), 'utf8')] : [];
+    }).join('\n');
 }
-// Wizard tạo giải đã đổi sang luồng 3 bước; phạm vi "Giao hữu (mời CLB)" thay
-// cho nhãn "Giải liên CLB" cũ. Vẫn mời CLB khác qua inviteTournamentClub.
+
+// Workspace setup thay wizard cũ; contract phải quét toàn bộ component setup đệ quy.
+const wizard = readJavaScriptTree('app/giai-dau/v2/setup');
 assert(wizard.includes('Giao hữu'), 'wizard có phạm vi giao hữu (mời CLB)');
 assert(wizard.includes('inviteTournamentClub'), 'wizard mời CLB khác');
 assert(wizard.includes('CLB được mời'), 'wizard có nhánh đăng ký giao hữu (CLB được mời)');

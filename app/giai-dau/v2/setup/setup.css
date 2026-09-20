@@ -148,6 +148,23 @@
 .setup-placeholder span { display: block; }
 .setup-placeholder span { margin-top: 6px; }
 
+.setup-step-info { display: grid; gap: 14px; }
+.setup-scope-card, .setup-friendly-card { border: 1px solid var(--setup-border); border-radius: 24px; padding: 18px; background: rgba(255, 255, 255, .92); }
+.setup-scope-card h2, .setup-friendly-card h2 { margin: 0; }
+.setup-scope-toggle { display: grid; gap: 8px; margin-top: 12px; }
+.setup-scope-toggle button, .setup-club-option, .setup-invited-row button { border: 1px solid var(--setup-border); border-radius: 18px; background: #fff; color: var(--setup-text); font-weight: 800; cursor: pointer; }
+.setup-scope-toggle button { min-height: 48px; padding: 0 14px; }
+.setup-scope-toggle button.is-active { border-color: var(--setup-primary); background: var(--setup-primary-soft); color: var(--setup-primary); }
+.setup-club-grid, .setup-invited-list { display: grid; gap: 10px; }
+.setup-club-option { display: grid; gap: 4px; padding: 13px 14px; text-align: left; }
+.setup-club-option small, .setup-invited-row small { color: var(--setup-muted); font-weight: 600; }
+.setup-external-club { display: grid; gap: 10px; margin: 14px 0; }
+.setup-external-club label { display: grid; gap: 6px; font-weight: 800; }
+.setup-external-club input { width: 100%; border: 1px solid var(--setup-border); border-radius: 14px; padding: 12px; }
+.setup-invited-row { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 12px; border: 1px solid var(--setup-border); border-radius: 18px; background: var(--setup-surface-soft); }
+.setup-invited-row div { display: grid; gap: 3px; }
+.setup-invited-row button { padding: 8px 12px; }
+
 .setup-summary {
   display: grid;
   gap: 12px;
@@ -229,6 +246,9 @@
 
 @media (min-width: 860px) {
   .setup-workspace { padding: 28px 24px 116px; }
+  .setup-scope-toggle { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .setup-club-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .setup-external-club { grid-template-columns: minmax(0, 1fr) auto; align-items: end; }
   .setup-layout { grid-template-columns: minmax(0, 1fr) 340px; align-items: start; }
   .setup-summary { position: sticky; top: 18px; }
   .setup-actionbar { left: 50%; right: auto; width: min(1120px, calc(100vw - 48px)); transform: translateX(-50%); grid-template-columns: minmax(220px, 1fr) auto; align-items: center; }

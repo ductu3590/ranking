@@ -86,15 +86,16 @@ export async function GET(request) {
         }
 
         const readiness = normalizeSetupReadiness(data);
-        const [{ data: division, error: divisionError }, { data: athletes, error: athletesError }, { data: rosterRows, error: rosterError }, { data: entries, error: entriesError }, { data: pairs, error: pairsError }, { data: stages, error: stagesError }] = await Promise.all([
+        const [{ data: division, error: divisionError }, { data: athletes, error: athletesError }, { data: rosterRows, error: rosterError }, { data: entries, error: entriesError }, { data: pairs, error: pairsError }, { data: stages, error: stagesError }, { data: invitedClubs, error: invitedClubsError }] = await Promise.all([
             db.from('tournament_divisions').select('id, name, play_type, pairing_mode, setup_revision, roster_lock_status').eq('id', Number(divisionId)).eq('group_id', Number(groupId)).eq('tournament_id', Number(tournamentId)).maybeSingle(),
             db.from('tournament_athletes').select('id, display_name_snapshot, tournament_club_id, phr_rating, phr_status').eq('group_id', Number(groupId)).eq('tournament_id', Number(tournamentId)).order('id'),
             db.from('tournament_division_roster_members').select('tournament_athlete_id').eq('group_id', Number(groupId)).eq('division_id', Number(divisionId)).order('tournament_athlete_id'),
             db.from('tournament_entries').select('id, pair_id, name_snapshot, status, seed').eq('group_id', Number(groupId)).eq('division_id', Number(divisionId)).order('id'),
             db.from('tournament_pairs').select('id, name_snapshot, status, pairing_mode').eq('group_id', Number(groupId)).eq('division_id', Number(divisionId)).in('status', ['confirmed', 'locked']).order('id'),
             db.from('tournament_stages').select('id, name, schedule_format, stage_order, status, config').eq('group_id', Number(groupId)).eq('tournament_id', Number(tournamentId)).eq('division_id', Number(divisionId)).order('stage_order'),
+            db.from('tournament_clubs').select('id, club_id, external_club_id, invitation_status').eq('group_id', Number(groupId)).eq('tournament_id', Number(tournamentId)).neq('invitation_status', 'withdrawn').order('id'),
         ]);
-        const aggregateError = divisionError || athletesError || rosterError || entriesError || pairsError || stagesError;
+        const aggregateError = divisionError || athletesError || rosterError || entriesError || pairsError || stagesError || invitedClubsError;
         if (aggregateError) {
             console.error('Setup aggregate query error:', aggregateError);
             return NextResponse.json({ error: aggregateError.message }, { status: 500 });
@@ -114,9 +115,28 @@ export async function GET(request) {
             if (!membersByPair.has(member.pair_id)) membersByPair.set(member.pair_id, []);
             membersByPair.get(member.pair_id).push(member);
         }
+        const invitedRows = invitedClubs || [];
+        const invitedSystemIds = [...new Set(invitedRows.map((club) => club.club_id).filter((id) => id != null))];
+        const invitedExternalIds = [...new Set(invitedRows.map((club) => club.external_club_id).filter((id) => id != null))];
+        const [invitedSystemResult, invitedExternalResult] = await Promise.all([
+            invitedSystemIds.length ? db.from('groups').select('id, name').in('id', invitedSystemIds) : Promise.resolve({ data: [] }),
+            invitedExternalIds.length ? db.from('tournament_external_clubs').select('id, name').eq('group_id', Number(groupId)).in('id', invitedExternalIds) : Promise.resolve({ data: [] }),
+        ]);
+        const invitedSystemNames = new Map((invitedSystemResult.data || []).map((row) => [String(row.id), row.name]));
+        const invitedExternalNames = new Map((invitedExternalResult.data || []).map((row) => [String(row.id), row.name]));
         return NextResponse.json({
             readiness,
             division,
+            invitedClubs: invitedRows.map((club) => ({
+                tournamentClubId: club.id,
+                clubId: club.club_id,
+                externalClubId: club.external_club_id,
+                name: club.club_id == null
+                    ? (invitedExternalNames.get(String(club.external_club_id)) || `CLB ngoài #${club.external_club_id}`)
+                    : (invitedSystemNames.get(String(club.club_id)) || `CLB #${club.club_id}`),
+                source: club.club_id == null ? 'external' : 'system',
+                status: club.invitation_status || 'invited',
+            })),
             roster: { athlete_ids: (rosterRows || []).map((row) => row.tournament_athlete_id), athletes: athletes || [] },
             pairs: (pairs || []).map((pair) => ({ ...pair, members: membersByPair.get(pair.id) || [], entry_id: (entries || []).find((entry) => entry.pair_id === pair.id)?.id || null })),
             entries: entries || [],
@@ -158,6 +178,19 @@ export async function POST(request) {
             const { data, error } = await db.rpc('replace_tournament_division_roster_revisioned', {
                 p_group_id: Number(groupId), p_tournament_id: Number(tournamentId), p_division_id: Number(divisionId),
                 p_athlete_ids: athleteIds.map(Number), p_expected_setup_revision: expectedRevision, p_idempotency_key: idempotencyKey,
+            });
+            if (error) return mutationError(error);
+            return NextResponse.json({ success: true, ...(data || {}) });
+        }
+
+        if (action === 'replace_invited_clubs') {
+            const invitedClubs = body?.invited_clubs ?? body?.invitedClubs;
+            if (!Array.isArray(invitedClubs)) {
+                return NextResponse.json({ error: 'invited_clubs phải là mảng CLB được mời', code: 'SETUP_PAYLOAD_INVALID' }, { status: 400 });
+            }
+            const { data, error } = await db.rpc('replace_tournament_invited_clubs_revisioned', {
+                p_group_id: Number(groupId), p_tournament_id: Number(tournamentId), p_division_id: Number(divisionId),
+                p_invited_clubs: invitedClubs, p_expected_setup_revision: expectedRevision, p_idempotency_key: idempotencyKey,
             });
             if (error) return mutationError(error);
             return NextResponse.json({ success: true, ...(data || {}) });

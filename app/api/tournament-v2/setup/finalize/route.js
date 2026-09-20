@@ -15,6 +15,14 @@ export async function POST(request) {
     try {
         const body = await request.json();
         const { tournamentId, divisionId, expectedRevision, idempotencyKey } = validateFinalizePayload(body);
+        const draft = body?.draft && typeof body.draft === 'object' ? body.draft : {};
+        const invitedClubs = Array.isArray(draft.invitedClubs) ? draft.invitedClubs : [];
+        if (draft?.tournament?.organizerMode === 'friendly' && invitedClubs.length === 0) {
+            const error = new Error('Hãy mời ít nhất một CLB trước khi chốt giải giao hữu.');
+            error.code = 'NO_CLUB_INVITED';
+            error.status = 400;
+            throw error;
+        }
         const stages = Array.isArray(body.stage_plan) ? body.stage_plan : body.stagePlan;
         const draw = body.draw;
         const normalizedStages = stages.map((stage) => ({
@@ -34,6 +42,7 @@ export async function POST(request) {
             p_expected_revision: expectedRevision,
             p_stage_plan: normalizedStages,
             p_idempotency_key: idempotencyKey,
+            p_invited_clubs: invitedClubs,
         });
         if (error) throw mapRpcError(error);
 

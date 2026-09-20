@@ -59,6 +59,15 @@ function formatTags(tournament) {
 
 function rowPresentation(tournament) {
     const group = groupOf(tournament.status || 'draft');
+    if (tournament.status === 'draft') {
+        return {
+            tone: 'upcoming',
+            badge: STATUS_LABELS.draft || 'Bản nháp',
+            visualLabel: 'Nội bộ CLB',
+            primaryAction: 'Tiếp tục thiết lập',
+            secondaryAction: 'Chỉnh sửa giải',
+        };
+    }
     if (group === 'running') {
         return {
             tone: 'live',
@@ -239,12 +248,13 @@ function TournamentV2DashboardClientInner() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const activeId = searchParams.get('t');
+    const createMode = searchParams.get('create');
 
     const [tournaments, setTournaments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [isAdmin, setIsAdmin] = useState(false);
-    const [creating, setCreating] = useState(false);
+    const [creating, setCreating] = useState(createMode === 'internal');
     const [editing, setEditing] = useState(null);      // tournament object
     const [deletingId, setDeletingId] = useState(null); // id to delete
     const [deleteBusy, setDeleteBusy] = useState(false);
@@ -280,6 +290,13 @@ function TournamentV2DashboardClientInner() {
 
     function openTournament(id) {
         router.push(`/dieu-hanh-giai/${id}`);
+    }
+
+    function openSetup(tournament) {
+        const divisionId = tournament?.formats?.[0]?.division_id || tournament?.division_id;
+        const params = new URLSearchParams({ tournamentId: String(tournament.id) });
+        if (divisionId) params.set('divisionId', String(divisionId));
+        router.push(`/giai-dau/v2?create=internal&${params.toString()}`);
     }
 
     function handleWizardDone(id) {
@@ -402,7 +419,7 @@ function TournamentV2DashboardClientInner() {
                 </div>
                 {isAdmin && (
                     <button type="button" className="v2-btn-primary v2-create-tournament" onClick={() => setCreating(true)}>
-                        <span aria-hidden="true">＋</span> Tạo giải đấu mới
+                        <span aria-hidden="true">＋</span> Tạo giải nội bộ
                     </button>
                 )}
             </section>
@@ -481,8 +498,8 @@ function TournamentV2DashboardClientInner() {
                             key={t.id}
                             tournament={t}
                             isAdmin={isAdmin}
-                            onOpen={() => openTournament(t.id)}
-                            onEdit={() => setEditing(t)}
+                            onOpen={() => (t.status === 'draft' ? openSetup(t) : openTournament(t.id))}
+                            onEdit={() => (t.status === 'draft' ? openSetup(t) : setEditing(t))}
                             onDelete={() => setDeletingId(t.id)}
                         />
                     ))}

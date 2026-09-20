@@ -90,36 +90,36 @@ export default function DrawStep({ tournamentId, stageId, stage, isAdmin, reload
 
     function closeDialog() { setDialog(null); setUnlockReason(''); }
 
-    if (loading) return <p className="ops-muted">Đang tải bốc thăm…</p>;
+    if (loading) return <p className="v2-console-muted">Đang tải bốc thăm…</p>;
     if (error && !data) {
-        return <div className="ops-error"><p>{error}</p><button type="button" className="ops-control-button" onClick={load}>Thử lại</button></div>;
+        return <div className="v2-console-error"><p>{error}</p><button type="button" className="v2-console-control-button" onClick={load}>Thử lại</button></div>;
     }
     if (!data) return null;
 
     return (
-        <div className="ops-block-list">
-            {error ? <p className="ops-error">{error}</p> : null}
-            {notice ? <p className="ops-muted">{notice}</p> : null}
+        <div className="v2-console-block-list">
+            {error ? <p className="v2-console-error">{error}</p> : null}
+            {notice ? <p className="v2-console-muted">{notice}</p> : null}
 
-            <section className="ops-block">
+            <section className="v2-console-block">
                 <h3>Bốc thăm &amp; chốt lịch</h3>
-                <p className="ops-muted">
+                <p className="v2-console-muted">
                     Bốc thăm chưa tạo trận nào. Sửa tay và bốc lại thoải mái; chỉ khi bấm
                     <b> Chốt &amp; sinh lịch</b> thì lịch thi đấu mới được tạo.
                 </p>
 
                 {readiness ? (
-                    <div className={`ops-readiness ${readiness.status === 'ready' ? 'is-ready' : 'is-blocked'}`}>
+                    <div className={`v2-console-readiness ${readiness.status === 'ready' ? 'is-ready' : 'is-blocked'}`}>
                         <div><b>Kiểm tra chuẩn bị từ máy chủ</b><span>Phiên bản thiết lập {readiness.revision}</span></div>
                         {readiness.status === 'ready' ? <p>Đội hình và suất thi đấu đã sẵn sàng.</p> : <><p>Cần xử lý trước khi hoàn tất thiết lập:</p><ul>{readinessReasons.map((reason, index) => <li key={`${reason.code || 'reason'}-${reason.entity_id || index}`}>{reason.message || reason.code || 'Thiết lập chưa hợp lệ.'}</li>)}</ul></>}
                     </div>
                 ) : null}
 
                 {isAdmin ? (
-                    <div className="ops-draw-actions">
+                    <div className="v2-console-draw-actions">
                         <button
                             type="button"
-                            className="ops-control-button"
+                            className="v2-console-control-button"
                             disabled={busy || locked || setupBlocked}
                             onClick={() => run(() => rollDraw({ stage_id: stageId }), 'Đã bốc thăm.')}
                         >
@@ -127,7 +127,7 @@ export default function DrawStep({ tournamentId, stageId, stage, isAdmin, reload
                         </button>
                         <button
                             type="button"
-                            className="ops-control-button"
+                            className="v2-console-control-button"
                             disabled={busy || locked || setupBlocked || picked.length !== 2}
                             onClick={() => run(
                                 () => swapDrawEntries({ stage_id: stageId, entry_a: picked[0], entry_b: picked[1] }),
@@ -137,13 +137,13 @@ export default function DrawStep({ tournamentId, stageId, stage, isAdmin, reload
                             Đổi chỗ {picked.length === 2 ? '' : `(chọn 2 đội — đang chọn ${picked.length})`}
                         </button>
                         {locked ? (
-                            <button type="button" className="ops-control-button" disabled={busy} onClick={() => setDialog('unlock')}>
+                            <button type="button" className="v2-console-control-button" disabled={busy} onClick={() => setDialog('unlock')}>
                                 Huỷ chốt
                             </button>
                         ) : (
                             <button
                                 type="button"
-                                className="ops-control-button is-primary"
+                                className="v2-console-control-button is-primary"
                                 disabled={busy || setupBlocked || draw.status !== 'draft'}
                                 onClick={() => setDialog('lock')}
                             >
@@ -154,7 +154,7 @@ export default function DrawStep({ tournamentId, stageId, stage, isAdmin, reload
                 ) : null}
 
                 {locked ? (
-                    <p className="ops-muted">
+                    <p className="v2-console-muted">
                         🔒 Đã chốt{draw.locked_at ? ` lúc ${new Date(draw.locked_at).toLocaleString('vi-VN')}` : ''}.
                         {data.played_matches > 0
                             ? ` Giai đoạn đã có ${data.played_matches} trận bắt đầu — không huỷ chốt được nữa.`
@@ -163,7 +163,7 @@ export default function DrawStep({ tournamentId, stageId, stage, isAdmin, reload
                 ) : null}
 
                 {(data.warnings || []).length > 0 ? (
-                    <div className="ops-impact">
+                    <div className="v2-console-impact">
                         <b>Cảnh báo</b> — không chặn, BTC vẫn chốt được:
                         <ul>{data.warnings.map((w) => <li key={w.code}>{w.message}</li>)}</ul>
                     </div>
@@ -171,29 +171,29 @@ export default function DrawStep({ tournamentId, stageId, stage, isAdmin, reload
             </section>
 
             {draw.status === 'none' ? (
-                <section className="ops-block">
-                    <p className="ops-muted">
+                <section className="v2-console-block">
+                    <p className="v2-console-muted">
                         Chưa bốc thăm. Giai đoạn đang có <b>{entrants.length}</b> đội.
                     </p>
                 </section>
             ) : (
-                <div className="ops-draw-groups">
+                <div className="v2-console-draw-groups">
                     {groups.map(([label, slots]) => (
-                        <section className="ops-block" key={label || 'all'}>
+                        <section className="v2-console-block" key={label || 'all'}>
                             <h3>{label ? `Bảng ${label}` : 'Thứ tự nhánh'}</h3>
-                            <div className="ops-draw-slots">
+                            <div className="v2-console-draw-slots">
                                 {slots.map((slot) => {
                                     const isPicked = picked.some((x) => String(x) === String(slot.entry_id));
                                     return (
                                         <button
                                             key={slot.entry_id}
                                             type="button"
-                                            className={`ops-draw-slot ${isPicked ? 'is-picked' : ''}`}
+                                            className={`v2-console-draw-slot ${isPicked ? 'is-picked' : ''}`}
                                             aria-pressed={isPicked}
                                             disabled={locked || !isAdmin}
                                             onClick={() => toggle(slot.entry_id)}
                                         >
-                                            <span className="ops-draw-seed">{slot.seed_in_stage}</span>
+                                            <span className="v2-console-draw-seed">{slot.seed_in_stage}</span>
                                             <span>{nameOf(entrants, slot.entry_id)}</span>
                                         </button>
                                     );
@@ -203,7 +203,7 @@ export default function DrawStep({ tournamentId, stageId, stage, isAdmin, reload
                     ))}
                 </div>
             )}
-            {dialog ? <div className="ops-dialog-backdrop" role="presentation"><section className="ops-dialog" role="dialog" aria-modal="true" aria-labelledby="draw-dialog-title"><h3 id="draw-dialog-title">{dialog === 'lock' ? 'Chốt bốc thăm?' : 'Huỷ chốt lịch?'}</h3>{dialog === 'lock' ? <><p>Chốt bốc thăm sẽ sinh lịch thi đấu. Muốn sửa sau đó cần huỷ chốt.</p>{(data.warnings || []).length ? <ul>{data.warnings.map((warning) => <li key={warning.code}>{warning.message}</li>)}</ul> : null}</> : <><p>Huỷ chốt sẽ xoá toàn bộ lịch đã sinh. Nhập lý do để tiếp tục.</p><input autoFocus value={unlockReason} onChange={(event) => setUnlockReason(event.target.value)} placeholder="Lý do huỷ chốt" /></>}<div className="ops-draw-actions"><button type="button" className="ops-control-button" onClick={closeDialog}>Quay lại</button><button type="button" className="ops-control-button is-primary" disabled={busy || (dialog === 'unlock' && !unlockReason.trim())} onClick={() => { const kind = dialog; const reason = unlockReason.trim(); closeDialog(); run(() => kind === 'lock' ? lockDraw({ stage_id: stageId }) : unlockDraw({ stage_id: stageId, reason }), kind === 'lock' ? 'Đã chốt bốc thăm và sinh lịch.' : 'Đã huỷ chốt, lịch đã xoá.'); }}>{dialog === 'lock' ? 'Chốt lịch' : 'Huỷ chốt'}</button></div></section></div> : null}
+            {dialog ? <div className="v2-console-dialog-backdrop" role="presentation"><section className="v2-console-dialog" role="dialog" aria-modal="true" aria-labelledby="draw-dialog-title"><h3 id="draw-dialog-title">{dialog === 'lock' ? 'Chốt bốc thăm?' : 'Huỷ chốt lịch?'}</h3>{dialog === 'lock' ? <><p>Chốt bốc thăm sẽ sinh lịch thi đấu. Muốn sửa sau đó cần huỷ chốt.</p>{(data.warnings || []).length ? <ul>{data.warnings.map((warning) => <li key={warning.code}>{warning.message}</li>)}</ul> : null}</> : <><p>Huỷ chốt sẽ xoá toàn bộ lịch đã sinh. Nhập lý do để tiếp tục.</p><input autoFocus value={unlockReason} onChange={(event) => setUnlockReason(event.target.value)} placeholder="Lý do huỷ chốt" /></>}<div className="v2-console-draw-actions"><button type="button" className="v2-console-control-button" onClick={closeDialog}>Quay lại</button><button type="button" className="v2-console-control-button is-primary" disabled={busy || (dialog === 'unlock' && !unlockReason.trim())} onClick={() => { const kind = dialog; const reason = unlockReason.trim(); closeDialog(); run(() => kind === 'lock' ? lockDraw({ stage_id: stageId }) : unlockDraw({ stage_id: stageId, reason }), kind === 'lock' ? 'Đã chốt bốc thăm và sinh lịch.' : 'Đã huỷ chốt, lịch đã xoá.'); }}>{dialog === 'lock' ? 'Chốt lịch' : 'Huỷ chốt'}</button></div></section></div> : null}
         </div>
     );
 }

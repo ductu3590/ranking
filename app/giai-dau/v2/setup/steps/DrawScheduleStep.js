@@ -3,13 +3,14 @@
 import '../draw/draw-review.css';
 import { useState } from 'react';
 import { buildDrawPreviewModel } from '../draw/drawReviewModel';
+import { groupAssignments, rollDraw, swapDraw } from '../draw/drawActions';
 
 const GROUP_PAIRING_LABELS = {
   cross_seed: 'Bán kết chéo bảng: Nhất A – Nhì B, Nhất B – Nhì A',
   same_seed: 'Ghép cùng thứ hạng theo cấu hình BTC',
 };
 
-export default function DrawScheduleStep({ draft = {}, onConfigChange, onRollDraw, onRerollDraw, onSwapDrawSlot, onPreviewSchedule }) {
+export default function DrawScheduleStep({ draft = {}, onConfigChange, onPreviewSchedule }) {
   const preview = buildDrawPreviewModel(draft);
   const config = preview.config;
   const drawStatus = draft.draw?.status || 'not_started';
@@ -19,6 +20,45 @@ export default function DrawScheduleStep({ draft = {}, onConfigChange, onRollDra
   // báo lỗi ngay cạnh, không reset trạng thái cả trang (plan §T3.3 LOAD-02).
   const [pendingAction, setPendingAction] = useState('');
   const [actionError, setActionError] = useState('');
+  // Đổi chỗ cần chọn HAI suất: bấm suất thứ nhất để đánh dấu, bấm suất thứ hai để đổi.
+  // Không dùng kéo-thả vì bước này phải chạy được trên điện thoại.
+  const [pickedEntryId, setPickedEntryId] = useState('');
+
+  const drawnGroups = groupAssignments(draft);
+  const hasDraw = drawnGroups.length > 0;
+
+  const applyDraw = (nextDraw) => onConfigChange?.({ draw: nextDraw });
+
+  const runLocal = (name, compute) => {
+    if (pendingAction) return;
+    setActionError('');
+    setPendingAction(name);
+    try {
+      applyDraw(compute());
+    } catch (error) {
+      setActionError(error?.message || 'Thao tác không thành công.');
+    } finally {
+      setPendingAction('');
+    }
+  };
+
+  const handleRoll = () => runLocal('roll', () => rollDraw(draft));
+
+  const handleReroll = () => {
+    if (hasDraw && !window.confirm('Bốc lại sẽ thay toàn bộ bản bốc thăm hiện tại. Tiếp tục?')) return;
+    setPickedEntryId('');
+    runLocal('reroll', () => rollDraw(draft));
+  };
+
+  const handleSlotClick = (entryId) => {
+    if (pendingAction) return;
+    setActionError('');
+    if (!pickedEntryId) { setPickedEntryId(String(entryId)); return; }
+    if (String(pickedEntryId) === String(entryId)) { setPickedEntryId(''); return; }
+    const first = pickedEntryId;
+    setPickedEntryId('');
+    runLocal('swap', () => swapDraw(draft, first, entryId));
+  };
 
   const runAction = async (name, handler, argument) => {
     if (!handler || pendingAction) return;
@@ -100,17 +140,54 @@ export default function DrawScheduleStep({ draft = {}, onConfigChange, onRollDra
         {needsRedraw ? <div className="setup-status-item blocker">Cấu hình hoặc cặp đã đổi: cần bốc lại, không tự sinh lại.</div> : null}
         {actionError ? <div className="setup-status-item blocker" role="alert">{actionError}</div> : null}
         <div className="setup-action-row">
-          <button className="setup-primary-action" type="button" disabled={Boolean(pendingAction)} aria-busy={pendingAction === 'roll'} onClick={() => runAction('roll', onRollDraw, config)}>{pendingAction === 'roll' ? 'Đang bốc thăm...' : 'Bốc thăm'}</button>
-          <button className="setup-secondary-action" type="button" disabled={Boolean(pendingAction)} aria-busy={pendingAction === 'reroll'} onClick={() => runAction('reroll', onRerollDraw, config)}>{pendingAction === 'reroll' ? 'Đang bốc lại...' : 'Bốc lại'}</button>
-          <button className="setup-secondary-action" type="button" disabled={Boolean(pendingAction)} aria-busy={pendingAction === 'swap'} onClick={() => runAction('swap', onSwapDrawSlot)}>{pendingAction === 'swap' ? 'Đang đổi...' : 'Đổi vị trí'}</button>
-          <button className="setup-secondary-action" type="button" disabled={Boolean(pendingAction)} aria-busy={pendingAction === 'preview'} onClick={() => runAction('preview', onPreviewSchedule, config)}>{pendingAction === 'preview' ? 'Đang sinh trận...' : 'Sinh trận & xếp sân/giờ'}</button>
+          <button className="setup-primary-action" type="button" disabled={Boolean(pendingAction)} aria-busy={pendingAction === 'roll'} onClick={handleRoll}>{pendingAction === 'roll' ? 'Đang bốc thăm...' : 'Bốc thăm'}</button>
+          <button className="setup-secondary-action" type="button" disabled={Boolean(pendingAction) || !hasDraw} aria-busy={pendingAction === 'reroll'} onClick={handleReroll}>{pendingAction === 'reroll' ? 'Đang bốc lại...' : 'Bốc lại'}</button>
+          <button className="setup-secondary-action" type="button" disabled={Boolean(pendingAction) || !hasDraw} aria-busy={pendingAction === 'preview'} onClick={() => runAction('preview', onPreviewSchedule, config)}>{pendingAction === 'preview' ? 'Đang sinh trận...' : 'Sinh trận & xếp sân/giờ'}</button>
         </div>
       </div>
 
       <div className="setup-draw-card">
         <p className="setup-draw-eyebrow">Bảng đấu thật</p>
         <h3>Phân bảng và tuyến đi tiếp</h3>
-        <ul className="setup-groups-list">
+        {hasDraw ? (
+          <>
+            <p className="setup-draw-hint">
+              <strong>Đổi vị trí:</strong>{' '}
+              {pickedEntryId
+                ? 'đã chọn một suất, bấm suất thứ hai để đổi chỗ, hoặc bấm lại suất đang chọn để bỏ.'
+                : 'bấm hai suất để đổi chỗ cho nhau.'}
+            </p>
+            <div className="setup-drawn-groups">
+              {drawnGroups.map((group) => (
+                <section className="setup-drawn-group" key={group.label} aria-label={`Bảng ${group.label}`}>
+                  <h4>Bảng {group.label} · {group.slots.length} cặp</h4>
+                  <ul className="setup-drawn-slots">
+                    {group.slots.map((slot) => {
+                      const picked = String(pickedEntryId) === String(slot.entryId);
+                      return (
+                        <li key={slot.entryId}>
+                          <button
+                            type="button"
+                            className={`setup-draw-slot ${picked ? 'is-picked' : ''}`}
+                            aria-pressed={picked}
+                            disabled={Boolean(pendingAction)}
+                            onClick={() => handleSlotClick(slot.entryId)}
+                          >
+                            <span className="setup-draw-seed">{slot.seedInStage}</span>
+                            <span>{slot.name}</span>
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </section>
+              ))}
+            </div>
+          </>
+        ) : (
+          <p className="setup-draw-hint">Chưa bốc thăm. Bấm &ldquo;Bốc thăm&rdquo; để chia bảng theo cấu hình trên.</p>
+        )}
+        <ul className="setup-groups-list" aria-label="Số cặp dự kiến mỗi bảng theo cấu hình">
           {preview.groupSizes.map((size, index) => <li key={index}>Bảng {String.fromCharCode(65 + index)}: {size} cặp</li>)}
         </ul>
         <ul className="setup-progression-list" aria-label="Tuyến đi tiếp thật">

@@ -1,12 +1,32 @@
 'use client';
 
 import '../draw/draw-review.css';
+import { useState } from 'react';
 import { buildReviewSummaryModel } from '../draw/drawReviewModel';
 
 export default function ReviewFinalizeStep({ draft = {}, saveState = {}, finalizeState = {}, onSaveDraft, onFinalize, onRetry }) {
   const review = buildReviewSummaryModel(draft);
+  // Pending/error CỤC BỘ cho hành động khởi chạy từ chính bước này. saveState /
+  // finalizeState đến từ shell; retry chưa có nguồn nào nên phải tự giữ (LOAD-02).
+  const [localAction, setLocalAction] = useState('');
+  const [localError, setLocalError] = useState('');
   const saving = saveState.status === 'saving';
   const finalizing = finalizeState.status === 'finalizing';
+  const retrying = localAction === 'retry';
+  const busy = saving || finalizing || retrying;
+
+  const runAction = async (name, handler, argument) => {
+    if (!handler || busy) return;
+    setLocalError('');
+    setLocalAction(name);
+    try {
+      await handler(argument);
+    } catch (error) {
+      setLocalError(error?.message || 'Thao tác không thành công.');
+    } finally {
+      setLocalAction('');
+    }
+  };
 
   return (
     <section className="setup-review-panel" aria-label="Bước 4: kiểm tra và chốt">
@@ -36,10 +56,11 @@ export default function ReviewFinalizeStep({ draft = {}, saveState = {}, finaliz
         {review.finalizeDisabled ? <div className="setup-status-item blocker">Không thể chốt: {review.finalizeDisabledReason}</div> : null}
         {saveState.error ? <div className="setup-status-item blocker">Lưu nháp lỗi: {saveState.error}</div> : null}
         {finalizeState.error ? <div className="setup-status-item blocker">Chốt lịch lỗi: {finalizeState.error}</div> : null}
+        {localError ? <div className="setup-status-item blocker" role="alert">{localError}</div> : null}
         <div className="setup-action-row">
-          <button className="setup-secondary-action" type="button" onClick={() => onSaveDraft?.()} disabled={saving || finalizing}>{saving ? 'Đang lưu...' : 'Lưu nháp'}</button>
-          <button className="setup-primary-action" type="button" onClick={() => onFinalize?.({ destination: 'schedule' })} disabled={review.finalizeDisabled || saving || finalizing}>{finalizing ? 'Đang chốt...' : 'Chốt bốc thăm & tạo lịch'}</button>
-          <button className="setup-secondary-action" type="button" onClick={() => onRetry?.()} disabled={saving || finalizing}>Thử lại</button>
+          <button className="setup-secondary-action" type="button" aria-busy={saving} onClick={() => onSaveDraft?.()} disabled={busy}>{saving ? 'Đang lưu...' : 'Lưu nháp'}</button>
+          <button className="setup-primary-action" type="button" aria-busy={finalizing} onClick={() => onFinalize?.({ destination: 'schedule' })} disabled={review.finalizeDisabled || busy}>{finalizing ? 'Đang chốt...' : 'Chốt bốc thăm & tạo lịch'}</button>
+          <button className="setup-secondary-action" type="button" aria-busy={retrying} onClick={() => runAction('retry', onRetry)} disabled={busy}>{retrying ? 'Đang thử lại...' : 'Thử lại'}</button>
         </div>
       </div>
     </section>

@@ -14,6 +14,8 @@ export default function InfoParticipantsStep({ draft = {}, roster = [], onDraftC
     const [availableClubs, setAvailableClubs] = useState([]);
     const [clubLoadError, setClubLoadError] = useState('');
     const [inviteNotice, setInviteNotice] = useState('');
+    const [inviteError, setInviteError] = useState('');
+    const [invitingClubKey, setInvitingClubKey] = useState('');
     const [externalClubName, setExternalClubName] = useState('');
 
     useEffect(() => {
@@ -68,14 +70,25 @@ export default function InfoParticipantsStep({ draft = {}, roster = [], onDraftC
             setInviteNotice(`Đã thêm "${row.name}" vào danh sách CLB được mời. Lời mời sẽ gửi khi tạo giải.`);
             return;
         }
+        setInviteError('');
+        setInvitingClubKey(String(row.clubId));
         try {
             await inviteTournamentClub({ tournament_id: draft.tournamentId, club_id: Number(row.clubId) });
             onDraftChange?.({ ...draft, invitedClubs: mergeInvitedClubs(invitedClubs, [{ ...row, status: 'invited' }]) });
             setInviteNotice(`Đã mời "${row.name}".`);
-        } catch (inviteError) {
-            if (inviteError?.status !== 409) throw inviteError;
-            onDraftChange?.({ ...draft, invitedClubs: mergeInvitedClubs(invitedClubs, [{ ...row, status: 'existing' }]) });
-            setInviteNotice(`CLB "${row.name}" đã có trong giải, hệ thống đánh dấu là đã mời.`);
+        } catch (requestError) {
+            // 409 = CLB đã có trong giải: ghi nhận là đã mời, không phải lỗi.
+            if (requestError?.status === 409) {
+                onDraftChange?.({ ...draft, invitedClubs: mergeInvitedClubs(invitedClubs, [{ ...row, status: 'existing' }]) });
+                setInviteNotice(`CLB "${row.name}" đã có trong giải, hệ thống đánh dấu là đã mời.`);
+            } else {
+                // Mọi lỗi khác phải hiện cạnh danh sách CLB. Ném ra ngoài onClick sẽ
+                // thành unhandled rejection và BTC không thấy gì.
+                setInviteNotice('');
+                setInviteError(`Không mời được "${row.name}": ${requestError?.message || 'lỗi không xác định'}.`);
+            }
+        } finally {
+            setInvitingClubKey('');
         }
     }
 
@@ -89,16 +102,24 @@ export default function InfoParticipantsStep({ draft = {}, roster = [], onDraftC
             setInviteNotice(`Đã thêm "${name}" vào danh sách CLB được mời. Lời mời sẽ gửi khi tạo giải.`);
             return;
         }
+        setInviteError('');
+        setInvitingClubKey(`external:${name}`);
         try {
             await inviteExternalClub({ tournament_id: draft.tournamentId, external_club_name: name });
             onDraftChange?.({ ...draft, invitedClubs: mergeInvitedClubs(invitedClubs, [{ ...row, status: 'invited' }]) });
             setExternalClubName('');
             setInviteNotice(`Đã mời "${name}".`);
-        } catch (inviteError) {
-            if (inviteError?.status !== 409) throw inviteError;
-            onDraftChange?.({ ...draft, invitedClubs: mergeInvitedClubs(invitedClubs, [{ ...row, status: 'existing' }]) });
-            setExternalClubName('');
-            setInviteNotice(`CLB "${name}" đã có trong giải, hệ thống đánh dấu là đã mời.`);
+        } catch (requestError) {
+            if (requestError?.status === 409) {
+                onDraftChange?.({ ...draft, invitedClubs: mergeInvitedClubs(invitedClubs, [{ ...row, status: 'existing' }]) });
+                setExternalClubName('');
+                setInviteNotice(`CLB "${name}" đã có trong giải, hệ thống đánh dấu là đã mời.`);
+            } else {
+                setInviteNotice('');
+                setInviteError(`Không mời được "${name}": ${requestError?.message || 'lỗi không xác định'}.`);
+            }
+        } finally {
+            setInvitingClubKey('');
         }
     }
 
@@ -143,21 +164,26 @@ export default function InfoParticipantsStep({ draft = {}, roster = [], onDraftC
                         <strong className="participants-count">Đã mời {invitedClubs.length}</strong>
                     </div>
                     {clubLoadError ? <div className="participants-error">{clubLoadError}</div> : null}
+                    {inviteError ? <div className="participants-error" role="alert">{inviteError}</div> : null}
                     {inviteNotice ? <div className="participants-warning">{inviteNotice}</div> : null}
                     <div className="setup-club-grid">
-                        {availableClubs.map((club) => (
-                            <button key={club.id || club.club_id} type="button" className="setup-club-option" onClick={() => inviteClub(club)}>
-                                <span>{club.name || club.club_name}</span>
-                                <small>Mời CLB trong hệ thống</small>
-                            </button>
-                        ))}
+                        {availableClubs.map((club) => {
+                            const clubKey = String(club.id || club.club_id);
+                            const sending = invitingClubKey === clubKey;
+                            return (
+                                <button key={clubKey} type="button" className="setup-club-option" disabled={Boolean(invitingClubKey)} aria-busy={sending} onClick={() => inviteClub(club)}>
+                                    <span>{club.name || club.club_name}</span>
+                                    <small>{sending ? 'Đang mời...' : 'Mời CLB trong hệ thống'}</small>
+                                </button>
+                            );
+                        })}
                     </div>
                     <div className="setup-external-club">
                         <label>
                             CLB ngoài hệ thống
                             <input value={externalClubName} onChange={(event) => setExternalClubName(event.target.value)} placeholder="Nhập tên CLB" />
                         </label>
-                        <button type="button" className="setup-btn setup-btn--secondary" onClick={inviteExternal}>Thêm CLB ngoài</button>
+                        <button type="button" className="setup-btn setup-btn--secondary" disabled={Boolean(invitingClubKey)} onClick={inviteExternal}>{invitingClubKey.startsWith('external:') ? 'Đang mời...' : 'Thêm CLB ngoài'}</button>
                     </div>
                     <div className="setup-invited-list">
                         {invitedClubs.length ? invitedClubs.map((club, index) => (

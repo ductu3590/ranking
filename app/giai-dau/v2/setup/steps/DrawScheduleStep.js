@@ -1,6 +1,7 @@
 'use client';
 
 import '../draw/draw-review.css';
+import { useState } from 'react';
 import { buildDrawPreviewModel } from '../draw/drawReviewModel';
 
 const GROUP_PAIRING_LABELS = {
@@ -13,6 +14,24 @@ export default function DrawScheduleStep({ draft = {}, onConfigChange, onRollDra
   const config = preview.config;
   const drawStatus = draft.draw?.status || 'not_started';
   const needsRedraw = drawStatus === 'stale';
+
+  // Pending/error CỤC BỘ cho từng hành động: bấm nút nào chỉ khoá nút đó và
+  // báo lỗi ngay cạnh, không reset trạng thái cả trang (plan §T3.3 LOAD-02).
+  const [pendingAction, setPendingAction] = useState('');
+  const [actionError, setActionError] = useState('');
+
+  const runAction = async (name, handler, argument) => {
+    if (!handler || pendingAction) return;
+    setActionError('');
+    setPendingAction(name);
+    try {
+      await handler(argument);
+    } catch (error) {
+      setActionError(error?.message || 'Thao tác không thành công.');
+    } finally {
+      setPendingAction('');
+    }
+  };
 
   const updateConfig = (patch) => {
     onConfigChange?.({
@@ -79,11 +98,12 @@ export default function DrawScheduleStep({ draft = {}, onConfigChange, onRollDra
         </div>
         <p>{GROUP_PAIRING_LABELS[config.bracketPairing] || GROUP_PAIRING_LABELS.cross_seed}</p>
         {needsRedraw ? <div className="setup-status-item blocker">Cấu hình hoặc cặp đã đổi: cần bốc lại, không tự sinh lại.</div> : null}
+        {actionError ? <div className="setup-status-item blocker" role="alert">{actionError}</div> : null}
         <div className="setup-action-row">
-          <button className="setup-primary-action" type="button" onClick={() => onRollDraw?.(config)}>Bốc thăm</button>
-          <button className="setup-secondary-action" type="button" onClick={() => onRerollDraw?.(config)}>Bốc lại</button>
-          <button className="setup-secondary-action" type="button" onClick={() => onSwapDrawSlot?.()}>Đổi vị trí</button>
-          <button className="setup-secondary-action" type="button" onClick={() => onPreviewSchedule?.(config)}>Sinh trận & xếp sân/giờ</button>
+          <button className="setup-primary-action" type="button" disabled={Boolean(pendingAction)} aria-busy={pendingAction === 'roll'} onClick={() => runAction('roll', onRollDraw, config)}>{pendingAction === 'roll' ? 'Đang bốc thăm...' : 'Bốc thăm'}</button>
+          <button className="setup-secondary-action" type="button" disabled={Boolean(pendingAction)} aria-busy={pendingAction === 'reroll'} onClick={() => runAction('reroll', onRerollDraw, config)}>{pendingAction === 'reroll' ? 'Đang bốc lại...' : 'Bốc lại'}</button>
+          <button className="setup-secondary-action" type="button" disabled={Boolean(pendingAction)} aria-busy={pendingAction === 'swap'} onClick={() => runAction('swap', onSwapDrawSlot)}>{pendingAction === 'swap' ? 'Đang đổi...' : 'Đổi vị trí'}</button>
+          <button className="setup-secondary-action" type="button" disabled={Boolean(pendingAction)} aria-busy={pendingAction === 'preview'} onClick={() => runAction('preview', onPreviewSchedule, config)}>{pendingAction === 'preview' ? 'Đang sinh trận...' : 'Sinh trận & xếp sân/giờ'}</button>
         </div>
       </div>
 

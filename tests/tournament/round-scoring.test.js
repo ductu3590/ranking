@@ -78,6 +78,8 @@ assert(locks['1'].counts.finalized === 2 && locks['1'].counts.total === 2, 'đ�
 assert(locks['2'].locked === true && locks['2'].reason === 'ROUND_LIVE', 'vòng có trận đang đấu -> khoá');
 assert(locks['2'].counts.live === 1 && locks['2'].counts.pending === 1, 'đếm đúng vòng 2');
 assert(locks['3'].locked === false && locks['3'].reason === null, 'vòng chưa đấu -> mở');
+const startedLocks = R.computeRoundLocks(stageKo, [{ id: 6, round: 4, status: 'pending', started_at: '2026-09-22T10:00:00Z' }]);
+assert(startedLocks['4'].locked === true && startedLocks['4'].reason === 'ROUND_LIVE', 'started_at khóa BO kể cả status chưa đồng bộ');
 assert(R.computeRoundLocks(stageKo, []) && Object.keys(R.computeRoundLocks(stageKo, [])).length === 0, 'không trận thì không vòng nào');
 
 // totalRounds dùng cho nhãn: lớn nhất trong CÙNG bracket

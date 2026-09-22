@@ -87,7 +87,12 @@ export async function POST(request) {
         }
 
         if (!isStageComplete(loaded.matches)) {
-            return NextResponse.json({ error: 'Stage chưa hoàn tất' }, { status: 400 });
+            return NextResponse.json({
+                error: {
+                    code: 'ADVANCE_RESULTS_INCOMPLETE',
+                    message: 'Stage chưa hoàn tất',
+                },
+            }, { status: 400 });
         }
 
         // 3. Compute standings before advancing

@@ -1,0 +1,23 @@
+T3.1 QA reproduction evidence
+Date: 2026-09-20
+Command:
+$env:PICKHUB_TASK_ID = 'T3.1'; node tests/unified-setup-v2/t3.1-happy-path.test.js
+
+Observed output:
+AssertionError [ERR_ASSERTION]: transition references the persisted group stage identity
+
+null !== 'stage-1'
+
+    at tests/unified-setup-v2/t3.1-happy-path.test.js:49:12
+
+Interpretation:
+lib/tournament/stagePlan.js builds progressions and knockout slot placeholders from
+stages[0].id/stages[1].id before assigning deterministic IDs in its return value.
+The returned stages are stage-1/stage-2, but progression sourceStageId/targetStageId
+and placeholders retain null. This violates the frozen group-knockout contract that
+requires explicit sourceStageId and targetStageId, and prevents a valid persisted
+progression graph.
+
+Browser journey result:
+SKIP: thiếu env baseUrl, adminSession, groupId, chrome; cần provision harness riêng
+và chạy server checkout này trước release gate

@@ -27,7 +27,7 @@ const NAMED_MUTATION_CODES = [
     'REPAIR_ENTRY_UPDATE_CONFLICT', 'SETUP_SCOPE_MISMATCH', 'SETUP_PAYLOAD_INVALID',
     'UNSEED_BLOCKED_MATCH_STARTED', 'GROUP_SEEDING_IN_PROGRESS',
     'GROUP_CORRECTION_BLOCKED_QUALIFICATION_SEEDED', 'GROUP_RESULTS_CHANGED',
-    'GROUP_TOO_SMALL_FOR_TOP_TWO', 'GROUP_RANK_ENTRY_DUPLICATE',
+    'GROUP_TOO_SMALL_FOR_TOP_TWO', 'GROUP_RANK_ENTRY_DUPLICATE', 'SETUP_DRAFT_DIVISION_AMBIGUOUS',
 ];
 const CONFLICT_MUTATION_CODES = [
     'SETUP_REVISION_CONFLICT', 'ROSTER_LOCKED', 'SETUP_NOT_READY', 'ROSTER_UNLOCK_BLOCKED',
@@ -35,7 +35,7 @@ const CONFLICT_MUTATION_CODES = [
     'REPAIR_BLOCKED_ATHLETE_REUSE', 'REPAIR_ENTRY_UPDATE_CONFLICT', 'SETUP_SCOPE_MISMATCH',
     'DIVISION_ROSTER_ATHLETE_SCOPE_MISMATCH', 'UNSEED_BLOCKED_MATCH_STARTED',
     'GROUP_SEEDING_IN_PROGRESS', 'GROUP_CORRECTION_BLOCKED_QUALIFICATION_SEEDED',
-    'GROUP_RESULTS_CHANGED',
+    'GROUP_RESULTS_CHANGED', 'SETUP_DRAFT_DIVISION_AMBIGUOUS',
 ];
 
 function mutationError(error) {
@@ -82,22 +82,23 @@ export async function GET(request) {
                 return NextResponse.json({ error: 'Không tìm thấy nội dung trong giải đấu' }, { status: 404 });
             }
             console.error('Setup readiness RPC error:', error);
-            return NextResponse.json({ error: error.message }, { status: 500 });
+            return NextResponse.json({ error: 'Không thể tải thiết lập giải đấu', code: 'SETUP_READ_FAILED' }, { status: 500 });
         }
 
         const readiness = normalizeSetupReadiness(data);
-        const [{ data: division, error: divisionError }, { data: athletes, error: athletesError }, { data: rosterRows, error: rosterError }, { data: entries, error: entriesError }, { data: pairs, error: pairsError }, { data: stages, error: stagesError }] = await Promise.all([
-            db.from('tournament_divisions').select('id, name, play_type, pairing_mode, setup_revision, roster_lock_status').eq('id', Number(divisionId)).eq('group_id', Number(groupId)).eq('tournament_id', Number(tournamentId)).maybeSingle(),
+        const [{ data: division, error: divisionError }, { data: athletes, error: athletesError }, { data: rosterRows, error: rosterError }, { data: entries, error: entriesError }, { data: pairs, error: pairsError }, { data: stages, error: stagesError }, { data: invitedClubs, error: invitedClubsError }] = await Promise.all([
+            db.from('tournament_divisions').select('id, name, play_type, pairing_mode, setup_revision, roster_lock_status, setup_draft').eq('id', Number(divisionId)).eq('group_id', Number(groupId)).eq('tournament_id', Number(tournamentId)).maybeSingle(),
             db.from('tournament_athletes').select('id, display_name_snapshot, tournament_club_id, phr_rating, phr_status').eq('group_id', Number(groupId)).eq('tournament_id', Number(tournamentId)).order('id'),
             db.from('tournament_division_roster_members').select('tournament_athlete_id').eq('group_id', Number(groupId)).eq('division_id', Number(divisionId)).order('tournament_athlete_id'),
             db.from('tournament_entries').select('id, pair_id, name_snapshot, status, seed').eq('group_id', Number(groupId)).eq('division_id', Number(divisionId)).order('id'),
             db.from('tournament_pairs').select('id, name_snapshot, status, pairing_mode').eq('group_id', Number(groupId)).eq('division_id', Number(divisionId)).in('status', ['confirmed', 'locked']).order('id'),
             db.from('tournament_stages').select('id, name, schedule_format, stage_order, status, config').eq('group_id', Number(groupId)).eq('tournament_id', Number(tournamentId)).eq('division_id', Number(divisionId)).order('stage_order'),
+            db.from('tournament_clubs').select('id, club_id, external_club_id, invitation_status').eq('group_id', Number(groupId)).eq('tournament_id', Number(tournamentId)).neq('invitation_status', 'withdrawn').order('id'),
         ]);
-        const aggregateError = divisionError || athletesError || rosterError || entriesError || pairsError || stagesError;
+        const aggregateError = divisionError || athletesError || rosterError || entriesError || pairsError || stagesError || invitedClubsError;
         if (aggregateError) {
             console.error('Setup aggregate query error:', aggregateError);
-            return NextResponse.json({ error: aggregateError.message }, { status: 500 });
+            return NextResponse.json({ error: 'Không thể tải thiết lập giải đấu', code: 'SETUP_READ_FAILED' }, { status: 500 });
         }
         if (!division) return NextResponse.json({ error: 'Không tìm thấy nội dung trong giải đấu' }, { status: 404 });
 
@@ -106,7 +107,10 @@ export async function GET(request) {
         if (pairIds.length) {
             const { data: pairMembers, error: pairMembersError } = await db.from('tournament_pair_members')
                 .select('pair_id, tournament_athlete_id, role').eq('group_id', Number(groupId)).in('pair_id', pairIds).order('pair_id');
-            if (pairMembersError) return NextResponse.json({ error: pairMembersError.message }, { status: 500 });
+            if (pairMembersError) {
+                console.error('Setup pair members query error:', pairMembersError);
+                return NextResponse.json({ error: 'Không thể tải thiết lập giải đấu', code: 'SETUP_READ_FAILED' }, { status: 500 });
+            }
             members = pairMembers || [];
         }
         const membersByPair = new Map();
@@ -114,9 +118,31 @@ export async function GET(request) {
             if (!membersByPair.has(member.pair_id)) membersByPair.set(member.pair_id, []);
             membersByPair.get(member.pair_id).push(member);
         }
+        const invitedRows = invitedClubs || [];
+        const invitedSystemIds = [...new Set(invitedRows.map((club) => club.club_id).filter((id) => id != null))];
+        const invitedExternalIds = [...new Set(invitedRows.map((club) => club.external_club_id).filter((id) => id != null))];
+        const [invitedSystemResult, invitedExternalResult] = await Promise.all([
+            invitedSystemIds.length ? db.from('groups').select('id, name').in('id', invitedSystemIds) : Promise.resolve({ data: [] }),
+            invitedExternalIds.length ? db.from('tournament_external_clubs').select('id, name').eq('group_id', Number(groupId)).in('id', invitedExternalIds) : Promise.resolve({ data: [] }),
+        ]);
+        const invitedSystemNames = new Map((invitedSystemResult.data || []).map((row) => [String(row.id), row.name]));
+        const invitedExternalNames = new Map((invitedExternalResult.data || []).map((row) => [String(row.id), row.name]));
         return NextResponse.json({
             readiness,
             division,
+            // Aggregate draft is an opaque, allowlisted snapshot produced by the RPC.
+            // It carries member ids, never tournament-athlete ids as client identity.
+            draft: division.setup_draft || null,
+            invitedClubs: invitedRows.map((club) => ({
+                tournamentClubId: club.id,
+                clubId: club.club_id,
+                externalClubId: club.external_club_id,
+                name: club.club_id == null
+                    ? (invitedExternalNames.get(String(club.external_club_id)) || `CLB ngoài #${club.external_club_id}`)
+                    : (invitedSystemNames.get(String(club.club_id)) || `CLB #${club.club_id}`),
+                source: club.club_id == null ? 'external' : 'system',
+                status: club.invitation_status || 'invited',
+            })),
             roster: { athlete_ids: (rosterRows || []).map((row) => row.tournament_athlete_id), athletes: athletes || [] },
             pairs: (pairs || []).map((pair) => ({ ...pair, members: membersByPair.get(pair.id) || [], entry_id: (entries || []).find((entry) => entry.pair_id === pair.id)?.id || null })),
             entries: entries || [],
@@ -124,7 +150,7 @@ export async function GET(request) {
         });
     } catch (err) {
         console.error('Setup GET error:', err);
-        return NextResponse.json({ error: err.message }, { status: 500 });
+        return NextResponse.json({ error: 'Không thể tải thiết lập giải đấu', code: 'SETUP_READ_FAILED' }, { status: 500 });
     }
 }
 
@@ -143,11 +169,33 @@ export async function POST(request) {
         const rawIdempotencyKey = body?.idempotency_key ?? body?.idempotencyKey;
         const idempotencyKey = String(rawIdempotencyKey ?? '').trim();
 
-        if (!validId(tournamentId) || !validId(divisionId) || !Number.isSafeInteger(expectedRevision) || expectedRevision < 1) {
+        const isAggregateSave = action === 'save_aggregate';
+        const hasTournamentId = tournamentId != null;
+        const hasDivisionId = divisionId != null;
+        if ((!isAggregateSave && (!validId(tournamentId) || !validId(divisionId))) || (isAggregateSave && (!hasTournamentId || !hasDivisionId || !validId(tournamentId) || !validId(divisionId))) || !Number.isSafeInteger(expectedRevision) || expectedRevision < 1) {
             return NextResponse.json({ error: 'tournament_id, division_id và expected_setup_revision hợp lệ là bắt buộc', code: 'SETUP_PAYLOAD_INVALID' }, { status: 400 });
         }
         if (rawIdempotencyKey == null || !idempotencyKey || idempotencyKey.length > 200) {
             return NextResponse.json({ error: 'idempotency_key là bắt buộc và phải dài 1-200 ký tự', code: 'SETUP_PAYLOAD_INVALID' }, { status: 400 });
+        }
+
+        if (action === 'save_aggregate') {
+            const clientDraftKey = String(body?.client_draft_key ?? body?.clientDraftKey ?? '').trim();
+            const draft = body?.draft;
+            if (!clientDraftKey || clientDraftKey.length > 200 || !draft || typeof draft !== 'object' || Array.isArray(draft)) {
+                return payloadError('client_draft_key và draft aggregate hợp lệ là bắt buộc');
+            }
+            const { data, error } = await db.rpc('save_unified_setup_aggregate_draft', {
+                p_group_id: Number(groupId),
+                p_tournament_id: validId(tournamentId) ? Number(tournamentId) : null,
+                p_division_id: validId(divisionId) ? Number(divisionId) : null,
+                p_client_draft_key: clientDraftKey,
+                p_draft: draft,
+                p_expected_setup_revision: expectedRevision,
+                p_idempotency_key: idempotencyKey,
+            });
+            if (error) return mutationError(error);
+            return NextResponse.json({ success: true, ...(data || {}) });
         }
 
         if (action === 'replace_roster') {
@@ -158,6 +206,19 @@ export async function POST(request) {
             const { data, error } = await db.rpc('replace_tournament_division_roster_revisioned', {
                 p_group_id: Number(groupId), p_tournament_id: Number(tournamentId), p_division_id: Number(divisionId),
                 p_athlete_ids: athleteIds.map(Number), p_expected_setup_revision: expectedRevision, p_idempotency_key: idempotencyKey,
+            });
+            if (error) return mutationError(error);
+            return NextResponse.json({ success: true, ...(data || {}) });
+        }
+
+        if (action === 'replace_invited_clubs') {
+            const invitedClubs = body?.invited_clubs ?? body?.invitedClubs;
+            if (!Array.isArray(invitedClubs)) {
+                return NextResponse.json({ error: 'invited_clubs phải là mảng CLB được mời', code: 'SETUP_PAYLOAD_INVALID' }, { status: 400 });
+            }
+            const { data, error } = await db.rpc('replace_tournament_invited_clubs_revisioned', {
+                p_group_id: Number(groupId), p_tournament_id: Number(tournamentId), p_division_id: Number(divisionId),
+                p_invited_clubs: invitedClubs, p_expected_setup_revision: expectedRevision, p_idempotency_key: idempotencyKey,
             });
             if (error) return mutationError(error);
             return NextResponse.json({ success: true, ...(data || {}) });

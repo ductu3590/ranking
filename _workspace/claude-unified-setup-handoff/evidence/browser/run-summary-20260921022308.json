@@ -1,0 +1,130 @@
+{
+  "started_at": "2026-09-21T02:23:08.191Z",
+  "finished_at": "2026-09-21T02:29:14.908Z",
+  "base_url": "http://127.0.0.1:3100",
+  "group_id": "46",
+  "tenant_b_group_id": "47",
+  "counts": {
+    "PASS": 0,
+    "FAIL": 12,
+    "BLOCKED": 1
+  },
+  "scenarios": [
+    {
+      "status": "FAIL",
+      "id": "A-journey-bronze-off",
+      "title": "05 A1-A8 khong tranh hang ba: 14 VDV -> 7 cap -> 2 bang 4/3 -> 9 tran -> 12 tran, hai doi thua ban ket DONG hang ba",
+      "required": true,
+      "ms": 34508,
+      "detail": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /Cặp đôi/ }).first()\u001b[22m\n",
+      "artifact": "_workspace/claude-unified-setup-handoff/evidence/browser/FAIL-A-journey-bronze-off-20260921022308.png"
+    },
+    {
+      "status": "FAIL",
+      "id": "A-journey-bronze-on",
+      "title": "05 A1-A8 co tranh hang ba: 13 tran, tranh hang ba xong TRUOC chung ket khong lam nguoi thang thanh vo dich (E2)",
+      "required": true,
+      "ms": 32208,
+      "detail": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /Cặp đôi/ }).first()\u001b[22m\n",
+      "artifact": "_workspace/claude-unified-setup-handoff/evidence/browser/FAIL-A-journey-bronze-on-20260921022308.png"
+    },
+    {
+      "status": "FAIL",
+      "id": "A-wizard-reload-resume",
+      "title": "05 A3: tai lai GIUA CAC CHECKPOINT DA PERSIST -> wizard tiep tuc dung giai do, khong nhan doi giai / VDV / cap",
+      "required": true,
+      "ms": 33051,
+      "detail": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /Cặp đôi/ }).first()\u001b[22m\n",
+      "artifact": "_workspace/claude-unified-setup-handoff/evidence/browser/FAIL-A-wizard-reload-resume-20260921022308.png"
+    },
+    {
+      "status": "FAIL",
+      "id": "T-tiebreak-changes-rank-and-qualifiers",
+      "title": "Tie-break khac mac dinh doi THU HANG va SUAT A1/A2 (legacy_v2 => C,A,B,D | phong_trao_mac_dinh => A,C,B,D)",
+      "required": true,
+      "ms": 33407,
+      "detail": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /Cặp đôi/ }).first()\u001b[22m\n",
+      "artifact": "_workspace/claude-unified-setup-handoff/evidence/browser/FAIL-T-tiebreak-changes-rank-and-qualifiers-20260921022308.png"
+    },
+    {
+      "status": "FAIL",
+      "id": "T-tiebreak-change-blocked-after-seed",
+      "title": "Doi chinh sach tie-break SAU khi da seed play-off bi chan 409 (E5), khong am tham doi BXH",
+      "required": true,
+      "ms": 32296,
+      "detail": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /Cặp đôi/ }).first()\u001b[22m\n",
+      "artifact": "_workspace/claude-unified-setup-handoff/evidence/browser/FAIL-T-tiebreak-change-blocked-after-seed-20260921022308.png"
+    },
+    {
+      "status": "FAIL",
+      "id": "C-correction-blocked-then-unseed-recovers",
+      "title": "Sua ket qua vong bang sau khi seed -> 409; go seed tren GIAO DIEN -> sua duoc -> tien cap lai ra suat dung",
+      "required": true,
+      "ms": 32260,
+      "detail": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /Cặp đôi/ }).first()\u001b[22m\n",
+      "artifact": "_workspace/claude-unified-setup-handoff/evidence/browser/FAIL-C-correction-blocked-then-unseed-recovers-20260921022308.png"
+    },
+    {
+      "status": "FAIL",
+      "id": "C-unseed-refused-when-downstream-started",
+      "title": "Go seed bi tu choi 409 khi tran vong sau da co ket qua; khong dung gi toi du lieu",
+      "required": true,
+      "ms": 33155,
+      "detail": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /Cặp đôi/ }).first()\u001b[22m\n",
+      "artifact": "_workspace/claude-unified-setup-handoff/evidence/browser/FAIL-C-unseed-refused-when-downstream-started-20260921022308.png"
+    },
+    {
+      "status": "FAIL",
+      "id": "B-conflict-409-rehydrate-requires-confirm",
+      "title": "409 tren giao dien -> panel tu tai lai trang thai moi va YEU CAU xac nhan, khong tu ghi tiep",
+      "required": true,
+      "ms": 32303,
+      "detail": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /Cặp đôi/ }).first()\u001b[22m\n",
+      "artifact": "_workspace/claude-unified-setup-handoff/evidence/browser/FAIL-B-conflict-409-rehydrate-requires-confirm-20260921022308.png"
+    },
+    {
+      "status": "FAIL",
+      "id": "B-member-role-ui-and-api",
+      "title": "Thanh vien: giao dien khong lo hanh dong quan tri VA moi mutation qua API deu bi tu choi",
+      "required": true,
+      "ms": 32023,
+      "detail": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /Cặp đôi/ }).first()\u001b[22m\n",
+      "artifact": "_workspace/claude-unified-setup-handoff/evidence/browser/FAIL-B-member-role-ui-and-api-20260921022308.png"
+    },
+    {
+      "status": "FAIL",
+      "id": "B-tenant-isolation",
+      "title": "Tenant B khong doc/ghi duoc du lieu cua tenant A du biet du id cha-con",
+      "required": true,
+      "ms": 32058,
+      "detail": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /Cặp đôi/ }).first()\u001b[22m\n",
+      "artifact": "_workspace/claude-unified-setup-handoff/evidence/browser/FAIL-B-tenant-isolation-20260921022308.png"
+    },
+    {
+      "status": "FAIL",
+      "id": "B-viewports-and-tap-targets",
+      "title": "Wizard + console dung o 375/390/768/1440: khong tran ngang, khong con control quan trong duoi 44px",
+      "required": true,
+      "ms": 32278,
+      "detail": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /Cặp đôi/ }).first()\u001b[22m\n",
+      "artifact": "_workspace/claude-unified-setup-handoff/evidence/browser/FAIL-B-viewports-and-tap-targets-20260921022308.png"
+    },
+    {
+      "status": "FAIL",
+      "id": "B-legacy-singles-regression",
+      "title": "Giai DON (duong legacy) van tao duoc va khong bi day sang duong dinh danh cap doi",
+      "required": true,
+      "ms": 2354,
+      "detail": "locator.click: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /Cá nhân/ }).first()\u001b[22m\n",
+      "artifact": null
+    },
+    {
+      "status": "BLOCKED",
+      "id": "repair-dry-run-legacy",
+      "title": "05 C (TUY CHON): dry-run sua cap legacy — chi doc, khong ghi gi, anh xa theo entry_member id",
+      "required": false,
+      "detail": "PICKHUB_QA_ALLOW_T47_DRYRUN=1 va PICKHUB_QA_T47=<tournamentId>:<divisionId> la bat buoc truoc khi cham vao giai cu, ke ca chi doc"
+    }
+  ],
+  "created_scope": []
+}

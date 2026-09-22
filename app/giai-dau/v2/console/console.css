@@ -78,6 +78,7 @@
 
 .v2-stage-seg {
     flex: 0 0 auto;
+    min-height: 44px;
     background: var(--bg-secondary);
     border: 1.5px solid var(--border-color);
     border-radius: 999px;
@@ -97,7 +98,7 @@
     border-color: var(--primary);
 }
 
-.v2-stage-seg.active {
+.v2-stage-seg[aria-pressed='true'] {
     background: var(--gradient-court-green);
     color: #fff;
     border-color: transparent;

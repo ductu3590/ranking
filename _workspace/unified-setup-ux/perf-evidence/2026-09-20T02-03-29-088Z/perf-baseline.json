@@ -1,0 +1,2799 @@
+{
+  "result": {
+    "meta": {
+      "commit": "d1355bf4b7785b65b14ac10a64915554e50657ea",
+      "measuredAt": "2026-09-20T02:06:11.353Z",
+      "browserVersion": "153.0.8010.52",
+      "viewport": "1440x900",
+      "runs": 5,
+      "athletes": 14,
+      "groupId": "44",
+      "baseUrl": "http://127.0.0.1:3100",
+      "note": "UI CŨ (wizard 3 bước) — điểm baseline \"before\" cho GAP-PERF."
+    },
+    "rows": [
+      {
+        "label": "Mở nháp",
+        "route": "GET /giai-dau/v2 → wizard render",
+        "stats": {
+          "n": 5,
+          "min": 1600,
+          "median": 1634,
+          "p95": 1701,
+          "max": 1701,
+          "requestCount": 5
+        },
+        "bytes": 2506
+      },
+      {
+        "label": "Lưu nháp",
+        "route": "—",
+        "stats": null,
+        "bytes": null,
+        "note": "wizard cũ KHÔNG có hành động lưu nháp riêng; bản nháp ghi vào browserStorage đồng bộ, không phát request"
+      },
+      {
+        "label": "Preview lịch",
+        "route": "POST /api/tournament-v2/preview-schedule",
+        "stats": {
+          "n": 5,
+          "min": 1083,
+          "median": 1099,
+          "p95": 1245,
+          "max": 1245,
+          "requestCount": 1
+        },
+        "bytes": 1027
+      },
+      {
+        "label": "Chốt tạo giải",
+        "route": "chuỗi checkpoint qua /api/tournament-v2/*",
+        "stats": {
+          "n": 5,
+          "min": 17152,
+          "median": 17268,
+          "p95": 17394,
+          "max": 17394,
+          "requestCount": 35
+        },
+        "bytes": 1763820
+      }
+    ],
+    "duplicates": [
+      {
+        "label": "Roster (1 lần mở wizard)",
+        "total": 1,
+        "duplicated": [],
+        "bytes": 13
+      },
+      {
+        "label": "Sân (1 lần mở wizard)",
+        "total": 0,
+        "duplicated": [],
+        "bytes": 0
+      },
+      {
+        "label": "Danh sách giải (1 lần mở dashboard)",
+        "total": 2,
+        "duplicated": [
+          {
+            "key": "GET /api/tournament-v2/tournaments",
+            "n": 2
+          }
+        ],
+        "bytes": 27372
+      },
+      {
+        "label": "Toàn bộ API khi chốt",
+        "total": 31,
+        "duplicated": [
+          {
+            "key": "POST /api/tournament-v2/entries",
+            "n": 14
+          },
+          {
+            "key": "GET /api/tournament-v2/tournaments",
+            "n": 3
+          },
+          {
+            "key": "GET /api/groups/session",
+            "n": 2
+          },
+          {
+            "key": "GET /api/tournament-v2/divisions?tournamentId=162",
+            "n": 2
+          },
+          {
+            "key": "GET /api/tournament-v2/stages?tournamentId=162",
+            "n": 2
+          },
+          {
+            "key": "GET /api/tournament-v2/assignments?tournamentId=162",
+            "n": 4
+          }
+        ],
+        "bytes": 55660
+      }
+    ],
+    "mutations": [
+      {
+        "label": "Thêm một người",
+        "ms": 595,
+        "requestCount": 0
+      },
+      {
+        "label": "Bỏ một người",
+        "ms": 586,
+        "requestCount": 0
+      }
+    ],
+    "blocked": []
+  },
+  "phases": [
+    {
+      "name": "tournament_listing",
+      "requests": [
+        {
+          "url": "/giai-dau/v2",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "document",
+          "encodedBytes": 12927,
+          "decodedBytes": 12927,
+          "contentEncoding": "gzip"
+        },
+        {
+          "url": "/_next/static/css/app/layout.css?v=1789869813114",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "stylesheet",
+          "encodedBytes": 27490,
+          "decodedBytes": 27490,
+          "contentEncoding": "gzip"
+        },
+        {
+          "url": "/_next/static/css/app/giai-dau/layout.css?v=1789869813114",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "stylesheet",
+          "encodedBytes": 28016,
+          "decodedBytes": 28016,
+          "contentEncoding": "gzip"
+        },
+        {
+          "url": "/_next/static/css/app/giai-dau/v2/page.css?v=1789869813114",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "stylesheet",
+          "encodedBytes": 60354,
+          "decodedBytes": 60354,
+          "contentEncoding": "gzip"
+        },
+        {
+          "url": "/_next/static/media/bf24a9759715e608-s.p.woff2",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "font",
+          "encodedBytes": 10620,
+          "decodedBytes": null,
+          "contentEncoding": null
+        },
+        {
+          "url": "/_next/static/media/1f173e5e25f3efee-s.woff2",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "font",
+          "encodedBytes": 68224,
+          "decodedBytes": null,
+          "contentEncoding": null
+        },
+        {
+          "url": "/_next/static/media/904be59b21bd51cb-s.p.woff2",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "font",
+          "encodedBytes": 35508,
+          "decodedBytes": null,
+          "contentEncoding": null
+        },
+        {
+          "url": "/_next/static/chunks/webpack.js?v=1789869813114",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "script",
+          "encodedBytes": 56325,
+          "decodedBytes": 56325,
+          "contentEncoding": "gzip"
+        },
+        {
+          "url": "/_next/static/chunks/app-pages-internals.js",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "script",
+          "encodedBytes": 134231,
+          "decodedBytes": 134231,
+          "contentEncoding": "gzip"
+        },
+        {
+          "url": "/_next/static/chunks/app/giai-dau/layout.js",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "script",
+          "encodedBytes": 397496,
+          "decodedBytes": 397496,
+          "contentEncoding": "gzip"
+        },
+        {
+          "url": "/_next/static/chunks/app/giai-dau/v2/page.js",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "script",
+          "encodedBytes": 949096,
+          "decodedBytes": 949096,
+          "contentEncoding": "gzip"
+        },
+        {
+          "url": "/_next/static/chunks/main-app.js?v=1789869813114",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "script",
+          "encodedBytes": 6034554,
+          "decodedBytes": 6034554,
+          "contentEncoding": "gzip"
+        },
+        {
+          "url": "/api/identity/athlete-sessions",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 16,
+          "decodedBytes": 16,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/club/branding",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 79,
+          "decodedBytes": 79,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 392,
+          "decodedBytes": 392,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/identity/athlete-sessions",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 16,
+          "decodedBytes": 16,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 392,
+          "decodedBytes": 392,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 392,
+          "decodedBytes": 392,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 392,
+          "decodedBytes": 392,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 392,
+          "decodedBytes": 392,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 392,
+          "decodedBytes": 392,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/club/branding",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 79,
+          "decodedBytes": 79,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 392,
+          "decodedBytes": 392,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 392,
+          "decodedBytes": 392,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/club/branding",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 79,
+          "decodedBytes": 79,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/club/branding",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 79,
+          "decodedBytes": 79,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 13686,
+          "decodedBytes": 13686,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/club/notifications",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 34,
+          "decodedBytes": 34,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/club/notifications",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 34,
+          "decodedBytes": 34,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/club/notifications",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 34,
+          "decodedBytes": 34,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/club/notifications",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 34,
+          "decodedBytes": 34,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 13686,
+          "decodedBytes": 13686,
+          "contentEncoding": null
+        }
+      ],
+      "startedAt": 1789869813097,
+      "durationMs": 3555
+    },
+    {
+      "name": "open_draft",
+      "requests": [
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 392,
+          "decodedBytes": 392,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 392,
+          "decodedBytes": 392,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/athletes?mode=roster",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 13,
+          "decodedBytes": 13,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/preview-schedule",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 1027,
+          "decodedBytes": 1027,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/clubs?mode=available",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 682,
+          "decodedBytes": 682,
+          "contentEncoding": null
+        }
+      ],
+      "startedAt": 1789869820004,
+      "durationMs": 1605
+    },
+    {
+      "name": "preview_schedule",
+      "requests": [
+        {
+          "url": "/api/tournament-v2/preview-schedule",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 1027,
+          "decodedBytes": 1027,
+          "contentEncoding": null
+        }
+      ],
+      "startedAt": 1789869821653,
+      "durationMs": 1081
+    },
+    {
+      "name": "add_member",
+      "requests": [],
+      "startedAt": 1789869822779,
+      "durationMs": 595
+    },
+    {
+      "name": "remove_member",
+      "requests": [],
+      "startedAt": 1789869823380,
+      "durationMs": 586
+    },
+    {
+      "name": "finalize",
+      "requests": [
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 735,
+          "decodedBytes": 735,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/clubs",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 241,
+          "decodedBytes": 241,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/divisions",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 659,
+          "decodedBytes": 659,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/stages",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 225,
+          "decodedBytes": 225,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 289,
+          "decodedBytes": 289,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 289,
+          "decodedBytes": 289,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 14603,
+          "decodedBytes": 14603,
+          "contentEncoding": null
+        },
+        {
+          "url": "/_next/static/webpack/dcd116bbd267058f.webpack.hot-update.json",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 31,
+          "decodedBytes": 31,
+          "contentEncoding": null
+        },
+        {
+          "url": "/_next/static/webpack/webpack.dcd116bbd267058f.hot-update.js",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "script",
+          "encodedBytes": 858,
+          "decodedBytes": 858,
+          "contentEncoding": null
+        },
+        {
+          "url": "/dieu-hanh-giai/161?_rsc=e6mdq",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 150,
+          "decodedBytes": 150,
+          "contentEncoding": "gzip"
+        },
+        {
+          "url": "/dieu-hanh-giai/161?_rsc=16pi1",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": null,
+          "decodedBytes": null,
+          "contentEncoding": "gzip"
+        },
+        {
+          "url": "/_next/static/chunks/app/dieu-hanh-giai/%5BtournamentId%5D/page.js",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "script",
+          "encodedBytes": 1656738,
+          "decodedBytes": 1656738,
+          "contentEncoding": "gzip"
+        },
+        {
+          "url": "/_next/static/css/app/dieu-hanh-giai/%5BtournamentId%5D/page.css?v=1789869840011",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "stylesheet",
+          "encodedBytes": 45799,
+          "decodedBytes": 45799,
+          "contentEncoding": "gzip"
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 392,
+          "decodedBytes": 392,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 392,
+          "decodedBytes": 392,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/stages?tournamentId=161",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 213,
+          "decodedBytes": 213,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/divisions?tournamentId=161",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 647,
+          "decodedBytes": 647,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 14603,
+          "decodedBytes": 14603,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=161",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 169,
+          "decodedBytes": 169,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/stages?tournamentId=161",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 213,
+          "decodedBytes": 213,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/divisions?tournamentId=161",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 647,
+          "decodedBytes": 647,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 14603,
+          "decodedBytes": 14603,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=161",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 169,
+          "decodedBytes": 169,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=161",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 169,
+          "decodedBytes": 169,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=161",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 169,
+          "decodedBytes": 169,
+          "contentEncoding": null
+        }
+      ],
+      "startedAt": 1789869825677,
+      "durationMs": 20194
+    },
+    {
+      "name": "open_draft",
+      "requests": [
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 392,
+          "decodedBytes": 392,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 392,
+          "decodedBytes": 392,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/athletes?mode=roster",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 13,
+          "decodedBytes": 13,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/preview-schedule",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 1027,
+          "decodedBytes": 1027,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/clubs?mode=available",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 682,
+          "decodedBytes": 682,
+          "contentEncoding": null
+        }
+      ],
+      "startedAt": 1789869849220,
+      "durationMs": 1634
+    },
+    {
+      "name": "preview_schedule",
+      "requests": [
+        {
+          "url": "/api/tournament-v2/preview-schedule",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 1027,
+          "decodedBytes": 1027,
+          "contentEncoding": null
+        }
+      ],
+      "startedAt": 1789869850877,
+      "durationMs": 1083
+    },
+    {
+      "name": "finalize",
+      "requests": [
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 735,
+          "decodedBytes": 735,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/clubs",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 241,
+          "decodedBytes": 241,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/divisions",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 659,
+          "decodedBytes": 659,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/stages",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 225,
+          "decodedBytes": 225,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/dieu-hanh-giai/162?_rsc=e6mdq",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": null,
+          "decodedBytes": null,
+          "contentEncoding": "gzip"
+        },
+        {
+          "url": "/dieu-hanh-giai/162?_rsc=mlluz",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": null,
+          "decodedBytes": null,
+          "contentEncoding": "gzip"
+        },
+        {
+          "url": "/_next/static/chunks/app/dieu-hanh-giai/%5BtournamentId%5D/page.js",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "script",
+          "encodedBytes": 1656738,
+          "decodedBytes": 1656738,
+          "contentEncoding": "gzip"
+        },
+        {
+          "url": "/_next/static/css/app/dieu-hanh-giai/%5BtournamentId%5D/page.css?v=1789869865070",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "stylesheet",
+          "encodedBytes": 45799,
+          "decodedBytes": 45799,
+          "contentEncoding": "gzip"
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 15520,
+          "decodedBytes": 15520,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 392,
+          "decodedBytes": 392,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 392,
+          "decodedBytes": 392,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/divisions?tournamentId=162",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 647,
+          "decodedBytes": 647,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/stages?tournamentId=162",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 213,
+          "decodedBytes": 213,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 15520,
+          "decodedBytes": 15520,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=162",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 169,
+          "decodedBytes": 169,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/divisions?tournamentId=162",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 647,
+          "decodedBytes": 647,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/stages?tournamentId=162",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 213,
+          "decodedBytes": 213,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 15520,
+          "decodedBytes": 15520,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=162",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 169,
+          "decodedBytes": 169,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=162",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 169,
+          "decodedBytes": 169,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=162",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 169,
+          "decodedBytes": 169,
+          "contentEncoding": null
+        }
+      ],
+      "startedAt": 1789869853578,
+      "durationMs": 17152
+    },
+    {
+      "name": "open_draft",
+      "requests": [
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 392,
+          "decodedBytes": 392,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 392,
+          "decodedBytes": 392,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/athletes?mode=roster",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 13,
+          "decodedBytes": 13,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/preview-schedule",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 1027,
+          "decodedBytes": 1027,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/clubs?mode=available",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 682,
+          "decodedBytes": 682,
+          "contentEncoding": null
+        }
+      ],
+      "startedAt": 1789869874092,
+      "durationMs": 1605
+    },
+    {
+      "name": "preview_schedule",
+      "requests": [
+        {
+          "url": "/api/tournament-v2/preview-schedule",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 1027,
+          "decodedBytes": 1027,
+          "contentEncoding": null
+        }
+      ],
+      "startedAt": 1789869875738,
+      "durationMs": 1093
+    },
+    {
+      "name": "finalize",
+      "requests": [
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 735,
+          "decodedBytes": 735,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/clubs",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 241,
+          "decodedBytes": 241,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/divisions",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 659,
+          "decodedBytes": 659,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/stages",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 225,
+          "decodedBytes": 225,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 289,
+          "decodedBytes": 289,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/dieu-hanh-giai/163?_rsc=e6mdq",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 150,
+          "decodedBytes": 150,
+          "contentEncoding": "gzip"
+        },
+        {
+          "url": "/dieu-hanh-giai/163?_rsc=2hpo9",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": null,
+          "decodedBytes": null,
+          "contentEncoding": "gzip"
+        },
+        {
+          "url": "/_next/static/chunks/app/dieu-hanh-giai/%5BtournamentId%5D/page.js",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "script",
+          "encodedBytes": 1656738,
+          "decodedBytes": 1656738,
+          "contentEncoding": "gzip"
+        },
+        {
+          "url": "/_next/static/css/app/dieu-hanh-giai/%5BtournamentId%5D/page.css?v=1789869890140",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "stylesheet",
+          "encodedBytes": 45799,
+          "decodedBytes": 45799,
+          "contentEncoding": "gzip"
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 16437,
+          "decodedBytes": 16437,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 392,
+          "decodedBytes": 392,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 392,
+          "decodedBytes": 392,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/divisions?tournamentId=163",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 647,
+          "decodedBytes": 647,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/stages?tournamentId=163",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 213,
+          "decodedBytes": 213,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 16437,
+          "decodedBytes": 16437,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=163",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 169,
+          "decodedBytes": 169,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/stages?tournamentId=163",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 213,
+          "decodedBytes": 213,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/divisions?tournamentId=163",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 647,
+          "decodedBytes": 647,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 16437,
+          "decodedBytes": 16437,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=163",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 169,
+          "decodedBytes": 169,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=163",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 169,
+          "decodedBytes": 169,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=163",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 169,
+          "decodedBytes": 169,
+          "contentEncoding": null
+        }
+      ],
+      "startedAt": 1789869878419,
+      "durationMs": 17337
+    },
+    {
+      "name": "open_draft",
+      "requests": [
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 392,
+          "decodedBytes": 392,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 392,
+          "decodedBytes": 392,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/athletes?mode=roster",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 13,
+          "decodedBytes": 13,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/preview-schedule",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 1027,
+          "decodedBytes": 1027,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/clubs?mode=available",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 682,
+          "decodedBytes": 682,
+          "contentEncoding": null
+        }
+      ],
+      "startedAt": 1789869899078,
+      "durationMs": 1701
+    },
+    {
+      "name": "preview_schedule",
+      "requests": [
+        {
+          "url": "/api/tournament-v2/preview-schedule",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 1027,
+          "decodedBytes": 1027,
+          "contentEncoding": null
+        }
+      ],
+      "startedAt": 1789869900822,
+      "durationMs": 1245
+    },
+    {
+      "name": "finalize",
+      "requests": [
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 736,
+          "decodedBytes": 736,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/clubs",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 241,
+          "decodedBytes": 241,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/divisions",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 659,
+          "decodedBytes": 659,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/stages",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 225,
+          "decodedBytes": 225,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 289,
+          "decodedBytes": 289,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 289,
+          "decodedBytes": 289,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 289,
+          "decodedBytes": 289,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 289,
+          "decodedBytes": 289,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/dieu-hanh-giai/164?_rsc=e6mdq",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 150,
+          "decodedBytes": 150,
+          "contentEncoding": "gzip"
+        },
+        {
+          "url": "/dieu-hanh-giai/164?_rsc=1hexj",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": null,
+          "decodedBytes": null,
+          "contentEncoding": "gzip"
+        },
+        {
+          "url": "/_next/static/chunks/app/dieu-hanh-giai/%5BtournamentId%5D/page.js",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "script",
+          "encodedBytes": 1656738,
+          "decodedBytes": 1656738,
+          "contentEncoding": "gzip"
+        },
+        {
+          "url": "/_next/static/css/app/dieu-hanh-giai/%5BtournamentId%5D/page.css?v=1789869915280",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "stylesheet",
+          "encodedBytes": 45799,
+          "decodedBytes": 45799,
+          "contentEncoding": "gzip"
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 17355,
+          "decodedBytes": 17355,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 392,
+          "decodedBytes": 392,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 392,
+          "decodedBytes": 392,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/stages?tournamentId=164",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 213,
+          "decodedBytes": 213,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/divisions?tournamentId=164",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 647,
+          "decodedBytes": 647,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 17355,
+          "decodedBytes": 17355,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=164",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 169,
+          "decodedBytes": 169,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/stages?tournamentId=164",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 213,
+          "decodedBytes": 213,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/divisions?tournamentId=164",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 647,
+          "decodedBytes": 647,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 17355,
+          "decodedBytes": 17355,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=164",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 169,
+          "decodedBytes": 169,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=164",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 169,
+          "decodedBytes": 169,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=164",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 169,
+          "decodedBytes": 169,
+          "contentEncoding": null
+        }
+      ],
+      "startedAt": 1789869903705,
+      "durationMs": 17268
+    },
+    {
+      "name": "open_draft",
+      "requests": [
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 392,
+          "decodedBytes": 392,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 392,
+          "decodedBytes": 392,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/athletes?mode=roster",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 13,
+          "decodedBytes": 13,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/preview-schedule",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 1027,
+          "decodedBytes": 1027,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/clubs?mode=available",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 682,
+          "decodedBytes": 682,
+          "contentEncoding": null
+        }
+      ],
+      "startedAt": 1789869924296,
+      "durationMs": 1600
+    },
+    {
+      "name": "preview_schedule",
+      "requests": [
+        {
+          "url": "/api/tournament-v2/preview-schedule",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 1027,
+          "decodedBytes": 1027,
+          "contentEncoding": null
+        }
+      ],
+      "startedAt": 1789869925951,
+      "durationMs": 1100
+    },
+    {
+      "name": "finalize",
+      "requests": [
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 736,
+          "decodedBytes": 736,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/clubs",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 241,
+          "decodedBytes": 241,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/divisions",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 659,
+          "decodedBytes": 659,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/stages",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 225,
+          "decodedBytes": 225,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 289,
+          "decodedBytes": 289,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 288,
+          "decodedBytes": 288,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 289,
+          "decodedBytes": 289,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/dieu-hanh-giai/165?_rsc=e6mdq",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 150,
+          "decodedBytes": 150,
+          "contentEncoding": "gzip"
+        },
+        {
+          "url": "/dieu-hanh-giai/165?_rsc=xb1ct",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": null,
+          "decodedBytes": null,
+          "contentEncoding": "gzip"
+        },
+        {
+          "url": "/_next/static/chunks/app/dieu-hanh-giai/%5BtournamentId%5D/page.js",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "script",
+          "encodedBytes": 1656738,
+          "decodedBytes": 1656738,
+          "contentEncoding": "gzip"
+        },
+        {
+          "url": "/_next/static/css/app/dieu-hanh-giai/%5BtournamentId%5D/page.css?v=1789869940424",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "stylesheet",
+          "encodedBytes": 45799,
+          "decodedBytes": 45799,
+          "contentEncoding": "gzip"
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 18273,
+          "decodedBytes": 18273,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 392,
+          "decodedBytes": 392,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 392,
+          "decodedBytes": 392,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/stages?tournamentId=165",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 213,
+          "decodedBytes": 213,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/divisions?tournamentId=165",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 647,
+          "decodedBytes": 647,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 18273,
+          "decodedBytes": 18273,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=165",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 169,
+          "decodedBytes": 169,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/divisions?tournamentId=165",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 647,
+          "decodedBytes": 647,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/stages?tournamentId=165",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 213,
+          "decodedBytes": 213,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 18273,
+          "decodedBytes": 18273,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=165",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 169,
+          "decodedBytes": 169,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=165",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 169,
+          "decodedBytes": 169,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=165",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 169,
+          "decodedBytes": 169,
+          "contentEncoding": null
+        }
+      ],
+      "startedAt": 1789869928743,
+      "durationMs": 17394
+    },
+    {
+      "name": "open_draft",
+      "requests": [
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 392,
+          "decodedBytes": 392,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 392,
+          "decodedBytes": 392,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/athletes?mode=roster",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 13,
+          "decodedBytes": 13,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/preview-schedule",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 1027,
+          "decodedBytes": 1027,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/clubs?mode=available",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 682,
+          "decodedBytes": 682,
+          "contentEncoding": null
+        }
+      ],
+      "startedAt": 1789869949499,
+      "durationMs": 1642
+    },
+    {
+      "name": "preview_schedule",
+      "requests": [
+        {
+          "url": "/api/tournament-v2/preview-schedule",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 1027,
+          "decodedBytes": 1027,
+          "contentEncoding": null
+        }
+      ],
+      "startedAt": 1789869951168,
+      "durationMs": 1099
+    },
+    {
+      "name": "finalize",
+      "requests": [
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 735,
+          "decodedBytes": 735,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/clubs",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 241,
+          "decodedBytes": 241,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/divisions",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 659,
+          "decodedBytes": 659,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/stages",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 225,
+          "decodedBytes": 225,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 289,
+          "decodedBytes": 289,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 289,
+          "decodedBytes": 289,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/entries",
+          "method": "POST",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 290,
+          "decodedBytes": 290,
+          "contentEncoding": null
+        },
+        {
+          "url": "/dieu-hanh-giai/166?_rsc=e6mdq",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 150,
+          "decodedBytes": 150,
+          "contentEncoding": "gzip"
+        },
+        {
+          "url": "/dieu-hanh-giai/166?_rsc=d7563",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": null,
+          "decodedBytes": null,
+          "contentEncoding": "gzip"
+        },
+        {
+          "url": "/_next/static/chunks/app/dieu-hanh-giai/%5BtournamentId%5D/page.js",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "script",
+          "encodedBytes": 1656738,
+          "decodedBytes": 1656738,
+          "contentEncoding": "gzip"
+        },
+        {
+          "url": "/_next/static/css/app/dieu-hanh-giai/%5BtournamentId%5D/page.css?v=1789869965528",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "stylesheet",
+          "encodedBytes": 45799,
+          "decodedBytes": 45799,
+          "contentEncoding": "gzip"
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 19190,
+          "decodedBytes": 19190,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 392,
+          "decodedBytes": 392,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 392,
+          "decodedBytes": 392,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/stages?tournamentId=166",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 213,
+          "decodedBytes": 213,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/divisions?tournamentId=166",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 647,
+          "decodedBytes": 647,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 19190,
+          "decodedBytes": 19190,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=166",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 169,
+          "decodedBytes": 169,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/stages?tournamentId=166",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 213,
+          "decodedBytes": 213,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/divisions?tournamentId=166",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 647,
+          "decodedBytes": 647,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 19190,
+          "decodedBytes": 19190,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=166",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 169,
+          "decodedBytes": 169,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=166",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 169,
+          "decodedBytes": 169,
+          "contentEncoding": null
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=166",
+          "method": "GET",
+          "status": 200,
+          "resourceType": "fetch",
+          "encodedBytes": 169,
+          "decodedBytes": 169,
+          "contentEncoding": null
+        }
+      ],
+      "startedAt": 1789869953919,
+      "durationMs": 17210
+    }
+  ]
+}

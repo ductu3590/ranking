@@ -1,0 +1,130 @@
+{
+  "started_at": "2026-09-19T16:19:54.696Z",
+  "finished_at": "2026-09-19T16:25:33.416Z",
+  "base_url": "http://127.0.0.1:3100",
+  "group_id": "42",
+  "tenant_b_group_id": "43",
+  "counts": {
+    "PASS": 0,
+    "FAIL": 12,
+    "BLOCKED": 1
+  },
+  "scenarios": [
+    {
+      "status": "FAIL",
+      "id": "A-journey-bronze-off",
+      "title": "05 A1-A8 khong tranh hang ba: 14 VDV -> 7 cap -> 2 bang 4/3 -> 9 tran -> 12 tran, hai doi thua ban ket DONG hang ba",
+      "required": true,
+      "ms": 185104,
+      "detail": "page.waitForURL: Timeout 180000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n  navigated to \"http://127.0.0.1:3100/giai-dau/v2\"\n============================================================",
+      "artifact": "_workspace/claude-unified-setup-handoff/evidence/browser/FAIL-A-journey-bronze-off-20260919161954.png"
+    },
+    {
+      "status": "FAIL",
+      "id": "A-journey-bronze-on",
+      "title": "05 A1-A8 co tranh hang ba: 13 tran, tranh hang ba xong TRUOC chung ket khong lam nguoi thang thanh vo dich (E2)",
+      "required": true,
+      "ms": 146619,
+      "detail": "page.waitForURL: Target page, context or browser has been closed\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n============================================================",
+      "artifact": null
+    },
+    {
+      "status": "FAIL",
+      "id": "A-wizard-reload-resume",
+      "title": "05 A3: tai lai GIUA CAC CHECKPOINT DA PERSIST -> wizard tiep tuc dung giai do, khong nhan doi giai / VDV / cap",
+      "required": true,
+      "ms": 5,
+      "detail": "browser.newContext: Target page, context or browser has been closed\nBrowser logs:\n\n<launching> C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=C:\\Users\\ductu\\AppData\\Local\\Temp\\playwright_chromiumdev_profile-OkVdcQ --remote-debugging-pipe --no-startup-window\n<launched> pid=16780\n[pid=16780][err] [16780:12064:0919/232009.476:ERROR:google_apis\\gcm\\engine\\registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT\n[pid=16780][err] Created TensorFlow Lite XNNPACK delegate for CPU.\n[pid=16780][err] [16780:14176:0919/232020.628:ERROR:chrome\\updater\\ipc\\update_service_dialer_win.cc:75] Failed to open named pipe server process 15456: Access is denied. (0x5)\n[pid=16780][err] [16780:14340:0919/232020.629:ERROR:chrome\\updater\\ipc\\update_service_dialer_win.cc:75] Failed to open named pipe server process 15456: Access is denied. (0x5)\n[pid=16780][err] [16780:14176:0919/232022.683:ERROR:chrome\\updater\\ipc\\update_service_dialer_win.cc:75] Failed to open named pipe server process 18232: Access is denied. (0x5)\n[pid=16780][err] [16780:14340:0919/232022.729:ERROR:chrome\\updater\\ipc\\update_service_dialer_win.cc:75] Failed to open named pipe server process 18408: Access is denied. (0x5)\n[pid=16780][err] [16780:14176:0919/232024.797:ERROR:chrome\\updater\\ipc\\update_service_dialer_win.cc:75] Failed to open named pipe server process 13700: Access is denied. (0x5)\n[pid=16780][err] [16780:14340:0919/232024.849:ERROR:chrome\\updater\\ipc\\update_service_dialer_win.cc:75] Failed to open named pipe server process 17632: Access is denied. (0x5)\n[pid=16780][err] [16780:12064:0919/232034.053:ERROR:google_apis\\gcm\\engine\\registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT\n[pid=16780][err] [16780:12064:0919/232128.558:ERROR:google_apis\\gcm\\engine\\registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT\n[pid=16780][err] [16780:12896:0919/232306.832:ERROR:chrome\\browser\\ui\\views\\user_education\\impl\\browser_user_education_interface_impl.cc:186] Attempting to show IPH IPH_ExtensionsZeroStatePromo before browser initialization complete; IPH will not be shown.\n[pid=16780][err] [16780:12064:0919/232323.283:ERROR:google_apis\\gcm\\engine\\registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT\n[pid=16780] <gracefully close start>",
+      "artifact": null
+    },
+    {
+      "status": "FAIL",
+      "id": "T-tiebreak-changes-rank-and-qualifiers",
+      "title": "Tie-break khac mac dinh doi THU HANG va SUAT A1/A2 (legacy_v2 => C,A,B,D | phong_trao_mac_dinh => A,C,B,D)",
+      "required": true,
+      "ms": 0,
+      "detail": "browser.newContext: Target page, context or browser has been closed",
+      "artifact": null
+    },
+    {
+      "status": "FAIL",
+      "id": "T-tiebreak-change-blocked-after-seed",
+      "title": "Doi chinh sach tie-break SAU khi da seed play-off bi chan 409 (E5), khong am tham doi BXH",
+      "required": true,
+      "ms": 1,
+      "detail": "browser.newContext: Target page, context or browser has been closed",
+      "artifact": null
+    },
+    {
+      "status": "FAIL",
+      "id": "C-correction-blocked-then-unseed-recovers",
+      "title": "Sua ket qua vong bang sau khi seed -> 409; go seed tren GIAO DIEN -> sua duoc -> tien cap lai ra suat dung",
+      "required": true,
+      "ms": 0,
+      "detail": "browser.newContext: Target page, context or browser has been closed",
+      "artifact": null
+    },
+    {
+      "status": "FAIL",
+      "id": "C-unseed-refused-when-downstream-started",
+      "title": "Go seed bi tu choi 409 khi tran vong sau da co ket qua; khong dung gi toi du lieu",
+      "required": true,
+      "ms": 1,
+      "detail": "browser.newContext: Target page, context or browser has been closed",
+      "artifact": null
+    },
+    {
+      "status": "FAIL",
+      "id": "B-conflict-409-rehydrate-requires-confirm",
+      "title": "409 tren giao dien -> panel tu tai lai trang thai moi va YEU CAU xac nhan, khong tu ghi tiep",
+      "required": true,
+      "ms": 0,
+      "detail": "browser.newContext: Target page, context or browser has been closed",
+      "artifact": null
+    },
+    {
+      "status": "FAIL",
+      "id": "B-member-role-ui-and-api",
+      "title": "Thanh vien: giao dien khong lo hanh dong quan tri VA moi mutation qua API deu bi tu choi",
+      "required": true,
+      "ms": 0,
+      "detail": "browser.newContext: Target page, context or browser has been closed",
+      "artifact": null
+    },
+    {
+      "status": "FAIL",
+      "id": "B-tenant-isolation",
+      "title": "Tenant B khong doc/ghi duoc du lieu cua tenant A du biet du id cha-con",
+      "required": true,
+      "ms": 1,
+      "detail": "browser.newContext: Target page, context or browser has been closed",
+      "artifact": null
+    },
+    {
+      "status": "FAIL",
+      "id": "B-viewports-and-tap-targets",
+      "title": "Wizard + console dung o 375/390/768/1440: khong tran ngang, khong con control quan trong duoi 44px",
+      "required": true,
+      "ms": 0,
+      "detail": "browser.newContext: Target page, context or browser has been closed",
+      "artifact": null
+    },
+    {
+      "status": "FAIL",
+      "id": "B-legacy-singles-regression",
+      "title": "Giai DON (duong legacy) van tao duoc va khong bi day sang duong dinh danh cap doi",
+      "required": true,
+      "ms": 0,
+      "detail": "browser.newContext: Target page, context or browser has been closed",
+      "artifact": null
+    },
+    {
+      "status": "BLOCKED",
+      "id": "repair-dry-run-legacy",
+      "title": "05 C (TUY CHON): dry-run sua cap legacy — chi doc, khong ghi gi, anh xa theo entry_member id",
+      "required": false,
+      "detail": "PICKHUB_QA_ALLOW_T47_DRYRUN=1 va PICKHUB_QA_T47=<tournamentId>:<divisionId> la bat buoc truoc khi cham vao giai cu, ke ca chi doc"
+    }
+  ],
+  "created_scope": []
+}

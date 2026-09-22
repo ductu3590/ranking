@@ -16,5 +16,5 @@ assert(/TournamentConsoleV2/.test(fullSource), 'route toàn màn hình tái dùn
 assert(/requireTournamentAccess/.test(fullSource) && /need:\s*'write'/.test(fullSource) && /redirect\(/.test(fullSource), 'gõ URL trực tiếp phải qua server-side tournament admin guard');
 assert(/\/dieu-hanh-giai\//.test(fs.readFileSync(dashboardPage, 'utf8')), 'CTA danh sách điều hướng sang route toàn màn hình');
 assert(/api\/groups\/session/.test(source) && /actor=\{session\}/.test(source), 'console lấy admin thực từ session server');
-assert(/ops-admin-card/.test(shell) && /actor/.test(shell), 'menu trái có thẻ thông tin admin');
+assert(/v2-console-admin-card/.test(shell) && /actor/.test(shell), 'menu trái có thẻ thông tin admin');
 console.log('ui-console contract ok');

@@ -66,7 +66,7 @@ export default function ParticipantRosterPicker({ roster = [], selectedMemberIds
                 <div>
                     <p className="setup-eyebrow">Bước 2</p>
                     <h2>Người tham gia</h2>
-                    <p>Chọn bằng mã thành viên để không gộp nhầm người trùng tên.</p>
+                    <p>Chọn thành viên ra sân. Mỗi người được nhận diện riêng, kể cả khi trùng tên.</p>
                 </div>
                 <strong className="participants-count">Đã chọn {selectedCount}/{totalCount}</strong>
             </div>
@@ -102,18 +102,18 @@ export default function ParticipantRosterPicker({ roster = [], selectedMemberIds
                 {loading ? <p>Đang tải danh sách thành viên...</p> : null}
                 {!loading && visibleMembers.length === 0 ? <p>Không có thành viên phù hợp.</p> : null}
                 {visibleMembers.map((member) => (
-                    <label key={member.memberId} className="participants-row">
+                    <label key={member.memberId} className={`participants-row ${selectedSet.has(member.memberId) ? 'is-selected' : ''}`}>
                         <input type="checkbox" checked={selectedSet.has(member.memberId)} onChange={() => toggleMember(member.memberId)} />
+                        <span className="participants-avatar" aria-hidden="true">{member.fullName.split(' ').filter(Boolean).slice(-2).map((part) => part[0]).join('')}</span>
                         <span className="participants-person">
                             <strong>{member.fullName}</strong>
                             <small>
                                 ID {member.memberId}
                                 {member.memberCode ? ` · Mã ${member.memberCode}` : ''}
-                                {member.athleteId ? ` · athlete ${member.athleteId}` : ' · chưa có athlete_id'}
                                 {member.clubName ? ` · ${member.clubName}` : ''}
                             </small>
                         </span>
-                        {!member.isActive ? <span className="participants-badge">Ngừng hoạt động</span> : null}
+                        <span className={`participants-badge ${member.isActive ? 'is-active' : ''}`}>{member.isActive ? 'Đang hoạt động' : 'Ngừng hoạt động'}</span>
                     </label>
                 ))}
             </div>

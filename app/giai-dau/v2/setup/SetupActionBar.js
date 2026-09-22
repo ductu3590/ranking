@@ -30,11 +30,11 @@ export default function SetupActionBar({
         <button type="button" className="setup-btn setup-btn--ghost" onClick={onBack} disabled={isFirst || saving || isFinalizing}>
           Quay lại
         </button>
-        <button type="button" className="setup-btn setup-btn--secondary" onClick={onSave} disabled={saving || isFinalizing}>
+        <button type="button" className="setup-btn setup-btn--secondary" onClick={() => { Promise.resolve(onSave?.()).catch(() => {}); }} disabled={saving || isFinalizing}>
           {saving ? 'Đang lưu...' : 'Lưu nháp'}
         </button>
         {isLast ? (
-          <button type="button" className="setup-btn setup-btn--primary" onClick={onFinalize} disabled={!canFinalize || saving || isFinalizing}>
+          <button type="button" className="setup-btn setup-btn--primary" onClick={() => { Promise.resolve(onFinalize?.()).catch(() => {}); }} disabled={!canFinalize || saving || isFinalizing}>
             {isFinalizing ? 'Đang chốt...' : 'Chốt bốc thăm & tạo lịch'}
           </button>
         ) : (

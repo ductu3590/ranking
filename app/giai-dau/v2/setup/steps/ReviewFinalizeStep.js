@@ -7,12 +7,12 @@ export function TournamentDetailsForm({ tournament, onChange }) {
   const update = (key, value) => onChange?.({ ...tournament, [key]: value });
   return (
     <div className="setup-tournament-details">
-      <label>Tên giải<input value={tournament.name || ''} onChange={(event) => update('name', event.target.value)} placeholder="Ví dụ: Giải nội bộ tháng 9" /></label>
+      <label className="setup-field-wide">Tên giải<input value={tournament.name || ''} onChange={(event) => update('name', event.target.value)} placeholder="Ví dụ: Giải nội bộ tháng 9" /></label>
       <label>Ngày thi đấu<input type="date" value={tournament.eventDate || ''} onChange={(event) => update('eventDate', event.target.value)} /></label>
       <label>Giờ bắt đầu<input type="time" value={tournament.startTime || ''} onChange={(event) => update('startTime', event.target.value)} /></label>
-      <label>Địa điểm<input value={tournament.location || ''} onChange={(event) => update('location', event.target.value)} placeholder="Ví dụ: Sân PickHub" /></label>
-      <label>Mô tả<textarea rows="3" value={tournament.description || ''} onChange={(event) => update('description', event.target.value)} placeholder="Giới thiệu ngắn về giải đấu" /></label>
-      <label>Áp phích giải<input type="url" value={tournament.posterUrl || ''} onChange={(event) => update('posterUrl', event.target.value)} placeholder="Dán liên kết ảnh áp phích" /><small>Tải ảnh trực tiếp sẽ được bổ sung sau khi cấu hình kho lưu trữ áp phích an toàn.</small></label>
+      <label className="setup-field-wide">Địa điểm<input value={tournament.location || ''} onChange={(event) => update('location', event.target.value)} placeholder="Ví dụ: Sân PickHub" /></label>
+      <label className="setup-field-wide">Mô tả <small>Không bắt buộc</small><textarea rows="3" value={tournament.description || ''} onChange={(event) => update('description', event.target.value)} placeholder="Giới thiệu ngắn về giải đấu" /></label>
+      <label className="setup-field-wide setup-poster-field"><span>Áp phích giải <small>Không bắt buộc</small></span><input type="url" value={tournament.posterUrl || ''} onChange={(event) => update('posterUrl', event.target.value)} placeholder="https://… · Liên kết ảnh áp phích" /><small>Dùng liên kết ảnh có sẵn. Hiện chưa hỗ trợ tải ảnh trực tiếp.</small></label>
     </div>
   );
 }
@@ -52,13 +52,13 @@ export default function ReviewFinalizeStep({ draft = {}, saveState = {}, finaliz
       <div className="setup-draw-card">
         <p className="setup-draw-eyebrow">Hành động</p>
         <h3>Lưu nháp hoặc chốt tạo lịch</h3>
-        <p>Sau finalize điều hướng tới Lịch thi đấu ({review.destinationLabel}), không tự chuyển giải sang LIVE.</p>
+        <p>Sau khi chốt, bạn sẽ đến Lịch thi đấu ({review.destinationLabel}) để quản lý giải. Giải chỉ bắt đầu khi bạn chủ động mở thi đấu.</p>
         {review.finalizeDisabled ? <div className="setup-status-item blocker">Không thể chốt: {review.finalizeDisabledReason}</div> : null}
         {saveState.error ? <div className="setup-status-item blocker">Lưu nháp lỗi: {saveState.error}</div> : null}
         {finalizeState.error ? <div className="setup-status-item blocker">Chốt lịch lỗi: {finalizeState.error}</div> : null}
         <div className="setup-action-row">
-          <button className="setup-secondary-action" type="button" aria-busy={saving} onClick={() => onSaveDraft?.()} disabled={busy}>{saving ? 'Đang lưu...' : 'Lưu nháp'}</button>
-          <button className="setup-primary-action" type="button" aria-busy={finalizing} onClick={() => onFinalize?.({ destination: 'schedule' })} disabled={review.finalizeDisabled || busy}>{finalizing ? 'Đang chốt...' : 'Chốt bốc thăm & tạo lịch'}</button>
+          <button className="setup-secondary-action" type="button" aria-busy={saving} onClick={() => { Promise.resolve(onSaveDraft?.()).catch(() => {}); }} disabled={busy}>{saving ? 'Đang lưu...' : 'Lưu nháp'}</button>
+          <button className="setup-primary-action" type="button" aria-busy={finalizing} onClick={() => { Promise.resolve(onFinalize?.({ destination: 'schedule' })).catch(() => {}); }} disabled={review.finalizeDisabled || busy}>{finalizing ? 'Đang chốt...' : 'Chốt bốc thăm & tạo lịch'}</button>
         </div>
       </div>
     </section>

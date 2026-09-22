@@ -1,6 +1,7 @@
 'use client';
 
 import './setup.css';
+import './pro-court.css';
 import SetupActionBar from './SetupActionBar';
 import { SETUP_STEPS, TournamentSetupProvider, useTournamentSetup } from './SetupContext';
 import SetupStepper from './SetupStepper';
@@ -44,13 +45,15 @@ function WorkspaceInner({ renderStep }) {
   const renderedStep = renderStep ? renderStep({ step: currentStepMeta, state, dispatch }) : <PlaceholderStep step={currentStepMeta} />;
 
   return (
-    <div className="setup-workspace">
+    <div className="setup-workspace" data-setup-step={state.currentStep}>
+      <div className="setup-brandbar"><span className="setup-brandmark" aria-hidden="true">P</span><strong>PickHub <span>PRO COURT OS</span></strong><span className="setup-brandbar__context">Không gian tổ chức giải</span></div>
       <header className="setup-hero">
         <div>
-          <p className="setup-eyebrow">Thiết lập giải nội bộ</p>
-          <h1>Dựng giải trong 4 bước</h1>
-          <p>Hoàn tất thông tin, ghép cặp, bốc thăm và chốt lịch mà không làm phát sinh I/O ngoài adapter.</p>
+          <p className="setup-eyebrow">Giải đấu / Thiết lập giải nội bộ</p>
+          <h1>{currentStepMeta.label}</h1>
+          <p>{currentStepMeta.description}. Thiết lập từng bước, sẵn sàng ra sân.</p>
         </div>
+        <span className="setup-hero__progress">Bước <strong>{state.currentStep}</strong> / {stepCount}</span>
       </header>
 
       <SetupStepper

@@ -6,6 +6,20 @@ export default function FormatPairingStep({ draft = {}, roster = [], onDraftChan
     const participants = draft.participants || {};
     const format = draft.format || {};
     const selectedMemberIds = participants.memberIds || participants.selectedMemberIds || [];
+    const guests = Array.isArray(participants.guests) ? participants.guests : [];
+    const guestParticipantIds = guests
+        .map((guest) => String(guest?.clientRef || guest?.client_ref || '').trim())
+        .filter(Boolean)
+        .map((clientRef) => `guest:${clientRef}`);
+    const participantIds = [...selectedMemberIds.map(String), ...guestParticipantIds];
+    const pairingRoster = [
+        ...roster,
+        ...guests.map((guest) => ({
+            id: `guest:${guest.clientRef || guest.client_ref}`,
+            displayName: guest.displayName || guest.display_name || 'Khách mời',
+            source: 'guest',
+        })),
+    ];
     const entrantType = format.entrantType || 'doubles';
 
     function chooseFormat(formatKey) {
@@ -52,11 +66,19 @@ export default function FormatPairingStep({ draft = {}, roster = [], onDraftChan
         });
     }
 
-    const pairingValue = draft.pairingDraft || {
-        memberIds: selectedMemberIds.map(String),
-        pairs: draft.pairs || [],
-        unpairedMemberIds: draft.unpairedMemberIds || selectedMemberIds.map(String),
-        nextPairNumber: (draft.pairs || []).length + 1,
+    const existingPairing = draft.pairingDraft || {};
+    const existingIds = Array.isArray(existingPairing.memberIds) ? existingPairing.memberIds.map(String) : [];
+    const pairingMembers = Array.from(new Set([...existingIds, ...participantIds]));
+    const pairs = existingPairing.pairs || draft.pairs || [];
+    // `unpairedMemberIds` là dữ liệu dẫn xuất: sau auto-pair, reducer có thể
+    // render lại cùng snapshot cũ một nhịp. Không để snapshot đó giữ một người
+    // đồng thời trong cặp và trong danh sách chưa ghép.
+    const pairedMemberIds = new Set(pairs.flatMap((pair) => Array.isArray(pair?.memberIds) ? pair.memberIds.map(String) : []));
+    const pairingValue = {
+        memberIds: pairingMembers,
+        pairs,
+        unpairedMemberIds: pairingMembers.filter((id) => !pairedMemberIds.has(id)),
+        nextPairNumber: existingPairing.nextPairNumber || (draft.pairs || []).length + 1,
     };
     const hasUnpaired = (pairingValue.unpairedMemberIds || []).length > 0;
     const supportedEntrantTypes = Array.isArray(format.supportedEntrantTypes)
@@ -71,10 +93,10 @@ export default function FormatPairingStep({ draft = {}, roster = [], onDraftChan
                 <p>Chọn thể thức trước. Hệ thống sẽ tư vấn theo số cặp sau khi bạn ghép đội.</p>
                 <div className="setup-format-options" role="group" aria-label="Chọn thể thức thi đấu">
                     <button type="button" disabled title="Unified preview hiện chưa hỗ trợ thể thức này" className={(format.formatKey || 'group_knockout') === 'round_robin' ? 'is-active' : ''} aria-pressed={(format.formatKey || 'group_knockout') === 'round_robin'} onClick={() => chooseFormat('round_robin')}>
-                        <strong>Vòng tròn</strong><span>Chưa hỗ trợ trong unified setup</span>
+                        <strong>Vòng tròn</strong><span>Chưa khả dụng trong luồng thiết lập này</span>
                     </button>
                     <button type="button" disabled title="Unified preview hiện chưa hỗ trợ thể thức này" className={(format.formatKey || 'group_knockout') === 'knockout' ? 'is-active' : ''} aria-pressed={(format.formatKey || 'group_knockout') === 'knockout'} onClick={() => chooseFormat('knockout')}>
-                        <strong>Loại trực tiếp</strong><span>Chưa hỗ trợ trong unified setup</span>
+                        <strong>Loại trực tiếp</strong><span>Chưa khả dụng trong luồng thiết lập này</span>
                     </button>
                     <button type="button" className={(format.formatKey || 'group_knockout') === 'group_knockout' ? 'is-active' : ''} aria-pressed={(format.formatKey || 'group_knockout') === 'group_knockout'} onClick={() => chooseFormat('group_knockout')}>
                         <strong>Vòng bảng → loại trực tiếp</strong><span>Chia bảng rồi chọn suất đi tiếp</span>
@@ -86,8 +108,8 @@ export default function FormatPairingStep({ draft = {}, roster = [], onDraftChan
                 </div>
             </div>
             <PairingBoard
-                roster={roster}
-                selectedMemberIds={selectedMemberIds}
+                roster={pairingRoster}
+                selectedMemberIds={participantIds}
                 value={pairingValue}
                 onChange={updatePairs}
                 entrantType={entrantType}

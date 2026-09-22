@@ -212,6 +212,8 @@ export function TournamentSetupProvider({ children, initialDraft, adapter, resum
   const ioAdapter = useMemo(() => adapter || createMockAdapter(), [adapter]);
   const initialFingerprint = draftFingerprint(initialDraft);
   const hydratedFingerprint = useRef(initialFingerprint);
+  const savePromiseRef = useRef(null);
+  const finalizePromiseRef = useRef(null);
 
   useEffect(() => {
     if (hydratedFingerprint.current === initialFingerprint) return;
@@ -228,27 +230,46 @@ export function TournamentSetupProvider({ children, initialDraft, adapter, resum
   }, []);
 
   const saveDraft = useCallback(async () => {
-    dispatch({ type: 'saveStart' });
-    try {
-      const result = await ioAdapter.saveDraft(state.draft);
-      dispatch({ type: 'saveSuccess', draft: result?.draft || state.draft });
-      return result;
-    } catch (error) {
-      dispatch({ type: 'saveError', error: error?.message });
-      throw error;
-    }
+    if (savePromiseRef.current) return savePromiseRef.current;
+    const operation = (async () => {
+      dispatch({ type: 'saveStart' });
+      try {
+        const result = await ioAdapter.saveDraft(state.draft);
+        dispatch({ type: 'saveSuccess', draft: result?.draft || state.draft });
+        return result;
+      } catch (error) {
+        dispatch({ type: 'saveError', error: error?.message });
+        throw error;
+      } finally {
+        savePromiseRef.current = null;
+      }
+    })();
+    savePromiseRef.current = operation;
+    return operation;
   }, [ioAdapter, state.draft]);
 
   const finalizeDraft = useCallback(async () => {
-    dispatch({ type: 'finalizeStart' });
-    try {
-      const result = await ioAdapter.finalizeDraft(state.draft);
-      dispatch({ type: 'finalizeSuccess', draft: result?.draft || state.draft });
-      return result;
-    } catch (error) {
-      dispatch({ type: 'finalizeError', error: error?.message });
-      throw error;
-    }
+    if (finalizePromiseRef.current) return finalizePromiseRef.current;
+    const operation = (async () => {
+      try {
+        if (!/^[a-f0-9]{64}$/i.test(String(state.draft?.draw?.previewFingerprint || ''))) {
+          const error = new Error('Hãy bốc thăm và xem trước lịch trước khi chốt.');
+          dispatch({ type: 'finalizeError', error: error.message });
+          throw error;
+        }
+        dispatch({ type: 'finalizeStart' });
+        const result = await ioAdapter.finalizeDraft(state.draft);
+        dispatch({ type: 'finalizeSuccess', draft: result?.draft || state.draft });
+        return result;
+      } catch (error) {
+        dispatch({ type: 'finalizeError', error: error?.message });
+        throw error;
+      } finally {
+        finalizePromiseRef.current = null;
+      }
+    })();
+    finalizePromiseRef.current = operation;
+    return operation;
   }, [ioAdapter, state.draft]);
 
   const value = useMemo(() => {

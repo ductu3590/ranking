@@ -18,6 +18,9 @@ assert.deepEqual(pairing.getPair(regenerated, 'pair-1'), pairing.getPair(locked,
 const evenRegenerated = pairing.regenerateUnlockedPairs(pairing({ memberIds: ['m1', 'm2', 'm3', 'm4'] }));
 assert.deepEqual(pairing.getUnpairedMemberIds(evenRegenerated), [], 'an even roster leaves no member unpaired after automatic pairing');
 assert.equal(new Set(pairing.getPairs(evenRegenerated).flatMap((pair) => pair.memberIds)).size, 4, 'automatic pairing assigns each even-roster member exactly once');
+const clubAndGuests = pairing.regenerateUnlockedPairs(pairing({ memberIds: ['m1', 'm2', 'guest:hoa-anh', 'guest:le-minh'] }));
+assert.deepEqual(clubAndGuests.pairs.map((pair) => pair.memberIds), [['m1', 'm2'], ['guest:hoa-anh', 'guest:le-minh']], 'guest participant IDs take part in automatic pairing just like club members');
+assert.deepEqual(clubAndGuests.memberIds.filter((id) => !new Set(clubAndGuests.pairs.flatMap((pair) => pair.memberIds)).has(id)), [], 'a complete pairing has no derived unpaired participants');
 
 const odd = pairing({ memberIds: ['m1', 'm2', 'm3'] });
 const oddRegenerated = pairing.regenerateUnlockedPairs(odd);

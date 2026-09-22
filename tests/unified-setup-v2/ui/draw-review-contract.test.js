@@ -35,7 +35,7 @@ const draft = {
     },
   },
   pairs,
-  draw: { status: 'drafted', seed: 19, assignments: [] },
+  draw: { status: 'drafted', seed: 19, previewFingerprint: 'a'.repeat(64), assignments: [] },
   readiness: { blockers: [], warnings: ['GROUP_SIZE_IMBALANCE'] },
 };
 
@@ -62,6 +62,8 @@ const stale = model.markDrawStaleOnSetupChange(draft, 'PAIRING_CHANGED');
 assert.equal(stale.draw.status, 'stale', 'setup changes mark draw stale');
 assert.ok(stale.invalidation.draw, 'draw invalidation flag is set');
 assert.equal(stale.draw.matches, undefined, 'stale marker does not auto-regenerate matches');
+const withoutPreview = model.buildReviewSummaryModel({ ...draft, draw: { status: 'not_started' } });
+assert.equal(withoutPreview.finalizeDisabledCode, 'DRAW_REQUIRED', 'finalize stays disabled until server preview returns a fingerprint');
 
 const lockedReview = model.buildReviewSummaryModel({
   ...draft,

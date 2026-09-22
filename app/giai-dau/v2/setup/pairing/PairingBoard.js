@@ -7,7 +7,8 @@ import './pairing.css';
 function memberName(memberMap, memberId) {
     const member = memberMap.get(String(memberId));
     if (!member) return `Thành viên ${memberId}`;
-    return member.full_name || member.displayName || member.display_name || member.name || `Thành viên ${memberId}`;
+    const name = member.full_name || member.displayName || member.display_name || member.name || `Thành viên ${memberId}`;
+    return member.source === 'guest' ? `${name} (khách)` : name;
 }
 
 function ensureDraft(value, selectedMemberIds) {
@@ -89,7 +90,7 @@ export default function PairingBoard({ roster = [], selectedMemberIds = [], valu
                 <div>
                     <p className="setup-eyebrow">Ghép cặp</p>
                     <h2>Xác nhận các cặp thi đấu</h2>
-                    <p>Ghép cặp ổn định theo member_id. Mobile dùng nút rõ ràng, không cần kéo-thả.</p>
+                    <p>Khóa các cặp đã thống nhất. Chọn hai người để đổi chỗ, các cặp khác được giữ nguyên.</p>
                 </div>
                 <div className="pairing-mode" role="group" aria-label="Chế độ ghép cặp">
                     <button type="button" aria-pressed={mode === 'manual'} onClick={() => setMode('manual')}>Thủ công</button>
@@ -115,10 +116,10 @@ export default function PairingBoard({ roster = [], selectedMemberIds = [], valu
 
             <div className="pairing-grid">
                 {draft.pairs.map((pair, index) => (
-                    <article key={pair.pairId} className="pairing-pair">
+                    <article key={pair.pairId} className={`pairing-pair ${pair.locked ? 'is-locked' : ''}`}>
                         <div className="pairing-pair-head">
                             <strong>Cặp {index + 1}</strong>
-                            <button type="button" onClick={() => toggleLock(pair)}>{pair.locked ? 'Mở khóa' : 'Khóa'}</button>
+                            <button type="button" aria-pressed={pair.locked} aria-label={`${pair.locked ? 'Mở khóa' : 'Khóa'} cặp ${index + 1}`} onClick={() => toggleLock(pair)}>{pair.locked ? 'Mở khóa' : 'Khóa'}</button>
                         </div>
                         {pair.memberIds.map((memberId) => (
                             <div key={memberId} className="pairing-member">

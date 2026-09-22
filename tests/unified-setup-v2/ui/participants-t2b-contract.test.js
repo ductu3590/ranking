@@ -51,6 +51,9 @@ assert.match(format, /PairingBoard/, 'format step uses pairing board');
 assert.match(pairing, /manual|automatic|Thủ công|Tự động/, 'manual and automatic preview/apply modes are present');
 assert.match(format, /UNPAIRED_MEMBER|chưa ghép/i, 'unpaired blocker is surfaced');
 assert.match(format, /memberIds/, 'pairing persists member identities through the aggregate draft');
+assert.match(format, /guestParticipantIds[\s\S]*guest:/, 'step 3 converts guests into stable local pairing identities');
+assert.match(format, /pairingRoster/, 'step 3 supplies guest display names to the pairing board');
+assert.match(format, /pairedMemberIds[\s\S]*unpairedMemberIds: pairingMembers\.filter/, 'step 3 derives unpaired state from the actual pairs after auto-pair');
 assert.match(format, /disabled title="Unified preview hiện chưa hỗ trợ thể thức này"/, 'format chưa có preview được disabled thay vì cho chọn rồi lỗi muộn');
 
 console.log('participants T2.B UI contract ok');

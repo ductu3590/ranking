@@ -208,7 +208,9 @@
     border-radius: 10px;
     background: var(--bg-card);
     color: var(--text-primary);
-    font: 600 .86rem inherit;
+    font-family: inherit;
+    font-size: .86rem;
+    font-weight: 600;
     text-align: left;
     cursor: pointer;
 }

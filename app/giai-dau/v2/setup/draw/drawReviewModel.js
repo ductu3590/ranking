@@ -66,6 +66,9 @@ function buildBlockers(draft = {}, config) {
   if (drawStatus === 'stale') {
     blockers.push({ code: 'DRAW_STALE', message: 'Cấu hình hoặc cặp đã đổi, cần bốc lại trước khi chốt.', severity: 'blocker' });
   }
+  if (!/^[a-f0-9]{64}$/i.test(String(draft?.draw?.previewFingerprint || ''))) {
+    blockers.push({ code: 'DRAW_REQUIRED', message: 'Hãy bốc thăm và xem trước lịch trước khi chốt.', severity: 'blocker' });
+  }
   return blockers;
 }
 

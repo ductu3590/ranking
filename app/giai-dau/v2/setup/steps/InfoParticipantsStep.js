@@ -137,8 +137,8 @@ export default function InfoParticipantsStep({ draft = {}, roster = [], onDraftC
                 <p className="setup-eyebrow">Phạm vi giải</p>
                 <h2 id="organizer-mode-title">Chọn cách tổ chức</h2>
                 <div className="setup-scope-toggle" role="group" aria-label="Phạm vi giải">
-                    <button type="button" className={organizerMode === 'internal' ? 'is-active' : ''} aria-pressed={organizerMode === 'internal'} onClick={() => setOrganizerMode('internal')}>Nội bộ CLB</button>
-                    <button type="button" className={organizerMode === 'friendly' ? 'is-active' : ''} aria-pressed={organizerMode === 'friendly'} onClick={() => setOrganizerMode('friendly')}>Giao hữu liên CLB</button>
+                    <button type="button" className={organizerMode === 'internal' ? 'is-active' : ''} aria-pressed={organizerMode === 'internal'} onClick={() => setOrganizerMode('internal')}><span className="setup-option-icon" aria-hidden="true">◎</span><strong>Nội bộ CLB</strong><small>Thi đấu cùng thành viên và khách mời của CLB</small></button>
+                    <button type="button" className={organizerMode === 'friendly' ? 'is-active' : ''} aria-pressed={organizerMode === 'friendly'} onClick={() => setOrganizerMode('friendly')}><span className="setup-option-icon" aria-hidden="true">⊕</span><strong>Giao hữu liên CLB</strong><small>Kết nối và mời các CLB cùng tham gia</small></button>
                 </div>
             </section>
             {organizerMode === 'friendly' ? (

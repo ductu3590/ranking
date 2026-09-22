@@ -22,19 +22,20 @@ function renderCodeItem(item) {
 }
 
 export default function SetupSummaryRail({ draft, saveStatus, lastSavedAt, blockers, warnings }) {
-  const participantCount = countSelected(draft.participants);
+  const participantCount = countSelected(draft.participants) + (draft.participants?.guests?.length || 0);
   const pairCount = Array.isArray(draft.pairs) ? draft.pairs.length : 0;
   const stageCount = Array.isArray(draft.draw?.stagePlans) ? draft.draw.stagePlans.length : 0;
 
   return (
     <aside className="setup-summary" aria-label="Tóm tắt thiết lập">
       <section className="setup-summary__card setup-summary__card--hero">
-        <p className="setup-eyebrow">Tóm tắt nháp</p>
+        <div className="setup-summary__visual" aria-hidden="true"><span>PRO COURT</span><div className="setup-court-lines" /></div>
+        <p className="setup-eyebrow">Giải đấu của bạn</p>
         <h2>{draft.tournament?.name || 'Giải nội bộ chưa đặt tên'}</h2>
         <dl className="setup-summary__facts">
           <div><dt>Ngày đấu</dt><dd>{formatDateLabel(draft.tournament?.eventDate)}</dd></div>
           <div><dt>Địa điểm</dt><dd>{draft.tournament?.location || 'Chưa nhập'}</dd></div>
-          <div><dt>Trạng thái</dt><dd>{draft.state || 'local_only'}</dd></div>
+          <div><dt>Trạng thái</dt><dd>{draft.state === 'finalized' ? 'Đã chốt' : 'Bản nháp'}</dd></div>
         </dl>
       </section>
 
@@ -52,12 +53,12 @@ export default function SetupSummaryRail({ draft, saveStatus, lastSavedAt, block
       </section>
 
       <section className="setup-summary__card">
-        <h3>Readiness</h3>
+        <h3>Kiểm tra sẵn sàng</h3>
         {blockers.length ? (
           <ul className="setup-code-list is-blocker">
             {blockers.slice(0, 4).map((item, index) => <li key={`${renderCodeItem(item)}-${index}`}>{renderCodeItem(item)}</li>)}
           </ul>
-        ) : <p className="setup-empty-state">Chưa có blocker.</p>}
+        ) : <p className="setup-empty-state">Không có mục cần xử lý.</p>}
         {warnings.length ? (
           <ul className="setup-code-list is-warning">
             {warnings.slice(0, 4).map((item, index) => <li key={`${renderCodeItem(item)}-${index}`}>{renderCodeItem(item)}</li>)}

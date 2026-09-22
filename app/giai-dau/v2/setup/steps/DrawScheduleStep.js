@@ -93,10 +93,10 @@ export default function DrawScheduleStep({ draft = {}, onConfigChange, onPreview
   return (
     <section className="setup-draw-panel" aria-label="Bước 4: bốc thăm, xem trước lịch và chốt">
       <div className="setup-draw-card">
-        <p className="setup-draw-eyebrow">Luồng nghiệp vụ</p>
-        <h3>{'ghép cặp -> bốc thăm -> sinh trận -> xếp sân/giờ'}</h3>
-        <p>Xếp sân/giờ chỉ chạy sau khi đã có fixtures, không làm đổi kết quả bốc thăm.</p>
-        <div className="setup-flow-chain" aria-label="Bốn nghiệp vụ tách biệt">
+        <p className="setup-draw-eyebrow">Bước 4 · Hoàn tất thiết lập</p>
+        <h3>Bốc thăm & chốt lịch thi đấu</h3>
+        <p>Kiểm tra bảng đấu, nhánh đi tiếp và lịch dự kiến trước khi chốt. Xếp sân/giờ không làm đổi kết quả bốc thăm.</p>
+        <div className="setup-flow-chain" aria-label="ghép cặp -> bốc thăm -> sinh trận -> xếp sân/giờ">
           <span className="setup-flow-chip">1. Ghép cặp</span>
           <span className="setup-flow-chip">2. Bốc thăm</span>
           <span className="setup-flow-chip">3. Sinh trận</span>
@@ -164,7 +164,7 @@ export default function DrawScheduleStep({ draft = {}, onConfigChange, onPreview
       </div>
 
       <div className="setup-draw-card">
-        <p className="setup-draw-eyebrow">Bảng đấu thật</p>
+        <p className="setup-draw-eyebrow">01 · Kết quả bốc thăm</p>
         <h3>Phân bảng và tuyến đi tiếp</h3>
         {hasDraw ? (
           <>
@@ -213,7 +213,7 @@ export default function DrawScheduleStep({ draft = {}, onConfigChange, onPreview
       </div>
 
       <div className="setup-draw-card">
-        <p className="setup-draw-eyebrow">Bracket placeholder</p>
+        <p className="setup-draw-eyebrow">02 · Nhánh loại trực tiếp</p>
         <h3>Trận chờ suất đi tiếp</h3>
         <div className="setup-bracket-scroll">
           <div className="setup-bracket-lane">
@@ -238,12 +238,12 @@ export default function DrawScheduleStep({ draft = {}, onConfigChange, onPreview
             ) : null}
           </div>
         </div>
-        <p>Không tạo VĐV giả; slot knockout là placeholder chờ kết quả vòng bảng.</p>
+        <p>Các suất đi tiếp sẽ được xác định sau khi xác nhận kết quả vòng bảng.</p>
       </div>
 
       <div className="setup-draw-card">
-        <p className="setup-draw-eyebrow">Sân và thời gian</p>
-        <h3>Metrics xếp sân/giờ</h3>
+        <p className="setup-draw-eyebrow">03 · Sân và thời gian</p>
+        <h3>Xem trước lịch thi đấu</h3>
         <div className="setup-metric-grid">
           <div className="setup-metric-tile">Vòng bảng: {preview.metrics.groupMatches} trận</div>
           <div className="setup-metric-tile">Knockout: {preview.metrics.semifinalMatches + preview.metrics.finalMatches + preview.metrics.thirdPlaceMatches} trận</div>
@@ -251,15 +251,19 @@ export default function DrawScheduleStep({ draft = {}, onConfigChange, onPreview
           <div className="setup-metric-tile">Dự kiến: {preview.courtPlan.estimatedRounds} lượt · {preview.courtPlan.estimatedMinutes} phút</div>
         </div>
         {Array.isArray(draft.draw?.schedulePreview) && draft.draw.schedulePreview.length ? (
-          <ol className="setup-progression-list" aria-label="Lịch sân và giờ dự kiến">
-            {draft.draw.schedulePreview.map((item) => <li key={item.matchKey}>{item.matchKey} · Sân {item.court} · lượt {item.round} · {item.projectedStart ? new Intl.DateTimeFormat('vi-VN', { hour: '2-digit', minute: '2-digit' }).format(new Date(item.projectedStart)) : 'Chưa có giờ bắt đầu'}</li>)}
-          </ol>
+          <div className="setup-schedule-scroll" tabIndex={0} role="region" aria-label="Lịch sân và giờ dự kiến">
+            <table className="setup-schedule-table">
+              <caption>Lịch sân và giờ dự kiến · {draft.draw.schedulePreview.length} trận</caption>
+              <thead><tr><th scope="col">Mã trận</th><th scope="col">Lượt</th><th scope="col">Sân đấu</th><th scope="col">Giờ dự kiến</th></tr></thead>
+              <tbody>{draft.draw.schedulePreview.map((item) => <tr key={item.matchKey}><td><strong>{item.matchKey}</strong></td><td>{item.round}</td><td>Sân {item.court}</td><td>{item.projectedStart ? new Intl.DateTimeFormat('vi-VN', { hour: '2-digit', minute: '2-digit' }).format(new Date(item.projectedStart)) : 'Chưa có giờ bắt đầu'}</td></tr>)}</tbody>
+            </table>
+          </div>
         ) : <p className="setup-draw-hint">Bốc thăm tự động hoặc xác nhận bốc thủ công để xem sân và giờ dự kiến.</p>}
       </div>
 
       {(preview.blockers.length || preview.warnings.length) ? (
         <div className="setup-draw-card">
-          <p className="setup-draw-eyebrow">Blocker / warning</p>
+          <p className="setup-draw-eyebrow">Các mục cần kiểm tra</p>
           <div className="setup-status-list">
             {preview.blockers.map((item) => <div className="setup-status-item blocker" key={item.code}>Blocker: {item.message}</div>)}
             {preview.warnings.map((item) => <div className="setup-status-item warning" key={item.code}>Warning: {item.message}</div>)}

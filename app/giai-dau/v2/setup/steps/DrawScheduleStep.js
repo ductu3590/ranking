@@ -3,14 +3,14 @@
 import '../draw/draw-review.css';
 import { useState } from 'react';
 import { buildDrawPreviewModel } from '../draw/drawReviewModel';
-import { groupAssignments, rollDraw, swapDraw } from '../draw/drawActions';
+import { groupAssignments, swapDraw } from '../draw/drawActions';
 
 const GROUP_PAIRING_LABELS = {
   cross_seed: 'Bán kết chéo bảng: Nhất A – Nhì B, Nhất B – Nhì A',
   same_seed: 'Ghép cùng thứ hạng theo cấu hình BTC',
 };
 
-export default function DrawScheduleStep({ draft = {}, onConfigChange, onPreviewSchedule }) {
+export default function DrawScheduleStep({ draft = {}, onConfigChange, onPreviewSchedule, onAutoDraw }) {
   const preview = buildDrawPreviewModel(draft);
   const config = preview.config;
   const drawStatus = draft.draw?.status || 'not_started';
@@ -42,12 +42,12 @@ export default function DrawScheduleStep({ draft = {}, onConfigChange, onPreview
     }
   };
 
-  const handleRoll = () => runLocal('roll', () => rollDraw(draft));
+  const handleRoll = () => runAction('roll', onAutoDraw);
 
   const handleReroll = () => {
     if (hasDraw && !window.confirm('Bốc lại sẽ thay toàn bộ bản bốc thăm hiện tại. Tiếp tục?')) return;
     setPickedEntryId('');
-    runLocal('reroll', () => rollDraw(draft));
+    runAction('reroll', onAutoDraw, { reroll: true });
   };
 
   const handleSlotClick = (entryId) => {
@@ -91,7 +91,7 @@ export default function DrawScheduleStep({ draft = {}, onConfigChange, onPreview
   };
 
   return (
-    <section className="setup-draw-panel" aria-label="Bước 3: bốc thăm và xem trước lịch">
+    <section className="setup-draw-panel" aria-label="Bước 4: bốc thăm, xem trước lịch và chốt">
       <div className="setup-draw-card">
         <p className="setup-draw-eyebrow">Luồng nghiệp vụ</p>
         <h3>{'ghép cặp -> bốc thăm -> sinh trận -> xếp sân/giờ'}</h3>
@@ -250,6 +250,11 @@ export default function DrawScheduleStep({ draft = {}, onConfigChange, onPreview
           <div className="setup-metric-tile">Tổng: {preview.metrics.totalMatches} trận</div>
           <div className="setup-metric-tile">Dự kiến: {preview.courtPlan.estimatedRounds} lượt · {preview.courtPlan.estimatedMinutes} phút</div>
         </div>
+        {Array.isArray(draft.draw?.schedulePreview) && draft.draw.schedulePreview.length ? (
+          <ol className="setup-progression-list" aria-label="Lịch sân và giờ dự kiến">
+            {draft.draw.schedulePreview.map((item) => <li key={item.matchKey}>{item.matchKey} · Sân {item.court} · lượt {item.round} · {item.projectedStart ? new Intl.DateTimeFormat('vi-VN', { hour: '2-digit', minute: '2-digit' }).format(new Date(item.projectedStart)) : 'Chưa có giờ bắt đầu'}</li>)}
+          </ol>
+        ) : <p className="setup-draw-hint">Bốc thăm tự động hoặc xác nhận bốc thủ công để xem sân và giờ dự kiến.</p>}
       </div>
 
       {(preview.blockers.length || preview.warnings.length) ? (

@@ -12,6 +12,7 @@ import {
 } from '@/lib/tournamentV2Client';
 import TournamentSetupWorkspace from './setup/TournamentSetupWorkspace';
 import InfoParticipantsStep from './setup/steps/InfoParticipantsStep';
+import ParticipantsStep from './setup/steps/ParticipantsStep';
 import FormatPairingStep from './setup/steps/FormatPairingStep';
 import DrawScheduleStep from './setup/steps/DrawScheduleStep';
 import ReviewFinalizeStep from './setup/steps/ReviewFinalizeStep';
@@ -39,11 +40,10 @@ function emptyDraft(searchParams) {
         revision: 0,
         currentStep: normalizeStep(searchParams.get('step')),
         tournament: { organizerMode: 'internal', name: '', eventDate: '', location: '', description: '', posterUrl: '' },
-        participants: { selectedMemberIds: [], athleteSnapshots: [] },
+        participants: { memberIds: [], guests: [], athleteSnapshots: [] },
         format: { entrantType: 'doubles', formatKey: 'group_knockout', config: { groupCount: 2, qualifiersPerGroup: 2, thirdPlaceEnabled: false } },
         pairs: [],
         unpairedMemberIds: [],
-        reserveMemberIds: [],
         draw: { status: 'not_started' },
         readiness: { blockers: [], warnings: [] },
         invalidation: {},
@@ -76,12 +76,12 @@ function draftFromAggregate(aggregate, fallback) {
         tournament: {
             ...(fallback.tournament || {}),
             ...(persisted.tournament || {}),
-            // A technical bootstrap name must never be shown as a user-entered title.
-            name: persisted.tournament?.displayName || (persisted.tournament?.name === 'Giải nội bộ chưa đặt tên' ? '' : persisted.tournament?.name || fallback.tournament?.name || ''),
+            name: persisted.tournament?.name || fallback.tournament?.name || '',
         },
         participants: {
             ...(persisted.participants || fallback.participants || {}),
-            selectedMemberIds: persisted.participants?.selectedMemberIds || selectedAthleteIds.map(String),
+            memberIds: persisted.participants?.memberIds || persisted.participants?.selectedMemberIds || selectedAthleteIds.map(String),
+            guests: persisted.participants?.guests || [],
             athleteSnapshots: (aggregate.roster?.athletes || []).map((athlete) => ({
                 memberId: String(athlete.member_id || athlete.id),
                 athleteId: athlete.id,
@@ -179,15 +179,31 @@ export default function TournamentWizard({ onDone }) {
     function renderStep({ step, state, dispatch }) {
         const draft = state.draft;
         const onDraftChange = (nextDraft) => dispatch({ type: 'replaceDraft', draft: nextDraft, saveStatus: 'dirty', highestAllowedStep: step.id + 1 });
-        if (step.key === 'info') return <InfoParticipantsStep draft={draft} roster={roster} loading={loading} error={loadError} onDraftChange={onDraftChange} />;
+        if (step.key === 'info') return <InfoParticipantsStep draft={draft} onDraftChange={onDraftChange} />;
+        if (step.key === 'participants') return <ParticipantsStep draft={draft} roster={roster} loading={loading} error={loadError} onDraftChange={onDraftChange} />;
         if (step.key === 'format') return <FormatPairingStep draft={draft} roster={roster} onDraftChange={onDraftChange} />;
-        if (step.key === 'draw') return <DrawScheduleStep draft={draft} onConfigChange={(patch) => onDraftChange({ ...draft, ...patch })} onPreviewSchedule={async () => {
-            const saved = await saveDraft({ ...draft, currentStep: 3 });
+        if (step.key === 'draw_review') return <>
+            <DrawScheduleStep draft={draft} onConfigChange={(patch) => onDraftChange({ ...draft, ...patch })} onAutoDraw={async ({ reroll } = {}) => {
+            const prepared = { ...draft, currentStep: 4, draw: { ...(draft.draw || {}), mode: 'automatic', assignments: [], seed: undefined, previewFingerprint: undefined, rerollNonce: reroll ? Number(draft?.draw?.rerollNonce || 0) + 1 : Number(draft?.draw?.rerollNonce || 0) } };
+            const saved = await saveDraft(prepared);
+            const persistedDraft = saved?.draft || prepared;
+            const preview = await previewSavedDraft(persistedDraft);
+            const nextDraft = {
+                ...persistedDraft,
+                currentStep: 4,
+                state: preview?.draftUpdate?.state || 'draw_drafted',
+                draw: { ...(persistedDraft.draw || {}), ...(preview?.draftUpdate?.draw || {}), assignments: normalizePreviewAssignments(preview?.draftUpdate?.draw?.assignments || []) },
+            };
+            const persistedDraw = await saveDraft(nextDraft);
+            dispatch({ type: 'replaceDraft', draft: persistedDraw?.draft || nextDraft, saveStatus: 'saved', highestAllowedStep: 4 });
+            return preview;
+            }} onPreviewSchedule={async () => {
+            const saved = await saveDraft({ ...draft, currentStep: 4 });
             const persistedDraft = saved?.draft || draft;
             const preview = await previewSavedDraft(persistedDraft);
             const nextDraft = {
                 ...persistedDraft,
-                currentStep: 3,
+                currentStep: 4,
                 state: preview?.draftUpdate?.state || 'draw_drafted',
                 draw: {
                     ...(persistedDraft.draw || {}),
@@ -199,8 +215,10 @@ export default function TournamentWizard({ onDone }) {
             const finalizedDraft = persistedDraw?.draft || nextDraft;
             dispatch({ type: 'replaceDraft', draft: finalizedDraft, saveStatus: 'saved', highestAllowedStep: 4 });
             return preview;
-        }} />;
-        return <ReviewFinalizeStepWithLifecycle />;
+            }} />
+            <ReviewFinalizeStepWithLifecycle />
+        </>;
+        return null;
     }
 
     return <TournamentSetupWorkspace initialDraft={initialDraft} adapter={adapter} resumeStep={initialDraft.currentStep} renderStep={renderStep} />;

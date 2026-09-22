@@ -1,13 +1,11 @@
 'use client';
 
-import ParticipantRosterPicker from '../participants/ParticipantRosterPicker';
 import { useEffect, useState } from 'react';
 import { inviteExternalClub, inviteTournamentClub, listAvailableTournamentClubs, listTournamentClubs } from '@/lib/tournamentV2Client';
+import { TournamentDetailsForm } from './ReviewFinalizeStep';
 
 // Contract tokens: select-visible is implemented by ParticipantRosterPicker; Xóa maps to the friendly remove action; STRUCTURE_LOCKED_BY_RESULTS is surfaced by finalize readiness.
 export default function InfoParticipantsStep({ draft = {}, roster = [], onDraftChange, onSaveDraft, loading = false, error = '' }) {
-    const participants = draft.participants || {};
-    const selectedMemberIds = participants.selectedMemberIds || [];
     const tournament = draft.tournament || {};
     const organizerMode = tournament.organizerMode === 'friendly' ? 'friendly' : 'internal';
     const invitedClubs = Array.isArray(draft.invitedClubs) ? draft.invitedClubs : [];
@@ -127,24 +125,14 @@ export default function InfoParticipantsStep({ draft = {}, roster = [], onDraftC
         onDraftChange?.({ ...draft, invitedClubs: invitedClubs.filter((_, itemIndex) => itemIndex !== index) });
     }
 
-    function updateSelectedMemberIds(nextIds) {
-        onDraftChange?.({
-            ...draft,
-            participants: {
-                ...participants,
-                selectedMemberIds: nextIds,
-            },
-            invalidation: {
-                ...(draft.invalidation || {}),
-                pairing: true,
-                draw: true,
-                reasonCodes: Array.from(new Set([...(draft.invalidation?.reasonCodes || []), 'ROSTER_CHANGED'])),
-            },
-        });
-    }
-
     return (
         <div className="setup-step setup-step-info">
+            <section className="setup-draw-card" aria-labelledby="tournament-info-title">
+                <p className="setup-eyebrow">Bước 1</p>
+                <h2 id="tournament-info-title">Thông tin giải</h2>
+                <p>Nhập thông tin cơ bản trước khi chọn người tham gia và thể thức.</p>
+                <TournamentDetailsForm tournament={tournament} onChange={(nextTournament) => onDraftChange?.({ ...draft, tournament: nextTournament })} />
+            </section>
             <section className="setup-scope-card" aria-labelledby="organizer-mode-title">
                 <p className="setup-eyebrow">Phạm vi giải</p>
                 <h2 id="organizer-mode-title">Chọn cách tổ chức</h2>
@@ -198,20 +186,6 @@ export default function InfoParticipantsStep({ draft = {}, roster = [], onDraftC
                         {onSaveDraft ? <button type="button" onClick={onSaveDraft}>Lưu nháp</button> : null}
                     </div>
                 </section>
-            ) : (
-                <ParticipantRosterPicker
-                    roster={roster}
-                    selectedMemberIds={selectedMemberIds}
-                    onChange={updateSelectedMemberIds}
-                    loading={loading}
-                    error={error}
-                />
-            )}
-            {organizerMode === 'internal' ? (
-                <div className="setup-save-note">
-                    <span>{draft.savedAt ? `Đã lưu lúc ${draft.savedAt}` : 'Trạng thái chỉ hiện đã lưu khi server xác nhận.'}</span>
-                    {onSaveDraft ? <button type="button" onClick={onSaveDraft}>Lưu nháp</button> : null}
-                </div>
             ) : null}
         </div>
     );

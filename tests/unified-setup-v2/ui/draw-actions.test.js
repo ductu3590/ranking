@@ -60,6 +60,8 @@ for (const entryId of before.keys()) {
     assert.equal(after.get(entryId), before.get(entryId), `đổi chỗ không đụng tới ${entryId}`);
 }
 assert.equal(swapped.assignments.length, rolled.assignments.length, 'đổi chỗ không làm mất suất nào');
+assert.equal(swapped.mode, 'manual', 'đổi chỗ chuyển draw sang manual');
+assert.equal(swapped.status, 'stale', 'bốc thủ công phải được server preview lại trước khi chốt');
 
 // --- Lỗi phải nêu rõ, không crash -------------------------------------------
 
@@ -70,7 +72,8 @@ assert.throws(() => swapDraw({ ...draft, draw: rolled }, 'pair-1', 'pair-1'),
 assert.throws(() => swapDraw(draft, 'pair-1', 'pair-2'),
     /Chưa bốc thăm/, 'chưa bốc thăm thì không đổi chỗ được');
 assert.throws(() => rollDraw(makeDraft(1)), /ít nhất 2 cặp/, 'dưới 2 cặp thì không bốc được');
-assert.throws(() => rollDraw(makeDraft(2, 5)), /Số bảng nhiều hơn số cặp/, 'số bảng nhiều hơn số cặp thì báo lỗi hiểu được');
+assert.throws(() => rollDraw(makeDraft(2)), /máy chủ cấp/, 'client không tự sinh random seed');
+assert.throws(() => rollDraw(makeDraft(2, 5), { seed: 9 }), /Số bảng nhiều hơn số cặp/, 'số bảng nhiều hơn số cặp thì báo lỗi hiểu được');
 
 // --- Dây nối UI: không được có nút gọi handler undefined --------------------
 

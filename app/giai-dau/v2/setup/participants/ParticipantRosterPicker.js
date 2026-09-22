@@ -64,8 +64,8 @@ export default function ParticipantRosterPicker({ roster = [], selectedMemberIds
         <section className="participants-card" aria-label="Danh sách thành viên tham gia">
             <div className="participants-head">
                 <div>
-                    <p className="setup-eyebrow">Bước 1</p>
-                    <h2>Thông tin & người tham gia</h2>
+                    <p className="setup-eyebrow">Bước 2</p>
+                    <h2>Người tham gia</h2>
                     <p>Chọn bằng mã thành viên để không gộp nhầm người trùng tên.</p>
                 </div>
                 <strong className="participants-count">Đã chọn {selectedCount}/{totalCount}</strong>

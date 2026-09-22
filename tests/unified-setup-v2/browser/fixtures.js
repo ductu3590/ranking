@@ -30,7 +30,7 @@ const fixtures = {
         expectedPairs: 7,
         unpairedMemberCount: 1,
         finalizeMustBeBlocked: true,
-        expectedChoices: ['add_member', 'reserve_member', 'switch_format'],
+        expectedChoices: ['add_member', 'switch_format'],
         athletes: athleteFixture(15),
     },
 };

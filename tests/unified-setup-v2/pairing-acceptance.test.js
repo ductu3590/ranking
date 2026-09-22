@@ -30,11 +30,7 @@ assert.deepEqual(pairing.getUnpairedMemberIds(oddRegenerated), ['m3'], 'automati
 assert.throws(() => pairing.pairMembers(initial, [['m1', 'm1']]), /PAIR_MEMBER_COUNT_INVALID/, 'a member cannot occupy both positions in one pair');
 assert.throws(() => pairing.pairMembers(locked, [['m2', 'm1'], ['m3', 'm4'], ['m5', 'm6']]), /LOCKED_PAIR_MUTATION_FORBIDDEN/, 'manual pairing cannot mutate a locked pair');
 assert.throws(() => pairing.swapPairMembers(locked, 'pair-1', 'm1', 'pair-2', 'm3'), /LOCKED_PAIR_MUTATION_FORBIDDEN/, 'swapping a locked pair is rejected by the domain');
-const reserved = pairing.reserveMember(oddRegenerated, 'm3');
-assert.deepEqual(reserved.memberIds, ['m1', 'm2'], 'reserving removes the odd member from active doubles entrants');
-assert.deepEqual(reserved.reserveMemberIds, ['m3'], 'reserving records the odd member exactly once');
-const restored = pairing.addMember(reserved, 'm3');
-assert.equal(restored.reserveMemberIds.includes('m3'), false, 're-adding a reserve clears its reserve status');
-assert.ok(pairing.getUnpairedMemberIds(restored).includes('m3'), 're-added reserve returns to the explicit unpaired pool');
+assert.equal(typeof pairing.reserveMember, 'undefined', 'pairing domain no longer exposes a reserve path');
+assert.deepEqual(pairing.oddChoices(oddRegenerated), ['add_member', 'switch_format'], 'odd roster keeps explicit add/switch remedies and never silently removes a participant');
 
 console.log('pairing acceptance: stable pairs and odd-roster contract ok');

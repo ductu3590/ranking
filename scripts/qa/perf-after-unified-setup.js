@@ -177,7 +177,7 @@ async function runJourney(page, rec, runNumber) {
     await page.getByRole('button', { name: /^Tiếp tục$/ }).click();
     const finalizeWait = page.waitForURL(/\/dieu-hanh-giai\/\d+/, { timeout: 60000 });
     rec.start('finalize'); const finalizeStart = Date.now();
-    await page.getByLabel('Bước 4: kiểm tra và chốt').getByRole('button', { name: 'Chốt bốc thăm & tạo lịch' }).click();
+    await page.getByLabel('Kiểm tra và chốt lịch').getByRole('button', { name: 'Chốt bốc thăm & tạo lịch' }).click();
     await finalizeWait; await settled(page);
     return { open, save, preview, finalize: { ms: Date.now() - finalizeStart, phase: await rec.stop() }, addMs, removeMs };
 }

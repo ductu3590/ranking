@@ -122,7 +122,7 @@ function buildReviewSummaryModel(draft = {}) {
     finalizeDisabledCode: blockers[0] ? blockers[0].code : null,
     finalizeDisabledReason: blockers[0] ? blockers[0].message : '',
     destinationLabel: 'Lịch thi đấu',
-    summaryText: `${(draft.participants && draft.participants.selectedMemberIds || []).length || (draft.pairs || []).length * 2} VĐV · ${(draft.pairs || []).length} cặp · ${preview.groupSizes.map((size, index) => `Bảng ${groupLabel(index)} ${size} cặp`).join(' / ')} · vòng bảng ${preview.metrics.groupMatches} trận · bán kết ${preview.metrics.semifinalMatches} · chung kết ${preview.metrics.finalMatches} · tổng ${preview.metrics.totalMatches}`,
+    summaryText: `${(draft.participants && (draft.participants.memberIds || draft.participants.selectedMemberIds) || []).length || (draft.pairs || []).length * 2} VĐV · ${(draft.pairs || []).length} cặp · ${preview.groupSizes.map((size, index) => `Bảng ${groupLabel(index)} ${size} cặp`).join(' / ')} · vòng bảng ${preview.metrics.groupMatches} trận · bán kết ${preview.metrics.semifinalMatches} · chung kết ${preview.metrics.finalMatches} · tổng ${preview.metrics.totalMatches}`,
   };
 }
 

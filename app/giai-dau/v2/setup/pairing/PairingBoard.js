@@ -78,23 +78,17 @@ export default function PairingBoard({ roster = [], selectedMemberIds = [], valu
     const oddMemberId = draft.unpairedMemberIds.length % 2 ? draft.unpairedMemberIds[draft.unpairedMemberIds.length - 1] : null;
     const availableMembers = roster.filter((member) => {
         const memberId = String(member.member_id ?? member.memberId ?? member.id);
-        return memberId && !draft.memberIds.includes(memberId) && !draft.reserveMemberIds.includes(memberId);
+        return memberId && !draft.memberIds.includes(memberId);
     });
     // The current draw and review contracts only resolve doubles entrants.
     const canSwitchToSingles = false;
-
-    function reserveOddMember() {
-        if (!oddMemberId) return;
-        const next = createPairingDraft.reserveMember(draft, oddMemberId);
-        update(next, { type: 'reserve_member', memberId: oddMemberId });
-    }
 
     return (
         <section className="pairing-card" aria-label="Ghép cặp thi đấu">
             <div className="pairing-head">
                 <div>
-                    <p className="setup-eyebrow">Bước 2</p>
-                    <h2>Thể thức & ghép cặp</h2>
+                    <p className="setup-eyebrow">Ghép cặp</p>
+                    <h2>Xác nhận các cặp thi đấu</h2>
                     <p>Ghép cặp ổn định theo member_id. Mobile dùng nút rõ ràng, không cần kéo-thả.</p>
                 </div>
                 <div className="pairing-mode" role="group" aria-label="Chế độ ghép cặp">
@@ -158,9 +152,8 @@ export default function PairingBoard({ roster = [], selectedMemberIds = [], valu
                         {availableMembers.length ? availableMembers.map((member) => {
                             const memberId = String(member.member_id ?? member.memberId ?? member.id);
                             return <button key={memberId} type="button" data-choice="add_member" onClick={() => addPerson(memberId)}>Thêm {memberName(memberMap, memberId)}</button>;
-                        }) : <span>Không còn thành viên nào để thêm. Hãy quay lại Bước 1 để chọn thêm người.</span>}
+                        }) : <span>Không còn thành viên nào để thêm. Hãy quay lại Bước 2 để chọn thêm người.</span>}
                     </div>
-                    <button type="button" data-choice="reserve_member" onClick={reserveOddMember}>reserve_member · Đưa {memberName(memberMap, oddMemberId)} vào dự bị ngoài danh sách thi đấu</button>
                     <button type="button" data-choice="switch_format" disabled={!canSwitchToSingles} aria-describedby="pairing-switch-format-reason">switch_format · Đổi sang đánh đơn</button>
                     <span id="pairing-switch-format-reason">Chưa thể đổi sang đánh đơn: bốc thăm và bước rà soát hiện chưa hỗ trợ workflow đánh đơn hoàn chỉnh.</span>
                 </div>

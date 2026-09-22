@@ -20,7 +20,7 @@ assert.equal(typeof model.markDrawStaleOnSetupChange, 'function', 'exports markD
 
 const pairs = Array.from({ length: 7 }, (_, index) => ({ pairId: `pair-${index + 1}`, nameSnapshot: `Cặp ${index + 1}` }));
 const draft = {
-  tournament: { name: 'Giải nội bộ 14 VĐV' },
+  tournament: { name: 'Giải nội bộ 14 VĐV', eventDate: '2026-09-22', startTime: '08:00' },
   format: {
     entrantType: 'doubles',
     formatKey: 'group_knockout',

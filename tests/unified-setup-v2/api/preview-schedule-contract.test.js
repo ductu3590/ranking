@@ -10,11 +10,15 @@ assert.ok(route.includes("from('tournament_divisions')") && route.includes('setu
 assert.ok(route.includes(".eq('group_id', Number(admin.groupId))"), 'both preview reads scope the group from the server session');
 assert.ok(route.includes('expectedRevision') && route.includes('DRAFT_FINGERPRINT_MISMATCH'), 'preview rejects stale revisions and draft snapshots');
 assert.ok(route.includes('UNSUPPORTED_ORGANIZER_MODE') && route.includes('UNSUPPORTED_PREVIEW_FORMAT'), 'preview explicitly limits the slice to internal doubles group-knockout');
-assert.ok(route.includes('PAIR_ID_REQUIRED') && route.includes('UNPAIRED_MEMBER') && route.includes('UNPAIRED_MEMBER_OUTSIDE_ACTIVE_ROSTER') && route.includes('RESERVE_MEMBER_OUTSIDE_ROSTER'), 'preview validates stable pairs, active members, and reserves');
+assert.ok(route.includes('PAIR_ID_REQUIRED') && route.includes('UNPAIRED_MEMBER') && route.includes('UNPAIRED_MEMBER_OUTSIDE_ACTIVE_ROSTER') && !route.includes('RESERVE_MEMBER_OUTSIDE_ROSTER'), 'preview validates stable pairs and active members without a reserve path');
 assert.ok(route.includes("from('club_members')") && route.includes("from('athletes')") && route.includes('MEMBER_NOT_ACTIVE_IN_GROUP') && route.includes('ATHLETE_IDENTITY_MISSING'), 'preview resolves saved member identities within the server tenant');
 assert.ok(route.includes('entryId: pairId'), 'pairId is the transient, client-stable preview entrant identity');
 assert.ok(route.includes('draftUpdate:') && route.includes("status: 'draft'"), 'preview returns a non-persisted aggregate draw update');
 assert.ok(route.includes('previewFingerprint: plan.fingerprint'), 'preview persists the canonical plan fingerprint for finalization');
+assert.ok(route.includes('roundScoring: draft?.format?.config?.roundScoring'), 'preview passes BO theo vòng into the canonical stage plan and fingerprint');
+assert.ok(route.includes('serverDrawSeed') && route.includes("unified-draw"), 'server derives the automatic draw seed from authoritative draft context');
+assert.ok(route.includes("assignments: draft?.draw?.mode === 'manual'"), 'manual draw assignments are handed to the canonical plan for server-side validation');
+assert.ok(route.includes('schedulePreview: previewScheduleProjection(plan, draft)') && route.includes('projectedStart'), 'preview returns read-only court/time projections without writing fixtures');
 assert.ok(route.includes("error: error.message") && route.includes("code: error.code"), 'preview errors use the shared top-level client error envelope');
 assert.ok(!route.includes('.insert(') && !route.includes('.upsert(') && !route.includes('.rpc(') && !route.includes(".from('tournament_divisions').update("), 'preview does not write database state');
 assert.ok(!route.includes('buildSchedulePreview') && !route.includes('entrant_count'), 'legacy count-based synthetic preview is not used');

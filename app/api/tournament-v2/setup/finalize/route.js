@@ -19,7 +19,7 @@ function validId(value) {
 function mapRpcError(error) {
     const message = error?.message || 'Không thể chốt bốc thăm';
     const code = [
-        'SETUP_REVISION_CONFLICT', 'ROSTER_LOCKED', 'DRAW_FINGERPRINT_MISMATCH',
+        'SETUP_REVISION_CONFLICT', 'ROSTER_LOCKED', 'DRAW_FINGERPRINT_MISMATCH', 'FINALIZE_DRAFT_INVALID',
         'FINALIZE_STRUCTURE_ALREADY_EXISTS', 'IDEMPOTENCY_KEY_REUSED',
         'TOURNAMENT_ATHLETE_CLUB_SCOPE_MISMATCH',
     ].find((candidate) => message.includes(candidate)) || 'FINALIZE_NOT_ATOMIC';
@@ -40,7 +40,7 @@ export async function POST(request) {
             || !idempotencyKey || idempotencyKey.length > 200 || !/^[a-f0-9]{64}$/i.test(previewFingerprint)) {
             throw finalizeError('SETUP_PAYLOAD_INVALID', 'Thông tin chốt bốc thăm không hợp lệ.');
         }
-        const { data, error } = await db.rpc('finalize_internal_doubles_group_knockout_v2', {
+        const { data, error } = await db.rpc('finalize_internal_doubles_group_knockout_v3', {
             p_group_id: Number(admin.groupId),
             p_tournament_id: Number(tournamentId),
             p_division_id: Number(divisionId),

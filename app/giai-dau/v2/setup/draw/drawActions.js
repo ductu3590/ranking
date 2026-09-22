@@ -28,13 +28,6 @@ function stageFromDraft(draft = {}) {
     return { schedule_format: 'round_robin', config: { groupCount } };
 }
 
-function nextSeed(previousSeed) {
-    const candidate = Math.floor(Math.random() * 1000000) + 1;
-    // Bốc lại phải thực sự ra seed khác, nếu không người dùng bấm mà không thấy đổi.
-    if (Number(previousSeed) === candidate) return candidate === 1000000 ? 1 : candidate + 1;
-    return candidate;
-}
-
 // Bốc thăm mới. Trả về đối tượng draw để ghi thẳng vào draft.
 function rollDraw(draft = {}, options = {}) {
     const entrants = entrantsFromDraft(draft);
@@ -43,7 +36,12 @@ function rollDraw(draft = {}, options = {}) {
         error.code = 'DRAW_TOO_FEW_ENTRIES';
         throw error;
     }
-    const seed = Number(options.seed) || nextSeed(draft.draw?.seed);
+    const seed = Number(options.seed);
+    if (!Number.isInteger(seed) || seed < 1) {
+        const error = new Error('Seed bốc thăm phải do máy chủ cấp. Hãy dùng nút bốc thăm tự động.');
+        error.code = 'SERVER_DRAW_SEED_REQUIRED';
+        throw error;
+    }
     let assignments;
     try {
         assignments = buildDrawSlots(stageFromDraft(draft), entrants, seed);
@@ -55,7 +53,7 @@ function rollDraw(draft = {}, options = {}) {
         }
         throw engineError;
     }
-    return { ...(draft.draw || {}), status: 'drafted', seed, assignments };
+    return { ...(draft.draw || {}), status: 'drafted', mode: 'automatic', seed, assignments };
 }
 
 // Đổi chỗ hai suất đã bốc. Ném lỗi có thông điệp tiếng Việt nếu entry không tồn tại.
@@ -72,7 +70,7 @@ function swapDraw(draft = {}, entryA, entryB) {
         throw error;
     }
     const assignments = swapDrawSlots(current, entryA, entryB);
-    return { ...(draft.draw || {}), status: 'drafted', assignments };
+    return { ...(draft.draw || {}), status: 'stale', mode: 'manual', assignments, previewFingerprint: undefined, schedulePreview: undefined };
 }
 
 // Gom assignments theo bảng để render. Giữ thứ tự seed_in_stage trong mỗi bảng.

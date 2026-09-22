@@ -138,6 +138,7 @@ function MatchCard({ match, savedGames, isMlp, entrantsById, isAdmin, onSaved, p
 
     const nameA = entrantName(entrantsById, match.entrant_a_id, 'Đội A');
     const nameB = entrantName(entrantsById, match.entrant_b_id, 'Đội B');
+    const isWalkover = match.result_type === 'walkover';
 
     const entrantA = entrantsById[String(match.entrant_a_id)];
     const entrantB = entrantsById[String(match.entrant_b_id)];
@@ -265,6 +266,7 @@ function MatchCard({ match, savedGames, isMlp, entrantsById, isAdmin, onSaved, p
                 </span>
             </div>
 
+            {isWalkover ? <p className="v2-match-msg">W.O. · Thắng xử do đối thủ rút lui. Tỉ số ván chỉ dùng để hoàn tất trận, không tính hiệu số.</p> : null}
             <div className="v2-game-rows">
                 {rows.map((r, i) => {
                     const subKind = isMlp ? subKinds[i] : null;

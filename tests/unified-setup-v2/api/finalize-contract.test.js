@@ -6,9 +6,9 @@ const assert = (value, message) => { if (!value) throw new Error(message); };
 const route = read('app/api/tournament-v2/setup/finalize/route.js');
 const setupRoute = read('app/api/tournament-v2/setup/route.js');
 const useCase = read('lib/tournament/setupFinalize.js');
-const migration = read('database/migrations/092_internal_doubles_group_knockout_finalize.sql');
+const migration = read('database/migrations/095_unified_setup_finalize_v3.sql');
 assert(route.includes('requireValidatedGroupAdmin'), 'finalize must require admin');
-assert(route.includes("'finalize_internal_doubles_group_knockout_v2'"), 'finalize must use the R3 atomic finalizer RPC');
+assert(route.includes("'finalize_internal_doubles_group_knockout_v3'"), 'finalize must use the v3 atomic finalizer RPC');
 assert(useCase.includes('FINALIZE_NOT_ATOMIC'), 'finalize must expose atomic failure code');
 assert(route.includes('p_group_id'), 'finalize must scope group');
 assert(!route.includes('tournament_draw_slots'), 'finalize must not use draw slots');
@@ -18,5 +18,5 @@ assert(route.includes('previewFingerprint') && route.includes('p_preview_fingerp
 assert(route.includes('error: error.message') && route.includes('code: error.code'), 'finalize must use the shared top-level error envelope');
 assert(setupRoute.includes("action === 'replace_invited_clubs'"), 'existing friendly invite mutation remains available');
 assert(setupRoute.includes('invitedClubs:'), 'setup GET must return invitedClubs for resume');
-assert(migration.includes('roster_lock_status') && migration.includes('tournament_stage_transitions'), 'finalizer must lock setup and materialize the transition graph atomically');
+assert(migration.includes('finalize_internal_doubles_group_knockout_v2') && migration.includes('round_scoring') && migration.includes('memberIds'), 'v3 adapts aggregate member IDs, reuses the atomic materializer, and persists stage BO configuration');
 console.log('unified setup finalize API contract ok');

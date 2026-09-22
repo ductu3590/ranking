@@ -32,6 +32,22 @@ assert.deepEqual(
   'final slots explicitly reference each semifinal winner',
 );
 assert.equal(plan.fingerprint, reordered.fingerprint, 'canonical output ignores caller entry ordering');
+const manualPlan = buildInternalDoublesGroupKnockoutPlan({
+  ...input,
+  assignments: [
+    ...plan.groups[0].entryIds.map((entryId, index) => ({ entrantId: entryId, groupLabel: 'B', slot: index + 1 })),
+    ...plan.groups[1].entryIds.map((entryId, index) => ({ entrantId: entryId, groupLabel: 'A', slot: index + 1 })),
+  ],
+});
+assert.deepEqual(manualPlan.groups.map((group) => group.entryIds), [plan.groups[1].entryIds, plan.groups[0].entryIds], 'manual assignments replace automatic slots without re-randomizing');
+assert.notEqual(manualPlan.fingerprint, plan.fingerprint, 'manual assignment changes canonical fingerprint');
+const boPlan = buildInternalDoublesGroupKnockoutPlan({
+  ...input,
+  roundScoring: { group: { 1: { best_of: 1 } }, knockout: { 1: { best_of: 3 }, 2: { best_of: 5 } } },
+});
+assert.equal(boPlan.stages[0].config.round_scoring['1'].best_of, 1, 'BO vòng bảng nằm trong config stage');
+assert.equal(boPlan.stages[1].config.round_scoring['2'].best_of, 5, 'BO playoff nằm trong config stage');
+assert.notEqual(boPlan.fingerprint, plan.fingerprint, 'BO theo vòng làm đổi preview fingerprint');
 const thirdPlacePlan = buildInternalDoublesGroupKnockoutPlan({ ...input, thirdPlaceEnabled: true });
 assert.equal(thirdPlacePlan.matches.length, 13);
 const bronzeMatch = thirdPlacePlan.matches.find((match) => match.matchKey === 'third-place');

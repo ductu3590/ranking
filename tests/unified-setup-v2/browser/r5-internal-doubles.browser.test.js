@@ -69,7 +69,7 @@ async function chooseAllAndCreate(page, label) {
     await page.getByText(/Đang sinh trận/).waitFor({ state: 'hidden' });
     await page.getByRole('button', { name: /^Tiếp tục$/ }).click();
 
-    await page.getByLabel('Bước 4: kiểm tra và chốt').getByRole('button', { name: 'Chốt bốc thăm & tạo lịch' }).click();
+    await page.getByLabel('Kiểm tra và chốt lịch').getByRole('button', { name: 'Chốt bốc thăm & tạo lịch' }).click();
     await page.waitForURL(/\/dieu-hanh-giai\/\d+/, { timeout: 60000 });
     return Number(/\/dieu-hanh-giai\/(\d+)/.exec(page.url())[1]);
 }

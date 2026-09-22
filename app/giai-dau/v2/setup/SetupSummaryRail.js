@@ -3,7 +3,7 @@
 import { SAVE_STATUS_LABELS } from './SetupContext';
 
 function countSelected(participants) {
-  const ids = participants?.selectedMemberIds;
+  const ids = participants?.memberIds || participants?.selectedMemberIds;
   return Array.isArray(ids) ? ids.length : 0;
 }
 

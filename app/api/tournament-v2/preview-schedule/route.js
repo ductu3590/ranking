@@ -45,10 +45,9 @@ function previewFingerprintSnapshot(draft) {
         },
         division: { name: String(draft?.division?.name || '').trim(), playType: draft?.division?.playType || draft?.format?.entrantType || 'doubles' },
         format: { entrantType: draft?.format?.entrantType, formatKey: draft?.format?.formatKey, config: draft?.format?.config || {} },
-        participants: { selectedMemberIds: (draft?.participants?.selectedMemberIds || []).map(String) },
+        participants: { memberIds: (draft?.participants?.memberIds || draft?.participants?.selectedMemberIds || []).map(String), guests: Array.isArray(draft?.participants?.guests) ? draft.participants.guests : [] },
         pairs: Array.isArray(draft?.pairs) ? draft.pairs : [],
         unpairedMemberIds: Array.isArray(draft?.unpairedMemberIds) ? draft.unpairedMemberIds.map(String) : [],
-        reserveMemberIds: Array.isArray(draft?.reserveMemberIds) ? draft.reserveMemberIds.map(String) : [],
         invitedClubs: Array.isArray(draft?.invitedClubs) ? draft.invitedClubs : [],
         draw: draft?.draw || {},
     };
@@ -58,14 +57,30 @@ function draftFingerprint(draft) {
     return require('node:crypto').createHash('sha256').update(stableStringify(previewFingerprintSnapshot(draft))).digest('hex');
 }
 
+function serverDrawSeed({ groupId, tournamentId, divisionId, revision, rerollNonce = 0 }) {
+    const digest = require('node:crypto').createHash('sha256')
+        .update(`${groupId}:unified-draw:${tournamentId}:${divisionId}:${revision}:${rerollNonce}`)
+        .digest('hex');
+    return (parseInt(digest.slice(0, 8), 16) % 1000000) + 1;
+}
+
+function previewScheduleProjection(plan, draft) {
+    const courtCount = Math.max(1, Number(draft?.format?.config?.courtCount || 1));
+    const minutesPerMatch = Math.max(1, Number(draft?.format?.config?.minutesPerMatch || 30));
+    const date = String(draft?.tournament?.eventDate || '').trim();
+    const time = String(draft?.tournament?.startTime || '08:00').trim();
+    const base = new Date(`${date || '1970-01-01'}T${time.length === 5 ? time : '08:00'}:00`);
+    return plan.matches.map((match, index) => ({
+        matchKey: match.matchKey,
+        stagePlanKey: match.stagePlanKey,
+        court: (index % courtCount) + 1,
+        round: Math.floor(index / courtCount) + 1,
+        projectedStart: Number.isNaN(base.getTime()) ? null : new Date(base.getTime() + Math.floor(index / courtCount) * minutesPerMatch * 60000).toISOString(),
+    }));
+}
+
 function buildPairEntries(draft) {
-    const selectedMemberIds = normalizedIds(draft?.participants?.selectedMemberIds, 'selectedMemberIds');
-    const reserveMemberIds = normalizedIds(draft?.reserveMemberIds || [], 'reserveMemberIds');
-    const selected = new Set(selectedMemberIds);
-    if (reserveMemberIds.some((memberId) => !selected.has(memberId))) {
-        throw previewError('RESERVE_MEMBER_OUTSIDE_ROSTER', 'VĐV dự bị phải thuộc roster đã chọn');
-    }
-    const activeMemberIds = selectedMemberIds.filter((memberId) => !reserveMemberIds.includes(memberId));
+    const activeMemberIds = normalizedIds(draft?.participants?.memberIds || draft?.participants?.selectedMemberIds, 'memberIds');
     const active = new Set(activeMemberIds);
     const unpairedMemberIds = normalizedIds(draft?.unpairedMemberIds || [], 'unpairedMemberIds');
     if (unpairedMemberIds.some((memberId) => !active.has(memberId))) {
@@ -158,7 +173,7 @@ export async function POST(request) {
             throw previewError('DRAFT_FINGERPRINT_MISMATCH', 'Bản nháp đã thay đổi; hãy tải lại trước khi bốc thăm', 409);
         }
         const entries = validateSupportedDraft(draft);
-        const selectedMemberIds = normalizedIds(draft.participants.selectedMemberIds, 'selectedMemberIds');
+        const selectedMemberIds = normalizedIds(draft.participants.memberIds || draft.participants.selectedMemberIds, 'memberIds');
         const [{ data: members, error: membersError }, { data: athletes, error: athletesError }] = await Promise.all([
             db.from('club_members').select('id, is_active').eq('group_id', Number(admin.groupId)).in('id', selectedMemberIds.map(Number)),
             // Global athlete identities are scoped through their tenant-checked club member.
@@ -180,10 +195,12 @@ export async function POST(request) {
             tournamentId: String(tournament.id),
             divisionId: String(division.id),
             entries,
-            seed: draft?.draw?.seed,
+            seed: serverDrawSeed({ groupId: admin.groupId, tournamentId: tournament.id, divisionId: division.id, revision: division.setup_revision, rerollNonce: draft?.draw?.rerollNonce }),
             groupCount: draft?.format?.config?.groupCount,
             qualifiersPerGroup: draft?.format?.config?.qualifiersPerGroup ?? draft?.format?.config?.advancePerGroup,
             thirdPlaceEnabled: draft?.format?.config?.thirdPlaceEnabled === true,
+            roundScoring: draft?.format?.config?.roundScoring,
+            assignments: draft?.draw?.mode === 'manual' ? draft?.draw?.assignments : null,
         });
         const assignments = plan.groups.flatMap((group) => group.entryIds.map((entrantId, index) => ({
             entrantId,
@@ -193,18 +210,21 @@ export async function POST(request) {
         return NextResponse.json({
             plan,
             fingerprint: plan.fingerprint,
+            schedulePreview: previewScheduleProjection(plan, draft),
             revision: Number(division.setup_revision),
             // The aggregate save route persists this shape later; preview itself never writes.
             draftUpdate: {
                 state: 'draw_drafted',
-                currentStep: 3,
+                currentStep: 4,
                 draw: {
                     status: 'draft',
                     seed: plan.seed,
+                    mode: draft?.draw?.mode === 'manual' ? 'manual' : 'automatic',
                     previewFingerprint: plan.fingerprint,
                     assignments,
                     stagePlans: plan.stages,
                     matches: plan.matches,
+                    schedulePreview: previewScheduleProjection(plan, draft),
                 },
             },
         });

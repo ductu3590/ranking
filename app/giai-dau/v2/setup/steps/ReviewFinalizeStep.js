@@ -3,12 +3,13 @@
 import '../draw/draw-review.css';
 import { buildReviewSummaryModel } from '../draw/drawReviewModel';
 
-function TournamentDetailsForm({ tournament, onChange }) {
+export function TournamentDetailsForm({ tournament, onChange }) {
   const update = (key, value) => onChange?.({ ...tournament, [key]: value });
   return (
     <div className="setup-tournament-details">
       <label>Tên giải<input value={tournament.name || ''} onChange={(event) => update('name', event.target.value)} placeholder="Ví dụ: Giải nội bộ tháng 9" /></label>
       <label>Ngày thi đấu<input type="date" value={tournament.eventDate || ''} onChange={(event) => update('eventDate', event.target.value)} /></label>
+      <label>Giờ bắt đầu<input type="time" value={tournament.startTime || ''} onChange={(event) => update('startTime', event.target.value)} /></label>
       <label>Địa điểm<input value={tournament.location || ''} onChange={(event) => update('location', event.target.value)} placeholder="Ví dụ: Sân PickHub" /></label>
       <label>Mô tả<textarea rows="3" value={tournament.description || ''} onChange={(event) => update('description', event.target.value)} placeholder="Giới thiệu ngắn về giải đấu" /></label>
       <label>Áp phích giải<input type="url" value={tournament.posterUrl || ''} onChange={(event) => update('posterUrl', event.target.value)} placeholder="Dán liên kết ảnh áp phích" /><small>Tải ảnh trực tiếp sẽ được bổ sung sau khi cấu hình kho lưu trữ áp phích an toàn.</small></label>
@@ -28,13 +29,7 @@ export default function ReviewFinalizeStep({ draft = {}, saveState = {}, finaliz
   const busy = saving || finalizing;
 
   return (
-    <section className="setup-review-panel" aria-label="Bước 4: kiểm tra và chốt">
-      <div className="setup-draw-card">
-        <p className="setup-draw-eyebrow">Thông tin giải</p>
-        <h3>Hoàn thiện trước khi chốt</h3>
-        <p>Tên giải và ngày thi đấu là bắt buộc khi chốt. Địa điểm, mô tả và áp phích có thể bổ sung sau.</p>
-        <TournamentDetailsForm tournament={draft.tournament || {}} onChange={(tournament) => onDraftChange?.({ ...draft, tournament })} />
-      </div>
+    <section className="setup-review-panel" aria-label="Kiểm tra và chốt lịch">
       <div className="setup-draw-card">
         <p className="setup-draw-eyebrow">Tóm tắt tính toán</p>
         <h3>Kiểm tra trước khi chốt</h3>

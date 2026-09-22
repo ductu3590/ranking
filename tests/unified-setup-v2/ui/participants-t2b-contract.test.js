@@ -28,6 +28,7 @@ assert.match(roster, /memberCode|athleteId|clubName/, 'duplicate names have extr
 
 assert.match(info, /ParticipantRosterPicker/, 'info step uses roster picker');
 assert.match(info, /persist|savedAt|revision|onSaveDraft/i, 'info step exposes persisted draft state');
+assert.match(info, /Tên giải[\s\S]*tournament\.name[\s\S]*setTournamentName/, 'info step captures the tournament name required by the aggregate draft');
 
 assert.match(pairing, /createPairingDraft|pairingDraft/, 'pairing UI uses domain pairingDraft module');
 assert.match(pairing, /unpairedMemberIds|Danh sách chưa ghép/, 'unpaired list is rendered as blocker');
@@ -40,7 +41,7 @@ assert.match(pairing, /data-choice="add_member"[\s\S]*onClick/, 'add-member reme
 assert.match(pairing, /data-choice="reserve_member"[\s\S]*onClick/, 'reserve remedy is actionable');
 assert.match(pairing, /reserveMemberIds/, 'reserve remedy removes the member from competition and records the reserve ID');
 assert.match(pairing, /disabled=\{!canSwitchToSingles\}/, 'format remedy is disabled when the format is unsupported');
-assert.match(pairing, /Đánh đơn chưa được hỗ trợ/, 'unsupported format has a Vietnamese reason');
+assert.match(pairing, /Chưa thể đổi sang đánh đơn/, 'unsupported format has a Vietnamese reason');
 assert.match(pairing, /addPerson|addMember/, 'adding a person only sends them to unpaired');
 assert.match(pairing, /removePerson|removeMember/, 'removing a person preserves other pairs via domain function');
 assert.doesNotMatch(pairing, /draggable|onDragStart|react-beautiful-dnd|dnd-kit/, 'mobile UI does not depend on drag and drop');

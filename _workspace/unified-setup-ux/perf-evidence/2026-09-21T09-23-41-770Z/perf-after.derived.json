@@ -1,0 +1,354 @@
+{
+  "meta": {
+    "measuredAt": "2026-09-21T09:25:43.660Z",
+    "viewport": "1440x900",
+    "runs": 5,
+    "athletes": 14,
+    "groupId": "50",
+    "workflow": "four-step internal doubles group_knockout",
+    "derived": true,
+    "newMeasurement": false,
+    "warmupExcluded": "First four phases, inferred from original recorder order",
+    "acceptance": "INCOMPLETE: historical phase attribution and missing bodies cannot be repaired offline",
+    "source": "_workspace\\unified-setup-ux\\perf-evidence\\2026-09-21T09-23-41-770Z\\perf-after.json"
+  },
+  "caveats": [
+    "Legacy baseline finalizes singles; current workflow finalizes doubles (14 people, 7 pairs). Not a controlled speedup comparison.",
+    "Current flow timings include a 650ms network quiet delay; legacy quiet delay differs. These are UI journey timings, not API latency.",
+    "Roster mutation timing ends at selection text render, not network settled; legacy mutation timing includes settling.",
+    "New payload bytes are decoded response.body() lengths, not wire transfer sizes. Legacy bytes mix Content-Length (possibly encoded) and body lengths; missing bytes are unknown, not zero.",
+    "Repeated method + URL within one run is a repetition, not proof of a redundant request; POST bodies may differ.",
+    "Original rows and mutation statistics are retained as reported, not remeasured. Per-run repetitions alone are recomputed; original response-phase race remains unresolvable."
+  ],
+  "originalRows": [
+    {
+      "label": "Mở nháp",
+      "stats": {
+        "n": 5,
+        "min": 1733,
+        "median": 1771,
+        "p95": 1809,
+        "max": 1809
+      },
+      "requestCount": 5,
+      "bytes": 57974
+    },
+    {
+      "label": "Lưu nháp",
+      "stats": {
+        "n": 5,
+        "min": 1305,
+        "median": 1310,
+        "p95": 1945,
+        "max": 1945
+      },
+      "requestCount": 1,
+      "bytes": 754
+    },
+    {
+      "label": "Preview lịch",
+      "stats": {
+        "n": 5,
+        "min": 2723,
+        "median": 2779,
+        "p95": 3094,
+        "max": 3094
+      },
+      "requestCount": 3,
+      "bytes": 13804
+    },
+    {
+      "label": "Chốt tạo giải",
+      "stats": {
+        "n": 5,
+        "min": 6931,
+        "median": 6979,
+        "p95": 7280,
+        "max": 7280
+      },
+      "requestCount": 52,
+      "bytes": 1785977
+    }
+  ],
+  "originalMutations": {
+    "add": {
+      "n": 5,
+      "min": 38,
+      "median": 46,
+      "p95": 51,
+      "max": 51
+    },
+    "remove": {
+      "n": 5,
+      "min": 382,
+      "median": 408,
+      "p95": 433,
+      "max": 433
+    }
+  },
+  "duplicates": {
+    "roster": {
+      "perRun": [
+        {
+          "run": 1,
+          "total": 2,
+          "excessRequests": 1,
+          "duplicated": [
+            "GET /api/tournament-v2/athletes?mode=roster x2"
+          ],
+          "bytes": 2180,
+          "unknownBytes": 0
+        },
+        {
+          "run": 2,
+          "total": 2,
+          "excessRequests": 1,
+          "duplicated": [
+            "GET /api/tournament-v2/athletes?mode=roster x2"
+          ],
+          "bytes": 2180,
+          "unknownBytes": 0
+        },
+        {
+          "run": 3,
+          "total": 2,
+          "excessRequests": 1,
+          "duplicated": [
+            "GET /api/tournament-v2/athletes?mode=roster x2"
+          ],
+          "bytes": 2180,
+          "unknownBytes": 0
+        },
+        {
+          "run": 4,
+          "total": 2,
+          "excessRequests": 1,
+          "duplicated": [
+            "GET /api/tournament-v2/athletes?mode=roster x2"
+          ],
+          "bytes": 2180,
+          "unknownBytes": 0
+        },
+        {
+          "run": 5,
+          "total": 2,
+          "excessRequests": 1,
+          "duplicated": [
+            "GET /api/tournament-v2/athletes?mode=roster x2"
+          ],
+          "bytes": 2180,
+          "unknownBytes": 0
+        }
+      ],
+      "total": 10,
+      "excessRequests": 5,
+      "duplicated": [
+        "run 1: GET /api/tournament-v2/athletes?mode=roster x2",
+        "run 2: GET /api/tournament-v2/athletes?mode=roster x2",
+        "run 3: GET /api/tournament-v2/athletes?mode=roster x2",
+        "run 4: GET /api/tournament-v2/athletes?mode=roster x2",
+        "run 5: GET /api/tournament-v2/athletes?mode=roster x2"
+      ]
+    },
+    "courts": {
+      "perRun": [
+        {
+          "run": 1,
+          "total": 0,
+          "excessRequests": 0,
+          "duplicated": [],
+          "bytes": 0,
+          "unknownBytes": 0
+        },
+        {
+          "run": 2,
+          "total": 0,
+          "excessRequests": 0,
+          "duplicated": [],
+          "bytes": 0,
+          "unknownBytes": 0
+        },
+        {
+          "run": 3,
+          "total": 0,
+          "excessRequests": 0,
+          "duplicated": [],
+          "bytes": 0,
+          "unknownBytes": 0
+        },
+        {
+          "run": 4,
+          "total": 0,
+          "excessRequests": 0,
+          "duplicated": [],
+          "bytes": 0,
+          "unknownBytes": 0
+        },
+        {
+          "run": 5,
+          "total": 0,
+          "excessRequests": 0,
+          "duplicated": [],
+          "bytes": 0,
+          "unknownBytes": 0
+        }
+      ],
+      "total": 0,
+      "excessRequests": 0,
+      "duplicated": []
+    },
+    "finalize": {
+      "perRun": [
+        {
+          "run": 1,
+          "total": 44,
+          "excessRequests": 33,
+          "duplicated": [
+            "GET /api/tournament-v2/tournaments x6",
+            "GET /api/groups/session x11",
+            "GET /api/tournament-v2/stages?tournamentId=175 x3",
+            "GET /api/tournament-v2/divisions?tournamentId=175 x3",
+            "GET /api/tournament-v2/assignments?tournamentId=175 x3",
+            "GET /api/tournament-v2/setup?tournamentId=175&divisionId=159 x5",
+            "GET /api/club/branding x4",
+            "GET /api/tournament-v2/athletes?mode=roster x2",
+            "GET /api/identity/athlete-sessions x2",
+            "GET /api/club/notifications x4"
+          ],
+          "bytes": 102389,
+          "unknownBytes": 0
+        },
+        {
+          "run": 2,
+          "total": 44,
+          "excessRequests": 33,
+          "duplicated": [
+            "GET /api/tournament-v2/tournaments x6",
+            "GET /api/groups/session x11",
+            "GET /api/tournament-v2/stages?tournamentId=176 x3",
+            "GET /api/tournament-v2/divisions?tournamentId=176 x3",
+            "GET /api/tournament-v2/assignments?tournamentId=176 x3",
+            "GET /api/tournament-v2/setup?tournamentId=176&divisionId=160 x5",
+            "GET /api/club/branding x4",
+            "GET /api/tournament-v2/athletes?mode=roster x2",
+            "GET /api/identity/athlete-sessions x2",
+            "GET /api/club/notifications x4"
+          ],
+          "bytes": 107909,
+          "unknownBytes": 0
+        },
+        {
+          "run": 3,
+          "total": 44,
+          "excessRequests": 33,
+          "duplicated": [
+            "GET /api/tournament-v2/tournaments x6",
+            "GET /api/groups/session x11",
+            "GET /api/tournament-v2/stages?tournamentId=177 x3",
+            "GET /api/tournament-v2/divisions?tournamentId=177 x3",
+            "GET /api/tournament-v2/assignments?tournamentId=177 x3",
+            "GET /api/tournament-v2/setup?tournamentId=177&divisionId=161 x5",
+            "GET /api/club/branding x4",
+            "GET /api/tournament-v2/athletes?mode=roster x2",
+            "GET /api/identity/athlete-sessions x2",
+            "GET /api/club/notifications x4"
+          ],
+          "bytes": 113429,
+          "unknownBytes": 0
+        },
+        {
+          "run": 4,
+          "total": 44,
+          "excessRequests": 33,
+          "duplicated": [
+            "GET /api/tournament-v2/tournaments x6",
+            "GET /api/groups/session x11",
+            "GET /api/tournament-v2/divisions?tournamentId=178 x3",
+            "GET /api/tournament-v2/stages?tournamentId=178 x3",
+            "GET /api/tournament-v2/assignments?tournamentId=178 x3",
+            "GET /api/tournament-v2/setup?tournamentId=178&divisionId=162 x5",
+            "GET /api/club/branding x4",
+            "GET /api/tournament-v2/athletes?mode=roster x2",
+            "GET /api/identity/athlete-sessions x2",
+            "GET /api/club/notifications x4"
+          ],
+          "bytes": 118949,
+          "unknownBytes": 0
+        },
+        {
+          "run": 5,
+          "total": 44,
+          "excessRequests": 33,
+          "duplicated": [
+            "GET /api/tournament-v2/tournaments x6",
+            "GET /api/groups/session x11",
+            "GET /api/tournament-v2/divisions?tournamentId=179 x3",
+            "GET /api/tournament-v2/stages?tournamentId=179 x3",
+            "GET /api/tournament-v2/assignments?tournamentId=179 x3",
+            "GET /api/tournament-v2/setup?tournamentId=179&divisionId=163 x5",
+            "GET /api/club/branding x4",
+            "GET /api/tournament-v2/athletes?mode=roster x2",
+            "GET /api/identity/athlete-sessions x2",
+            "GET /api/club/notifications x4"
+          ],
+          "bytes": 124469,
+          "unknownBytes": 0
+        }
+      ],
+      "total": 220,
+      "excessRequests": 165,
+      "duplicated": [
+        "run 1: GET /api/tournament-v2/tournaments x6",
+        "run 1: GET /api/groups/session x11",
+        "run 1: GET /api/tournament-v2/stages?tournamentId=175 x3",
+        "run 1: GET /api/tournament-v2/divisions?tournamentId=175 x3",
+        "run 1: GET /api/tournament-v2/assignments?tournamentId=175 x3",
+        "run 1: GET /api/tournament-v2/setup?tournamentId=175&divisionId=159 x5",
+        "run 1: GET /api/club/branding x4",
+        "run 1: GET /api/tournament-v2/athletes?mode=roster x2",
+        "run 1: GET /api/identity/athlete-sessions x2",
+        "run 1: GET /api/club/notifications x4",
+        "run 2: GET /api/tournament-v2/tournaments x6",
+        "run 2: GET /api/groups/session x11",
+        "run 2: GET /api/tournament-v2/stages?tournamentId=176 x3",
+        "run 2: GET /api/tournament-v2/divisions?tournamentId=176 x3",
+        "run 2: GET /api/tournament-v2/assignments?tournamentId=176 x3",
+        "run 2: GET /api/tournament-v2/setup?tournamentId=176&divisionId=160 x5",
+        "run 2: GET /api/club/branding x4",
+        "run 2: GET /api/tournament-v2/athletes?mode=roster x2",
+        "run 2: GET /api/identity/athlete-sessions x2",
+        "run 2: GET /api/club/notifications x4",
+        "run 3: GET /api/tournament-v2/tournaments x6",
+        "run 3: GET /api/groups/session x11",
+        "run 3: GET /api/tournament-v2/stages?tournamentId=177 x3",
+        "run 3: GET /api/tournament-v2/divisions?tournamentId=177 x3",
+        "run 3: GET /api/tournament-v2/assignments?tournamentId=177 x3",
+        "run 3: GET /api/tournament-v2/setup?tournamentId=177&divisionId=161 x5",
+        "run 3: GET /api/club/branding x4",
+        "run 3: GET /api/tournament-v2/athletes?mode=roster x2",
+        "run 3: GET /api/identity/athlete-sessions x2",
+        "run 3: GET /api/club/notifications x4",
+        "run 4: GET /api/tournament-v2/tournaments x6",
+        "run 4: GET /api/groups/session x11",
+        "run 4: GET /api/tournament-v2/divisions?tournamentId=178 x3",
+        "run 4: GET /api/tournament-v2/stages?tournamentId=178 x3",
+        "run 4: GET /api/tournament-v2/assignments?tournamentId=178 x3",
+        "run 4: GET /api/tournament-v2/setup?tournamentId=178&divisionId=162 x5",
+        "run 4: GET /api/club/branding x4",
+        "run 4: GET /api/tournament-v2/athletes?mode=roster x2",
+        "run 4: GET /api/identity/athlete-sessions x2",
+        "run 4: GET /api/club/notifications x4",
+        "run 5: GET /api/tournament-v2/tournaments x6",
+        "run 5: GET /api/groups/session x11",
+        "run 5: GET /api/tournament-v2/divisions?tournamentId=179 x3",
+        "run 5: GET /api/tournament-v2/stages?tournamentId=179 x3",
+        "run 5: GET /api/tournament-v2/assignments?tournamentId=179 x3",
+        "run 5: GET /api/tournament-v2/setup?tournamentId=179&divisionId=163 x5",
+        "run 5: GET /api/club/branding x4",
+        "run 5: GET /api/tournament-v2/athletes?mode=roster x2",
+        "run 5: GET /api/identity/athlete-sessions x2",
+        "run 5: GET /api/club/notifications x4"
+      ]
+    }
+  }
+}

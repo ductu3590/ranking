@@ -1,212 +1,118 @@
-# Prompt điều hành — Unified Internal Tournament Setup
+## Kết luận rà soát
 
-**Plan:** `docs/superpowers/plans/2026-09-19-unified-internal-tournament-setup-parallel.md`
-**Worktree:** `C:\Users\ductu\ranking-unified-setup-ux` · branch `feat/tournament-unified-setup-ux`
-**Cập nhật:** 2026-09-20
+**Không nên tiếp tục chạy theo các wave/task cũ hoặc coi worktree hiện tại là sẵn sàng phát hành.** Có nhiều phần tái sử dụng được, nhưng đường đi từ tạo giải → lưu nháp → mở lại → bốc thăm → chốt lịch chưa hoạt động thống nhất.
 
-> Tài liệu này viết cho **một session lead duy nhất**. Dán §1 một lần khi mở session, sau đó mỗi task chỉ dán đoạn ngắn ở §3. Không lặp lại luật.
+Tôi đã dùng ba lượt rà soát độc lập cho domain/API/database, UI và cơ chế điều phối/kiểm thử; đồng thời khảo sát các vùng rủi ro ngoài giải đấu. Đây là **đánh giá mã nguồn và bằng chứng hiện có**, chưa phải kiểm chứng toàn ứng dụng bằng chạy thực tế: chưa chạy test/build/browser hay truy vấn database; chưa xác nhận trạng thái Git dirty.
 
----
+### Các lỗi cần ưu tiên
 
-## 1. Primer — dán MỘT LẦN khi mở session
+| Mức | Phát hiện | Bằng chứng |
+|---|---|---|
+| Chặn phát hành | Tạo giải mới bắt đầu không có ID, nhưng lưu nháp yêu cầu đã có tournament/division ID; chưa nối bước tạo ban đầu. | `app/giai-dau/v2/TournamentWizard.js:29`, `lib/tournamentV2Client.js:153` |
+| Chặn phát hành | “Lưu nháp” chỉ lưu roster hoặc CLB mời, không lưu đủ cấu hình/cặp/bốc thăm; gửi `member_id` dưới tên `athlete_ids`. | `lib/tournamentV2Client.js:163`, `lib/tournamentV2Client.js:178` |
+| Chặn phát hành | Dữ liệu tải bất đồng bộ không hydrate vào reducer; mở lại có thể giữ bản nháp rỗng hoặc cũ. | `app/giai-dau/v2/setup/SetupContext.js:203` |
+| Chặn phát hành | Ghép tự động tạo cặp xong vẫn đưa sai người vào danh sách chưa ghép. Với số chẵn, toàn bộ pool vẫn bị đánh dấu chưa ghép. | `lib/tournament/pairingDraft.js:28` |
+| Chặn phát hành | Preview nhận payload khác cấu trúc UI gửi; kết quả preview không được đưa vào draft. | `app/api/tournament-v2/preview-schedule/route.js:10`, `app/giai-dau/v2/setup/steps/DrawScheduleStep.js:69` |
+| Chặn phát hành | Finalize chấp nhận danh sách stage rỗng và có thể báo thành công dù không tạo lịch; revision/idempotency cấp aggregate chưa đầy đủ. | `lib/tournament/setupFinalize.js:26`, `database/migrations/090_unified_setup_friendly_invites.sql:198` |
+| An toàn dữ liệu | Đường mời CLB chưa kiểm tra tenant của `externalClubId`; SQL ghi nhiều stage có nguy cơ trùng bảng tạm trong cùng transaction. Cần đối chiếu RPC thật. | `database/migrations/090_unified_setup_friendly_invites.sql:83`, `database/migrations/034_phase3_entry_schedule_rpc.sql:51` |
+| Độ tin cậy kiểm thử | Runner bỏ qua test lồng thư mục; CI chưa chạy đầy đủ unified setup. Nhiều test chỉ tìm chuỗi trong source, không kiểm tra hành vi. | `tests/unified-setup-v2/run-all.js:7`, `package.json:52` |
 
-```text
-Bạn là lead/integrator đợt "Unified Internal Tournament Setup" của Pickhub.
-Worktree: C:\Users\ductu\ranking-unified-setup-ux. Làm trong worktree này, không cd ra ngoài.
+Ngoài ra, readiness, vô hiệu hóa kết quả bốc thăm, nút finalize và chuyển trang chưa dùng chung một luồng xử lý. Console vẫn còn đường thiết lập riêng.
 
-Đọc ngay, một lần:
-- docs/superpowers/plans/2026-09-19-unified-internal-tournament-setup-parallel.md (plan thi hành)
-- docs/superpowers/plans/2026-09-19-prompt-giao-ide-unified-setup.md (tài liệu này)
-- _workspace/unified-setup-ux/00-contract.md (contract đã khóa)
-- skill tournament-setup-invariants  ← gọi skill này, nó chứa bất biến + ma trận ownership
+**Ngoài setup:** có rủi ro cần xác minh ở ghi dữ liệu đăng ký nhiều bước, quyền đọc sau thu hồi phiên và webhook của CLB chưa cấu hình secret. Chưa đủ bằng chứng để kết luận các rủi ro này đang bị khai thác hoặc ảnh hưởng dữ liệu thật.
 
-$env:PICKHUB_TASK_ID = "LEAD"
+## Vì sao cách điều phối cũ thất bại?
 
-LUẬT (áp dụng cả session, tôi sẽ không nhắc lại):
-1. Hook .claude/hooks/ownership-guard.js chặn ghi sai phạm vi. Bị chặn thì DỪNG và hỏi tôi,
-   không tắt hook, không đặt PICKHUB_GUARD_OFF / PICKHUB_ALLOW_FROZEN.
-2. Khi giao việc cho sub-agent, đặt PICKHUB_TASK_ID đúng mã task của nó.
-   Chỉ có 5 sub-agent: tournament-architect, tournament-engine-dev, tournament-api-dev,
-   tournament-ui-dev, tournament-qa. KHÔNG có agent tên LEAD — việc integrator bạn tự làm.
-3. Ba file đóng băng, không ai sửa: lib/tournament/setupContract.js,
-   lib/tournament/engines/roundRobin.js, lib/tournament/draw.js.
-4. Shared entry points chỉ mình bạn sửa: TournamentWizard.js, TournamentV2DashboardClient.js,
-   console/**, lib/tournamentV2Client.js, package.json.
-5. Test đỏ trước, xanh sau. Không sửa test để che bug. Commit riêng từng task.
-   Handoff _workspace/unified-setup-ux/<ID>.md.
-6. Không DROP/TRUNCATE/reset DB. Dữ liệu test scope theo group_id, cleanup an toàn.
-7. Contract đổi thì phải có ADR ngắn trong _workspace/unified-setup-ux/.
-8. Nhiễu có sẵn trong worktree (38 file plan cũ bị xóa có chủ ý, docs chưa track) KHÔNG phải
-   lỗi — đừng dừng vì nó. Chỉ dừng khi thấy thay đổi lạ trong app/, lib/, tests/, database/.
+Không chỉ là giao tiếp giữa Claude và người viết code:
 
-Báo tôi trạng thái ngắn sau mỗi task: xong gì, test nào xanh, rủi ro gì, cần tôi quyết gì.
-Xác nhận đã đọc xong rồi chờ tôi giao task.
-```
+- **Giao việc theo tầng nhưng thiếu người chịu trách nhiệm luồng hoàn chỉnh.** UI và backend đều giả định phía còn lại tạo dữ liệu ban đầu.
+- **Contract đã “đóng băng” nhưng chưa được kiểm chứng bằng test tích hợp.** Spec yêu cầu lưu aggregate, implementation lại lưu từng phần.
+- **Nhiều nguồn chỉ dẫn mâu thuẫn.** Có hướng dẫn auth/database cũ, đường dẫn agent không tồn tại và cơ chế team không có trong công cụ hiện tại.
+- **Đánh dấu hoàn thành dựa trên artifact hoặc test cục bộ.** Có file, có helper, có test xanh không đồng nghĩa người dùng tạo được giải.
+- **Ownership quá cứng ở một số chỗ, nhưng không bảo vệ được mọi cách ghi file.** Điều này vừa gây dừng việc, vừa không ngăn lệch contract.
 
----
+**Không cần viết lại toàn bộ.** Cần giữ engine và phần đã đúng, sửa các điểm nối, thay cơ chế nghiệm thu.
 
-## 2. Trạng thái
+## Plan mới: Khôi phục theo luồng hoàn chỉnh
 
-| Wave | Task | Trạng thái | Commit |
-|---|---|---|---|
-| 0 | T0.1 contract + preflight | xong | `df67630`, `e1ea803` |
-| 0 | T0.2 acceptance tests đỏ | xong | `ab6a056` |
-| 0 | T0.3 baseline (khung) | xong | `9a6a38a`, `d1355bf` |
-| — | T0.3-live (số thật) | xong | `9589237` |
-| 1 | T1.A domain | xong | `6f1ca23` |
-| 1 | T1.B aggregate/finalize | xong | `3aabe01` |
-| 1 | T1.C roster/pair | xong | `6165c1f` |
-| 1 | T1.D browser harness | xong | `5827749` |
-| 2 | T2.A shell + T2.B participants | xong | `1a9168a` |
-| 2 | T2.C draw/review | xong | `a269b70` |
-| 2 | T2.D integrator | xong | `e567260` |
-| 3 | T3.4 vòng 1 (nhãn bước, assertion console) | **chưa commit** | — |
-| 2 | **T2.E giao hữu** | **đang làm** | — |
-| 3 | T3.1 / T3.2 / T3.3 | chưa | — |
-| 4 | Release gate | chưa | — |
+Phạm vi đã chốt với bạn: **nội bộ trước; giữ tương thích giao hữu và các thể thức hiện có; xác minh và xử lý lỗi an toàn nghiêm trọng ngoài setup.**
 
-**Đang chặn release:** `tests/phase3/interclub-ui.test.js` đỏ vì T2.D xóa mất đường tạo giải giao hữu → T2.E xử lý.
+### R0 — Chốt baseline và an toàn
 
----
+- Ghi nhận Git HEAD, staged/unstaged/untracked và bảo toàn thay đổi đang có.
+- Xác minh công cụ thực thi; kiểm tra schema/RPC/quyền thật trên Supabase, không suy từ file migration.
+- Chạy baseline, phân loại lỗi sản phẩm, test lỗi thời và thiếu môi trường.
+- Hợp nhất chỉ dẫn điều phối; giữ tài liệu cũ làm lịch sử, không xóa `_workspace`.
+- Xác minh các rủi ro ngoài setup; sửa hẹp nếu nghiêm trọng và đã chứng minh.
 
-## 3. Prompt còn lại
+**Điều kiện qua chặng:** biết chính xác trạng thái code/database, lỗi nền và công cụ có thể sử dụng.
 
-Dán trực tiếp, không cần khung chung.
+### R1 — Một contract và bộ test đáng tin
 
-### 3.1 — Commit T3.4 (bạn tự làm)
+*Phụ thuộc R0.*
 
-```text
-Commit T3.4 (nhãn bước + assertion console) ngay, đừng chờ release gate xanh.
-Lệnh đỏ duy nhất là interclub-ui.test.js, đỏ vì regression T2.D, xử lý ở T2.E.
+- Chốt cách tạo lần đầu khi chưa có ID, lưu đầy đủ draft, ánh xạ danh tính, revision, idempotency và lỗi API.
+- Thống nhất cấu trúc preview, suất chờ đi tiếp và trạng thái draw.
+- Sửa test discovery/CI; bổ sung test hành vi tái hiện lỗi trước khi sửa.
+- Test bắt buộc thiếu điều kiện chạy phải báo **BLOCKED**, không được tính là PASS.
 
-Trước khi commit: _workspace/unified-setup-ux/perf-evidence/ có 5 thư mục timestamp từ các
-lần chạy thử. Chỉ 2026-09-20T02-03-29-088Z là bằng chứng thật (đã trong commit 9589237).
-Xóa 4 cái còn lại, kiểm git log trước khi xóa.
+**Điều kiện qua chặng:** mỗi lỗi trọng yếu có test tái hiện; UI/API/database không còn dùng các contract khác nhau.
 
-Message:
-  fix: dua nhan buoc ve dung contract va siet assertion console
+### R2 — Hoàn chỉnh tạo → lưu → mở lại
 
-  interclub-ui.test.js con do vi T2.D xoa duong tao giai giao huu
-  (regression ngoai pham vi plan); xu ly o task T2.E.
+*Phụ thuộc R1. Sửa domain ghép cặp và backend lưu draft có thể song song nếu không chồng file.*
 
-T3.4-round1.md ghi rõ release gate CHƯA xanh + lý do. Không ghi "hoàn tất".
-```
+- Sửa ghép cặp, dự bị, khóa cặp, ID ổn định và xử lý thêm/bớt người.
+- Lưu aggregate nguyên tử; server giải quyết `member_id` và kiểm tra tenant.
+- Nối đủ thông tin giải, lựa chọn thể thức, roster, cặp và bước đang làm.
+- Sửa hydration, resume, lỗi mạng và trường hợp người dùng sửa tiếp khi request lưu đang chạy.
 
-### 3.2 — T1.B bổ sung: server ghi lời mời CLB
+**Điều kiện qua chặng:** tạo từ dashboard, lưu rồi reload vẫn giữ đầy đủ dữ liệu; lưu nháp không sinh trận chính thức.
 
-```text
-@runSubagent tournament-api-dev  (PICKHUB_TASK_ID=T1.B)
+### R3 — Một preview và finalize nguyên tử
 
-Đọc plan §T2.E bảng "Phân chia ba phần" trước.
+*Phụ thuộc R2.*
 
-A. /setup/finalize ghi lời mời, NGUYÊN TỬ.
-   finalize(draft) ở client đã POST nguyên draft → body.draft.invitedClubs có sẵn, không cần
-   đổi client. Đọc nó, ghi lời mời TRONG CÙNG transaction với stage/entrants/fixtures/khóa draw.
-   CẤM gọi tuần tự từng lời mời rồi nuốt lỗi — đó là lỗi E của plan-1.md.
-   CLB trùng: coi là 'invited', không hỏng transaction.
-   Blocker NO_CLUB_INVITED khi organizerMode='friendly' mà invitedClubs rỗng.
+- Dùng `buildDivisionStagePayloads()` làm nguồn chuyển đổi thể thức duy nhất.
+- Preview dùng cặp và kết quả bốc thăm thật; trả fingerprint để xác nhận đúng bản được duyệt.
+- Finalize ghi stages, entrants, transitions, fixtures, trạng thái khóa và revision trong **một transaction**.
+- Chặn plan rỗng, draw cũ, revision cũ, sai tenant và giải đã có trận bắt đầu/tỉ số.
+- Retry cùng request trả lại kết quả cũ; không tạo trùng hoặc báo thành công giả.
 
-B. /setup nhận action replace_invited_clubs.
-   saveDraft hiện chỉ gửi athlete_ids nên nháp giao hữu mất CLB sau reload trong khi UI báo
-   "Đã lưu" — bug kiểu plan-1 §F. Thêm action, cùng chuẩn revision CAS + idempotency key.
-   GET /setup trả invitedClubs trong aggregate để resume được.
+**Điều kiện qua chặng:** 14 người → 7 cặp → bảng 4/3 → **12 trận**, hoặc **13** khi tranh hạng ba; 15 người lưu nháp được nhưng phải xử lý người lẻ trước finalize. Lỗi giữa transaction không để lại dữ liệu dở dang.
 
-Migration chỉ khi preflight chứng minh thiếu — tournament_clubs và tournament_external_clubs
-đã có, kiểm bằng Supabase MCP + npm run migration:ledger trước.
+### R4 — Một đường thiết lập, giữ vận hành tương thích
 
-Handoff T1.B-friendly.md phải ghi shape invitedClubs để T2.E và tôi dùng đúng.
-```
+*Phụ thuộc R2–R3.*
 
-### 3.3 — Integrator nối saveDraft (bạn tự làm, sau 3.2)
+- Dùng chung bộ điều khiển save/finalize và readiness cho shell, review, console.
+- Draft quay về workspace; giải đã chốt đi đúng màn lịch, không tự chuyển LIVE.
+- Gỡ đường setup trùng sau khi kiểm thử redirect; giữ riêng thao tác điều hành.
+- Kiểm tra giao hữu và các thể thức hiện có để không làm mất chức năng.
+- Hoàn thiện tiếng Việt, mobile 390px, bàn phím/focus, loading và thông báo lỗi.
 
-```text
-lib/tournamentV2Client.js, hàm saveDraft (~dòng 153): hiện chỉ gửi action 'replace_roster'
-với athlete_ids. Thêm nhánh organizerMode==='friendly' gửi action 'replace_invited_clubs'
-với draft.invitedClubs, theo shape trong T1.B-friendly.md.
-Giữ nguyên expectedRevision, idempotencyKey, lỗi SETUP_DRAFT_LOCAL_ONLY.
-KHÔNG đụng TournamentWizard.js. Chỉ sửa file này. Commit riêng.
-```
+**Điều kiện qua chặng:** không còn hai luồng thiết lập cạnh tranh; giải cũ đang thi đấu không bị thay đổi cấu trúc.
 
-### 3.4 — T2.E giao hữu trên workspace (sau 3.2 và 3.3)
+### R5 — QA độc lập và báo cáo sẵn sàng phát hành
 
-```text
-@runSubagent tournament-ui-dev  (PICKHUB_TASK_ID=T2.E)
+*Phụ thuộc các chặng trước.*
 
-Đọc plan §T2.E. Luồng giao hữu cũ xem bằng:
-  git show e567260^:app/giai-dau/v2/TournamentWizard.js
-(chú ý scope==='friendly', inviteClubs state, validate "Hãy mời ít nhất một CLB")
+- Chạy CI/build, toàn bộ unified suites và identity regressions.
+- Browser thật cho tạo mới, lưu/mở lại, 14/15 người, trùng tên, khóa cặp, draw hết hiệu lực, retry và hai phiên sửa đồng thời.
+- Kiểm tra database về rollback, tenant, revision, số trận và tuyến đi tiếp.
+- Regression CLB, đăng ký, tài chính, auth và thanh toán theo phạm vi ảnh hưởng.
+- Đo hiệu năng cùng điều kiện; bằng chứng gắn với phiên bản code và môi trường cụ thể.
 
-1. ADR trước: _workspace/unified-setup-ux/ADR-002-friendly-invited-clubs.md — thêm
-   invitedClubs: [{clubId, name, source:'system'|'external', status}] vào SetupDraftV2,
-   thêm blocker NO_CLUB_INVITED. Nêu rõ phần còn lại của contract không đổi.
+**Điều kiện hoàn thành:** không còn lỗi chặn; không tính test bắt buộc bị bỏ qua là đạt. Phát hành vẫn cần bạn cho phép riêng.
 
-2. Bước 1 có bộ chọn phạm vi: 'Nội bộ CLB' / 'Giao hữu liên CLB' → draft.tournament.organizerMode.
-   Mặc định 'internal'.
+## Cách tôi và subagent sẽ làm
 
-3. Khi organizerMode='friendly', Bước 1 đổi sang MỜI CLB:
-   - Liệt kê bằng listAvailableTournamentClubs() — ĐÃ export sẵn ở lib/tournamentV2Client.js:285,
-     gọi KHÔNG cần tournamentId. Đừng viết helper mới.
-   - Ghi vào draft.invitedClubs theo shape T1.B-friendly.md.
-   - Blocker NO_CLUB_INVITED.
-   - TUYỆT ĐỐI KHÔNG gọi inviteTournamentClub trong vòng lặp ở UI. T1.B ghi server-side khi
-     finalize. UI chỉ thu thập vào draft.
+- **Tôi là đầu mối duy nhất:** giữ contract, phân việc, tích hợp và quyết định qua từng chặng.
+- **Subagent nhận nhiệm vụ có đầu ra kiểm chứng được**, không tự truyền yêu cầu qua nhiều tầng.
+- **Không hai agent cùng ghi một file.** Song song cho nghiên cứu/review hoặc phần code độc lập; phần dùng chung tích hợp tuần tự.
+- **Người review độc lập với người thực hiện.** Không nhận “DONE” chỉ dựa trên báo cáo của agent.
+- **Không hỏi lại các quyết định kỹ thuật thường lệ.** Chỉ hỏi khi đổi nghiệp vụ/phạm vi, ảnh hưởng tương thích người dùng thật, rủi ro dữ liệu hoặc deploy.
 
-4. Cảnh báo cùng CLB chung bảng: giao hữu PHẢI có. draw.js đã đúng sẵn (chỉ bỏ qua khi
-   internal) — KHÔNG sửa draw.js, chỉ truyền organizerMode xuống đúng.
+Các điểm sửa chính là `TournamentWizard`, `TournamentSetupProvider`, `tournamentV2Client`, các route setup/preview/finalize, `pairingDraft`, `stagePlan`, transaction database và runner kiểm thử. Danh sách đường dẫn đầy đủ, phụ thuộc và tiêu chí nghiệm thu đã lưu trong `/memories/session/plan.md`.
 
-5. tests/phase3/interclub-ui.test.js: đổi ĐƯỜNG ĐỌC sang app/giai-dau/v2/setup/** vì UI đã
-   dời hợp lệ. GIỮ NGUYÊN cả ba assertion nội dung ('Giao hữu', 'inviteTournamentClub',
-   'CLB được mời') — chúng bắt được bug này.
-
-File được chạm: app/giai-dau/v2/setup/**, tests/phase3/interclub-ui.test.js (chỉ đường đọc),
-tests/unified-setup-v2/ui/**, _workspace/**. Ngoài danh sách → dừng, hỏi tôi.
-
-Exit gate: interclub-ui.test.js xanh; wizard-redesign-contract + ui-unified-wizard vẫn xanh;
-npm run test:regression, test:t-ui, build xanh; grep inviteTournamentClub|listAvailableTournamentClubs
-trong app/ (trừ app/api) phải có caller thật.
-```
-
-### 3.5 — Wave 3 (ba QA song song, sau T2.E)
-
-```text
-@runSubagent tournament-qa  (PICKHUB_TASK_ID=T3.1)
-Happy path theo plan §T3.1, BẰNG CA 14 NGƯỜI. Dùng fixture T1.D.
-Ngoài assertion trong plan, kiểm thêm: đúng 2 stage cho group_knockout cùng division_id,
-tuyến đi tiếp hợp lệ, tổng 12 trận (13 khi tranh hạng ba), knockout là placeholder chờ suất
-không có entrant giả, advance ghép đúng bán kết chéo bảng.
-Không tự sửa production code — báo bug theo ownership.
-```
-
-```text
-@runSubagent tournament-qa  (PICKHUB_TASK_ID=T3.2)
-Toàn bộ edge journeys plan §T3.2, không bỏ ca nào. Mỗi ca ghi: bước tái hiện, kỳ vọng,
-thực tế, mã lỗi. Chú ý ca trùng tên, chưa có athlete_id, member_id khác tenant, bỏ người
-giữa danh sách không phá cặp khóa, số lẻ 15 người, giải đã có tỉ số, advance khi kết quả
-chưa đủ, hai admin 409, retry fault từng checkpoint.
-```
-
-```text
-@runSubagent tournament-qa  (PICKHUB_TASK_ID=T3.3)
-Accessibility/responsive theo plan §T3.3. Bàn phím, 390px không tràn, target 44px,
-summary rail tablet/desktop, loading cục bộ, theme thống nhất (GAP-THEME), lỗi cạnh chỗ cần sửa.
-Chụp màn hình từng viewport làm bằng chứng.
-```
-
-### 3.6 — Wave 4 release gate (bạn tự làm)
-
-```text
-Chạy đúng khối lệnh plan §8, không bỏ lệnh nào, ghi output thật.
-Sau đó browser journeys với fixture đã scope, advisors nếu có DDL.
-Đo lại hiệu năng: lặp đúng kịch bản trong T0.3-perf-baseline.md, ghi bảng trước/sau.
-Ghi 99-qa-report.md và evidence/unified-internal-tournament-setup-2026-09-19.md.
-Đối chiếu đủ hai nhóm điều kiện chặn release ở §8 và toàn bộ checklist §12.
-Chỉ báo hoàn tất khi TẤT CẢ xanh. Mục nào không chạy được thì ghi rõ, không báo hoàn tất mờ.
-```
-
----
-
-## 4. Ghi chú vận hành
-
-- **`LEAD` là vai trò, không phải agent.** `PICKHUB_TASK_ID="LEAD"` là giá trị biến môi trường hook hiểu; việc integrator bạn tự làm trong session này.
-- **Van thoát** `PICKHUB_ALLOW_FROZEN=1`, `PICKHUB_GUARD_OFF=1`: chỉ integrator, chỉ khi đã ghi lý do vào handoff.
-- **Prompt các wave đã xong** không lưu ở đây nữa. Xem plan và handoff `_workspace/unified-setup-ux/*.md`.
+**Chưa sửa code hay database.** Khi chuyển sang thực thi, cần bật công cụ chỉnh sửa, terminal, browser và Supabase tương ứng; phiên hiện tại chỉ đủ cho nghiên cứu/lập kế hoạch.

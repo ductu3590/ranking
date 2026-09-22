@@ -6,7 +6,8 @@ import {
     finalize,
     getDivisionSetup,
     listClubRoster,
-    previewSchedule,
+    listDivisions,
+    previewSavedDraft,
     saveDraft,
 } from '@/lib/tournamentV2Client';
 import TournamentSetupWorkspace from './setup/TournamentSetupWorkspace';
@@ -14,6 +15,7 @@ import InfoParticipantsStep from './setup/steps/InfoParticipantsStep';
 import FormatPairingStep from './setup/steps/FormatPairingStep';
 import DrawScheduleStep from './setup/steps/DrawScheduleStep';
 import ReviewFinalizeStep from './setup/steps/ReviewFinalizeStep';
+import { useTournamentSetup } from './setup/SetupContext';
 import './v2.css';
 import './setup/setup.css';
 
@@ -36,7 +38,7 @@ function emptyDraft(searchParams) {
         state: tournamentId && divisionId ? 'server_draft' : 'local_only',
         revision: 0,
         currentStep: normalizeStep(searchParams.get('step')),
-        tournament: { organizerMode: 'internal' },
+        tournament: { organizerMode: 'internal', name: '', eventDate: '', location: '', description: '', posterUrl: '' },
         participants: { selectedMemberIds: [], athleteSnapshots: [] },
         format: { entrantType: 'doubles', formatKey: 'group_knockout', config: { groupCount: 2, qualifiersPerGroup: 2, thirdPlaceEnabled: false } },
         pairs: [],
@@ -48,20 +50,38 @@ function emptyDraft(searchParams) {
     };
 }
 
+function normalizePreviewAssignments(assignments = []) {
+    return assignments.map((assignment) => ({
+        entry_id: String(assignment?.entry_id ?? assignment?.entrantId ?? ''),
+        group_label: assignment?.group_label ?? assignment?.groupLabel ?? 'A',
+        seed_in_stage: Number(assignment?.seed_in_stage ?? assignment?.slot ?? 0),
+    })).filter((assignment) => assignment.entry_id);
+}
+
 function draftFromAggregate(aggregate, fallback) {
     if (!aggregate) return fallback;
+    // The persisted aggregate is the canonical wizard state; relational data only enriches it.
+    const persisted = aggregate.draft && typeof aggregate.draft === 'object' ? aggregate.draft : {};
     const division = aggregate.division || {};
     const selectedAthleteIds = aggregate.roster?.athlete_ids || [];
     return {
         ...fallback,
-        tournamentId: fallback.tournamentId,
-        divisionId: division.id || fallback.divisionId,
+        ...persisted,
+        tournamentId: Number(persisted.tournamentId || fallback.tournamentId) || null,
+        divisionId: Number(persisted.divisionId || division.id || fallback.divisionId) || null,
         state: (aggregate.stages || []).some((stage) => Number(stage.match_count || 0) > 0) ? 'finalized' : 'server_draft',
-        revision: Number(division.setup_revision || aggregate.readiness?.revision || fallback.revision || 0),
-        currentStep: normalizeStep(aggregate.resumeStep || aggregate.currentStep || fallback.currentStep),
+        revision: Number(division.setup_revision || persisted.revision || aggregate.readiness?.revision || fallback.revision || 0),
+        clientDraftKey: persisted.clientDraftKey || fallback.clientDraftKey || null,
+        currentStep: normalizeStep(persisted.currentStep || aggregate.resumeStep || aggregate.currentStep || fallback.currentStep),
+        tournament: {
+            ...(fallback.tournament || {}),
+            ...(persisted.tournament || {}),
+            // A technical bootstrap name must never be shown as a user-entered title.
+            name: persisted.tournament?.displayName || (persisted.tournament?.name === 'Giải nội bộ chưa đặt tên' ? '' : persisted.tournament?.name || fallback.tournament?.name || ''),
+        },
         participants: {
-            ...(fallback.participants || {}),
-            selectedMemberIds: selectedAthleteIds.map(String),
+            ...(persisted.participants || fallback.participants || {}),
+            selectedMemberIds: persisted.participants?.selectedMemberIds || selectedAthleteIds.map(String),
             athleteSnapshots: (aggregate.roster?.athletes || []).map((athlete) => ({
                 memberId: String(athlete.member_id || athlete.id),
                 athleteId: athlete.id,
@@ -69,7 +89,7 @@ function draftFromAggregate(aggregate, fallback) {
                 clubNameSnapshot: athlete.club_name_snapshot,
             })),
         },
-        pairs: (aggregate.pairs || []).map((pair) => ({
+        pairs: Array.isArray(persisted.pairs) ? persisted.pairs : (aggregate.pairs || []).map((pair) => ({
             pairId: String(pair.id),
             memberIds: (pair.members || []).map((member) => String(member.member_id || member.tournament_athlete_id)),
             athleteIds: (pair.members || []).map((member) => member.tournament_athlete_id),
@@ -77,10 +97,30 @@ function draftFromAggregate(aggregate, fallback) {
             locked: pair.status === 'locked',
             status: pair.status,
         })),
-        draw: { ...(fallback.draw || {}), stagePlans: aggregate.stages || [], status: (aggregate.stages || []).length ? 'draft' : 'not_started' },
+        draw: {
+            ...(fallback.draw || {}),
+            ...(persisted.draw || {}),
+            assignments: normalizePreviewAssignments(persisted.draw?.assignments || []),
+            stagePlans: persisted.draw?.stagePlans || aggregate.stages || [],
+            status: persisted.draw?.status || ((aggregate.stages || []).length ? 'draft' : 'not_started'),
+        },
         readiness: aggregate.readiness || fallback.readiness,
         savedAt: aggregate.savedAt || fallback.savedAt,
     };
+}
+
+function ReviewFinalizeStepWithLifecycle() {
+    const { state, saveDraft, finalizeDraft, dispatch } = useTournamentSetup();
+    return (
+        <ReviewFinalizeStep
+            draft={state.draft}
+            saveState={{ status: state.saveStatus, error: state.saveError }}
+            finalizeState={{ status: state.isFinalizing ? 'finalizing' : 'idle', error: state.finalizeError }}
+            onSaveDraft={saveDraft}
+            onFinalize={finalizeDraft}
+            onDraftChange={(draft) => dispatch({ type: 'replaceDraft', draft, saveStatus: 'dirty', highestAllowedStep: 4 })}
+        />
+    );
 }
 
 export default function TournamentWizard({ onDone }) {
@@ -96,9 +136,23 @@ export default function TournamentWizard({ onDone }) {
         const fallback = emptyDraft(searchParams);
         setInitialDraft(fallback);
         setLoading(true);
+        const setupRequest = async () => {
+            if (!fallback.tournamentId) return null;
+            let divisionId = fallback.divisionId;
+            if (!divisionId) {
+                const divisions = await listDivisions(fallback.tournamentId);
+                if (divisions.length !== 1) {
+                    const error = new Error(divisions.length ? 'Giải có nhiều nội dung thi đấu; hãy chọn nội dung trước khi tiếp tục thiết lập.' : 'Không tìm thấy nội dung thiết lập của giải này.');
+                    error.code = 'SETUP_DRAFT_DIVISION_AMBIGUOUS';
+                    throw error;
+                }
+                divisionId = divisions[0].id;
+            }
+            return getDivisionSetup(fallback.tournamentId, divisionId);
+        };
         Promise.all([
             listClubRoster().catch(() => []),
-            fallback.tournamentId && fallback.divisionId ? getDivisionSetup(fallback.tournamentId, fallback.divisionId).catch((error) => ({ __error: error })) : null,
+            setupRequest().catch((error) => ({ __error: error })),
         ]).then(([rosterRows, aggregate]) => {
             if (!alive) return;
             setRoster(Array.isArray(rosterRows) ? rosterRows : []);
@@ -127,8 +181,26 @@ export default function TournamentWizard({ onDone }) {
         const onDraftChange = (nextDraft) => dispatch({ type: 'replaceDraft', draft: nextDraft, saveStatus: 'dirty', highestAllowedStep: step.id + 1 });
         if (step.key === 'info') return <InfoParticipantsStep draft={draft} roster={roster} loading={loading} error={loadError} onDraftChange={onDraftChange} />;
         if (step.key === 'format') return <FormatPairingStep draft={draft} roster={roster} onDraftChange={onDraftChange} />;
-        if (step.key === 'draw') return <DrawScheduleStep draft={draft} onConfigChange={(patch) => onDraftChange({ ...draft, ...patch })} onPreviewSchedule={() => previewSchedule(draft)} />;
-        return <ReviewFinalizeStep draft={draft} saveState={{ status: state.saveStatus, error: state.saveError }} finalizeState={{ status: state.isFinalizing ? 'finalizing' : 'idle', error: state.finalizeError }} onSaveDraft={() => adapter.saveDraft(draft)} onFinalize={() => adapter.finalizeDraft(draft)} />;
+        if (step.key === 'draw') return <DrawScheduleStep draft={draft} onConfigChange={(patch) => onDraftChange({ ...draft, ...patch })} onPreviewSchedule={async () => {
+            const saved = await saveDraft({ ...draft, currentStep: 3 });
+            const persistedDraft = saved?.draft || draft;
+            const preview = await previewSavedDraft(persistedDraft);
+            const nextDraft = {
+                ...persistedDraft,
+                currentStep: 3,
+                state: preview?.draftUpdate?.state || 'draw_drafted',
+                draw: {
+                    ...(persistedDraft.draw || {}),
+                    ...(preview?.draftUpdate?.draw || {}),
+                    assignments: normalizePreviewAssignments(preview?.draftUpdate?.draw?.assignments || []),
+                },
+            };
+            const persistedDraw = await saveDraft(nextDraft);
+            const finalizedDraft = persistedDraw?.draft || nextDraft;
+            dispatch({ type: 'replaceDraft', draft: finalizedDraft, saveStatus: 'saved', highestAllowedStep: 4 });
+            return preview;
+        }} />;
+        return <ReviewFinalizeStepWithLifecycle />;
     }
 
     return <TournamentSetupWorkspace initialDraft={initialDraft} adapter={adapter} resumeStep={initialDraft.currentStep} renderStep={renderStep} />;

@@ -249,12 +249,12 @@ function TournamentV2DashboardClientInner() {
     const router = useRouter();
     const activeId = searchParams.get('t');
     const createMode = searchParams.get('create');
+    const creating = createMode === 'internal';
 
     const [tournaments, setTournaments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [isAdmin, setIsAdmin] = useState(false);
-    const [creating, setCreating] = useState(createMode === 'internal');
     const [editing, setEditing] = useState(null);      // tournament object
     const [deletingId, setDeletingId] = useState(null); // id to delete
     const [deleteBusy, setDeleteBusy] = useState(false);
@@ -292,6 +292,14 @@ function TournamentV2DashboardClientInner() {
         router.push(`/dieu-hanh-giai/${id}`);
     }
 
+    function setCreateMode(enabled) {
+        const params = new URLSearchParams(searchParams.toString());
+        if (enabled) params.set('create', 'internal');
+        else params.delete('create');
+        const query = params.toString();
+        router.push(query ? `/giai-dau/v2?${query}` : '/giai-dau/v2');
+    }
+
     function openSetup(tournament) {
         const divisionId = tournament?.formats?.[0]?.division_id || tournament?.division_id;
         const params = new URLSearchParams({ tournamentId: String(tournament.id) });
@@ -300,9 +308,9 @@ function TournamentV2DashboardClientInner() {
     }
 
     function handleWizardDone(id) {
-        setCreating(false);
         load();
         if (id) openTournament(id);
+        else setCreateMode(false);
     }
 
     function handleEditDone() {
@@ -352,7 +360,7 @@ function TournamentV2DashboardClientInner() {
     if (creating) {
         return (
             <div className="v2-page">
-                <button type="button" className="v2-back" onClick={() => setCreating(false)}>
+                <button type="button" className="v2-back" onClick={() => setCreateMode(false)}>
                     ‹ Hủy tạo giải
                 </button>
                 <TournamentWizard onDone={handleWizardDone} />
@@ -418,7 +426,7 @@ function TournamentV2DashboardClientInner() {
                     <p>Quản trị, tổ chức và điều hành các giải đấu pickleball của câu lạc bộ.</p>
                 </div>
                 {isAdmin && (
-                    <button type="button" className="v2-btn-primary v2-create-tournament" onClick={() => setCreating(true)}>
+                    <button type="button" className="v2-btn-primary v2-create-tournament" onClick={() => setCreateMode(true)}>
                         <span aria-hidden="true">＋</span> Tạo giải nội bộ
                     </button>
                 )}
@@ -486,7 +494,7 @@ function TournamentV2DashboardClientInner() {
                 <div className="v2-state v2-empty">
                     <p>Chưa tìm thấy giải đấu phù hợp.</p>
                     {isAdmin && (
-                        <button type="button" className="v2-btn-primary" onClick={() => setCreating(true)}>
+                        <button type="button" className="v2-btn-primary" onClick={() => setCreateMode(true)}>
                             + Tạo giải đầu tiên
                         </button>
                     )}

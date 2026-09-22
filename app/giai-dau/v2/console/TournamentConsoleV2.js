@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { listTournaments, listStages, getCourtBoard, listDivisions, getDivisionSetup } from '@/lib/tournamentV2Client';
 import { validateSetup } from '@/lib/tournament/setupValidation';
 import ConsoleShell from './ConsoleShell';
@@ -40,6 +41,7 @@ function setupReason(validation, stages) {
 }
 
 export default function TournamentConsoleV2({ tournamentId }) {
+  const router = useRouter();
   const [tournament, setTournament] = useState(null);
   const [stages, setStages] = useState([]);
   const [divisions, setDivisions] = useState([]);
@@ -114,8 +116,18 @@ export default function TournamentConsoleV2({ tournamentId }) {
   const defaultStep = scheduleReady ? 'control' : (!setupValidation.ready ? 'athletes' : 'draw');
   const stepProps = { tournamentId, tournament, stageId: activeStageId, stage: activeStage, stages, isAdmin, reload: load };
 
+  useEffect(() => {
+    if (loading || error || scheduleReady || !isAdmin) return;
+    const params = new URLSearchParams({ create: 'internal', tournamentId: String(tournamentId) });
+    if (effectiveDivisionId) params.set('divisionId', String(effectiveDivisionId));
+    const resumeStep = Number(setupAggregate?.draft?.currentStep || 1);
+    params.set('step', String(Math.max(1, Math.min(4, resumeStep))));
+    router.replace(`/giai-dau/v2?${params.toString()}`);
+  }, [effectiveDivisionId, error, isAdmin, loading, router, scheduleReady, setupAggregate, tournamentId]);
+
   if (loading) return <div className="v2-state v2-loading"><span className="v2-spinner" aria-hidden="true" /><p>Đang tải dữ liệu giải...</p></div>;
   if (error) return <div className="v2-state v2-error"><p>{error}</p><button type="button" className="v2-btn-secondary" onClick={load}>Thử lại</button></div>;
+  if (!scheduleReady && isAdmin) return <div className="v2-state v2-route-redirect"><p>Đang mở không gian thiết lập thống nhất...</p></div>;
 
   return <ConsoleShell tournament={tournament} tournamentId={tournamentId} progress={board?.progress} readiness={readiness} actor={session} defaultStep={defaultStep}>
     {(step) => <>

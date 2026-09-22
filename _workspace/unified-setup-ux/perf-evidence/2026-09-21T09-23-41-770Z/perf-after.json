@@ -1,0 +1,2627 @@
+{
+  "meta": {
+    "measuredAt": "2026-09-21T09:25:43.660Z",
+    "viewport": "1440x900",
+    "runs": 5,
+    "athletes": 14,
+    "groupId": "50",
+    "workflow": "four-step internal doubles group_knockout"
+  },
+  "rows": [
+    {
+      "label": "Mở nháp",
+      "stats": {
+        "n": 5,
+        "min": 1733,
+        "median": 1771,
+        "p95": 1809,
+        "max": 1809
+      },
+      "requestCount": 5,
+      "bytes": 57974
+    },
+    {
+      "label": "Lưu nháp",
+      "stats": {
+        "n": 5,
+        "min": 1305,
+        "median": 1310,
+        "p95": 1945,
+        "max": 1945
+      },
+      "requestCount": 1,
+      "bytes": 754
+    },
+    {
+      "label": "Preview lịch",
+      "stats": {
+        "n": 5,
+        "min": 2723,
+        "median": 2779,
+        "p95": 3094,
+        "max": 3094
+      },
+      "requestCount": 3,
+      "bytes": 13804
+    },
+    {
+      "label": "Chốt tạo giải",
+      "stats": {
+        "n": 5,
+        "min": 6931,
+        "median": 6979,
+        "p95": 7280,
+        "max": 7280
+      },
+      "requestCount": 52,
+      "bytes": 1785977
+    }
+  ],
+  "mutations": {
+    "add": {
+      "n": 5,
+      "min": 38,
+      "median": 46,
+      "p95": 51,
+      "max": 51
+    },
+    "remove": {
+      "n": 5,
+      "min": 382,
+      "median": 408,
+      "p95": 433,
+      "max": 433
+    }
+  },
+  "duplicates": {
+    "roster": {
+      "total": 10,
+      "duplicated": [
+        "GET /api/tournament-v2/athletes?mode=roster x10"
+      ],
+      "bytes": 10900
+    },
+    "courts": {
+      "total": 0,
+      "duplicated": [],
+      "bytes": 0
+    },
+    "finalize": {
+      "total": 220,
+      "duplicated": [
+        "POST /api/tournament-v2/setup/finalize x5",
+        "GET /api/tournament-v2/tournaments x30",
+        "GET /api/groups/session x55",
+        "GET /api/tournament-v2/stages?tournamentId=175 x3",
+        "GET /api/tournament-v2/divisions?tournamentId=175 x3",
+        "GET /api/tournament-v2/assignments?tournamentId=175 x3",
+        "GET /api/tournament-v2/setup?tournamentId=175&divisionId=159 x5",
+        "GET /api/club/branding x20",
+        "GET /api/tournament-v2/athletes?mode=roster x10",
+        "GET /api/identity/athlete-sessions x10",
+        "GET /api/club/notifications x20",
+        "GET /api/tournament-v2/stages?tournamentId=176 x3",
+        "GET /api/tournament-v2/divisions?tournamentId=176 x3",
+        "GET /api/tournament-v2/assignments?tournamentId=176 x3",
+        "GET /api/tournament-v2/setup?tournamentId=176&divisionId=160 x5",
+        "GET /api/tournament-v2/stages?tournamentId=177 x3",
+        "GET /api/tournament-v2/divisions?tournamentId=177 x3",
+        "GET /api/tournament-v2/assignments?tournamentId=177 x3",
+        "GET /api/tournament-v2/setup?tournamentId=177&divisionId=161 x5",
+        "GET /api/tournament-v2/divisions?tournamentId=178 x3",
+        "GET /api/tournament-v2/stages?tournamentId=178 x3",
+        "GET /api/tournament-v2/assignments?tournamentId=178 x3",
+        "GET /api/tournament-v2/setup?tournamentId=178&divisionId=162 x5",
+        "GET /api/tournament-v2/divisions?tournamentId=179 x3",
+        "GET /api/tournament-v2/stages?tournamentId=179 x3",
+        "GET /api/tournament-v2/assignments?tournamentId=179 x3",
+        "GET /api/tournament-v2/setup?tournamentId=179&divisionId=163 x5"
+      ],
+      "bytes": 567145
+    }
+  },
+  "phases": [
+    {
+      "name": "open_draft",
+      "startedAt": 1789982629663,
+      "requests": [
+        {
+          "url": "/api/identity/athlete-sessions",
+          "method": "GET",
+          "status": 200,
+          "bytes": 16
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/identity/athlete-sessions",
+          "method": "GET",
+          "status": 200,
+          "bytes": 16
+        },
+        {
+          "url": "/api/club/branding",
+          "method": "GET",
+          "status": 200,
+          "bytes": 79
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 18
+        },
+        {
+          "url": "/api/club/branding",
+          "method": "GET",
+          "status": 200,
+          "bytes": 79
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/giai-dau/v2?create=internal&_rsc=e6mdq",
+          "method": "GET",
+          "status": 200,
+          "bytes": null
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 18
+        },
+        {
+          "url": "/giai-dau/v2?_rsc=1vyki",
+          "method": "GET",
+          "status": 200,
+          "bytes": null
+        },
+        {
+          "url": "/api/club/branding",
+          "method": "GET",
+          "status": 200,
+          "bytes": 79
+        },
+        {
+          "url": "/api/club/notifications",
+          "method": "GET",
+          "status": 200,
+          "bytes": 34
+        },
+        {
+          "url": "/api/club/branding",
+          "method": "GET",
+          "status": 200,
+          "bytes": 79
+        },
+        {
+          "url": "/api/club/notifications",
+          "method": "GET",
+          "status": 200,
+          "bytes": 34
+        },
+        {
+          "url": "/api/club/notifications",
+          "method": "GET",
+          "status": 200,
+          "bytes": 34
+        },
+        {
+          "url": "/giai-dau/v2?create=internal&_rsc=4w9x0",
+          "method": "GET",
+          "status": 200,
+          "bytes": null
+        },
+        {
+          "url": "/api/club/notifications",
+          "method": "GET",
+          "status": 200,
+          "bytes": 34
+        },
+        {
+          "url": "/_next/static/css/app/giai-dau/v2/page.css?v=1789982632285",
+          "method": "GET",
+          "status": 200,
+          "bytes": 55634
+        },
+        {
+          "url": "/api/tournament-v2/athletes?mode=roster",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1090
+        },
+        {
+          "url": "/api/tournament-v2/athletes?mode=roster",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1090
+        }
+      ],
+      "durationMs": 4629
+    },
+    {
+      "name": "save_draft",
+      "startedAt": 1789982635765,
+      "requests": [
+        {
+          "url": "/api/tournament-v2/setup",
+          "method": "POST",
+          "status": 200,
+          "bytes": 764
+        }
+      ],
+      "durationMs": 1619
+    },
+    {
+      "name": "preview_schedule",
+      "startedAt": 1789982638017,
+      "requests": [
+        {
+          "url": "/api/tournament-v2/setup",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1741
+        },
+        {
+          "url": "/api/tournament-v2/preview-schedule",
+          "method": "POST",
+          "status": 200,
+          "bytes": 7556
+        },
+        {
+          "url": "/api/tournament-v2/setup",
+          "method": "POST",
+          "status": 200,
+          "bytes": 4527
+        }
+      ],
+      "durationMs": 2984
+    },
+    {
+      "name": "finalize",
+      "startedAt": 1789982641038,
+      "requests": [
+        {
+          "url": "/api/tournament-v2/setup/finalize",
+          "method": "POST",
+          "status": 200,
+          "bytes": 335
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 942
+        },
+        {
+          "url": "/_next/static/webpack/4baf6ee93d9860f7.webpack.hot-update.json",
+          "method": "GET",
+          "status": 200,
+          "bytes": 31
+        },
+        {
+          "url": "/_next/static/webpack/webpack.4baf6ee93d9860f7.hot-update.js",
+          "method": "GET",
+          "status": 200,
+          "bytes": 858
+        },
+        {
+          "url": "/dieu-hanh-giai/174?_rsc=e6mdq",
+          "method": "GET",
+          "status": 200,
+          "bytes": null
+        },
+        {
+          "url": "/dieu-hanh-giai/174?step=schedule&_rsc=e6mdq",
+          "method": "GET",
+          "status": 200,
+          "bytes": 174
+        },
+        {
+          "url": "/dieu-hanh-giai/174?_rsc=t4fvp",
+          "method": "GET",
+          "status": 200,
+          "bytes": null
+        },
+        {
+          "url": "/_next/static/chunks/app/dieu-hanh-giai/%5BtournamentId%5D/page.js",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1576133
+        },
+        {
+          "url": "/_next/static/css/app/dieu-hanh-giai/%5BtournamentId%5D/page.css?v=1789982643621",
+          "method": "GET",
+          "status": 200,
+          "bytes": 40222
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/tournament-v2/divisions?tournamentId=174",
+          "method": "GET",
+          "status": 200,
+          "bytes": 641
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 942
+        },
+        {
+          "url": "/api/tournament-v2/stages?tournamentId=174",
+          "method": "GET",
+          "status": 200,
+          "bytes": 551
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=174",
+          "method": "GET",
+          "status": 200,
+          "bytes": 3090
+        },
+        {
+          "url": "/api/tournament-v2/divisions?tournamentId=174",
+          "method": "GET",
+          "status": 200,
+          "bytes": 641
+        },
+        {
+          "url": "/api/tournament-v2/stages?tournamentId=174",
+          "method": "GET",
+          "status": 200,
+          "bytes": 551
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 942
+        },
+        {
+          "url": "/api/tournament-v2/divisions?tournamentId=174",
+          "method": "GET",
+          "status": 200,
+          "bytes": 641
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=174",
+          "method": "GET",
+          "status": 200,
+          "bytes": 3090
+        },
+        {
+          "url": "/api/tournament-v2/stages?tournamentId=174",
+          "method": "GET",
+          "status": 200,
+          "bytes": 551
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 942
+        },
+        {
+          "url": "/api/tournament-v2/setup?tournamentId=174&divisionId=158",
+          "method": "GET",
+          "status": 200,
+          "bytes": 14240
+        },
+        {
+          "url": "/giai-dau/v2?create=internal&tournamentId=174&divisionId=158&step=3&_rsc=pyil1",
+          "method": "GET",
+          "status": 200,
+          "bytes": 236
+        },
+        {
+          "url": "/giai-dau/v2?create=internal&tournamentId=174&divisionId=158&step=3&_rsc=4w9x0",
+          "method": "GET",
+          "status": 200,
+          "bytes": null
+        },
+        {
+          "url": "/_next/static/css/app/giai-dau/v2/page.css?v=1789982647111",
+          "method": "GET",
+          "status": 200,
+          "bytes": 55634
+        },
+        {
+          "url": "/api/club/branding",
+          "method": "GET",
+          "status": 200,
+          "bytes": 79
+        },
+        {
+          "url": "/api/tournament-v2/setup?tournamentId=174&divisionId=158",
+          "method": "GET",
+          "status": 200,
+          "bytes": 14240
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/tournament-v2/athletes?mode=roster",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1090
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=174",
+          "method": "GET",
+          "status": 200,
+          "bytes": 3090
+        },
+        {
+          "url": "/api/identity/athlete-sessions",
+          "method": "GET",
+          "status": 200,
+          "bytes": 16
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/identity/athlete-sessions",
+          "method": "GET",
+          "status": 200,
+          "bytes": 16
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 942
+        },
+        {
+          "url": "/api/club/branding",
+          "method": "GET",
+          "status": 200,
+          "bytes": 79
+        },
+        {
+          "url": "/api/tournament-v2/setup?tournamentId=174&divisionId=158",
+          "method": "GET",
+          "status": 200,
+          "bytes": 14240
+        },
+        {
+          "url": "/api/tournament-v2/athletes?mode=roster",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1090
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 942
+        },
+        {
+          "url": "/api/club/notifications",
+          "method": "GET",
+          "status": 200,
+          "bytes": 34
+        },
+        {
+          "url": "/api/tournament-v2/setup?tournamentId=174&divisionId=158",
+          "method": "GET",
+          "status": 200,
+          "bytes": 14240
+        },
+        {
+          "url": "/api/club/notifications",
+          "method": "GET",
+          "status": 200,
+          "bytes": 34
+        },
+        {
+          "url": "/api/club/branding",
+          "method": "GET",
+          "status": 200,
+          "bytes": 79
+        },
+        {
+          "url": "/api/tournament-v2/setup?tournamentId=174&divisionId=158",
+          "method": "GET",
+          "status": 200,
+          "bytes": 14240
+        },
+        {
+          "url": "/api/club/notifications",
+          "method": "GET",
+          "status": 200,
+          "bytes": 34
+        },
+        {
+          "url": "/api/club/branding",
+          "method": "GET",
+          "status": 200,
+          "bytes": 79
+        },
+        {
+          "url": "/api/club/notifications",
+          "method": "GET",
+          "status": 200,
+          "bytes": 34
+        }
+      ],
+      "durationMs": 9697
+    },
+    {
+      "name": "open_draft",
+      "startedAt": 1789982653984,
+      "requests": [
+        {
+          "url": "/giai-dau/v2?create=internal&_rsc=e6mdq",
+          "method": "GET",
+          "status": 200,
+          "bytes": 160
+        },
+        {
+          "url": "/giai-dau/v2?create=internal&_rsc=4w9x0",
+          "method": "GET",
+          "status": 200,
+          "bytes": null
+        },
+        {
+          "url": "/_next/static/css/app/giai-dau/v2/page.css?v=1789982654081",
+          "method": "GET",
+          "status": 200,
+          "bytes": 55634
+        },
+        {
+          "url": "/api/tournament-v2/athletes?mode=roster",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1090
+        },
+        {
+          "url": "/api/tournament-v2/athletes?mode=roster",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1090
+        }
+      ],
+      "durationMs": 1771
+    },
+    {
+      "name": "save_draft",
+      "startedAt": 1789982657171,
+      "requests": [
+        {
+          "url": "/api/tournament-v2/setup",
+          "method": "POST",
+          "status": 200,
+          "bytes": 754
+        }
+      ],
+      "durationMs": 1310
+    },
+    {
+      "name": "preview_schedule",
+      "startedAt": 1789982659070,
+      "requests": [
+        {
+          "url": "/api/tournament-v2/setup",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1731
+        },
+        {
+          "url": "/api/tournament-v2/preview-schedule",
+          "method": "POST",
+          "status": 200,
+          "bytes": 7556
+        },
+        {
+          "url": "/api/tournament-v2/setup",
+          "method": "POST",
+          "status": 200,
+          "bytes": 4517
+        }
+      ],
+      "durationMs": 2745
+    },
+    {
+      "name": "finalize",
+      "startedAt": 1789982661838,
+      "requests": [
+        {
+          "url": "/api/tournament-v2/setup/finalize",
+          "method": "POST",
+          "status": 200,
+          "bytes": 335
+        },
+        {
+          "url": "/dieu-hanh-giai/175?step=schedule&_rsc=e6mdq",
+          "method": "GET",
+          "status": 200,
+          "bytes": null
+        },
+        {
+          "url": "/dieu-hanh-giai/175?_rsc=e6mdq",
+          "method": "GET",
+          "status": 200,
+          "bytes": null
+        },
+        {
+          "url": "/dieu-hanh-giai/175?_rsc=90joz",
+          "method": "GET",
+          "status": 200,
+          "bytes": null
+        },
+        {
+          "url": "/_next/static/chunks/app/dieu-hanh-giai/%5BtournamentId%5D/page.js",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1576133
+        },
+        {
+          "url": "/_next/static/css/app/dieu-hanh-giai/%5BtournamentId%5D/page.css?v=1789982662496",
+          "method": "GET",
+          "status": 200,
+          "bytes": 40222
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1862
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/tournament-v2/stages?tournamentId=175",
+          "method": "GET",
+          "status": 200,
+          "bytes": 551
+        },
+        {
+          "url": "/api/tournament-v2/divisions?tournamentId=175",
+          "method": "GET",
+          "status": 200,
+          "bytes": 636
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1862
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=175",
+          "method": "GET",
+          "status": 200,
+          "bytes": 3090
+        },
+        {
+          "url": "/api/tournament-v2/stages?tournamentId=175",
+          "method": "GET",
+          "status": 200,
+          "bytes": 551
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/tournament-v2/divisions?tournamentId=175",
+          "method": "GET",
+          "status": 200,
+          "bytes": 636
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1862
+        },
+        {
+          "url": "/api/tournament-v2/stages?tournamentId=175",
+          "method": "GET",
+          "status": 200,
+          "bytes": 551
+        },
+        {
+          "url": "/api/tournament-v2/setup?tournamentId=175&divisionId=159",
+          "method": "GET",
+          "status": 200,
+          "bytes": 14215
+        },
+        {
+          "url": "/giai-dau/v2?create=internal&tournamentId=175&divisionId=159&step=3&_rsc=vf5xy",
+          "method": "GET",
+          "status": 200,
+          "bytes": 236
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=175",
+          "method": "GET",
+          "status": 200,
+          "bytes": 3090
+        },
+        {
+          "url": "/api/tournament-v2/divisions?tournamentId=175",
+          "method": "GET",
+          "status": 200,
+          "bytes": 636
+        },
+        {
+          "url": "/giai-dau/v2?create=internal&tournamentId=175&divisionId=159&step=3&_rsc=4w9x0",
+          "method": "GET",
+          "status": 200,
+          "bytes": null
+        },
+        {
+          "url": "/_next/static/css/app/giai-dau/v2/page.css?v=1789982665149",
+          "method": "GET",
+          "status": 200,
+          "bytes": 55634
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1862
+        },
+        {
+          "url": "/api/club/branding",
+          "method": "GET",
+          "status": 200,
+          "bytes": 79
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/tournament-v2/athletes?mode=roster",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1090
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/identity/athlete-sessions",
+          "method": "GET",
+          "status": 200,
+          "bytes": 16
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=175",
+          "method": "GET",
+          "status": 200,
+          "bytes": 3090
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/tournament-v2/setup?tournamentId=175&divisionId=159",
+          "method": "GET",
+          "status": 200,
+          "bytes": 14215
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/identity/athlete-sessions",
+          "method": "GET",
+          "status": 200,
+          "bytes": 16
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/tournament-v2/setup?tournamentId=175&divisionId=159",
+          "method": "GET",
+          "status": 200,
+          "bytes": 14215
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/club/branding",
+          "method": "GET",
+          "status": 200,
+          "bytes": 79
+        },
+        {
+          "url": "/api/tournament-v2/athletes?mode=roster",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1090
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1862
+        },
+        {
+          "url": "/api/tournament-v2/setup?tournamentId=175&divisionId=159",
+          "method": "GET",
+          "status": 200,
+          "bytes": 14215
+        },
+        {
+          "url": "/api/club/notifications",
+          "method": "GET",
+          "status": 200,
+          "bytes": 34
+        },
+        {
+          "url": "/api/club/notifications",
+          "method": "GET",
+          "status": 200,
+          "bytes": 34
+        },
+        {
+          "url": "/api/club/branding",
+          "method": "GET",
+          "status": 200,
+          "bytes": 79
+        },
+        {
+          "url": "/api/tournament-v2/setup?tournamentId=175&divisionId=159",
+          "method": "GET",
+          "status": 200,
+          "bytes": 14215
+        },
+        {
+          "url": "/api/club/notifications",
+          "method": "GET",
+          "status": 200,
+          "bytes": 34
+        },
+        {
+          "url": "/api/club/branding",
+          "method": "GET",
+          "status": 200,
+          "bytes": 79
+        },
+        {
+          "url": "/api/club/notifications",
+          "method": "GET",
+          "status": 200,
+          "bytes": 34
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1862
+        }
+      ],
+      "durationMs": 6938
+    },
+    {
+      "name": "open_draft",
+      "startedAt": 1789982672113,
+      "requests": [
+        {
+          "url": "/giai-dau/v2?create=internal&_rsc=e6mdq",
+          "method": "GET",
+          "status": 200,
+          "bytes": 160
+        },
+        {
+          "url": "/giai-dau/v2?create=internal&_rsc=4w9x0",
+          "method": "GET",
+          "status": 200,
+          "bytes": null
+        },
+        {
+          "url": "/_next/static/css/app/giai-dau/v2/page.css?v=1789982672197",
+          "method": "GET",
+          "status": 200,
+          "bytes": 55634
+        },
+        {
+          "url": "/api/tournament-v2/athletes?mode=roster",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1090
+        },
+        {
+          "url": "/api/tournament-v2/athletes?mode=roster",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1090
+        }
+      ],
+      "durationMs": 1783
+    },
+    {
+      "name": "save_draft",
+      "startedAt": 1789982675355,
+      "requests": [
+        {
+          "url": "/api/tournament-v2/setup",
+          "method": "POST",
+          "status": 200,
+          "bytes": 754
+        }
+      ],
+      "durationMs": 1305
+    },
+    {
+      "name": "preview_schedule",
+      "startedAt": 1789982677261,
+      "requests": [
+        {
+          "url": "/api/tournament-v2/setup",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1731
+        },
+        {
+          "url": "/api/tournament-v2/preview-schedule",
+          "method": "POST",
+          "status": 200,
+          "bytes": 7556
+        },
+        {
+          "url": "/api/tournament-v2/setup",
+          "method": "POST",
+          "status": 200,
+          "bytes": 4517
+        }
+      ],
+      "durationMs": 2779
+    },
+    {
+      "name": "finalize",
+      "startedAt": 1789982680068,
+      "requests": [
+        {
+          "url": "/api/tournament-v2/setup/finalize",
+          "method": "POST",
+          "status": 200,
+          "bytes": 335
+        },
+        {
+          "url": "/dieu-hanh-giai/176?step=schedule&_rsc=e6mdq",
+          "method": "GET",
+          "status": 200,
+          "bytes": null
+        },
+        {
+          "url": "/dieu-hanh-giai/176?_rsc=e6mdq",
+          "method": "GET",
+          "status": 200,
+          "bytes": 150
+        },
+        {
+          "url": "/dieu-hanh-giai/176?_rsc=1nxrk",
+          "method": "GET",
+          "status": 200,
+          "bytes": null
+        },
+        {
+          "url": "/_next/static/chunks/app/dieu-hanh-giai/%5BtournamentId%5D/page.js",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1576133
+        },
+        {
+          "url": "/_next/static/css/app/dieu-hanh-giai/%5BtournamentId%5D/page.css?v=1789982680752",
+          "method": "GET",
+          "status": 200,
+          "bytes": 40222
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 2782
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/tournament-v2/stages?tournamentId=176",
+          "method": "GET",
+          "status": 200,
+          "bytes": 551
+        },
+        {
+          "url": "/api/tournament-v2/divisions?tournamentId=176",
+          "method": "GET",
+          "status": 200,
+          "bytes": 636
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 2782
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=176",
+          "method": "GET",
+          "status": 200,
+          "bytes": 3090
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/tournament-v2/stages?tournamentId=176",
+          "method": "GET",
+          "status": 200,
+          "bytes": 551
+        },
+        {
+          "url": "/api/tournament-v2/divisions?tournamentId=176",
+          "method": "GET",
+          "status": 200,
+          "bytes": 636
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 2782
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=176",
+          "method": "GET",
+          "status": 200,
+          "bytes": 3090
+        },
+        {
+          "url": "/api/tournament-v2/stages?tournamentId=176",
+          "method": "GET",
+          "status": 200,
+          "bytes": 551
+        },
+        {
+          "url": "/api/tournament-v2/setup?tournamentId=176&divisionId=160",
+          "method": "GET",
+          "status": 200,
+          "bytes": 14215
+        },
+        {
+          "url": "/giai-dau/v2?create=internal&tournamentId=176&divisionId=160&step=3&_rsc=10vta",
+          "method": "GET",
+          "status": 200,
+          "bytes": 236
+        },
+        {
+          "url": "/api/tournament-v2/divisions?tournamentId=176",
+          "method": "GET",
+          "status": 200,
+          "bytes": 636
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 2782
+        },
+        {
+          "url": "/giai-dau/v2?create=internal&tournamentId=176&divisionId=160&step=3&_rsc=4w9x0",
+          "method": "GET",
+          "status": 200,
+          "bytes": null
+        },
+        {
+          "url": "/_next/static/css/app/giai-dau/v2/page.css?v=1789982683846",
+          "method": "GET",
+          "status": 200,
+          "bytes": 55634
+        },
+        {
+          "url": "/api/club/branding",
+          "method": "GET",
+          "status": 200,
+          "bytes": 79
+        },
+        {
+          "url": "/api/tournament-v2/athletes?mode=roster",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1090
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=176",
+          "method": "GET",
+          "status": 200,
+          "bytes": 3090
+        },
+        {
+          "url": "/api/tournament-v2/setup?tournamentId=176&divisionId=160",
+          "method": "GET",
+          "status": 200,
+          "bytes": 14215
+        },
+        {
+          "url": "/api/identity/athlete-sessions",
+          "method": "GET",
+          "status": 200,
+          "bytes": 16
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/identity/athlete-sessions",
+          "method": "GET",
+          "status": 200,
+          "bytes": 16
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 2782
+        },
+        {
+          "url": "/api/club/branding",
+          "method": "GET",
+          "status": 200,
+          "bytes": 79
+        },
+        {
+          "url": "/api/tournament-v2/setup?tournamentId=176&divisionId=160",
+          "method": "GET",
+          "status": 200,
+          "bytes": 14215
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/club/branding",
+          "method": "GET",
+          "status": 200,
+          "bytes": 79
+        },
+        {
+          "url": "/api/tournament-v2/athletes?mode=roster",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1090
+        },
+        {
+          "url": "/api/tournament-v2/setup?tournamentId=176&divisionId=160",
+          "method": "GET",
+          "status": 200,
+          "bytes": 14215
+        },
+        {
+          "url": "/api/club/notifications",
+          "method": "GET",
+          "status": 200,
+          "bytes": 34
+        },
+        {
+          "url": "/api/tournament-v2/setup?tournamentId=176&divisionId=160",
+          "method": "GET",
+          "status": 200,
+          "bytes": 14215
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 2782
+        },
+        {
+          "url": "/api/club/notifications",
+          "method": "GET",
+          "status": 200,
+          "bytes": 34
+        },
+        {
+          "url": "/api/club/notifications",
+          "method": "GET",
+          "status": 200,
+          "bytes": 34
+        },
+        {
+          "url": "/api/club/branding",
+          "method": "GET",
+          "status": 200,
+          "bytes": 79
+        },
+        {
+          "url": "/api/club/notifications",
+          "method": "GET",
+          "status": 200,
+          "bytes": 34
+        }
+      ],
+      "durationMs": 7280
+    },
+    {
+      "name": "open_draft",
+      "startedAt": 1789982690775,
+      "requests": [
+        {
+          "url": "/giai-dau/v2?create=internal&_rsc=e6mdq",
+          "method": "GET",
+          "status": 200,
+          "bytes": 160
+        },
+        {
+          "url": "/giai-dau/v2?create=internal&_rsc=4w9x0",
+          "method": "GET",
+          "status": 200,
+          "bytes": null
+        },
+        {
+          "url": "/_next/static/css/app/giai-dau/v2/page.css?v=1789982690859",
+          "method": "GET",
+          "status": 200,
+          "bytes": 55634
+        },
+        {
+          "url": "/api/tournament-v2/athletes?mode=roster",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1090
+        },
+        {
+          "url": "/api/tournament-v2/athletes?mode=roster",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1090
+        }
+      ],
+      "durationMs": 1733
+    },
+    {
+      "name": "save_draft",
+      "startedAt": 1789982693867,
+      "requests": [
+        {
+          "url": "/api/tournament-v2/setup",
+          "method": "POST",
+          "status": 200,
+          "bytes": 754
+        }
+      ],
+      "durationMs": 1331
+    },
+    {
+      "name": "preview_schedule",
+      "startedAt": 1789982695767,
+      "requests": [
+        {
+          "url": "/api/tournament-v2/setup",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1731
+        },
+        {
+          "url": "/api/tournament-v2/preview-schedule",
+          "method": "POST",
+          "status": 200,
+          "bytes": 7556
+        },
+        {
+          "url": "/api/tournament-v2/setup",
+          "method": "POST",
+          "status": 200,
+          "bytes": 4517
+        }
+      ],
+      "durationMs": 2723
+    },
+    {
+      "name": "finalize",
+      "startedAt": 1789982698515,
+      "requests": [
+        {
+          "url": "/api/tournament-v2/setup/finalize",
+          "method": "POST",
+          "status": 200,
+          "bytes": 335
+        },
+        {
+          "url": "/dieu-hanh-giai/177?step=schedule&_rsc=e6mdq",
+          "method": "GET",
+          "status": 200,
+          "bytes": null
+        },
+        {
+          "url": "/dieu-hanh-giai/177?_rsc=e6mdq",
+          "method": "GET",
+          "status": 200,
+          "bytes": 150
+        },
+        {
+          "url": "/dieu-hanh-giai/177?_rsc=13tvd",
+          "method": "GET",
+          "status": 200,
+          "bytes": null
+        },
+        {
+          "url": "/_next/static/chunks/app/dieu-hanh-giai/%5BtournamentId%5D/page.js",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1576133
+        },
+        {
+          "url": "/_next/static/css/app/dieu-hanh-giai/%5BtournamentId%5D/page.css?v=1789982699161",
+          "method": "GET",
+          "status": 200,
+          "bytes": 40222
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 3702
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/tournament-v2/stages?tournamentId=177",
+          "method": "GET",
+          "status": 200,
+          "bytes": 551
+        },
+        {
+          "url": "/api/tournament-v2/divisions?tournamentId=177",
+          "method": "GET",
+          "status": 200,
+          "bytes": 636
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 3702
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=177",
+          "method": "GET",
+          "status": 200,
+          "bytes": 3090
+        },
+        {
+          "url": "/api/tournament-v2/stages?tournamentId=177",
+          "method": "GET",
+          "status": 200,
+          "bytes": 551
+        },
+        {
+          "url": "/api/tournament-v2/divisions?tournamentId=177",
+          "method": "GET",
+          "status": 200,
+          "bytes": 636
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 3702
+        },
+        {
+          "url": "/api/tournament-v2/divisions?tournamentId=177",
+          "method": "GET",
+          "status": 200,
+          "bytes": 636
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=177",
+          "method": "GET",
+          "status": 200,
+          "bytes": 3090
+        },
+        {
+          "url": "/api/tournament-v2/stages?tournamentId=177",
+          "method": "GET",
+          "status": 200,
+          "bytes": 551
+        },
+        {
+          "url": "/api/tournament-v2/setup?tournamentId=177&divisionId=161",
+          "method": "GET",
+          "status": 200,
+          "bytes": 14215
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 3702
+        },
+        {
+          "url": "/giai-dau/v2?create=internal&tournamentId=177&divisionId=161&step=3&_rsc=16cgn",
+          "method": "GET",
+          "status": 200,
+          "bytes": 236
+        },
+        {
+          "url": "/giai-dau/v2?create=internal&tournamentId=177&divisionId=161&step=3&_rsc=4w9x0",
+          "method": "GET",
+          "status": 200,
+          "bytes": null
+        },
+        {
+          "url": "/_next/static/css/app/giai-dau/v2/page.css?v=1789982702111",
+          "method": "GET",
+          "status": 200,
+          "bytes": 55634
+        },
+        {
+          "url": "/api/tournament-v2/setup?tournamentId=177&divisionId=161",
+          "method": "GET",
+          "status": 200,
+          "bytes": 14215
+        },
+        {
+          "url": "/api/club/branding",
+          "method": "GET",
+          "status": 200,
+          "bytes": 79
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=177",
+          "method": "GET",
+          "status": 200,
+          "bytes": 3090
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/tournament-v2/athletes?mode=roster",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1090
+        },
+        {
+          "url": "/api/identity/athlete-sessions",
+          "method": "GET",
+          "status": 200,
+          "bytes": 16
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/identity/athlete-sessions",
+          "method": "GET",
+          "status": 200,
+          "bytes": 16
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 3702
+        },
+        {
+          "url": "/api/club/branding",
+          "method": "GET",
+          "status": 200,
+          "bytes": 79
+        },
+        {
+          "url": "/api/tournament-v2/setup?tournamentId=177&divisionId=161",
+          "method": "GET",
+          "status": 200,
+          "bytes": 14215
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/club/branding",
+          "method": "GET",
+          "status": 200,
+          "bytes": 79
+        },
+        {
+          "url": "/api/tournament-v2/athletes?mode=roster",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1090
+        },
+        {
+          "url": "/api/tournament-v2/setup?tournamentId=177&divisionId=161",
+          "method": "GET",
+          "status": 200,
+          "bytes": 14215
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 3702
+        },
+        {
+          "url": "/api/club/notifications",
+          "method": "GET",
+          "status": 200,
+          "bytes": 34
+        },
+        {
+          "url": "/api/club/branding",
+          "method": "GET",
+          "status": 200,
+          "bytes": 79
+        },
+        {
+          "url": "/api/tournament-v2/setup?tournamentId=177&divisionId=161",
+          "method": "GET",
+          "status": 200,
+          "bytes": 14215
+        },
+        {
+          "url": "/api/club/notifications",
+          "method": "GET",
+          "status": 200,
+          "bytes": 34
+        },
+        {
+          "url": "/api/club/notifications",
+          "method": "GET",
+          "status": 200,
+          "bytes": 34
+        },
+        {
+          "url": "/api/club/notifications",
+          "method": "GET",
+          "status": 200,
+          "bytes": 34
+        }
+      ],
+      "durationMs": 6931
+    },
+    {
+      "name": "open_draft",
+      "startedAt": 1789982708880,
+      "requests": [
+        {
+          "url": "/giai-dau/v2?create=internal&_rsc=e6mdq",
+          "method": "GET",
+          "status": 200,
+          "bytes": 160
+        },
+        {
+          "url": "/giai-dau/v2?create=internal&_rsc=4w9x0",
+          "method": "GET",
+          "status": 200,
+          "bytes": null
+        },
+        {
+          "url": "/_next/static/css/app/giai-dau/v2/page.css?v=1789982708979",
+          "method": "GET",
+          "status": 200,
+          "bytes": 55634
+        },
+        {
+          "url": "/api/tournament-v2/athletes?mode=roster",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1090
+        },
+        {
+          "url": "/api/tournament-v2/athletes?mode=roster",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1090
+        }
+      ],
+      "durationMs": 1742
+    },
+    {
+      "name": "save_draft",
+      "startedAt": 1789982712030,
+      "requests": [
+        {
+          "url": "/api/tournament-v2/setup",
+          "method": "POST",
+          "status": 200,
+          "bytes": 754
+        }
+      ],
+      "durationMs": 1305
+    },
+    {
+      "name": "preview_schedule",
+      "startedAt": 1789982713958,
+      "requests": [
+        {
+          "url": "/api/tournament-v2/setup",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1731
+        },
+        {
+          "url": "/api/tournament-v2/preview-schedule",
+          "method": "POST",
+          "status": 200,
+          "bytes": 7556
+        },
+        {
+          "url": "/api/tournament-v2/setup",
+          "method": "POST",
+          "status": 200,
+          "bytes": 4517
+        }
+      ],
+      "durationMs": 2817
+    },
+    {
+      "name": "finalize",
+      "startedAt": 1789982716815,
+      "requests": [
+        {
+          "url": "/api/tournament-v2/setup/finalize",
+          "method": "POST",
+          "status": 200,
+          "bytes": 335
+        },
+        {
+          "url": "/dieu-hanh-giai/178?step=schedule&_rsc=e6mdq",
+          "method": "GET",
+          "status": 200,
+          "bytes": null
+        },
+        {
+          "url": "/dieu-hanh-giai/178?_rsc=e6mdq",
+          "method": "GET",
+          "status": 200,
+          "bytes": 150
+        },
+        {
+          "url": "/dieu-hanh-giai/178?_rsc=jpz6t",
+          "method": "GET",
+          "status": 200,
+          "bytes": null
+        },
+        {
+          "url": "/_next/static/chunks/app/dieu-hanh-giai/%5BtournamentId%5D/page.js",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1576133
+        },
+        {
+          "url": "/_next/static/css/app/dieu-hanh-giai/%5BtournamentId%5D/page.css?v=1789982717484",
+          "method": "GET",
+          "status": 200,
+          "bytes": 40222
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 4622
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/tournament-v2/divisions?tournamentId=178",
+          "method": "GET",
+          "status": 200,
+          "bytes": 636
+        },
+        {
+          "url": "/api/tournament-v2/stages?tournamentId=178",
+          "method": "GET",
+          "status": 200,
+          "bytes": 551
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 4622
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=178",
+          "method": "GET",
+          "status": 200,
+          "bytes": 3090
+        },
+        {
+          "url": "/api/tournament-v2/stages?tournamentId=178",
+          "method": "GET",
+          "status": 200,
+          "bytes": 551
+        },
+        {
+          "url": "/api/tournament-v2/divisions?tournamentId=178",
+          "method": "GET",
+          "status": 200,
+          "bytes": 636
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 4622
+        },
+        {
+          "url": "/api/tournament-v2/stages?tournamentId=178",
+          "method": "GET",
+          "status": 200,
+          "bytes": 551
+        },
+        {
+          "url": "/api/tournament-v2/divisions?tournamentId=178",
+          "method": "GET",
+          "status": 200,
+          "bytes": 636
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=178",
+          "method": "GET",
+          "status": 200,
+          "bytes": 3090
+        },
+        {
+          "url": "/api/tournament-v2/setup?tournamentId=178&divisionId=162",
+          "method": "GET",
+          "status": 200,
+          "bytes": 14215
+        },
+        {
+          "url": "/giai-dau/v2?create=internal&tournamentId=178&divisionId=162&step=3&_rsc=1bt40",
+          "method": "GET",
+          "status": 200,
+          "bytes": 236
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 4622
+        },
+        {
+          "url": "/giai-dau/v2?create=internal&tournamentId=178&divisionId=162&step=3&_rsc=4w9x0",
+          "method": "GET",
+          "status": 200,
+          "bytes": null
+        },
+        {
+          "url": "/_next/static/css/app/giai-dau/v2/page.css?v=1789982720521",
+          "method": "GET",
+          "status": 200,
+          "bytes": 55634
+        },
+        {
+          "url": "/api/club/branding",
+          "method": "GET",
+          "status": 200,
+          "bytes": 79
+        },
+        {
+          "url": "/api/tournament-v2/athletes?mode=roster",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1090
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/tournament-v2/setup?tournamentId=178&divisionId=162",
+          "method": "GET",
+          "status": 200,
+          "bytes": 14215
+        },
+        {
+          "url": "/api/identity/athlete-sessions",
+          "method": "GET",
+          "status": 200,
+          "bytes": 16
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=178",
+          "method": "GET",
+          "status": 200,
+          "bytes": 3090
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 4622
+        },
+        {
+          "url": "/api/identity/athlete-sessions",
+          "method": "GET",
+          "status": 200,
+          "bytes": 16
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/tournament-v2/setup?tournamentId=178&divisionId=162",
+          "method": "GET",
+          "status": 200,
+          "bytes": 14215
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/club/branding",
+          "method": "GET",
+          "status": 200,
+          "bytes": 79
+        },
+        {
+          "url": "/api/tournament-v2/athletes?mode=roster",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1090
+        },
+        {
+          "url": "/api/tournament-v2/setup?tournamentId=178&divisionId=162",
+          "method": "GET",
+          "status": 200,
+          "bytes": 14215
+        },
+        {
+          "url": "/api/club/notifications",
+          "method": "GET",
+          "status": 200,
+          "bytes": 34
+        },
+        {
+          "url": "/api/club/notifications",
+          "method": "GET",
+          "status": 200,
+          "bytes": 34
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 4622
+        },
+        {
+          "url": "/api/club/branding",
+          "method": "GET",
+          "status": 200,
+          "bytes": 79
+        },
+        {
+          "url": "/api/tournament-v2/setup?tournamentId=178&divisionId=162",
+          "method": "GET",
+          "status": 200,
+          "bytes": 14215
+        },
+        {
+          "url": "/api/club/notifications",
+          "method": "GET",
+          "status": 200,
+          "bytes": 34
+        },
+        {
+          "url": "/api/club/branding",
+          "method": "GET",
+          "status": 200,
+          "bytes": 79
+        },
+        {
+          "url": "/api/club/notifications",
+          "method": "GET",
+          "status": 200,
+          "bytes": 34
+        }
+      ],
+      "durationMs": 7276
+    },
+    {
+      "name": "open_draft",
+      "startedAt": 1789982727471,
+      "requests": [
+        {
+          "url": "/giai-dau/v2?create=internal&_rsc=e6mdq",
+          "method": "GET",
+          "status": 200,
+          "bytes": 160
+        },
+        {
+          "url": "/giai-dau/v2?create=internal&_rsc=4w9x0",
+          "method": "GET",
+          "status": 200,
+          "bytes": null
+        },
+        {
+          "url": "/_next/static/css/app/giai-dau/v2/page.css?v=1789982727555",
+          "method": "GET",
+          "status": 200,
+          "bytes": 55634
+        },
+        {
+          "url": "/api/tournament-v2/athletes?mode=roster",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1090
+        },
+        {
+          "url": "/api/tournament-v2/athletes?mode=roster",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1090
+        }
+      ],
+      "durationMs": 1809
+    },
+    {
+      "name": "save_draft",
+      "startedAt": 1789982730715,
+      "requests": [
+        {
+          "url": "/api/tournament-v2/setup",
+          "method": "POST",
+          "status": 200,
+          "bytes": 754
+        }
+      ],
+      "durationMs": 1945
+    },
+    {
+      "name": "preview_schedule",
+      "startedAt": 1789982733289,
+      "requests": [
+        {
+          "url": "/api/tournament-v2/setup",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1731
+        },
+        {
+          "url": "/api/tournament-v2/preview-schedule",
+          "method": "POST",
+          "status": 200,
+          "bytes": 7556
+        },
+        {
+          "url": "/api/tournament-v2/setup",
+          "method": "POST",
+          "status": 200,
+          "bytes": 4517
+        }
+      ],
+      "durationMs": 3094
+    },
+    {
+      "name": "finalize",
+      "startedAt": 1789982736431,
+      "requests": [
+        {
+          "url": "/api/tournament-v2/setup/finalize",
+          "method": "POST",
+          "status": 200,
+          "bytes": 335
+        },
+        {
+          "url": "/dieu-hanh-giai/179?step=schedule&_rsc=e6mdq",
+          "method": "GET",
+          "status": 200,
+          "bytes": null
+        },
+        {
+          "url": "/dieu-hanh-giai/179?_rsc=e6mdq",
+          "method": "GET",
+          "status": 200,
+          "bytes": null
+        },
+        {
+          "url": "/dieu-hanh-giai/179?_rsc=1yn72",
+          "method": "GET",
+          "status": 200,
+          "bytes": null
+        },
+        {
+          "url": "/_next/static/chunks/app/dieu-hanh-giai/%5BtournamentId%5D/page.js",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1576133
+        },
+        {
+          "url": "/_next/static/css/app/dieu-hanh-giai/%5BtournamentId%5D/page.css?v=1789982737321",
+          "method": "GET",
+          "status": 200,
+          "bytes": 40222
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 5542
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/tournament-v2/divisions?tournamentId=179",
+          "method": "GET",
+          "status": 200,
+          "bytes": 636
+        },
+        {
+          "url": "/api/tournament-v2/stages?tournamentId=179",
+          "method": "GET",
+          "status": 200,
+          "bytes": 551
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=179",
+          "method": "GET",
+          "status": 200,
+          "bytes": 3090
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 5542
+        },
+        {
+          "url": "/api/tournament-v2/stages?tournamentId=179",
+          "method": "GET",
+          "status": 200,
+          "bytes": 551
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/tournament-v2/divisions?tournamentId=179",
+          "method": "GET",
+          "status": 200,
+          "bytes": 636
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 5542
+        },
+        {
+          "url": "/api/tournament-v2/stages?tournamentId=179",
+          "method": "GET",
+          "status": 200,
+          "bytes": 551
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=179",
+          "method": "GET",
+          "status": 200,
+          "bytes": 3090
+        },
+        {
+          "url": "/api/tournament-v2/setup?tournamentId=179&divisionId=163",
+          "method": "GET",
+          "status": 200,
+          "bytes": 14215
+        },
+        {
+          "url": "/giai-dau/v2?create=internal&tournamentId=179&divisionId=163&step=3&_rsc=1h9rd",
+          "method": "GET",
+          "status": 200,
+          "bytes": 236
+        },
+        {
+          "url": "/api/tournament-v2/divisions?tournamentId=179",
+          "method": "GET",
+          "status": 200,
+          "bytes": 636
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 5542
+        },
+        {
+          "url": "/giai-dau/v2?create=internal&tournamentId=179&divisionId=163&step=3&_rsc=4w9x0",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1165
+        },
+        {
+          "url": "/_next/static/css/app/giai-dau/v2/page.css?v=1789982739984",
+          "method": "GET",
+          "status": 200,
+          "bytes": 55634
+        },
+        {
+          "url": "/api/club/branding",
+          "method": "GET",
+          "status": 200,
+          "bytes": 79
+        },
+        {
+          "url": "/api/tournament-v2/athletes?mode=roster",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1090
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/tournament-v2/assignments?tournamentId=179",
+          "method": "GET",
+          "status": 200,
+          "bytes": 3090
+        },
+        {
+          "url": "/api/tournament-v2/setup?tournamentId=179&divisionId=163",
+          "method": "GET",
+          "status": 200,
+          "bytes": 14215
+        },
+        {
+          "url": "/api/identity/athlete-sessions",
+          "method": "GET",
+          "status": 200,
+          "bytes": 16
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/identity/athlete-sessions",
+          "method": "GET",
+          "status": 200,
+          "bytes": 16
+        },
+        {
+          "url": "/api/tournament-v2/setup?tournamentId=179&divisionId=163",
+          "method": "GET",
+          "status": 200,
+          "bytes": 14215
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/club/branding",
+          "method": "GET",
+          "status": 200,
+          "bytes": 79
+        },
+        {
+          "url": "/api/groups/session",
+          "method": "GET",
+          "status": 200,
+          "bytes": 392
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 5542
+        },
+        {
+          "url": "/api/club/branding",
+          "method": "GET",
+          "status": 200,
+          "bytes": 79
+        },
+        {
+          "url": "/api/tournament-v2/athletes?mode=roster",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1090
+        },
+        {
+          "url": "/api/tournament-v2/setup?tournamentId=179&divisionId=163",
+          "method": "GET",
+          "status": 200,
+          "bytes": 14215
+        },
+        {
+          "url": "/api/tournament-v2/setup?tournamentId=179&divisionId=163",
+          "method": "GET",
+          "status": 200,
+          "bytes": 14215
+        },
+        {
+          "url": "/api/club/notifications",
+          "method": "GET",
+          "status": 200,
+          "bytes": 34
+        },
+        {
+          "url": "/api/club/branding",
+          "method": "GET",
+          "status": 200,
+          "bytes": 79
+        },
+        {
+          "url": "/api/club/notifications",
+          "method": "GET",
+          "status": 200,
+          "bytes": 34
+        },
+        {
+          "url": "/api/club/notifications",
+          "method": "GET",
+          "status": 200,
+          "bytes": 34
+        },
+        {
+          "url": "/api/club/notifications",
+          "method": "GET",
+          "status": 200,
+          "bytes": 34
+        },
+        {
+          "url": "/api/tournament-v2/tournaments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 5542
+        }
+      ],
+      "durationMs": 6979
+    }
+  ]
+}

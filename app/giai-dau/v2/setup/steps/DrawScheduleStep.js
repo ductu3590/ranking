@@ -73,11 +73,18 @@ export default function DrawScheduleStep({ draft = {}, onConfigChange, onPreview
     }
   };
 
+  const formatKey = draft.format?.formatKey || 'group_knockout';
+  const formatCopy = {
+    round_robin: { eyebrow: 'Cấu hình vòng tròn', title: 'Mọi cặp gặp nhau' },
+    knockout: { eyebrow: 'Cấu hình loại trực tiếp', title: 'Nhánh loại trực tiếp' },
+    group_knockout: { eyebrow: 'Cấu hình vòng bảng và loại trực tiếp', title: 'Vòng bảng → loại trực tiếp' },
+  }[formatKey] || { eyebrow: 'Cấu hình thể thức', title: 'Thiết lập lịch đấu' };
+
   const updateConfig = (patch) => {
     onConfigChange?.({
       format: {
         ...(draft.format || {}),
-        formatKey: 'group_knockout',
+        formatKey,
         config: { ...((draft.format && draft.format.config) || {}), ...patch },
       },
     });
@@ -98,35 +105,45 @@ export default function DrawScheduleStep({ draft = {}, onConfigChange, onPreview
       </div>
 
       <div className="setup-draw-card">
-        <p className="setup-draw-eyebrow">Cấu hình group_knockout</p>
-        <h3>Vòng bảng -&gt; loại trực tiếp</h3>
+        <p className="setup-draw-eyebrow">{formatCopy.eyebrow}</p>
+        <h3>{formatCopy.title}</h3>
         <div className="setup-config-grid">
-          <label className="setup-config-field">
-            Số bảng
-            <input type="number" min="1" value={config.groupCount} onChange={(event) => updateConfig({ groupCount: Number(event.target.value) })} />
-          </label>
-          <label className="setup-config-field">
-            Số cặp mỗi bảng
-            <input value={config.groupSizes.join('/')} onChange={(event) => updateConfig({ groupSizes: event.target.value.split('/').map((item) => Number(item.trim())).filter(Boolean) })} />
-          </label>
-          <label className="setup-config-field">
-            Suất đi tiếp mỗi bảng
-            <input type="number" min="1" value={config.qualifiersPerGroup} onChange={(event) => updateConfig({ qualifiersPerGroup: Number(event.target.value) })} />
-          </label>
-          <label className="setup-config-field">
-            Cách ghép nhánh
-            <select value={config.bracketPairing} onChange={(event) => updateConfig({ bracketPairing: event.target.value })}>
-              <option value="cross_seed">Nhất A - Nhì B, Nhất B - Nhì A</option>
-              <option value="same_seed">Theo thứ hạng cùng nhánh</option>
-            </select>
-          </label>
-          <label className="setup-config-field">
-            Tranh hạng ba
-            <select value={config.thirdPlaceEnabled ? 'yes' : 'no'} onChange={(event) => updateConfig({ thirdPlaceEnabled: event.target.value === 'yes' })}>
-              <option value="no">Không</option>
-              <option value="yes">Có</option>
-            </select>
-          </label>
+          {formatKey !== 'knockout' ? (
+            <>
+              <label className="setup-config-field">
+                Số bảng
+                <input type="number" min="1" value={config.groupCount} onChange={(event) => updateConfig({ groupCount: Number(event.target.value) })} />
+              </label>
+              <label className="setup-config-field">
+                Số cặp mỗi bảng
+                <input value={config.groupSizes.join('/')} onChange={(event) => updateConfig({ groupSizes: event.target.value.split('/').map((item) => Number(item.trim())).filter(Boolean) })} />
+              </label>
+            </>
+          ) : null}
+          {formatKey === 'group_knockout' ? (
+            <>
+              <label className="setup-config-field">
+                Suất đi tiếp mỗi bảng
+                <input type="number" min="1" value={config.qualifiersPerGroup} onChange={(event) => updateConfig({ qualifiersPerGroup: Number(event.target.value) })} />
+              </label>
+              <label className="setup-config-field">
+                Cách ghép nhánh
+                <select value={config.bracketPairing} onChange={(event) => updateConfig({ bracketPairing: event.target.value })}>
+                  <option value="cross_seed">Nhất A - Nhì B, Nhất B - Nhì A</option>
+                  <option value="same_seed">Theo thứ hạng cùng nhánh</option>
+                </select>
+              </label>
+            </>
+          ) : null}
+          {formatKey !== 'round_robin' ? (
+            <label className="setup-config-field">
+              Tranh hạng ba
+              <select value={config.thirdPlaceEnabled ? 'yes' : 'no'} onChange={(event) => updateConfig({ thirdPlaceEnabled: event.target.value === 'yes' })}>
+                <option value="no">Không</option>
+                <option value="yes">Có</option>
+              </select>
+            </label>
+          ) : null}
           <label className="setup-config-field">
             Số sân
             <input type="number" min="1" value={config.courtCount} onChange={(event) => updateConfig({ courtCount: Number(event.target.value) })} />

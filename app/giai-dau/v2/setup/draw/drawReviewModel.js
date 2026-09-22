@@ -103,9 +103,16 @@ function buildDrawPreviewModel(draft = {}) {
 function buildReviewSummaryModel(draft = {}) {
   const preview = buildDrawPreviewModel(draft);
   const lockedByResults = draft.matchState && (draft.matchState.started || draft.matchState.hasScore);
+  const metadataBlockers = [];
+  if (!String(draft?.tournament?.name || '').trim()) {
+    metadataBlockers.push({ code: 'TOURNAMENT_NAME_REQUIRED', message: 'Hãy nhập tên giải trước khi chốt.', severity: 'blocker' });
+  }
+  if (!String(draft?.tournament?.eventDate || '').trim()) {
+    metadataBlockers.push({ code: 'EVENT_DATE_REQUIRED', message: 'Hãy chọn ngày thi đấu trước khi chốt.', severity: 'blocker' });
+  }
   const blockers = lockedByResults
     ? [{ code: 'STRUCTURE_LOCKED_BY_RESULTS', message: 'Giải đã có trận bắt đầu hoặc đã có tỉ số, không thể đổi cấu trúc qua setup.', severity: 'blocker' }, ...preview.blockers]
-    : preview.blockers;
+    : [...preview.blockers, ...metadataBlockers];
 
   return {
     ...preview,

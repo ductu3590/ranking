@@ -38,8 +38,9 @@ export async function GET(request) {
             if (memberIds.length) {
                 const { data: athletes, error: athletesError } = await db
                     .from('athletes')
-                    .select('id, group_id, display_name, legacy_club_member_id')
-                    .eq('group_id', scope.groupId)
+                    // `athletes` is a global identity table. Tenant scope comes from
+                    // the already-scoped legacy club-member IDs, not a nonexistent group_id.
+                    .select('id, display_name, legacy_club_member_id')
                     .in('legacy_club_member_id', memberIds);
                 if (athletesError) return NextResponse.json({ error: athletesError.message }, { status: 500 });
                 athleteByMemberId = new Map((athletes || []).map((athlete) => [Number(athlete.legacy_club_member_id), athlete]));

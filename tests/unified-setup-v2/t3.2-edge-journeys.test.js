@@ -54,6 +54,17 @@ check('15-person doubles saves but blocks finalize without singleton or BYE team
   assert.ok(pairing.getPairs(paired).every((item) => !item.memberIds.includes('BYE')));
 });
 
+check('pairing rejects duplicate identities and protects locked pairs from manual mutation', () => {
+  const start = pairing.pairMembers(pairing({ memberIds: ['m1', 'm2', 'm3', 'm4'] }), [['m1', 'm2'], ['m3', 'm4']]);
+  const locked = pairing.setLocked(start, 'pair-1', true);
+  assert.throws(() => pairing.pairMembers(start, [['m1', 'm1']]), /PAIR_MEMBER_COUNT_INVALID/);
+  assert.throws(() => pairing.swapPairMembers(locked, 'pair-1', 'm1', 'pair-2', 'm3'), /LOCKED_PAIR_MUTATION_FORBIDDEN/);
+  const reserved = pairing.reserveMember(pairing.regenerateUnlockedPairs(pairing({ memberIds: ['m1', 'm2', 'm3'] })), 'm3');
+  assert.deepEqual(reserved.memberIds, ['m1', 'm2']);
+  assert.deepEqual(reserved.reserveMemberIds, ['m3']);
+  assert.equal(pairing.getUnpairedMemberIds(reserved).length, 0);
+});
+
 check('inactive member remains selected and emits warning', () => {
   const result = validateFinalize({ tournament: { name: 'Test' }, participants: { selectedMemberIds: ['m1'], inactiveSelectedMemberIds: ['m1'] }, pairs: [{ memberIds: ['m1', 'm2'] }] });
   assert.equal(result.ok, true);
@@ -99,9 +110,11 @@ check('advance incomplete results returns stable ADVANCE_RESULTS_INCOMPLETE', ()
   assert.match(advanceRoute, /ADVANCE_RESULTS_INCOMPLETE/);
 });
 
-check('pairing UI wires all three odd-roster remedies', () => {
+check('pairing UI wires safe odd-roster remedies and explicitly disables unsupported singles', () => {
   const board = read('app/giai-dau/v2/setup/pairing/PairingBoard.js');
-  for (const choice of fixtures.oddFifteen.expectedChoices) assert.match(board, new RegExp(`data-choice="${choice}"[^>]*onClick`));
+  for (const choice of ['add_member', 'reserve_member']) assert.match(board, new RegExp(`data-choice="${choice}"[^>]*onClick`));
+  assert.match(board, /data-choice="switch_format" disabled=\{!canSwitchToSingles\}/);
+  assert.match(board, /bốc thăm và bước rà soát hiện chưa hỗ trợ workflow đánh đơn hoàn chỉnh/);
 });
 
 const missingBrowserEnv = missingEnvironment(requiredEnvironment());

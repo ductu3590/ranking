@@ -213,8 +213,8 @@
   position: fixed;
   left: 10px;
   right: 10px;
-  bottom: 10px;
-  z-index: 20;
+  bottom: calc(80px + env(safe-area-inset-bottom));
+  z-index: 1101;
   display: grid;
   gap: 10px;
   padding: 12px;
@@ -251,7 +251,63 @@
   .setup-external-club { grid-template-columns: minmax(0, 1fr) auto; align-items: end; }
   .setup-layout { grid-template-columns: minmax(0, 1fr) 340px; align-items: start; }
   .setup-summary { position: sticky; top: 18px; }
-  .setup-actionbar { left: 50%; right: auto; width: min(1120px, calc(100vw - 48px)); transform: translateX(-50%); grid-template-columns: minmax(220px, 1fr) auto; align-items: center; }
+  .setup-actionbar { left: 50%; right: auto; bottom: 10px; width: min(1120px, calc(100vw - 48px)); transform: translateX(-50%); grid-template-columns: minmax(220px, 1fr) auto; align-items: center; }
   .setup-actionbar__buttons { display: flex; justify-content: flex-end; }
   .setup-actionbar__buttons .setup-btn--primary { grid-column: auto; }
+}
+
+.setup-format-options {
+  display: grid;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.setup-format-options button {
+  display: grid;
+  gap: 3px;
+  width: 100%;
+  padding: 14px;
+  color: var(--ph-ink, #1d312b);
+  font: inherit;
+  text-align: left;
+  background: var(--ph-surface, #fff);
+  border: 1px solid var(--ph-border, #d5e4db);
+  border-radius: 12px;
+}
+
+.setup-format-options button.is-active {
+  border-color: var(--ph-primary, #18734f);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--ph-primary, #18734f) 18%, transparent);
+}
+
+.setup-format-options span,
+.setup-tournament-details small { color: var(--ph-muted, #62746d); }
+
+.setup-tournament-details {
+  display: grid;
+  gap: 12px;
+}
+
+.setup-tournament-details label {
+  display: grid;
+  gap: 6px;
+  color: var(--ph-ink, #1d312b);
+  font-weight: 700;
+}
+
+.setup-tournament-details input,
+.setup-tournament-details textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  color: inherit;
+  font: inherit;
+  font-weight: 400;
+  background: var(--ph-surface, #fff);
+  border: 1px solid var(--ph-border, #d5e4db);
+  border-radius: 8px;
+}
+
+@media (min-width: 720px) {
+  .setup-format-options { grid-template-columns: repeat(3, 1fr); }
 }

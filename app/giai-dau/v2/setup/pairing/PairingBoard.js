@@ -63,15 +63,13 @@ export default function PairingBoard({ roster = [], selectedMemberIds = [], valu
             setSwapSource(null);
             return;
         }
-        const next = JSON.parse(JSON.stringify(draft));
-        next.pairs = next.pairs.map((pair) => ({ ...pair, memberIds: pair.memberIds.map(String) }));
-        for (const pair of next.pairs) {
-            pair.memberIds = pair.memberIds.map((id) => {
-                if (id === swapSource.memberId) return current.memberId;
-                if (id === current.memberId) return swapSource.memberId;
-                return id;
-            });
+        const sourcePair = draft.pairs.find((pair) => pair.pairId === swapSource.pairId);
+        const currentPair = draft.pairs.find((pair) => pair.pairId === current.pairId);
+        if (sourcePair?.locked || currentPair?.locked) {
+            setSwapSource(null);
+            return;
         }
+        const next = createPairingDraft.swapPairMembers(draft, swapSource.pairId, swapSource.memberId, current.pairId, current.memberId);
         setSwapSource(null);
         update(next);
     }
@@ -82,18 +80,13 @@ export default function PairingBoard({ roster = [], selectedMemberIds = [], valu
         const memberId = String(member.member_id ?? member.memberId ?? member.id);
         return memberId && !draft.memberIds.includes(memberId) && !draft.reserveMemberIds.includes(memberId);
     });
-    const canSwitchToSingles = supportedEntrantTypes.includes('singles');
+    // The current draw and review contracts only resolve doubles entrants.
+    const canSwitchToSingles = false;
 
     function reserveOddMember() {
         if (!oddMemberId) return;
-        const next = createPairingDraft.removeMember(draft, oddMemberId);
-        next.reserveMemberIds = Array.from(new Set([...next.reserveMemberIds, oddMemberId]));
+        const next = createPairingDraft.reserveMember(draft, oddMemberId);
         update(next, { type: 'reserve_member', memberId: oddMemberId });
-    }
-
-    function switchFormat() {
-        if (!canSwitchToSingles) return;
-        update(draft, { type: 'switch_format', entrantType: 'singles' });
     }
 
     return (
@@ -135,10 +128,10 @@ export default function PairingBoard({ roster = [], selectedMemberIds = [], valu
                         </div>
                         {pair.memberIds.map((memberId) => (
                             <div key={memberId} className="pairing-member">
-                                <button type="button" aria-pressed={swapSource?.memberId === String(memberId)} onClick={() => pickSwap(pair.pairId, memberId)}>
+                                <button type="button" disabled={pair.locked} aria-pressed={swapSource?.memberId === String(memberId)} onClick={() => pickSwap(pair.pairId, memberId)}>
                                     Đổi người · {memberName(memberMap, memberId)}
                                 </button>
-                                <button type="button" onClick={() => removePerson(memberId)}>Bỏ khỏi cặp</button>
+                                <button type="button" disabled={pair.locked} onClick={() => removePerson(memberId)}>Bỏ khỏi cặp</button>
                             </div>
                         ))}
                     </article>
@@ -168,8 +161,8 @@ export default function PairingBoard({ roster = [], selectedMemberIds = [], valu
                         }) : <span>Không còn thành viên nào để thêm. Hãy quay lại Bước 1 để chọn thêm người.</span>}
                     </div>
                     <button type="button" data-choice="reserve_member" onClick={reserveOddMember}>reserve_member · Đưa {memberName(memberMap, oddMemberId)} vào dự bị ngoài danh sách thi đấu</button>
-                    <button type="button" data-choice="switch_format" disabled={!canSwitchToSingles} aria-describedby={!canSwitchToSingles ? 'pairing-switch-format-reason' : undefined} onClick={switchFormat}>switch_format · Đổi sang đánh đơn</button>
-                    {!canSwitchToSingles ? <span id="pairing-switch-format-reason">Đánh đơn chưa được hỗ trợ trong cấu hình giải này.</span> : null}
+                    <button type="button" data-choice="switch_format" disabled={!canSwitchToSingles} aria-describedby="pairing-switch-format-reason">switch_format · Đổi sang đánh đơn</button>
+                    <span id="pairing-switch-format-reason">Chưa thể đổi sang đánh đơn: bốc thăm và bước rà soát hiện chưa hỗ trợ workflow đánh đơn hoàn chỉnh.</span>
                 </div>
             ) : null}
         </section>

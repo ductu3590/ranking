@@ -50,7 +50,13 @@ check.ok(
 // ---------- 2. từng bất biến cũ phải còn một chỗ sống ----------
 
 // (a) Không "thành công giả": finalize ghi nguyên tử phía server.
-check.match(finalizeRoute, /\bstage_plan\b|\bstagePlan\b/, 'finalize nhận stage plan để ghi cùng một lần');
+// R3 derives stages inside the transaction from the persisted draft, not client stage_plan.
+check.match(finalizeRoute, /rpc\('finalize_internal_doubles_group_knockout_v2'/, 'finalize gọi đúng RPC dựng stage từ draft đã lưu');
+const finalizeSql = readSource('database/migrations/092_internal_doubles_group_knockout_finalize.sql');
+check.match(finalizeSql, /v_draft\s*:=\s*d\.setup_draft/, 'RPC đọc snapshot draft đã lưu');
+check.ok((finalizeSql.match(/INSERT INTO public\.tournament_stages\(/g) || []).length === 2,
+    'RPC ghi đủ hai stage trong cùng transaction');
+check.match(finalizeSql, /INSERT INTO public\.tournament_stage_transitions/, 'RPC ghi tuyến đi tiếp tường minh');
 check.match(finalizeRoute, /rpc\(/, 'finalize đi qua RPC, không phải chuỗi request nối tiếp từ client');
 check.ok(
     exists('lib/tournament/setupFinalize.js'),

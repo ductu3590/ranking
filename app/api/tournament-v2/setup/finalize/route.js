@@ -2,63 +2,67 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { requireValidatedGroupAdmin } from '@/lib/groupSession';
-import { mapRpcError, validateFinalizePayload } from '@/lib/tournament/setupFinalize';
 
 const db = supabaseAdmin || supabaseServer;
 
-// The legacy draw RPC is intentionally used only for the final stage checkpoint.
-// It writes stage entrants and fixtures in one database transaction;
-// the existing stage-entrant table remains the only slot persistence path.
+function finalizeError(code, message, status = 400) {
+    const error = new Error(message);
+    error.code = code;
+    error.status = status;
+    return error;
+}
+
+function validId(value) {
+    return /^\d+$/.test(String(value || '')) && Number(value) > 0;
+}
+
+function mapRpcError(error) {
+    const message = error?.message || 'Không thể chốt bốc thăm';
+    const code = [
+        'SETUP_REVISION_CONFLICT', 'ROSTER_LOCKED', 'DRAW_FINGERPRINT_MISMATCH',
+        'FINALIZE_STRUCTURE_ALREADY_EXISTS', 'IDEMPOTENCY_KEY_REUSED',
+        'TOURNAMENT_ATHLETE_CLUB_SCOPE_MISMATCH',
+    ].find((candidate) => message.includes(candidate)) || 'FINALIZE_NOT_ATOMIC';
+    return finalizeError(code, message, error?.code === 'P0002' ? 404 : 409);
+}
+
 export async function POST(request) {
     const admin = await requireValidatedGroupAdmin();
     if (!admin.ok) return admin.response;
     try {
         const body = await request.json();
-        const { tournamentId, divisionId, expectedRevision, idempotencyKey } = validateFinalizePayload(body);
-        const draft = body?.draft && typeof body.draft === 'object' ? body.draft : {};
-        const invitedClubs = Array.isArray(draft.invitedClubs) ? draft.invitedClubs : [];
-        if (draft?.tournament?.organizerMode === 'friendly' && invitedClubs.length === 0) {
-            const error = new Error('Hãy mời ít nhất một CLB trước khi chốt giải giao hữu.');
-            error.code = 'NO_CLUB_INVITED';
-            error.status = 400;
-            throw error;
+        const tournamentId = body?.tournamentId ?? body?.tournament_id;
+        const divisionId = body?.divisionId ?? body?.division_id;
+        const expectedRevision = Number(body?.expectedRevision ?? body?.expected_revision);
+        const idempotencyKey = String(body?.idempotencyKey ?? body?.idempotency_key ?? '').trim();
+        const previewFingerprint = String(body?.previewFingerprint ?? body?.preview_fingerprint ?? '').trim();
+        if (!validId(tournamentId) || !validId(divisionId) || !Number.isSafeInteger(expectedRevision) || expectedRevision < 1
+            || !idempotencyKey || idempotencyKey.length > 200 || !/^[a-f0-9]{64}$/i.test(previewFingerprint)) {
+            throw finalizeError('SETUP_PAYLOAD_INVALID', 'Thông tin chốt bốc thăm không hợp lệ.');
         }
-        const stages = Array.isArray(body.stage_plan) ? body.stage_plan : body.stagePlan;
-        const draw = body.draw;
-        const normalizedStages = stages.map((stage) => ({
-            stage_id: Number(stage?.stage_id ?? stage?.stageId),
-            expected_config: stage.expected_config ?? stage.expectedConfig,
-            matches: stage.matches || [],
-        }));
-        if (normalizedStages.some((stage) => !Number.isSafeInteger(stage.stage_id) || stage.stage_id < 1)) {
-            const error = new Error('stage_id không hợp lệ');
-            error.code = 'STAGE_PLAN_INVALID';
-            throw error;
-        }
-        const { data, error } = await db.rpc('finalize_unified_setup_v2', {
+        const { data, error } = await db.rpc('finalize_internal_doubles_group_knockout_v2', {
             p_group_id: Number(admin.groupId),
-            p_tournament_id: tournamentId,
-            p_division_id: divisionId,
-            p_expected_revision: expectedRevision,
-            p_stage_plan: normalizedStages,
+            p_tournament_id: Number(tournamentId),
+            p_division_id: Number(divisionId),
+            p_expected_setup_revision: expectedRevision,
             p_idempotency_key: idempotencyKey,
-            p_invited_clubs: invitedClubs,
+            p_preview_fingerprint: previewFingerprint.toLowerCase(),
         });
         if (error) throw mapRpcError(error);
 
         return NextResponse.json({
             success: true,
-            tournamentId,
-            divisionId,
-            revision: expectedRevision + 1,
-            redirect: `/giai-dau/${tournamentId}/lich-thi-dau`,
-            stages: data?.stages || [],
-            draw: { ...draw, status: 'locked' },
+            ...(data || {}),
+            tournamentId: Number(tournamentId),
+            divisionId: Number(divisionId),
+            revision: Number(data?.setup_revision || expectedRevision + 1),
+            redirect: `/dieu-hanh-giai/${tournamentId}?step=schedule`,
         });
     } catch (error) {
         console.error('Setup finalize error:', error);
         return NextResponse.json({
-            error: { code: error.code || 'FINALIZE_NOT_ATOMIC', message: error.message },
-        }, { status: error.status || (error.code === 'STAGE_PLAN_INVALID' ? 400 : 409) });
+            error: error.message || 'Không thể chốt bốc thăm',
+            code: error.code || 'FINALIZE_NOT_ATOMIC',
+        }, { status: error.status || 409 });
     }
 }

@@ -4,12 +4,18 @@ const { spawnSync } = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const files = fs.readdirSync(__dirname)
-    .filter((file) => file.endsWith('.test.js'))
-    .sort();
+function discoverTests(directory) {
+    return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+        const fullPath = path.join(directory, entry.name);
+        if (entry.isDirectory()) return discoverTests(fullPath);
+        return entry.isFile() && entry.name.endsWith('.test.js') ? [fullPath] : [];
+    });
+}
+
+const files = discoverTests(__dirname).sort();
 const results = files.map((file) => ({
-    file,
-    code: spawnSync(process.execPath, [path.join(__dirname, file)], { stdio: 'inherit' }).status,
+    file: path.relative(__dirname, file),
+    code: spawnSync(process.execPath, [file], { stdio: 'inherit' }).status,
 }));
 
 console.log('\n=== unified-setup-v2 red-test summary ===');

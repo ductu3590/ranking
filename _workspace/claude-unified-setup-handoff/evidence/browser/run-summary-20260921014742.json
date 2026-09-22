@@ -1,0 +1,106 @@
+{
+  "started_at": "2026-09-21T01:47:42.243Z",
+  "finished_at": "2026-09-21T01:47:42.654Z",
+  "base_url": "",
+  "group_id": "",
+  "tenant_b_group_id": null,
+  "counts": {
+    "PASS": 0,
+    "FAIL": 0,
+    "BLOCKED": 13
+  },
+  "scenarios": [
+    {
+      "status": "BLOCKED",
+      "id": "A-journey-bronze-off",
+      "title": "05 A1-A8 khong tranh hang ba: 14 VDV -> 7 cap -> 2 bang 4/3 -> 9 tran -> 12 tran, hai doi thua ban ket DONG hang ba",
+      "required": true,
+      "detail": "PICKHUB_QA_BASE_URL chua dat: khong co server nao dang chay checkout nay ;; PICKHUB_QA_ADMIN_SESSION chua dat: khong co cookie group_session admin (khong duoc bia) ;; PICKHUB_QA_GROUP_ID chua dat: khong ghi/doi chieu duoc pham vi ;; CHROME_EXECUTABLE chua dat va playwright khong co browser tai san ;; base URL khong tra loi ;; cookie duoc cung cap khong phai phien admin hop le cua group da cau hinh ;; server khong ho tro action `replace_participants` (RPC replace_division_participants_revisioned chua deploy) ;; server khong ho tro action `configure_top_two_playoff`"
+    },
+    {
+      "status": "BLOCKED",
+      "id": "A-journey-bronze-on",
+      "title": "05 A1-A8 co tranh hang ba: 13 tran, tranh hang ba xong TRUOC chung ket khong lam nguoi thang thanh vo dich (E2)",
+      "required": true,
+      "detail": "PICKHUB_QA_BASE_URL chua dat: khong co server nao dang chay checkout nay ;; PICKHUB_QA_ADMIN_SESSION chua dat: khong co cookie group_session admin (khong duoc bia) ;; PICKHUB_QA_GROUP_ID chua dat: khong ghi/doi chieu duoc pham vi ;; CHROME_EXECUTABLE chua dat va playwright khong co browser tai san ;; base URL khong tra loi ;; cookie duoc cung cap khong phai phien admin hop le cua group da cau hinh ;; server khong ho tro action `replace_participants` (RPC replace_division_participants_revisioned chua deploy) ;; server khong ho tro action `configure_top_two_playoff`"
+    },
+    {
+      "status": "BLOCKED",
+      "id": "A-wizard-reload-resume",
+      "title": "05 A3: tai lai GIUA CAC CHECKPOINT DA PERSIST -> wizard tiep tuc dung giai do, khong nhan doi giai / VDV / cap",
+      "required": true,
+      "detail": "PICKHUB_QA_BASE_URL chua dat: khong co server nao dang chay checkout nay ;; PICKHUB_QA_ADMIN_SESSION chua dat: khong co cookie group_session admin (khong duoc bia) ;; PICKHUB_QA_GROUP_ID chua dat: khong ghi/doi chieu duoc pham vi ;; CHROME_EXECUTABLE chua dat va playwright khong co browser tai san ;; base URL khong tra loi ;; cookie duoc cung cap khong phai phien admin hop le cua group da cau hinh ;; server khong ho tro action `replace_participants` (RPC replace_division_participants_revisioned chua deploy) ;; server khong ho tro action `configure_top_two_playoff`"
+    },
+    {
+      "status": "BLOCKED",
+      "id": "T-tiebreak-changes-rank-and-qualifiers",
+      "title": "Tie-break khac mac dinh doi THU HANG va SUAT A1/A2 (legacy_v2 => C,A,B,D | phong_trao_mac_dinh => A,C,B,D)",
+      "required": true,
+      "detail": "PICKHUB_QA_BASE_URL chua dat: khong co server nao dang chay checkout nay ;; PICKHUB_QA_ADMIN_SESSION chua dat: khong co cookie group_session admin (khong duoc bia) ;; PICKHUB_QA_GROUP_ID chua dat: khong ghi/doi chieu duoc pham vi ;; CHROME_EXECUTABLE chua dat va playwright khong co browser tai san ;; base URL khong tra loi ;; cookie duoc cung cap khong phai phien admin hop le cua group da cau hinh ;; server khong ho tro action `replace_participants` (RPC replace_division_participants_revisioned chua deploy) ;; server khong ho tro action `configure_top_two_playoff` ;; endpoint /api/tournament-v2/rules khong san sang (khong doi duoc chinh sach tie-break)"
+    },
+    {
+      "status": "BLOCKED",
+      "id": "T-tiebreak-change-blocked-after-seed",
+      "title": "Doi chinh sach tie-break SAU khi da seed play-off bi chan 409 (E5), khong am tham doi BXH",
+      "required": true,
+      "detail": "PICKHUB_QA_BASE_URL chua dat: khong co server nao dang chay checkout nay ;; PICKHUB_QA_ADMIN_SESSION chua dat: khong co cookie group_session admin (khong duoc bia) ;; PICKHUB_QA_GROUP_ID chua dat: khong ghi/doi chieu duoc pham vi ;; CHROME_EXECUTABLE chua dat va playwright khong co browser tai san ;; base URL khong tra loi ;; cookie duoc cung cap khong phai phien admin hop le cua group da cau hinh ;; server khong ho tro action `replace_participants` (RPC replace_division_participants_revisioned chua deploy) ;; server khong ho tro action `configure_top_two_playoff` ;; endpoint /api/tournament-v2/rules khong san sang (khong doi duoc chinh sach tie-break)"
+    },
+    {
+      "status": "BLOCKED",
+      "id": "C-correction-blocked-then-unseed-recovers",
+      "title": "Sua ket qua vong bang sau khi seed -> 409; go seed tren GIAO DIEN -> sua duoc -> tien cap lai ra suat dung",
+      "required": true,
+      "detail": "PICKHUB_QA_BASE_URL chua dat: khong co server nao dang chay checkout nay ;; PICKHUB_QA_ADMIN_SESSION chua dat: khong co cookie group_session admin (khong duoc bia) ;; PICKHUB_QA_GROUP_ID chua dat: khong ghi/doi chieu duoc pham vi ;; CHROME_EXECUTABLE chua dat va playwright khong co browser tai san ;; base URL khong tra loi ;; cookie duoc cung cap khong phai phien admin hop le cua group da cau hinh ;; server khong ho tro action `replace_participants` (RPC replace_division_participants_revisioned chua deploy) ;; server khong ho tro action `configure_top_two_playoff` ;; server khong ho tro action `unseed_playoff` (RPC unseed_division_group_playoff chua deploy)"
+    },
+    {
+      "status": "BLOCKED",
+      "id": "C-unseed-refused-when-downstream-started",
+      "title": "Go seed bi tu choi 409 khi tran vong sau da co ket qua; khong dung gi toi du lieu",
+      "required": true,
+      "detail": "PICKHUB_QA_BASE_URL chua dat: khong co server nao dang chay checkout nay ;; PICKHUB_QA_ADMIN_SESSION chua dat: khong co cookie group_session admin (khong duoc bia) ;; PICKHUB_QA_GROUP_ID chua dat: khong ghi/doi chieu duoc pham vi ;; CHROME_EXECUTABLE chua dat va playwright khong co browser tai san ;; base URL khong tra loi ;; cookie duoc cung cap khong phai phien admin hop le cua group da cau hinh ;; server khong ho tro action `replace_participants` (RPC replace_division_participants_revisioned chua deploy) ;; server khong ho tro action `configure_top_two_playoff` ;; server khong ho tro action `unseed_playoff` (RPC unseed_division_group_playoff chua deploy)"
+    },
+    {
+      "status": "BLOCKED",
+      "id": "B-conflict-409-rehydrate-requires-confirm",
+      "title": "409 tren giao dien -> panel tu tai lai trang thai moi va YEU CAU xac nhan, khong tu ghi tiep",
+      "required": true,
+      "detail": "PICKHUB_QA_BASE_URL chua dat: khong co server nao dang chay checkout nay ;; PICKHUB_QA_ADMIN_SESSION chua dat: khong co cookie group_session admin (khong duoc bia) ;; PICKHUB_QA_GROUP_ID chua dat: khong ghi/doi chieu duoc pham vi ;; CHROME_EXECUTABLE chua dat va playwright khong co browser tai san ;; base URL khong tra loi ;; cookie duoc cung cap khong phai phien admin hop le cua group da cau hinh ;; server khong ho tro action `replace_participants` (RPC replace_division_participants_revisioned chua deploy) ;; server khong ho tro action `configure_top_two_playoff` ;; PICKHUB_QA_ADMIN_SESSION_B chua dat: kich ban hai admin / revision cu can phien thu hai"
+    },
+    {
+      "status": "BLOCKED",
+      "id": "B-member-role-ui-and-api",
+      "title": "Thanh vien: giao dien khong lo hanh dong quan tri VA moi mutation qua API deu bi tu choi",
+      "required": true,
+      "detail": "PICKHUB_QA_BASE_URL chua dat: khong co server nao dang chay checkout nay ;; PICKHUB_QA_ADMIN_SESSION chua dat: khong co cookie group_session admin (khong duoc bia) ;; PICKHUB_QA_GROUP_ID chua dat: khong ghi/doi chieu duoc pham vi ;; CHROME_EXECUTABLE chua dat va playwright khong co browser tai san ;; base URL khong tra loi ;; cookie duoc cung cap khong phai phien admin hop le cua group da cau hinh ;; server khong ho tro action `replace_participants` (RPC replace_division_participants_revisioned chua deploy) ;; server khong ho tro action `configure_top_two_playoff` ;; PICKHUB_QA_MEMBER_SESSION chua dat: kich ban member-role can mot phien khong phai admin"
+    },
+    {
+      "status": "BLOCKED",
+      "id": "B-tenant-isolation",
+      "title": "Tenant B khong doc/ghi duoc du lieu cua tenant A du biet du id cha-con",
+      "required": true,
+      "detail": "PICKHUB_QA_BASE_URL chua dat: khong co server nao dang chay checkout nay ;; PICKHUB_QA_ADMIN_SESSION chua dat: khong co cookie group_session admin (khong duoc bia) ;; PICKHUB_QA_GROUP_ID chua dat: khong ghi/doi chieu duoc pham vi ;; CHROME_EXECUTABLE chua dat va playwright khong co browser tai san ;; base URL khong tra loi ;; cookie duoc cung cap khong phai phien admin hop le cua group da cau hinh ;; server khong ho tro action `replace_participants` (RPC replace_division_participants_revisioned chua deploy) ;; server khong ho tro action `configure_top_two_playoff` ;; PICKHUB_QA_TENANT_B_SESSION chua dat: cach ly tenant can admin cua mot CLB khac"
+    },
+    {
+      "status": "BLOCKED",
+      "id": "B-viewports-and-tap-targets",
+      "title": "Wizard + console dung o 375/390/768/1440: khong tran ngang, khong con control quan trong duoi 44px",
+      "required": true,
+      "detail": "PICKHUB_QA_BASE_URL chua dat: khong co server nao dang chay checkout nay ;; PICKHUB_QA_ADMIN_SESSION chua dat: khong co cookie group_session admin (khong duoc bia) ;; PICKHUB_QA_GROUP_ID chua dat: khong ghi/doi chieu duoc pham vi ;; CHROME_EXECUTABLE chua dat va playwright khong co browser tai san ;; base URL khong tra loi ;; cookie duoc cung cap khong phai phien admin hop le cua group da cau hinh ;; server khong ho tro action `replace_participants` (RPC replace_division_participants_revisioned chua deploy) ;; server khong ho tro action `configure_top_two_playoff`"
+    },
+    {
+      "status": "BLOCKED",
+      "id": "B-legacy-singles-regression",
+      "title": "Giai DON (duong legacy) van tao duoc va khong bi day sang duong dinh danh cap doi",
+      "required": true,
+      "detail": "PICKHUB_QA_BASE_URL chua dat: khong co server nao dang chay checkout nay ;; PICKHUB_QA_ADMIN_SESSION chua dat: khong co cookie group_session admin (khong duoc bia) ;; PICKHUB_QA_GROUP_ID chua dat: khong ghi/doi chieu duoc pham vi ;; CHROME_EXECUTABLE chua dat va playwright khong co browser tai san ;; base URL khong tra loi ;; cookie duoc cung cap khong phai phien admin hop le cua group da cau hinh ;; server khong ho tro action `replace_participants` (RPC replace_division_participants_revisioned chua deploy) ;; server khong ho tro action `configure_top_two_playoff`"
+    },
+    {
+      "status": "BLOCKED",
+      "id": "repair-dry-run-legacy",
+      "title": "05 C (TUY CHON): dry-run sua cap legacy — chi doc, khong ghi gi, anh xa theo entry_member id",
+      "required": false,
+      "detail": "PICKHUB_QA_BASE_URL chua dat: khong co server nao dang chay checkout nay ;; PICKHUB_QA_ADMIN_SESSION chua dat: khong co cookie group_session admin (khong duoc bia) ;; PICKHUB_QA_GROUP_ID chua dat: khong ghi/doi chieu duoc pham vi ;; base URL khong tra loi ;; cookie duoc cung cap khong phai phien admin hop le cua group da cau hinh ;; server khong ho tro action `repair_legacy_pairs` (RPC repair_legacy_division_pair_identity chua deploy) ;; PICKHUB_QA_ALLOW_T47_DRYRUN=1 va PICKHUB_QA_T47=<tournamentId>:<divisionId> la bat buoc truoc khi cham vao giai cu, ke ca chi doc"
+    }
+  ],
+  "created_scope": []
+}

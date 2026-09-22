@@ -17,7 +17,6 @@ export default function ClubSettings() {
     const [qr, setQr] = useState({ joinUrl: '', qrCodeDataUrl: '' });
     const [form, setForm] = useState({ name: '', description: '', shameBadgesEnabled: true });
     const [logoUrl, setLogoUrl] = useState(null);
-    const [fundQrUrl, setFundQrUrl] = useState(null);
     const [passwordForm, setPasswordForm] = useState({ next: '', confirm: '' });
     const [changingPassword, setChangingPassword] = useState(false);
     const [memberPasswordForm, setMemberPasswordForm] = useState({ next: '', confirm: '' });
@@ -54,7 +53,6 @@ export default function ClubSettings() {
                 shameBadgesEnabled: data.group.shame_badges_enabled !== false,
             });
             setLogoUrl(data.group.logo_url || null);
-            setFundQrUrl(data.group.fund_qr_url || null);
         } else {
             showToast(data.error || 'Không tải được cài đặt.', 'error');
         }
@@ -112,51 +110,6 @@ export default function ClubSettings() {
             showToast('Đã đặt mật khẩu thành viên mới. Hãy gửi lại mã CLB và mật khẩu cho cả nhóm.');
         } else {
             showToast(data.error || 'Không đặt được mật khẩu thành viên.', 'error');
-        }
-    }
-
-    function handlePickFundQr(event) {
-        const file = event.target.files?.[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = () => {
-            const img = new Image();
-            img.onload = () => {
-                const MAX = 640;
-                const scale = Math.min(1, MAX / Math.max(img.width, img.height));
-                const canvas = document.createElement('canvas');
-                canvas.width = Math.round(img.width * scale);
-                canvas.height = Math.round(img.height * scale);
-                canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-                // PNG chu khong WebP: QR nen mat du lieu bi ro canh, may quet doc loi.
-                const dataUrl = canvas.toDataURL('image/png');
-                if (dataUrl.length > 280000) {
-                    showToast('Ảnh QR quá lớn, hãy chọn ảnh nhỏ hơn 200KB.', 'error');
-                    return;
-                }
-                                setFundQrUrl(dataUrl);
-                showToast('Đã chọn ảnh QR, bấm "Lưu QR" để áp dụng.');
-            };
-            img.src = reader.result;
-        };
-        reader.readAsDataURL(file);
-    }
-
-    async function handleSaveFundQr(nextValue) {
-                showToast('');
-        const res = await fetch('/api/club/settings', {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ fundQrUrl: nextValue }),
-        });
-        const data = await res.json();
-        if (res.ok) {
-            setGroup(data.group);
-            setFundQrUrl(data.group.fund_qr_url || null);
-            notifyClubSettingsChanged();
-            showToast(nextValue ? 'Đã lưu ảnh QR nhận quỹ.' : 'Đã xoá ảnh QR nhận quỹ.');
-        } else {
-            showToast(data.error || 'Không lưu được ảnh QR.', 'error');
         }
     }
 
@@ -281,7 +234,6 @@ export default function ClubSettings() {
                 </div>
                 <div className="club-settings__right">
                     <section className="set-group" id="set-code"><SettingsCardHeading title="Mã CLB & QR tham gia" description="Mã định danh duy nhất cho toàn bộ thành viên" badge="Đang kích hoạt" /><div className="club-settings-code"><label>Mã CLB<input value={group.code} readOnly tabIndex={-1} /></label>{qr.qrCodeDataUrl && <img src={qr.qrCodeDataUrl} alt={`QR tham gia ${group.code}`} />}<p className="set-note">Mã CLB là định danh cố định. Chỉ superadmin đổi trực tiếp trong Supabase; việc đổi mã sẽ đăng xuất các phiên đang truy cập.</p></div></section>
-                    <section className="set-group" id="set-qr"><SettingsCardHeading title="QR nhận quỹ thành viên" description="Hiển thị ở trang Tổng quan quỹ để thành viên quét nộp" /><div className="set-qr-row">{fundQrUrl ? <img className="set-qr-preview" src={fundQrUrl} alt="QR nhận quỹ CLB" /> : <span className="set-qr-empty">Chưa có ảnh QR</span>}<div className="set-qr-side"><label>Ảnh QR (PNG/JPG, tối đa 200KB)<input type="file" accept="image/png,image/jpeg" onChange={handlePickFundQr} /></label><div className="set-qr-actions"><button type="button" className="ph-btn ph-btn--primary ph-btn--sm" onClick={() => handleSaveFundQr(fundQrUrl)} disabled={!fundQrUrl}>Lưu QR</button><button type="button" className="ph-btn ph-btn--danger ph-btn--sm" onClick={() => handleSaveFundQr(null)} disabled={!group.fund_qr_url}>Xoá QR</button></div><small>Sau khi tải lên, QR sẽ tự động hiện ở giao diện nộp quỹ tháng của CLB.</small></div></div></section>
                 </div>
             </div>
             <section className="set-group club-settings__security"><SettingsCardHeading title="Mật khẩu & phân quyền" description="Bảo mật tài khoản quản trị và mã vào cho thành viên" badge="Bảo mật CLB" /><div className="club-settings__password-grid"><form className="club-settings-account" id="set-pw-admin" onSubmit={handleChangePassword}><h3>1. Mật khẩu quản trị viên</h3><p>Đổi mật khẩu đăng nhập tài khoản quản trị của bạn.</p><label>Mật khẩu mới<input type="password" value={passwordForm.next} onChange={(e) => setPasswordForm((p) => ({ ...p, next: e.target.value }))} minLength="6" placeholder="••••••" /></label><label>Xác nhận mật khẩu<input type="password" value={passwordForm.confirm} onChange={(e) => setPasswordForm((p) => ({ ...p, confirm: e.target.value }))} minLength="6" placeholder="••••••" /></label><button type="submit" className="club-settings-save" disabled={changingPassword}>{changingPassword ? 'Đang đổi...' : 'Đổi mật khẩu quản trị'}</button></form><form className="club-settings-account" id="set-pw-member" onSubmit={handleChangeMemberPassword}><h3>2. Mật khẩu thành viên chung</h3><p>Mật khẩu dùng chung khi thành viên truy cập qua mã CLB.</p><label>Mật khẩu mới<input type="password" value={memberPasswordForm.next} onChange={(e) => setMemberPasswordForm((p) => ({ ...p, next: e.target.value }))} minLength="4" placeholder="••••" /></label><label>Xác nhận mật khẩu<input type="password" value={memberPasswordForm.confirm} onChange={(e) => setMemberPasswordForm((p) => ({ ...p, confirm: e.target.value }))} minLength="4" placeholder="••••" /></label><button type="submit" className="club-settings-save" disabled={changingMemberPassword}>{changingMemberPassword ? 'Đang đổi...' : 'Đổi mật khẩu thành viên'}</button></form></div></section>

@@ -102,6 +102,28 @@
     padding: 12px;
 }
 
+.pairing-hint {
+    margin: 0;
+    padding: 8px 10px;
+    border-radius: 12px;
+    background: #ecfeff;
+    color: #0e7490;
+    font-size: 0.9rem;
+    line-height: 1.35;
+}
+
+.pairing-unpaired-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.pairing-unpaired button[aria-pressed="true"] {
+    border-color: #0f766e;
+    background: #0f766e;
+    color: #ffffff;
+}
+
 .pairing-odd {
     display: grid;
     gap: 8px;

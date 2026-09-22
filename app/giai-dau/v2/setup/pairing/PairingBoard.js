@@ -18,6 +18,7 @@ function ensureDraft(value, selectedMemberIds) {
 export default function PairingBoard({ roster = [], selectedMemberIds = [], value, onChange, entrantType = 'doubles', supportedEntrantTypes = [] }) {
     const [mode, setMode] = useState('automatic');
     const [swapSource, setSwapSource] = useState(null);
+    const [pairSource, setPairSource] = useState(null);
     const draft = ensureDraft(value, selectedMemberIds.map(String));
     const memberMap = useMemo(() => new Map(roster.map((member) => [String(member.member_id ?? member.memberId ?? member.id), member])), [roster]);
     const blockers = createPairingDraft.finalizeBlockers(draft);
@@ -32,6 +33,7 @@ export default function PairingBoard({ roster = [], selectedMemberIds = [], valu
     }
 
     function removePerson(memberId) {
+        if (pairSource?.memberId === String(memberId)) setPairSource(null);
         update(createPairingDraft.removeMember(draft, memberId));
     }
 
@@ -41,6 +43,7 @@ export default function PairingBoard({ roster = [], selectedMemberIds = [], valu
 
     function regenerateUnlockedPairs() {
         if (!window.confirm('Ghép lại các cặp chưa khóa? Các cặp đã khóa sẽ được giữ nguyên.')) return;
+        setPairSource(null);
         update(createPairingDraft.regenerateUnlockedPairs(draft));
     }
 
@@ -50,7 +53,28 @@ export default function PairingBoard({ roster = [], selectedMemberIds = [], valu
 
     function applyAutomaticPreview() {
         const next = createPairingDraft.regenerateUnlockedPairs(draft);
+        setPairSource(null);
         update(next);
+    }
+
+    function pickPair(memberId) {
+        const id = String(memberId);
+        if (!pairSource) {
+            setPairSource({ memberId: id });
+            return;
+        }
+        if (pairSource.memberId === id) {
+            setPairSource(null);
+            return;
+        }
+        const nextPairs = [...draft.pairs.map((pair) => pair.memberIds.slice()), [pairSource.memberId, id]];
+        try {
+            const next = createPairingDraft.pairMembers(draft, nextPairs);
+            setPairSource(null);
+            update(next);
+        } catch (err) {
+            setPairSource(null);
+        }
     }
 
     function pickSwap(pairId, memberId) {
@@ -89,7 +113,7 @@ export default function PairingBoard({ roster = [], selectedMemberIds = [], valu
                 <div>
                     <p className="setup-eyebrow">Ghép cặp</p>
                     <h2>Xác nhận các cặp thi đấu</h2>
-                    <p>Ghép cặp ổn định theo member_id. Mobile dùng nút rõ ràng, không cần kéo-thả.</p>
+                    <p>Ghép thủ công: bấm 1 người trong danh sách chưa ghép, rồi bấm người thứ 2 để tạo cặp. Không cần kéo-thả.</p>
                 </div>
                 <div className="pairing-mode" role="group" aria-label="Chế độ ghép cặp">
                     <button type="button" aria-pressed={mode === 'manual'} onClick={() => setMode('manual')}>Thủ công</button>
@@ -134,11 +158,26 @@ export default function PairingBoard({ roster = [], selectedMemberIds = [], valu
 
             <section className="pairing-unpaired" aria-label="Danh sách chưa ghép">
                 <h3>Danh sách chưa ghép</h3>
-                {draft.unpairedMemberIds.length === 0 ? <p>Không còn người chờ ghép.</p> : null}
+                {draft.unpairedMemberIds.length === 0 ? <p>Không còn người chờ ghép.</p> : (
+                    <p className="pairing-hint">
+                        {pairSource
+                            ? `Đã chọn ${memberName(memberMap, pairSource.memberId)}. Bấm người thứ 2 để ghép cặp, hoặc bấm lại để bỏ chọn.`
+                            : 'Bấm một người, rồi bấm người thứ 2 để ghép thành cặp.'}
+                    </p>
+                )}
                 {draft.unpairedMemberIds.map((memberId) => (
                     <div key={memberId} className="pairing-unpaired-row">
                         <span>{memberName(memberMap, memberId)}</span>
-                        <button type="button" onClick={() => removePerson(memberId)}>Bỏ khỏi danh sách</button>
+                        <div className="pairing-unpaired-actions">
+                            <button
+                                type="button"
+                                aria-pressed={pairSource?.memberId === String(memberId)}
+                                onClick={() => pickPair(memberId)}
+                            >
+                                {pairSource?.memberId === String(memberId) ? 'Bỏ chọn' : pairSource ? 'Ghép với người này' : 'Chọn để ghép'}
+                            </button>
+                            <button type="button" className="pairing-secondary" onClick={() => removePerson(memberId)}>Bỏ khỏi danh sách</button>
+                        </div>
                     </div>
                 ))}
             </section>

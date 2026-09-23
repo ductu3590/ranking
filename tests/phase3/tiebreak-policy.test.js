@@ -1,6 +1,9 @@
 const assert = require('assert');
 const { TIEBREAK_PRESETS, resolveTiebreak, rankStandings } = require('../../lib/tournament/rules/tiebreak');
+const { SCORING_PRESETS } = require('../../lib/tournament/rules/scoring');
 const { computeStandings } = require('../../lib/tournament/engines/roundRobin');
+assert.strictEqual(SCORING_PRESETS.phong_trao_mac_dinh.win_points, 1, 'phong_trao_mac_dinh tính thắng 1 điểm trận');
+assert.strictEqual(SCORING_PRESETS.phong_trao_mac_dinh.loss_points, 0, 'phong_trao_mac_dinh tính thua 0 điểm trận');
 assert.deepStrictEqual(TIEBREAK_PRESETS.phong_trao_mac_dinh.order, ['match_points', 'head_to_head', 'game_diff', 'point_diff', 'points_for', 'draw_lot']);
 assert.deepStrictEqual(TIEBREAK_PRESETS.giao_huu_clb.order, ['match_points', 'point_diff', 'points_for', 'head_to_head', 'draw_lot']);
 assert.deepStrictEqual(TIEBREAK_PRESETS.hieu_so_van_truoc.order, ['match_points', 'game_diff', 'head_to_head', 'point_diff', 'draw_lot']);

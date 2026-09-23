@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+
+<html lang="vi" style=""><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Thông tin thành viên - Pickleball 246 Club</title>
+<!-- Tailwind CSS v3 CDN with forms and container queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script data-purpose="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#F5F3FF',
+              100: '#EDE9FE',
+              200: '#DDD6FE',
+              300: '#C4B5FD',
+              400: '#A78BFA',
+              500: '#8B5CF6',
+              600: '#7C3AED',
+              700: '#6D28D9',
+              800: '#5B21B6',
+              900: '#4C1D95'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-scrollbars">
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="bg-[#F8FAFC] text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+<!-- BEGIN: AppLayoutWrapper -->
+<div class="flex-1 flex w-full min-h-screen">
+<!-- BEGIN: LeftSidebar -->
+<aside class="w-64 bg-white border-r border-slate-200/80 flex flex-col justify-between shrink-0 shadow-sm">
+<!-- Top Section: Brand & Navigation Menu -->
+<div>
+<!-- Club Brand Header -->
+<div class="px-5 py-5 border-b border-slate-100 flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-brand-600 flex items-center justify-center text-white font-black text-xl shadow-md shadow-brand-500/20">
+            P
+          </div>
+<div>
+<span class="text-[11px] font-bold text-slate-400 tracking-wider block uppercase leading-none mb-1">CÂU LẠC BỘ</span>
+<span class="font-bold text-slate-800 text-[15px] leading-tight block">Pickleball 246 Club</span>
+</div>
+</div>
+<!-- Menu Group -->
+<div class="p-4">
+<p class="text-[11px] font-bold text-slate-400 tracking-wider uppercase px-3 mb-2">MENU QUẢN LÝ</p>
+<nav aria-label="Menu chính" class="space-y-1.5">
+<!-- Item 1: Tổng quan quỹ -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 font-medium text-sm transition-colors group" href="#">
+<svg class="w-5 h-5 text-slate-400 group-hover:text-brand-600 transition-colors" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"></path>
+</svg>
+<span class="">Tổng quan quỹ</span>
+</a>
+<!-- Item 2: BXH Đóng góp -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 font-medium text-sm transition-colors group" href="#">
+<svg class="w-5 h-5 text-slate-400 group-hover:text-brand-600 transition-colors" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"></path>
+</svg>
+<span class="">Bảng xếp hạng đóng góp</span>
+</a>
+<!-- Item 3: Thành viên CLB -->
+<a class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 font-medium text-sm transition-colors group" href="#">
+<div class="flex items-center gap-3">
+<svg class="w-5 h-5 text-slate-400 group-hover:text-brand-600 transition-colors" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"></path>
+</svg>
+<span class="">Thành viên CLB</span>
+</div>
+<span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">30</span>
+</a>
+<!-- Item 4: Giải đấu nội bộ -->
+<a class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 font-medium text-sm transition-colors group" href="#">
+<div class="flex items-center gap-3">
+<svg class="w-5 h-5 text-slate-400 group-hover:text-brand-600 transition-colors" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"></path>
+</svg>
+<span class="">Giải đấu</span>
+</div>
+<span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">Hot</span>
+</a>
+<!-- Item 5: Thông tin thành viên (Active) -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-brand-100/70 text-brand-700 font-semibold text-sm shadow-sm" href="#">
+<svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="">Thông tin</span>
+<span class="ml-auto w-2 h-2 rounded-full bg-brand-600"></span>
+</a>
+<!-- Item 6: Cài đặt quỹ -->
+</nav>
+</div>
+</div>
+<!-- Bottom Profile Bar in Sidebar -->
+<div class="p-4 border-t border-slate-100 bg-slate-50/50">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5 overflow-hidden">
+<div class="w-8 h-8 rounded-lg bg-brand-200 text-brand-800 flex items-center justify-center font-bold text-xs shrink-0">
+              TU
+            </div>
+<div class="truncate">
+<p class="text-xs font-semibold text-slate-800 leading-snug truncate">CHƯA CÓ HỒ SƠ</p>
+<p class="text-[11px] text-slate-500 truncate">Thành viên</p>
+</div>
+</div>
+<button aria-label="Thông báo" class="text-slate-400 hover:text-brand-600 transition-colors relative p-1" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="absolute top-0.5 right-0.5 w-2 h-2 bg-emerald-500 rounded-full ring-2 ring-white"></span>
+</button>
+</div>
+</div>
+</aside>
+<!-- END: LeftSidebar -->
+<!-- BEGIN: MainContentArea -->
+<div class="flex-1 flex flex-col min-w-0 bg-[#F8FAFC]">
+<!-- Top Header Navigation -->
+<header class="h-16 bg-white/80 backdrop-blur-md border-b border-slate-200/80 px-8 flex items-center justify-between sticky top-0 z-20">
+<!-- Breadcrumb & Status -->
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-2 text-xs font-medium text-slate-500">
+<span class="">CLB CỦA TÔI</span>
+<svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="text-brand-600 font-semibold">HỒ SƠ ATHLETE / MEMBERSHIP</span>
+</div>
+<!-- Space Badge Indicator -->
+<div class="hidden md:flex items-center gap-2 px-2.5 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs ml-3">
+<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+<span class="text-slate-500">Không gian CLB:</span>
+<span class="font-semibold text-slate-700">Pickleball 246 Club</span>
+<span class="text-[10px] text-brand-600 font-mono bg-brand-50 px-1 py-0.5 rounded">P246CLUB</span>
+</div>
+</div>
+<!-- Role Selector & Session -->
+<div class="flex items-center gap-3">
+<div class="relative">
+</div>
+</div>
+</header>
+<!-- Scrollable Main Container -->
+<main class="flex-1 p-8 max-w-6xl w-full mx-auto space-y-6">
+<!-- BEGIN: PageTitleAndSelectorSection -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2 border-b border-slate-200/60">
+<div>
+<span class="text-xs font-bold text-brand-600 uppercase tracking-wider block mb-1">HỒ SƠ VẬN ĐỘNG VIÊN</span>
+<h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Thông tin thành viên</h1>
+<p class="text-sm text-slate-500 mt-1 max-w-xl">
+              Phiên dùng chung không xác nhận bạn là VĐV nào. Hãy chọn đúng hồ sơ trong CLB để xem dữ liệu công khai phù hợp.
+            </p>
+</div>
+<!-- Member Selector Dropdown -->
+<div class="shrink-0 w-full md:w-72">
+<label class="block text-xs font-semibold text-slate-500 mb-1.5" for="member-select">
+              Hồ sơ đang xem
+            </label>
+<div class="relative">
+<select class="w-full pl-3.5 pr-10 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-bold text-slate-800 shadow-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-200 appearance-none cursor-pointer transition" id="member-select">
+<option selected="" value="4">ĐẶNG NGỌC DƯƠNG</option>
+<option value="1">ĐỖ ĐỨC TÚ</option>
+<option value="2">BÙI VĂN SƠN</option>
+<option value="3">NGUYỄN NHẬT QUANG</option>
+<option value="5">VŨ NGỌC HƯNG</option>
+<option value="6">PHẠM XUÂN NGỌC HOÀNG</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</div>
+</div>
+</div>
+<!-- END: PageTitleAndSelectorSection -->
+<!-- BEGIN: ClaimAccountBanner -->
+<!-- Nút hành động & Banner liên kết tài khoản VĐV theo yêu cầu đặc biệt -->
+<!-- END: ClaimAccountBanner -->
+<!-- BEGIN: AthleteMainProfileCard -->
+<div class="bg-white rounded-2xl border border-slate-200/90 p-6 shadow-sm">
+<!-- Profile Top Header: Avatar, Name & Badges -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-slate-100 gap-4">
+<div class="flex items-center gap-4">
+<!-- Avatar Circle -->
+<div class="w-16 h-16 rounded-2xl bg-brand-100 text-brand-700 font-extrabold text-xl flex items-center justify-center shadow-inner">
+                ND
+              </div>
+<div>
+<span class="inline-block text-[11px] font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded tracking-wider uppercase mb-1">
+                  HỒ SƠ TRONG CLB
+                </span>
+<div class="flex flex-wrap items-center gap-2 mb-0.5"><h2 class="text-2xl font-black text-slate-900 tracking-tight">ĐẶNG NGỌC DƯƠNG</h2><span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-brand-50 text-brand-700 border border-brand-200 shadow-sm"><svg class="w-3.5 h-3.5 text-brand-600" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>Đã xác thực tài khoản chính chủ</span></div>
+<p class="text-xs text-slate-500 font-medium mt-0.5">
+                  Biệt danh: <span class="text-slate-700 font-semibold">ĐẶNG NGỌC DƯƠNG</span>
+</p>
+</div>
+</div>
+<!-- Role status tag -->
+<div>
+<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                Đang sinh hoạt tích cực
+              </span>
+</div>
+</div>
+<!-- Profile Metadata: 4 Key Metrics -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-6 pt-6">
+<!-- Col 1: Mã VĐV -->
+<div>
+<span class="text-xs font-semibold text-slate-400 block mb-1">Mã VĐV</span>
+<p class="text-xl font-black text-slate-900">4</p>
+</div>
+<!-- Col 2: Membership -->
+<div>
+<span class="text-xs font-semibold text-slate-400 block mb-1">Membership</span>
+<p class="text-xl font-black text-slate-900">4</p>
+</div>
+<!-- Col 3: Trạng thái -->
+<div>
+<span class="text-xs font-semibold text-slate-400 block mb-1">Trạng thái</span>
+<div>
+<span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold bg-brand-100 text-brand-700">
+                  Đang sinh hoạt
+                </span>
+</div>
+</div>
+<!-- Col 4: Ngày tham gia -->
+<div>
+<span class="text-xs font-semibold text-slate-400 block mb-1">Ngày tham gia</span>
+<p class="text-base font-bold text-slate-800">17/1/2026</p>
+</div>
+</div>
+</div>
+<!-- END: AthleteMainProfileCard -->
+<!-- BEGIN: LevelAndHistoryGrid -->
+<div class="bg-white rounded-2xl border border-slate-200/90 p-6 shadow-sm space-y-6"><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-100"><div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 ring-4 ring-emerald-50"></span><h3 class="text-base font-extrabold text-slate-900">Thông tin liên hệ &amp; Thông số thi đấu công khai</h3></div><span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200/60">Hồ sơ chính chủ đã cấp quyền chia sẻ</span></div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"><div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/60"><span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">SĐT / ZALO</span><p class="text-sm font-extrabold text-slate-800 font-mono mb-2">0988 246 789</p><div class="flex items-center gap-2"><button class="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition shadow-sm" type="button"><svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>Sao chép</button><a class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-brand-600 text-xs font-bold text-white hover:bg-brand-700 transition shadow-sm" href="https://zalo.me/0988246789" target="_blank"><svg class="w-3.5 h-3.5" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.82.49 3.53 1.34 5L2.05 21.4a.8.8 0 00.99.98L7.6 20.97C9.01 21.64 10.47 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"></path></svg>Nhắn Zalo</a></div></div><div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/60"><span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">FACEBOOK CÁ NHÂN</span><p class="text-xs font-bold text-slate-700 truncate mb-2">dangngocduong.pickle</p><a class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-50 border border-indigo-200 text-xs font-bold text-indigo-700 hover:bg-indigo-100 transition" href="https://facebook.com" target="_blank"><svg class="w-3.5 h-3.5 text-indigo-600" fill="currentColor" viewbox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"></path></svg>Kết nối FB</a></div><div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/60"><span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">EMAIL LIÊN HỆ</span><p class="text-xs font-bold text-slate-800 truncate mb-1">duong.dang@example.com</p><span class="text-[11px] text-slate-400">Thông báo quỹ &amp; Lịch đấu</span></div><div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/60"><span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">KHU VỰC SINH HOẠT</span><p class="text-sm font-extrabold text-slate-800 mb-1">Ba Đình, Hà Nội</p><span class="text-[11px] font-medium text-brand-600">Sân chính: Pickleball 246</span></div></div><div class="grid grid-cols-1 lg:grid-cols-3 gap-4 pt-2 border-t border-slate-100"><div class="lg:col-span-2 p-4 rounded-xl bg-brand-50 border border-brand-100"><div class="flex items-center gap-2 mb-1.5"><svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg><span class="text-xs font-bold text-brand-800 uppercase tracking-wider">Giới thiệu / Lời nhắn kết nối</span></div><p class="text-xs md:text-sm text-slate-700 leading-relaxed font-medium italic">“Thuận tay phải, sở trường đánh lưới phản xạ nhanh và dink bền bỉ. Rất mong muốn được ghép cặp giao lưu và tham dự các giải Pickleball đôi nam/nam nữ trình 2.5 - 3.0!”</p></div><div class="p-4 rounded-xl bg-slate-50 border border-slate-200/70 space-y-2"><span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">THÔNG SỐ THI ĐẤU</span><div class="flex items-center justify-between text-xs"><span class="text-slate-500">Tay thuận:</span><span class="font-bold text-slate-800">Tay phải</span></div><div class="flex items-center justify-between text-xs"><span class="text-slate-500">Vợt thi đấu:</span><span class="font-bold text-brand-700 truncate max-w-[150px] text-right" title="Selkirk Vanguard Power Air Invikta">Selkirk Power Air</span></div><div class="flex items-center justify-between text-xs"><span class="text-slate-500">Lối chơi:</span><span class="font-bold text-slate-800">Công thủ toàn diện</span></div></div></div></div><div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Left Card: Current Rating (PHR Cá Nhân) -->
+<div class="bg-white rounded-2xl border border-slate-200/90 p-6 shadow-sm flex flex-col justify-between">
+<div>
+<span class="text-[11px] font-bold text-brand-600 uppercase tracking-wider block mb-1">PHR CÁ NHÂN</span>
+<h3 class="text-xl font-extrabold text-slate-900 mb-6">Trình độ hiện tại</h3>
+<!-- Score & Category -->
+<div class="flex items-baseline gap-3 mb-4">
+<span class="text-5xl font-black text-slate-900 tracking-tight">2,9</span>
+<span class="text-lg font-bold text-brand-600 bg-brand-50 px-2.5 py-0.5 rounded-lg">Cơ bản</span>
+</div>
+<!-- Rating Progress Bar (Scale 1.0 - 5.0) -->
+<div class="space-y-1.5 mb-3">
+<div class="w-full bg-slate-100 h-3.5 rounded-full overflow-hidden p-0.5">
+<!-- 2.9 / 5.0 ~ 58% -->
+<div class="bg-gradient-to-r from-brand-500 to-brand-600 h-full rounded-full transition-all duration-500" style="width: 58%"></div>
+</div>
+<div class="flex justify-between text-[11px] font-medium text-slate-400">
+<span class="">1.0 (Tân thủ)</span>
+<span class="">2.9 Hiện tại</span>
+<span class="">3.5 (Khá)</span>
+<span class="">5.0 (Pro)</span>
+</div>
+</div>
+</div>
+<!-- Footer note -->
+<div class="pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+<div class="flex items-center gap-1.5">
+<svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="">Cập nhật: <strong class="text-slate-700">8/9/2026</strong></span>
+</div>
+<span class="bg-slate-100 px-2 py-0.5 rounded text-[11px] font-medium text-slate-600">Nguồn: Ban điều hành CLB</span>
+</div>
+</div>
+<!-- Right Card: Rating History Timeline -->
+<div class="bg-white rounded-2xl border border-slate-200/90 p-6 shadow-sm flex flex-col justify-between">
+<div>
+<span class="text-[11px] font-bold text-brand-600 uppercase tracking-wider block mb-1">LỊCH SỬ CẬP NHẬT</span>
+<h3 class="text-xl font-extrabold text-slate-900 mb-5">Các mốc trình độ</h3>
+<!-- Timeline Milestones -->
+<div class="relative pl-6 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-brand-100">
+<!-- Milestone 1 -->
+<div class="relative group">
+<span class="absolute -left-[23px] top-1.5 w-3.5 h-3.5 rounded-full bg-brand-600 ring-4 ring-brand-100"></span>
+<div>
+<div class="flex items-center gap-2">
+<span class="text-sm font-bold text-slate-800">Cơ bản · 2,9</span>
+<span class="text-[10px] font-semibold bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded">Mới nhất</span>
+</div>
+<p class="text-xs text-slate-500 mt-0.5">8/9/2026 · Trưởng nhóm ghi nhận sau buổi test skill &amp; giao lưu</p>
+</div>
+</div>
+<!-- Milestone 2 -->
+<div class="relative group">
+<span class="absolute -left-[23px] top-1.5 w-3.5 h-3.5 rounded-full bg-slate-300 ring-4 ring-slate-100"></span>
+<div>
+<div class="flex items-center gap-2">
+<span class="text-sm font-semibold text-slate-700">Tân thủ · 2,5</span>
+</div>
+<p class="text-xs text-slate-500 mt-0.5">17/1/2026 · Đánh giá đầu vào khi đăng ký tham gia sinh hoạt</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Extra Info Card Footer -->
+<div class="pt-4 border-t border-slate-100">
+<a class="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 hover:text-brand-700 transition" href="#">
+<span class="">Xem quy chuẩn đánh giá trình độ DUPR / PHR của CLB</span>
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+<!-- END: LevelAndHistoryGrid -->
+<!-- BEGIN: AdditionalStatsSection -->
+<div class="bg-white rounded-2xl border border-slate-200/90 p-6 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<h4 class="text-sm font-bold text-slate-900 uppercase tracking-wide">Thống kê hoạt động &amp; Đóng góp của Đặng Ngọc Dương</h4>
+<span class="text-xs text-slate-400 font-medium">Chuỗi 7 tuần liên tiếp</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+<!-- Stat 1 -->
+<div class="p-4 rounded-xl bg-slate-50 border border-slate-100">
+<div class="flex items-center justify-between mb-1">
+<span class="text-xs font-medium text-slate-500">Đóng góp quỹ</span>
+<span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">100% đúng hạn</span>
+</div>
+<p class="text-xl font-extrabold text-slate-800">9 lượt</p>
+<p class="text-[11px] text-slate-400 mt-0.5">Tổng đóng góp: 160.000 đ</p>
+</div>
+<!-- Stat 2 -->
+<div class="p-4 rounded-xl bg-slate-50 border border-slate-100">
+<div class="flex items-center justify-between mb-1">
+<span class="text-xs font-medium text-slate-500">Trận giao lưu CLB</span>
+<span class="text-xs font-bold text-brand-600 bg-brand-50 px-1.5 py-0.5 rounded">Tích cực</span>
+</div>
+<p class="text-xl font-extrabold text-slate-800">14 trận</p>
+<p class="text-[11px] text-slate-400 mt-0.5">Tỷ lệ thắng 57.1% (8 Thắng - 6 Thua)</p>
+</div>
+<!-- Stat 3 -->
+<div class="p-4 rounded-xl bg-slate-50 border border-slate-100">
+<div class="flex items-center justify-between mb-1">
+<span class="text-xs font-medium text-slate-500">Xếp hạng CLB</span>
+<span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded">Top 3 Tuần</span>
+</div>
+<p class="text-xl font-extrabold text-slate-800">#3 / 30 thành viên</p>
+<p class="text-[11px] text-slate-400 mt-0.5">Điểm năng nổ tuần: 94 điểm</p>
+</div>
+</div>
+</div>
+<!-- END: AdditionalStatsSection -->
+<!-- BEGIN: SharedSessionDisclaimerNotice -->
+<div class="bg-white rounded-2xl border border-slate-200/90 p-6 shadow-sm space-y-5"><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100"><div><span class="text-[11px] font-bold text-brand-600 uppercase tracking-wider block mb-0.5">HỒ SƠ THI ĐẤU CLB</span><h3 class="text-lg font-black text-slate-900">Lịch sử tham dự các giải đấu</h3></div><div class="flex items-center gap-2 flex-wrap"><span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-100 text-amber-700 text-xs font-bold"><span class="text-sm">🏆</span> 1 Cúp Vàng</span><span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold"><span class="text-sm">🥈</span> 1 Huy chương Bạc</span></div></div><div class="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 rounded-xl bg-slate-50 border border-slate-100"><div class="text-center"><span class="text-[11px] font-semibold text-slate-400 block">Tổng trận đấu</span><p class="text-xl font-extrabold text-slate-800">18 trận</p></div><div class="text-center"><span class="text-[11px] font-semibold text-slate-400 block">Thành tích</span><p class="text-xl font-extrabold text-emerald-600">13 Thắng - 5 Thua</p></div><div class="text-center"><span class="text-[11px] font-semibold text-slate-400 block">Tỷ lệ thắng</span><p class="text-xl font-extrabold text-brand-600">72.2%</p></div><div class="text-center"><span class="text-[11px] font-semibold text-slate-400 block">Màu áo thi đấu</span><p class="text-sm font-bold text-slate-800 mt-1">Pickleball 246</p></div></div><div class="space-y-3"><div class="p-4 rounded-xl border border-brand-200 bg-brand-50/50 flex flex-col md:flex-row md:items-center justify-between gap-4 transition hover:border-brand-500"><div class="flex items-start gap-3.5"><div class="w-10 h-10 rounded-xl bg-brand-600 text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></div><div><div class="flex items-center gap-2 flex-wrap mb-1"><h4 class="text-sm font-black text-slate-900">PickHub Open 2026 - Giải Vô Địch Mở Rộng Cộng Đồng</h4><span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-brand-600 text-white animate-pulse">Đang thi đấu (Bán Kết)</span></div><p class="text-xs text-slate-600">Thể thức: <strong class="text-slate-800">Đôi nam</strong> · Đánh cặp cùng: <span class="font-bold text-brand-700">Đỗ Đức Tú (#1)</span></p></div></div><div class="shrink-0 flex items-center md:flex-col md:items-end justify-between"><span class="text-[11px] text-slate-400">Thành tích tạm thời</span><span class="text-sm font-extrabold text-brand-700 bg-brand-100 px-2.5 py-1 rounded-lg">Top 4 Chung cuộc</span></div></div><div class="p-4 rounded-xl border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 transition hover:border-slate-300"><div class="flex items-start gap-3.5"><div class="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-lg shrink-0">🥈</div><div><div class="flex items-center gap-2 flex-wrap mb-1"><h4 class="text-sm font-bold text-slate-900">Cup Thu Đào - Giải Đấu Nội Bộ CLB 246</h4><span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-600">Tháng 10/2025</span></div><p class="text-xs text-slate-600">Thể thức: <strong class="text-slate-800">Đôi Nam Nữ</strong> · Đánh cặp cùng: <span class="font-bold text-slate-700">Bùi Văn Sơn (#49)</span></p></div></div><div class="shrink-0 flex items-center md:flex-col md:items-end justify-between"><span class="text-[11px] text-slate-400">Kết quả chung cuộc</span><span class="text-sm font-bold text-slate-800 bg-slate-100 px-2.5 py-1 rounded-lg">Hạng Nhì (Huy chương Bạc)</span></div></div><div class="p-4 rounded-xl border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 transition hover:border-slate-300"><div class="flex items-start gap-3.5"><div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-lg shrink-0">🏆</div><div><div class="flex items-center gap-2 flex-wrap mb-1"><h4 class="text-sm font-bold text-slate-900">Giao Hữu Pickleball 246 Club x D-Sport Cầu Giấy</h4><span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-600">Tháng 9/2025</span></div><p class="text-xs text-slate-600">Thể thức: <strong class="text-slate-800">Đồng đội CLB</strong> · Đại diện hàng 1 Pickleball 246</p></div></div><div class="shrink-0 flex items-center md:flex-col md:items-end justify-between"><span class="text-[11px] text-slate-400">Kết quả chung cuộc</span><span class="text-sm font-black text-amber-700 bg-amber-50 border border-amber-200/60 px-2.5 py-1 rounded-lg">Vô địch (Cúp Vàng)</span></div></div></div></div><div class="p-4 rounded-xl bg-slate-100/80 border border-slate-200/80 flex items-start gap-3 text-slate-600"><svg class="w-5 h-5 text-brand-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg><div class="text-xs leading-relaxed text-slate-600"><strong class="font-bold text-slate-800">Tài khoản chính chủ đã xác thực:</strong> Dữ liệu liên hệ, chỉ số DUPR/PHR và lịch sử giải đấu của VĐV Đặng Ngọc Dương đã được chủ tài khoản xác minh và cho phép hiển thị trên hệ thống CLB Pickleball 246.</div></div>
+<!-- END: SharedSessionDisclaimerNotice -->
+</main>
+<!-- BEGIN: Footer -->
+<footer class="mt-auto border-t border-slate-200 bg-white px-8 py-4 text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<div class="w-4 h-4 rounded-md bg-brand-600 text-white flex items-center justify-center font-bold text-[9px]">P</div>
+<span class="">Pickleball 246 Club • Hệ thống quản lý tài chính &amp; BXH đóng góp quỹ</span>
+</div>
+<div class="text-slate-400">
+          Thiết kế chuẩn Web App • Phiên bản 2.4.0
+        </div>
+</footer>
+<!-- END: Footer -->
+</div>
+<!-- END: MainContentArea -->
+</div>
+<!-- END: AppLayoutWrapper -->
+</body></html>

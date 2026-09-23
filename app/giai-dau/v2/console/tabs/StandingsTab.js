@@ -91,15 +91,27 @@ export default function StandingsTab({ tournamentId, stageId, stages, isAdmin, r
         }
     }
 
-    const canAdvance = Boolean(isAdmin && stageId
-        && (data.schedule_format || stage?.schedule_format) === 'round_robin');
+    // Chặng cuối (vd. giải vòng tròn một chặng): không có play-off, nút là "kết thúc giải".
+    const isLastStage = !(stages || []).some((other) => stage && other.id !== stage.id
+        && String(other.division_id ?? '') === String(stage.division_id ?? '')
+        && Number(other.stage_order) > Number(stage.stage_order));
+    const format = data.schedule_format || stage?.schedule_format;
+    // Nhánh loại trực tiếp của setup v4 (Lát C) cũng cần chốt chặng cuối; stage knockout cũ giữ nguyên.
+    const canAdvance = Boolean(isAdmin && stageId && (format === 'round_robin'
+        || (format === 'knockout' && isLastStage && String(stage?.config?.setupPlanVersion) === '4')));
+    const completed = stage?.status === 'completed';
 
     return (
         <>
-            {canAdvance ? (
+            {canAdvance && completed && isLastStage ? (
+                <p className="v2-notice" style={{ marginBottom: 12 }}>Giải đã kết thúc — bảng xếp hạng dưới đây là kết quả chung cuộc.</p>
+            ) : null}
+            {canAdvance && !(completed && isLastStage) ? (
                 <div className="v2-settings-block" style={{ marginBottom: 12 }}>
                     <button type="button" className="v2-btn-primary" disabled={advancing} onClick={handleAdvance}>
-                        {advancing ? 'Đang tiến cấp...' : 'Tiến cấp vào play-off'}
+                        {advancing
+                            ? (isLastStage ? 'Đang kết thúc...' : 'Đang tiến cấp...')
+                            : (isLastStage ? 'Kết thúc giải & chốt xếp hạng' : 'Tiến cấp vào play-off')}
                     </button>
                     {advanceNotice ? <p className="v2-notice">{advanceNotice}</p> : null}
                 </div>

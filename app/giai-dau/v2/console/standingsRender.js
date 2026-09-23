@@ -18,6 +18,8 @@ function RoundRobinStandings({ rows, entrantsById, outlook }) {
         groups[key].push(r);
     }
     const labels = Object.keys(groups).sort();
+    // Chặng cuối (vd. vòng tròn một chặng) không có suất đi tiếp: bỏ hẳn cột.
+    const showOutlook = Boolean(outlook && Object.keys(outlook).length);
 
     return (
         <div className="v2-standings">
@@ -37,7 +39,7 @@ function RoundRobinStandings({ rows, entrantsById, outlook }) {
                                         <th>B</th>
                                         <th>Hiệu số</th>
                                         <th>Điểm</th>
-                                        <th>Suất đi tiếp</th>
+                                        {showOutlook ? <th>Suất đi tiếp</th> : null}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -50,7 +52,7 @@ function RoundRobinStandings({ rows, entrantsById, outlook }) {
                                             <td>{r.lost}</td>
                                             <td>{r.diff > 0 ? `+${r.diff}` : r.diff}</td>
                                             <td className="v2-st-pts">{r.match_points}</td>
-                                            <td>{outlook?.[r.entrant_id]?.label || '—'}</td>
+                                            {showOutlook ? <td>{outlook[r.entrant_id]?.label || '—'}</td> : null}
                                         </tr>
                                     ))}
                                 </tbody>
@@ -85,7 +87,7 @@ function KnockoutStandings({ rows, entrantsById }) {
                     <li key={r.entrant_id} className="v2-placement-item">
                         <span className="v2-placement-rank">{r.rank}</span>
                         <span className="v2-placement-name">{entrantName(entrantsById, r.entrant_id)}</span>
-                        <span className="v2-placement-label">{koLabel(r.exit_round, maxExit)}</span>
+                        <span className="v2-placement-label">{r.label || koLabel(r.exit_round, maxExit)}</span>
                     </li>
                 ))}
             </ul>

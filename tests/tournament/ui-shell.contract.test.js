@@ -3,11 +3,12 @@ const path = require('path');
 const root = path.join(__dirname, '..', '..');
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 const assert = (condition, message) => { if (!condition) { console.error(`FAIL: ${message}`); process.exit(1); } };
+// GAP-THEME: console shell bảo vệ theme sáng dùng chung, không khóa theme tối ops-* cũ.
 const css = read('app/giai-dau/v2/console/shell.css');
-assert(/Montserrat/.test(css), 'font Montserrat');
+assert(/var\(--font-family\)|var\(--ph-font\)/.test(css), 'dùng token font dùng chung');
 assert(!/Outfit/.test(css), 'không dùng Outfit');
 for (const token of ['--court-green', '--pickle-lime', '--surface-court', '--live-cyan', '--rally-coral']) assert(!css.includes(token), `không dùng ${token}`);
-assert(/--ops-bg/.test(css) && /--ops-indigo/.test(css), 'có token tối và tím');
+assert(!/--ops-/.test(css), 'không còn token ops-* (GAP-THEME)');
 assert(/prefers-reduced-motion/.test(css), 'tôn trọng reduced motion');
 const shell = read('app/giai-dau/v2/console/ConsoleShell.js');
 assert(/'use client'|"use client"/.test(shell), 'client component');

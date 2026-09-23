@@ -11,6 +11,7 @@
 
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { notifyClubSettingsChanged } from '@/lib/clubSettingsEvents';
+import FundQrShare from '@/components/pickhub/FundQrShare';
 import './SepayConnect.css';
 
 const AFFILIATE_URL = 'https://my.sepay.vn/register?gcid=1008';
@@ -37,6 +38,8 @@ const PREP_STEPS = [
         'Trong SePay vào menu Ngân hàng → Kết nối mới, chọn ngân hàng của quỹ rồi làm theo hướng dẫn. Chưa làm bước này thì SePay không thấy tiền vào, và ô Tài khoản khi tạo webhook sẽ trống.'],
     ['🔗', 'Kết nối SePay với PickHub',
         'Copy hai dòng chữ từ PickHub dán sang SePay, rồi bấm một nút. Có ảnh chụp màn hình từng bước.'],
+    ['📣', 'Phát QR cho cả nhóm',
+        'Kết nối xong, PickHub tạo sẵn mã QR của tài khoản quỹ — gửi vào nhóm Zalo/Messenger để mọi người chuyển đúng tài khoản đó.'],
 ];
 
 // Chi so buoc trong PREP_STEPS de gan nut/badge — tranh so magic rai rac.
@@ -44,6 +47,7 @@ const STEP_SEPAY_SIGNUP = 1;
 const STEP_CHOOSE_PLAN = 2;
 const STEP_LINK_BANK = 3;
 const STEP_CONNECT_PICKHUB = 4;
+const STEP_SHARE_QR = 5;
 
 function formatClock(seconds) {
     const s = Math.max(0, Number(seconds) || 0);
@@ -61,9 +65,10 @@ function timeAgo(iso) {
     return `${Math.floor(hours / 24)} ngày trước`;
 }
 
-// Bon buoc cua luong thiet lap. Tach "Lien ket ngan hang" thanh mot buoc rieng
+// Nam buoc cua luong thiet lap. Tach "Lien ket ngan hang" thanh mot buoc rieng
 // vi no la mat xich bat buoc: chua lam thi o Tai khoan khi tao webhook se trong.
-const SETUP_STEPS = ['Tài khoản quỹ', 'Liên kết ngân hàng', 'Khai báo với SePay', 'Bấm Gửi thử'];
+// Buoc cuoi "Phat QR cho ca nhom" chi hien o man da ket noi (FundQrShare).
+const SETUP_STEPS = ['Tài khoản quỹ', 'Liên kết ngân hàng', 'Khai báo với SePay', 'Bấm Gửi thử', 'Phát QR cho cả nhóm'];
 
 function SetupStepper({ current }) {
     return (
@@ -259,6 +264,15 @@ export default function SepayConnect() {
                                     : <>Chưa có giao dịch nào đi qua. Khi có người chuyển tiền vào quỹ, nó sẽ hiện ở đây.</>}
                         </span>
                     </div>
+                </div>
+
+                <div className="spc__final">
+                    <span className="spc__wait-cap">Việc cuối cùng</span>
+                    <p className="spc__wait-title">Phát mã QR chuyển khoản cho cả nhóm</p>
+                    <p className="spc__wait-note">
+                        Auto Quỹ chỉ ghi nhận tiền vào đúng tài khoản này. Gửi QR bên dưới vào nhóm Zalo/Messenger để mọi người chuyển đúng chỗ.
+                    </p>
+                    <FundQrShare />
                 </div>
 
                 {error && <p className="spc__error">{error}</p>}
@@ -532,6 +546,7 @@ export default function SepayConnect() {
                             {index === STEP_CHOOSE_PLAN && <a className="ph-btn ph-btn--outline ph-btn--sm" href={PROMO_URL} target="_blank" rel="noreferrer">Xem khuyến mãi ↗</a>}
                             {index === STEP_LINK_BANK && <a className="ph-btn ph-btn--outline ph-btn--sm" href="https://my.sepay.vn/bank-account" target="_blank" rel="noreferrer">Mở mục Ngân hàng ↗</a>}
                             {index === STEP_CONNECT_PICKHUB && <span className="ph-badge">PickHub lo phần này</span>}
+                            {index === STEP_SHARE_QR && <span className="ph-badge">PickHub lo phần này</span>}
                         </div>
                     </li>
                 ))}

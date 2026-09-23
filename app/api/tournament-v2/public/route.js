@@ -22,7 +22,7 @@ const PUBLIC_ENTRANT_SELECT = 'id, division_id, name_snapshot, seed, color_snaps
 const PUBLIC_MATCH_SELECT = [
     'id', 'division_id', 'stage_id', 'round', 'bracket_slot', 'group_label',
     'court', 'match_order', 'entrant_a_id', 'entrant_b_id', 'status',
-    'winner_entrant_id', 'entry_a_id', 'entry_b_id', 'winner_entry_id', 'parent_match_id',
+    'winner_entrant_id', 'entry_a_id', 'entry_b_id', 'winner_entry_id', 'result_type', 'parent_match_id',
 ].join(', ');
 const PUBLIC_GAME_SELECT = [
     'match_id', 'game_no', 'kind', 'score_a', 'score_b',

@@ -42,12 +42,12 @@ export default function CourtsStep({ tournamentId, isAdmin }) {
   }
   const activeCount = courts.filter((court) => court.active).length;
   const progress = board?.progress;
-  return <div className="ops-block-list">
-    {error ? <p className="ops-error">{error}</p> : null}
-    <section className="ops-block"><h2>Số sân dành cho giải</h2><p className="ops-muted">Số sân quyết định giờ tan giải.</p><div className="ops-court-count"><b>{activeCount}</b> sân đang dùng / {courts.length} sân đã khai báo {isAdmin ? <button type="button" disabled={busy} onClick={addCourt}>+ Thêm sân</button> : null}</div>
-      {progress ? <div className="ops-impact">Đang bố trí <b>{activeCount} sân</b> cho <b>{progress.total - progress.finalized} trận còn lại</b> → <b>ước tính hoàn tất {formatClock(progress.finish_at)}</b>.</div> : null}
+  return <div className="v2-console-block-list">
+    {error ? <p className="v2-console-error">{error}</p> : null}
+    <section className="v2-console-block"><h2>Số sân dành cho giải</h2><p className="v2-console-muted">Số sân quyết định giờ tan giải.</p><div className="v2-console-court-count"><b>{activeCount}</b> sân đang dùng / {courts.length} sân đã khai báo {isAdmin ? <button type="button" disabled={busy} onClick={addCourt}>+ Thêm sân</button> : null}</div>
+      {progress ? <div className="v2-console-impact">Đang bố trí <b>{activeCount} sân</b> cho <b>{progress.total - progress.finalized} trận còn lại</b> → <b>ước tính hoàn tất {formatClock(progress.finish_at)}</b>.</div> : null}
     </section>
-    <section className="ops-block"><h2>Danh sách sân</h2>{courts.length ? courts.map((court) => <div className="ops-court-row" key={court.id}><div><b>{court.label}</b><span>{court.surface || 'Chưa ghi mặt sân'}</span></div>{isAdmin ? <button type="button" className={`ops-toggle ${court.active ? '' : 'is-off'}`} disabled={busy} onClick={() => toggle(court)}>{court.active ? 'Đang dùng' : 'Ngưng dùng'}</button> : <span>{court.active ? 'Đang dùng' : 'Ngưng dùng'}</span>}</div>) : <p className="ops-muted">Chưa khai báo sân nào.</p>}</section>
-    <section className="ops-block"><h2>Hàng đợi trận chờ</h2>{board?.queue?.length ? board.queue.map((item, index) => <div className="ops-queue-row" key={item.id}><span className="ops-queue-n">{index + 1}</span><span>Trận #{item.id}</span><span className="ops-queue-time">{item.locked_start ? `ghim ${formatClock(item.locked_start)}` : `dự kiến ${formatClock(item.projected_start)}`}</span></div>) : <p className="ops-muted">Không còn trận nào chờ.</p>}</section>
+    <section className="v2-console-block"><h2>Danh sách sân</h2>{courts.length ? courts.map((court) => <div className="v2-console-court-row" key={court.id}><div><b>{court.label}</b><span>{court.surface || 'Chưa ghi mặt sân'}</span></div>{isAdmin ? <button type="button" className={`v2-console-toggle ${court.active ? '' : 'is-off'}`} disabled={busy} onClick={() => toggle(court)}>{court.active ? 'Đang dùng' : 'Ngưng dùng'}</button> : <span>{court.active ? 'Đang dùng' : 'Ngưng dùng'}</span>}</div>) : <p className="v2-console-muted">Chưa khai báo sân nào.</p>}</section>
+    <section className="v2-console-block"><h2>Hàng đợi trận chờ</h2>{board?.queue?.length ? board.queue.map((item, index) => <div className="v2-console-queue-row" key={item.id}><span className="v2-console-queue-n">{index + 1}</span><span>Trận #{item.id}</span><span className="v2-console-queue-time">{item.locked_start ? `ghim ${formatClock(item.locked_start)}` : `dự kiến ${formatClock(item.projected_start)}`}</span></div>) : <p className="v2-console-muted">Không còn trận nào chờ.</p>}</section>
   </div>;
 }

@@ -29,7 +29,7 @@ export async function GET(request) {
             if (!scope.ok) return scope.response;
             const { data: members, error: membersError } = await db
                 .from('club_members')
-                .select('id, full_name, is_active')
+                .select('id, full_name, aliases, is_active')
                 .eq('group_id', scope.groupId)
                 .order('full_name', { ascending: true });
             if (membersError) return NextResponse.json({ error: membersError.message }, { status: 500 });
@@ -38,6 +38,8 @@ export async function GET(request) {
             if (memberIds.length) {
                 const { data: athletes, error: athletesError } = await db
                     .from('athletes')
+                    // `athletes` is a global identity table. Tenant scope comes from
+                    // the already-scoped legacy club-member IDs, not a nonexistent group_id.
                     .select('id, display_name, legacy_club_member_id')
                     .in('legacy_club_member_id', memberIds);
                 if (athletesError) return NextResponse.json({ error: athletesError.message }, { status: 500 });
@@ -47,6 +49,7 @@ export async function GET(request) {
                 roster: (members || []).map((member) => ({
                     member_id: member.id,
                     full_name: member.full_name,
+                    aliases: Array.isArray(member.aliases) ? member.aliases : [],
                     is_active: member.is_active !== false,
                     athlete_id: athleteByMemberId.get(Number(member.id))?.id ?? null,
                 })),

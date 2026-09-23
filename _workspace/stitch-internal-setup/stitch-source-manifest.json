@@ -1,0 +1,171 @@
+{
+  "source": "_workspace/stitch-internal-setup/stitch_pickleball_tournament_management_dashboard",
+  "copiedFrom": "C:/Users/ductu/ranking-unified-setup-ux (untracked snapshot)",
+  "copiedAt": "2026-09-23",
+  "canonical": [
+    "design-tokens",
+    "step-1-info",
+    "step-2-participants",
+    "step-3-format-pairing",
+    "step-3-state-tap-to-pair",
+    "step-4-draw-preview-finalize"
+  ],
+  "files": [
+    {
+      "path": "b_c_4_b_c_th_m_xem_tr_c_l_ch_ch_t_pro_court_os_s_ng/code.html",
+      "role": "step-4-draw-preview-finalize",
+      "bytes": 59190,
+      "sha256": "73bfd6d5ef5b0c0fa097d3b8511c6d6d0e4a71234209b4dd53188bfd354d8378"
+    },
+    {
+      "path": "b_c_4_b_c_th_m_xem_tr_c_l_ch_ch_t_pro_court_os_s_ng/screen.png",
+      "role": "step-4-draw-preview-finalize",
+      "bytes": 339693,
+      "sha256": "856de33024610715c3b6e1375905ec357b2007d3b25fcd84a13153d925773b25"
+    },
+    {
+      "path": "bxh_ng_g_p_qu_pickleball_246_club_sidebar/code.html",
+      "role": "reference-club-shell",
+      "bytes": 46807,
+      "sha256": "bebdbd8804ebc2b8dd70418d476301e3058eb907775405bdc69f2ddeb6e8574b"
+    },
+    {
+      "path": "bxh_ng_g_p_qu_pickleball_246_club_sidebar/screen.png",
+      "role": "reference-club-shell",
+      "bytes": 683192,
+      "sha256": "d4ebf903c368f247ee99d32d5199fa2c7ee986e468ea96b8b7e598eb6cab5656"
+    },
+    {
+      "path": "danh_b_th_nh_vi_n_clb_vai_tr_th_nh_vi_n/code.html",
+      "role": "reference-club-shell",
+      "bytes": 34241,
+      "sha256": "2a423afa022e7cfe820ad5192c251ed416287f22eb93fc00a25d4fa99fa81a3e"
+    },
+    {
+      "path": "danh_b_th_nh_vi_n_clb_vai_tr_th_nh_vi_n/screen.png",
+      "role": "reference-club-shell",
+      "bytes": 527441,
+      "sha256": "bf633145fd89f429b7d36449540efa577ef4314340548d91f45b4d3d197e54ca"
+    },
+    {
+      "path": "h_s_c_nh_n_c_u_h_nh_v_v_ng_ng_c_d_ng/code.html",
+      "role": "reference-club-shell",
+      "bytes": 32355,
+      "sha256": "a4e080fb7a3370aebe6758c3e4edccbd33eeb96cd5a4dc395e85fd7101e235b6"
+    },
+    {
+      "path": "h_s_c_nh_n_c_u_h_nh_v_v_ng_ng_c_d_ng/screen.png",
+      "role": "reference-club-shell",
+      "bytes": 648361,
+      "sha256": "7213b71836864dd4c608fb0f8c36765ad57d731f58e31e7a0a091abe697f0598"
+    },
+    {
+      "path": "h_s_v_v_ng_ng_c_d_ng_x_c_th_c_l_ch_s_gi_i_u/code.html",
+      "role": "reference-club-shell",
+      "bytes": 31039,
+      "sha256": "b294c88d8fb06e423b20833c778b44e5dd81237994ecee35c24806b0ca33bff3"
+    },
+    {
+      "path": "h_s_v_v_ng_ng_c_d_ng_x_c_th_c_l_ch_s_gi_i_u/screen.png",
+      "role": "reference-club-shell",
+      "bytes": 329104,
+      "sha256": "ad046a25b5263c7c1516c031e1400ee57418802bf8a23384f34ecdc2deaae3aa"
+    },
+    {
+      "path": "image.png/screen.png",
+      "role": "reference-club-shell",
+      "bytes": 93272,
+      "sha256": "34c1a38a6f5a5d9f6b33566900f7927566ee5945a0a223a2eecafbf53c42b4de"
+    },
+    {
+      "path": "pro_court_os/DESIGN.md",
+      "role": "design-tokens",
+      "bytes": 9103,
+      "sha256": "df96b440bd2343c83127ad4a8c22b1338a13f21ebf11194d0478c1bd9d5c4580"
+    },
+    {
+      "path": "t_ng_quan_qu_pickleball_246_club_sidebar/code.html",
+      "role": "reference-club-shell",
+      "bytes": 41809,
+      "sha256": "f793874e4850e024441914833a2a3e69e83076ebace881ee766b35fa64977e55"
+    },
+    {
+      "path": "t_ng_quan_qu_pickleball_246_club_sidebar/screen.png",
+      "role": "reference-club-shell",
+      "bytes": 744296,
+      "sha256": "f2b4c79294237c6483592c0781a7bcce8afa79163027c734506c11b19db9da54"
+    },
+    {
+      "path": "t_o_gi_i_n_i_b_b_c_1_th_ng_tin_gi_i_pro_court_os_s_ng/code.html",
+      "role": "step-1-info",
+      "bytes": 31801,
+      "sha256": "92c3ed5be0f940b8c133f252aa816e734db5f4b67620982edad8d292a6a9e3f5"
+    },
+    {
+      "path": "t_o_gi_i_n_i_b_b_c_1_th_ng_tin_gi_i_pro_court_os_s_ng/screen.png",
+      "role": "step-1-info",
+      "bytes": 359767,
+      "sha256": "034ea5c87ed1d68a4bb3080e5139164d95eebb58c39d30ce05ce57b0f00bc17b"
+    },
+    {
+      "path": "t_o_gi_i_n_i_b_b_c_2_ng_i_tham_gia_pro_court_os_s_ng/code.html",
+      "role": "step-2-participants",
+      "bytes": 62531,
+      "sha256": "b6084b355a5a6875ba490706a619687620f227111cf43786d053a7241e14e1bc"
+    },
+    {
+      "path": "t_o_gi_i_n_i_b_b_c_2_ng_i_tham_gia_pro_court_os_s_ng/screen.png",
+      "role": "step-2-participants",
+      "bytes": 654281,
+      "sha256": "f482575b637bcb728f89350c384fa92587b815afd026ced1f45ebdae5ef9ac50"
+    },
+    {
+      "path": "t_o_gi_i_n_i_b_b_c_3_th_th_c_gh_p_c_p_pro_court_os_s_ng/code.html",
+      "role": "step-3-format-pairing",
+      "bytes": 50726,
+      "sha256": "a941f7e3868813cb6a404c3638846941bd82f73fce8807630d3278e8054a64f2"
+    },
+    {
+      "path": "t_o_gi_i_n_i_b_b_c_3_th_th_c_gh_p_c_p_pro_court_os_s_ng/screen.png",
+      "role": "step-3-format-pairing",
+      "bytes": 397721,
+      "sha256": "ed7517d994499c8eb5f8fd97fdf59569d6f4d7c351220627488badbc19c2aaae"
+    },
+    {
+      "path": "t_o_gi_i_n_i_b_m_ph_ng_gh_p_c_p_1_ch_m_tap_to_pair_pro_court_os_s_ng/code.html",
+      "role": "step-3-state-tap-to-pair",
+      "bytes": 59614,
+      "sha256": "42c7c5f5e150985f14d421c617d0a6b590c3023b0577e7e3be93a71b0d8c336b"
+    },
+    {
+      "path": "t_o_gi_i_n_i_b_m_ph_ng_gh_p_c_p_1_ch_m_tap_to_pair_pro_court_os_s_ng/screen.png",
+      "role": "step-3-state-tap-to-pair",
+      "bytes": 387669,
+      "sha256": "20668279c330a0b55fc2bf23e5745fb97316171d5eb70b6ba1e6abe4b9802a7a"
+    },
+    {
+      "path": "th_ng_tin_th_nh_vi_n_li_n_k_t_v_v_pickleball_246_club/code.html",
+      "role": "reference-club-shell",
+      "bytes": 22437,
+      "sha256": "7685b6ef5d497f14ed2a8cc9d2268a25c2c10e98400182907bea12eedcf9204c"
+    },
+    {
+      "path": "th_ng_tin_th_nh_vi_n_li_n_k_t_v_v_pickleball_246_club/screen.png",
+      "role": "reference-club-shell",
+      "bytes": 28,
+      "sha256": "6c9a02e2605929162392587c714f045251761b8a72c4bced6d4cbc2e4303ef8b"
+    },
+    {
+      "path": "th_nh_vi_n_clb_qu_n_tr_vi_n_admin_th_qu/code.html",
+      "role": "reference-club-shell",
+      "bytes": 41693,
+      "sha256": "e9a2a11cf01d5ad12c2c6ac3378ea1c68b49fe76937dc31a419a3e2aa3b25c0d"
+    },
+    {
+      "path": "th_nh_vi_n_clb_qu_n_tr_vi_n_admin_th_qu/screen.png",
+      "role": "reference-club-shell",
+      "bytes": 356785,
+      "sha256": "75b198f6617470b76e9bc472e686f2f6891f86550912275b5c38be63b84cb962"
+    }
+  ]
+}

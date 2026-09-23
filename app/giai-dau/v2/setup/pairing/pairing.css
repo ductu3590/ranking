@@ -1,0 +1,136 @@
+.pairing-card {
+    background: var(--surface, #ffffff);
+    border: 1px solid var(--border, #e5e7eb);
+    border-radius: 24px;
+    padding: 18px;
+    box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+}
+
+.pairing-head {
+    display: grid;
+    gap: 14px;
+}
+
+.pairing-head h2 {
+    margin: 0;
+}
+
+.pairing-head p {
+    margin: 4px 0 0;
+    color: var(--muted, #64748b);
+}
+
+.pairing-mode,
+.pairing-actions {
+    display: grid;
+    gap: 8px;
+}
+
+.pairing-mode button,
+.pairing-actions button,
+.pairing-pair button,
+.pairing-unpaired button,
+.pairing-odd button {
+    border: 1px solid var(--border, #e5e7eb);
+    border-radius: 14px;
+    background: #ffffff;
+    padding: 10px 12px;
+    font-weight: 800;
+    min-height: 44px;
+}
+
+.pairing-card button:focus-visible {
+    outline: 3px solid var(--primary, #0f766e);
+    outline-offset: 3px;
+}
+
+.pairing-mode button[aria-pressed="true"],
+.pairing-actions button:first-child {
+    border-color: #0f766e;
+    background: #0f766e;
+    color: #ffffff;
+}
+
+.pairing-secondary {
+    color: #0f766e;
+}
+
+.pairing-blocker,
+.pairing-odd {
+    margin: 14px 0;
+    border-radius: 16px;
+    padding: 12px;
+}
+
+.pairing-blocker {
+    background: #fef2f2;
+    color: #b91c1c;
+    font-weight: 800;
+}
+
+.pairing-grid {
+    display: grid;
+    gap: 12px;
+    margin: 16px 0;
+}
+
+.pairing-pair {
+    border: 1px solid var(--border, #e5e7eb);
+    border-radius: 18px;
+    padding: 12px;
+}
+
+.pairing-pair-head,
+.pairing-member,
+.pairing-unpaired-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.pairing-member {
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.pairing-unpaired {
+    display: grid;
+    gap: 10px;
+    border-radius: 18px;
+    background: #f8fafc;
+    padding: 12px;
+}
+
+.pairing-odd {
+    display: grid;
+    gap: 8px;
+    background: #fff7ed;
+    color: #9a3412;
+}
+
+.pairing-odd-options {
+    display: grid;
+    gap: 8px;
+}
+
+.pairing-odd button:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+@media (min-width: 760px) {
+    .pairing-head,
+    .pairing-actions {
+        grid-template-columns: 1fr auto;
+        align-items: start;
+    }
+
+    .pairing-mode {
+        grid-template-columns: repeat(2, auto);
+    }
+
+    .pairing-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}

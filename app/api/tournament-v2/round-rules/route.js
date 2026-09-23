@@ -45,7 +45,7 @@ async function loadStageContext(stageId, groupId) {
 
     let matchQuery = db.from('tournament_matches')
         // cột bracket sẽ thêm khi engine double-elim lên
-        .select('id, round, status')
+        .select('id, round, status, started_at')
         .eq('stage_id', stage.id);
     if (groupId) matchQuery = matchQuery.eq('group_id', groupId);
 

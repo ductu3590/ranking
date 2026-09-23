@@ -39,7 +39,13 @@ export async function GET(request) {
             return NextResponse.json({ error: e.message }, { status: e.status || 400 });
         }
 
-        const advance = Number(stage.config?.advance?.slots || stage.config?.advance || 2);
+        // Stage v4 (setup Stitch) ghi số suất mỗi bảng ở advancePerGroup; 0 = chặng cuối (vòng tròn),
+        // không có "suất đi tiếp". Stage cũ giữ khóa advance và mặc định 2.
+        const isV4 = String(stage.config?.setupPlanVersion) === '4';
+        const advance = isV4
+            ? Number(stage.config?.advancePerGroup || 0)
+            : Number(stage.config?.advance?.slots || stage.config?.advance || 2);
+        const poolCount = isV4 ? Number(stage.config?.poolCount || 0) : 0;
         const winPoints = Number(stage.config?.scoring?.winPoints || stage.config?.winPoints || 2);
         const remaining = {};
         for (const match of result.matches || []) {
@@ -49,12 +55,20 @@ export async function GET(request) {
             }
         }
         const outlook = {};
-        for (const [label, rows] of Object.entries((result.standings || []).reduce((groups, row) => {
+        for (const [label, rows] of advance > 0 ? Object.entries((result.standings || []).reduce((groups, row) => {
             const key = row.group_label || 'A';
             (groups[key] ||= []).push(row);
             return groups;
-        }, {}))) {
+        }, {})) : []) {
             Object.assign(outlook, qualificationOutlook(rows, remaining, { slots: advance, winPoints, groupLabel: label }));
+            // Suất bù chéo bảng (ADR-005 D6): cặp đứng ngay sau suất trực tiếp vẫn còn cơ hội.
+            if (poolCount > 0) {
+                for (const row of rows) {
+                    if (Number(row.rank) === advance + 1 && outlook[row.entrant_id]?.status === 'eliminated') {
+                        outlook[row.entrant_id] = { status: 'contending', label: 'Xét suất bù' };
+                    }
+                }
+            }
         }
         const criteriaLabels = {
             match_points: 'Điểm', diff: 'Hiệu số', point_diff: 'Hiệu số điểm', game_diff: 'Hiệu số ván',

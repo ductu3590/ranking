@@ -16,6 +16,7 @@ assert(/need:\s*'write'/.test(s), "PATCH dùng need 'write'");
 assert((s.match(/\.eq\('group_id'/g) || []).length >= 3, 'mọi truy vấn scope theo group_id');
 assert(/roundScoring/.test(s), 'dùng module luật vòng');
 assert(/ROUND_LOCKED/.test(s), 'trả 409 ROUND_LOCKED');
+assert(/started_at/.test(s), 'trạng thái bắt đầu trận được đọc để khóa BO theo vòng');
 assert(/ROUND_NOT_FOUND/.test(s), 'trả 404 ROUND_NOT_FOUND');
 assert(/STAGE_CONFIG_CONFLICT/.test(s), 'chống ghi đè đồng thời');
 assert(/is\.\(|not\.is|IS NOT DISTINCT|\.eq\('id',/.test(s), 'ghi có điều kiện trên stage id');

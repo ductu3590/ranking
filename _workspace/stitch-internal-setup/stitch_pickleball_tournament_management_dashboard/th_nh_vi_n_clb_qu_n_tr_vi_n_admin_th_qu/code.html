@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+
+<html class="h-full bg-slate-50" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Quản lý thành viên CLB - Pickleball 246 Club</title>
+<!-- Tailwind CSS v3 with Forms and Container Queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#faf5ff',
+              100: '#f3e8ff',
+              200: '#e9d5ff',
+              300: '#d8b4fe',
+              400: '#c084fc',
+              500: '#a855f7',
+              600: '#9333ea',
+              700: '#7c3aed',
+              800: '#6b21a8',
+              900: '#581c87',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<style data-purpose="custom-typography">
+    body {
+      font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    }
+  </style>
+<style data-purpose="scrollbar-styling">
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="h-full font-sans antialiased text-slate-800 bg-[#f8fafc] flex">
+<!-- BEGIN: LeftSidebar -->
+<aside class="w-64 bg-white border-r border-slate-200 flex flex-col shrink-0 select-none z-20">
+<!-- Brand & Club Profile -->
+<div class="p-5 border-b border-slate-100 flex items-center space-x-3">
+<div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-700 to-indigo-600 flex items-center justify-center text-white font-bold text-xl shadow-md shadow-brand-500/20">
+        P
+      </div>
+<div>
+<span class="text-[11px] font-semibold text-slate-400 tracking-wider uppercase block">CÂU LẠC BỘ</span>
+<h1 class="text-sm font-bold text-slate-900 leading-tight">Pickleball 246 Club</h1>
+</div>
+</div>
+<!-- Navigation Menu -->
+<div class="px-3 py-4 flex-1 overflow-y-auto space-y-6">
+<div>
+<p class="px-3 text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">MENU QUẢN LÝ</p>
+<nav class="space-y-1">
+<!-- Item: Tổng quan quỹ -->
+<a class="flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors" href="#">
+<svg class="w-5 h-5 mr-3 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.75" viewbox="0 0 24 24">
+<path d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+            Tổng quan quỹ
+          </a>
+<!-- Item: BXH đóng góp -->
+<a class="flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors" href="#">
+<svg class="w-5 h-5 mr-3 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.75" viewbox="0 0 24 24">
+<path d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.003 0V9.75m-4 0v4.875m4-4.875A2.625 2.625 0 0 0 12 7.125v0a2.625 2.625 0 0 0-2.625 2.625m4 0h-4" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+            Bảng xếp hạng đóng góp
+          </a>
+<!-- Item: Thành viên CLB (Active) -->
+<a class="flex items-center justify-between px-3 py-2.5 text-sm font-semibold rounded-xl bg-brand-50 text-brand-700 transition-colors shadow-sm" href="#">
+<div class="flex items-center">
+<svg class="w-5 h-5 mr-3 text-brand-700" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.999-3.199a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span>Thành viên CLB</span>
+</div>
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-brand-100 text-brand-700">30</span>
+</a>
+<!-- Item: Giải đấu nội bộ -->
+<a class="flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors" href="#">
+<div class="flex items-center">
+<svg class="w-5 h-5 mr-3 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.75" viewbox="0 0 24 24">
+<path d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.003 0V9.75m-4 0v4.875m4-4.875A2.625 2.625 0 0 0 12 7.125v0a2.625 2.625 0 0 0-2.625 2.625m4 0h-4" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+              Giải đấu nội bộ
+            </div>
+<span class="px-1.5 py-0.5 text-[10px] font-bold tracking-wide uppercase bg-amber-100 text-amber-700 rounded-md">Hot</span>
+</a>
+<!-- Item: Cài đặt quỹ -->
+<a class="flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors" href="#">
+<svg class="w-5 h-5 mr-3 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.75" viewbox="0 0 24 24">
+<path d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 0 1 0 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 0 1 0-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281Z" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+            Cài đặt quỹ
+          </a>
+</nav>
+</div>
+</div>
+<!-- User Profile & Footer of Sidebar -->
+<div class="p-3 border-t border-slate-100 bg-slate-50/60">
+<div class="flex items-center justify-between p-2 rounded-xl hover:bg-white transition-all shadow-sm">
+<div class="flex items-center space-x-2.5">
+<div class="w-9 h-9 rounded-full bg-brand-600 text-white font-bold flex items-center justify-center text-xs shadow-inner">
+            TU
+          </div>
+<div>
+<div class="text-xs font-bold text-slate-900 leading-tight">Đỗ Đức Tú</div>
+<div class="text-[11px] font-medium text-slate-500">Thủ quỹ / Admin</div>
+</div>
+</div>
+<button class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition-colors" title="Thông báo">
+<span class="relative flex h-2 w-2 mb-2 ml-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+</span>
+<svg class="w-4 h-4 -mt-3" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+</div>
+</aside>
+<!-- END: LeftSidebar -->
+<!-- BEGIN: MainContentArea -->
+<div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+<!-- BEGIN: TopBar -->
+<header class="bg-white border-b border-slate-200 sticky top-0 z-10 px-8 py-3.5 flex items-center justify-between shadow-xs">
+<!-- Breadcrumb and Space Tag -->
+<div class="flex items-center space-x-3 text-xs">
+<span class="font-bold uppercase tracking-wider text-brand-700">QUẢN LÝ CLB</span>
+<svg class="w-3.5 h-3.5 text-slate-300" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path></svg>
+<span class="font-semibold text-slate-600">Thành viên CLB</span>
+<div class="hidden sm:flex items-center pl-4 ml-4 border-l border-slate-200 space-x-2">
+<span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
+<span class="text-slate-500 font-medium">Không gian:</span>
+<span class="font-semibold text-slate-700">Pickleball 246 Club</span>
+<span class="text-[10px] bg-brand-50 text-brand-700 px-1.5 py-0.5 rounded font-mono font-medium">P246CLUB</span>
+</div>
+</div>
+<!-- Top Right Controls -->
+<div class="flex items-center space-x-4">
+<button class="relative p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors" title="Thông báo hệ thống">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 bg-amber-500 rounded-full ring-2 ring-white"></span>
+</button>
+<div class="flex items-center space-x-2 pl-3 border-l border-slate-200">
+<div class="flex items-center space-x-2 bg-slate-50 border border-slate-200/80 px-3 py-1.5 rounded-full">
+<span class="text-sm">🛡️</span>
+<span class="text-xs font-semibold text-slate-700">Quản trị viên (Admin)</span>
+<svg class="w-3.5 h-3.5 text-slate-400 ml-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+</div>
+</header>
+<!-- END: TopBar -->
+<!-- BEGIN: MainBodyWrapper -->
+<main class="flex-1 p-8 max-w-7xl w-full mx-auto space-y-6">
+<!-- Page Header & Action Buttons -->
+<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+<div>
+<span class="text-xs font-bold uppercase tracking-wider text-brand-600 block mb-1">QUẢN LÝ CLB</span>
+<h2 class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight">Thành viên CLB</h2>
+<p class="text-sm text-slate-500 mt-1 max-w-2xl">
+            Danh sách hiển thị rõ mã thành viên, họ tên, biệt danh trong CLB, trình độ PHR/DUPR, trạng thái sinh hoạt và tài khoản liên kết.
+          </p>
+</div>
+<!-- Action Group -->
+<div class="flex items-center flex-wrap gap-2.5 shrink-0">
+<button class="inline-flex items-center px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 hover:border-slate-400 transition-all shadow-xs" type="button">
+<svg class="w-4 h-4 mr-1.5 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+            Xuất Excel
+          </button>
+<button class="inline-flex items-center px-4 py-2 text-xs font-semibold text-brand-700 bg-brand-50 border border-brand-200 rounded-xl hover:bg-brand-100 transition-all" type="button">
+<svg class="w-4 h-4 mr-1.5 text-brand-600" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+            Cấu hình CLB
+          </button>
+<button class="inline-flex items-center px-4 py-2 text-xs font-semibold text-white bg-brand-700 hover:bg-brand-800 rounded-xl shadow-md shadow-brand-500/25 transition-all" type="button">
+<svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M12 4.5v15m7.5-7.5h-15" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+</svg>
+            + Thêm VĐV
+          </button>
+</div>
+</div>
+<!-- Segment Tabs (Status selector) -->
+<div class="bg-white p-1.5 rounded-2xl border border-slate-200/80 shadow-xs inline-flex w-full sm:w-auto">
+<button class="flex-1 sm:flex-initial px-6 py-2 rounded-xl text-xs font-bold text-brand-700 bg-brand-50 shadow-xs transition-all flex items-center justify-center space-x-2">
+<span>Đang sinh hoạt</span>
+<span class="px-2 py-0.5 rounded-full bg-brand-200/70 text-brand-800 text-[11px]">23</span>
+</button>
+<button class="flex-1 sm:flex-initial px-6 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-900 transition-all flex items-center justify-center space-x-2">
+<span>Đã kết thúc / Tạm dừng</span>
+<span class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[11px]">7</span>
+</button>
+</div>
+<!-- Filter Bar & Search Tools -->
+<div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-3">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3">
+<!-- Search Box -->
+<div class="lg:col-span-6 relative">
+<div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<input class="w-full pl-10 pr-4 py-2 text-xs rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-all text-slate-800 placeholder-slate-400 bg-slate-50/50 hover:bg-white" placeholder="Tìm theo mã TV (#1), họ tên, biệt danh, tài khoản..." type="text"/>
+</div>
+<!-- Filter PHR Level -->
+<div class="lg:col-span-3">
+<select class="w-full py-2 px-3 text-xs rounded-xl border border-slate-200 text-slate-700 bg-slate-50/50 hover:bg-white focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-all font-medium">
+<option value="">Trình độ PHR / DUPR (Tất cả)</option>
+<option value="2.0-2.5">2.0 - 2.5 (Tân thủ)</option>
+<option value="2.6-3.0">2.6 - 3.0 (Cơ bản)</option>
+<option value="3.1-3.5">3.1 - 3.5 (Khá)</option>
+<option value="3.5+">3.5+ (Chuyên sâu)</option>
+</select>
+</div>
+<!-- Filter Account Link Status -->
+<div class="lg:col-span-3">
+<select class="w-full py-2 px-3 text-xs rounded-xl border border-slate-200 text-slate-700 bg-slate-50/50 hover:bg-white focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-all font-medium">
+<option value="">Tài khoản liên kết (Tất cả)</option>
+<option value="linked">Đã liên kết tài khoản (18)</option>
+<option value="unlinked">Chưa liên kết tài khoản (5)</option>
+</select>
+</div>
+</div>
+<!-- Metric Subheader Strip -->
+<div class="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between text-xs text-slate-500">
+<div class="flex items-center space-x-3">
+<span class="inline-flex items-center text-slate-700 font-semibold">
+<span class="w-2 h-2 rounded-full bg-brand-600 mr-1.5"></span>
+              Tổng số: 30 VĐV
+            </span>
+<span>•</span>
+<span class="text-emerald-700 font-medium">23 đang sinh hoạt</span>
+<span>•</span>
+<span class="text-indigo-700 font-medium">18 đã liên kết App</span>
+</div>
+<div class="text-[11px] text-slate-400">
+            Dữ liệu đồng bộ lúc 08:30 hôm nay
+          </div>
+</div>
+</div>
+<!-- BEGIN: MemberTable -->
+<div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-slate-200 bg-slate-50/80 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+<th class="py-3.5 pl-5 pr-2 w-10">
+<input class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 h-4 w-4" type="checkbox"/>
+</th>
+<th class="py-3.5 px-3 w-16">MÃ TV</th>
+<th class="py-3.5 px-4 min-w-[200px]">VẬN ĐỘNG VIÊN</th>
+<th class="py-3.5 px-4 min-w-[170px]">BIỆT DANH CLB</th>
+<th class="py-3.5 px-4 min-w-[140px]">TRÌNH ĐỘ PHR</th>
+<th class="py-3.5 px-4 min-w-[150px]">TRẠNG THÁI</th>
+<th class="py-3.5 px-5 text-right min-w-[190px]">QUẢN LÝ</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 text-xs">
+<!-- ROW 1: #4 ĐẶNG NGỌC DƯƠNG -->
+<tr class="hover:bg-slate-50/70 transition-colors group">
+<td class="py-3 pl-5 pr-2">
+<input class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 h-4 w-4" type="checkbox"/>
+</td>
+<td class="py-3 px-3 font-mono font-bold text-slate-900">#4</td>
+<td class="py-3 px-4">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 rounded-full bg-brand-100 text-brand-700 font-bold flex items-center justify-center shrink-0 text-xs">
+                      Đ
+                    </div>
+<div>
+<a class="font-bold text-slate-900 hover:text-brand-700 transition-colors uppercase" href="#">ĐẶNG NGỌC DƯƠNG</a>
+<span class="flex items-center text-[11px] text-emerald-600 font-medium">
+<svg class="w-3 h-3 mr-1" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
+                        Đã liên kết @duong.dang
+                      </span>
+</div>
+</div>
+</td>
+<td class="py-3 px-4 font-semibold text-slate-700 uppercase">ĐẶNG NGỌC DƯƠNG</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-semibold bg-violet-50 text-violet-700 border border-violet-200">
+                    2.9 • Cơ bản
+                  </span>
+</td>
+<td class="py-3 px-4">
+<div class="flex flex-col">
+<span class="inline-flex items-center w-max px-2 py-0.5 rounded-full text-[11px] font-bold bg-brand-50 text-brand-700">
+<span class="w-1.5 h-1.5 rounded-full bg-brand-600 mr-1.5"></span>
+                      Đang sinh hoạt
+                    </span>
+<span class="text-[10px] text-slate-400 mt-0.5 font-mono">Từ 2026-01-17</span>
+</div>
+</td>
+<td class="py-3 px-5 text-right space-x-1.5">
+<button class="px-2.5 py-1 text-xs font-semibold rounded-lg text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 transition-colors">Chỉnh sửa</button>
+<button class="px-2.5 py-1 text-xs font-semibold rounded-lg text-rose-600 bg-white border border-rose-200 hover:bg-rose-50 transition-colors">Kết thúc</button>
+</td>
+</tr>
+<!-- ROW 2: #2 ĐẶNG TIẾN ANH -->
+<tr class="hover:bg-slate-50/70 transition-colors group">
+<td class="py-3 pl-5 pr-2">
+<input class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 h-4 w-4" type="checkbox"/>
+</td>
+<td class="py-3 px-3 font-mono font-bold text-slate-900">#2</td>
+<td class="py-3 px-4">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 rounded-full bg-brand-100 text-brand-700 font-bold flex items-center justify-center shrink-0 text-xs">
+                      Đ
+                    </div>
+<div>
+<a class="font-bold text-slate-900 hover:text-brand-700 transition-colors uppercase" href="#">ĐẶNG TIẾN ANH</a>
+<span class="text-[11px] text-slate-400 block font-normal">Chưa liên kết tài khoản</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-4 font-semibold text-slate-700 uppercase">ĐẶNG TIẾN ANH</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-200">
+                    2.5 • Tân thủ
+                  </span>
+</td>
+<td class="py-3 px-4">
+<div class="flex flex-col">
+<span class="inline-flex items-center w-max px-2 py-0.5 rounded-full text-[11px] font-bold bg-brand-50 text-brand-700">
+<span class="w-1.5 h-1.5 rounded-full bg-brand-600 mr-1.5"></span>
+                      Đang sinh hoạt
+                    </span>
+<span class="text-[10px] text-slate-400 mt-0.5 font-mono">Từ 2026-01-17</span>
+</div>
+</td>
+<td class="py-3 px-5 text-right space-x-1.5">
+<button class="px-2.5 py-1 text-xs font-semibold rounded-lg text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 transition-colors">Chỉnh sửa</button>
+<button class="px-2.5 py-1 text-xs font-semibold rounded-lg text-rose-600 bg-white border border-rose-200 hover:bg-rose-50 transition-colors">Kết thúc</button>
+</td>
+</tr>
+<!-- ROW 3: #1 ĐỖ ĐỨC TÚ -->
+<tr class="hover:bg-slate-50/70 transition-colors group">
+<td class="py-3 pl-5 pr-2">
+<input class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 h-4 w-4" type="checkbox"/>
+</td>
+<td class="py-3 px-3 font-mono font-bold text-slate-900">#1</td>
+<td class="py-3 px-4">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center shrink-0 text-xs">
+                      Đ
+                    </div>
+<div>
+<div class="flex items-center space-x-1.5">
+<a class="font-bold text-slate-900 hover:text-brand-700 transition-colors uppercase" href="#">ĐỖ ĐỨC TÚ</a>
+<span class="text-[9px] px-1.5 py-0.5 bg-amber-100 text-amber-800 font-bold rounded">ADMIN</span>
+</div>
+<span class="flex items-center text-[11px] text-emerald-600 font-medium">
+<svg class="w-3 h-3 mr-1" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
+                        Đã liên kết @tu.doductu
+                      </span>
+</div>
+</div>
+</td>
+<td class="py-3 px-4 font-semibold text-slate-700 uppercase">ĐỖ ĐỨC TÚ</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    3.3 • Khá
+                  </span>
+</td>
+<td class="py-3 px-4">
+<div class="flex flex-col">
+<span class="inline-flex items-center w-max px-2 py-0.5 rounded-full text-[11px] font-bold bg-brand-50 text-brand-700">
+<span class="w-1.5 h-1.5 rounded-full bg-brand-600 mr-1.5"></span>
+                      Đang sinh hoạt
+                    </span>
+<span class="text-[10px] text-slate-400 mt-0.5 font-mono">Từ 2026-01-17</span>
+</div>
+</td>
+<td class="py-3 px-5 text-right space-x-1.5">
+<button class="px-2.5 py-1 text-xs font-semibold rounded-lg text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 transition-colors">Chỉnh sửa</button>
+<button class="px-2.5 py-1 text-xs font-semibold rounded-lg text-rose-600 bg-white border border-rose-200 hover:bg-rose-50 transition-colors">Kết thúc</button>
+</td>
+</tr>
+<!-- ROW 4: #6 ĐỒNG MẠNH LINH -->
+<tr class="hover:bg-slate-50/70 transition-colors group">
+<td class="py-3 pl-5 pr-2">
+<input class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 h-4 w-4" type="checkbox"/>
+</td>
+<td class="py-3 px-3 font-mono font-bold text-slate-900">#6</td>
+<td class="py-3 px-4">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center shrink-0 text-xs">
+                      Đ
+                    </div>
+<div>
+<a class="font-bold text-slate-900 hover:text-brand-700 transition-colors uppercase" href="#">ĐỒNG MẠNH LINH</a>
+<span class="text-[11px] text-slate-400 block font-normal">Chưa liên kết tài khoản</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-4 font-semibold text-slate-700 uppercase">ĐỒNG MẠNH LINH</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-semibold bg-violet-50 text-violet-700 border border-violet-200">
+                    2.8 • Cơ bản
+                  </span>
+</td>
+<td class="py-3 px-4">
+<div class="flex flex-col">
+<span class="inline-flex items-center w-max px-2 py-0.5 rounded-full text-[11px] font-bold bg-brand-50 text-brand-700">
+<span class="w-1.5 h-1.5 rounded-full bg-brand-600 mr-1.5"></span>
+                      Đang sinh hoạt
+                    </span>
+<span class="text-[10px] text-slate-400 mt-0.5 font-mono">Từ 2026-01-17</span>
+</div>
+</td>
+<td class="py-3 px-5 text-right space-x-1.5">
+<button class="px-2.5 py-1 text-xs font-semibold rounded-lg text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 transition-colors">Chỉnh sửa</button>
+<button class="px-2.5 py-1 text-xs font-semibold rounded-lg text-rose-600 bg-white border border-rose-200 hover:bg-rose-50 transition-colors">Kết thúc</button>
+</td>
+</tr>
+<!-- ROW 5: #5 NGUYỄN CHƯƠNG LONG -->
+<tr class="hover:bg-slate-50/70 transition-colors group">
+<td class="py-3 pl-5 pr-2">
+<input class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 h-4 w-4" type="checkbox"/>
+</td>
+<td class="py-3 px-3 font-mono font-bold text-slate-900">#5</td>
+<td class="py-3 px-4">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center shrink-0 text-xs">
+                      N
+                    </div>
+<div>
+<a class="font-bold text-slate-900 hover:text-brand-700 transition-colors uppercase" href="#">NGUYỄN CHƯƠNG LONG</a>
+<span class="flex items-center text-[11px] text-emerald-600 font-medium">
+<svg class="w-3 h-3 mr-1" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
+                        Đã liên kết @chuonglong
+                      </span>
+</div>
+</div>
+</td>
+<td class="py-3 px-4 font-semibold text-slate-700 uppercase">NGUYỄN CHƯƠNG LONG</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-semibold bg-violet-50 text-violet-700 border border-violet-200">
+                    2.9 • Cơ bản
+                  </span>
+</td>
+<td class="py-3 px-4">
+<div class="flex flex-col">
+<span class="inline-flex items-center w-max px-2 py-0.5 rounded-full text-[11px] font-bold bg-brand-50 text-brand-700">
+<span class="w-1.5 h-1.5 rounded-full bg-brand-600 mr-1.5"></span>
+                      Đang sinh hoạt
+                    </span>
+<span class="text-[10px] text-slate-400 mt-0.5 font-mono">Từ 2026-01-17</span>
+</div>
+</td>
+<td class="py-3 px-5 text-right space-x-1.5">
+<button class="px-2.5 py-1 text-xs font-semibold rounded-lg text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 transition-colors">Chỉnh sửa</button>
+<button class="px-2.5 py-1 text-xs font-semibold rounded-lg text-rose-600 bg-white border border-rose-200 hover:bg-rose-50 transition-colors">Kết thúc</button>
+</td>
+</tr>
+<!-- ROW 6: #12 NGUYỄN MẠNH THẮNG -->
+<tr class="hover:bg-slate-50/70 transition-colors group">
+<td class="py-3 pl-5 pr-2">
+<input class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 h-4 w-4" type="checkbox"/>
+</td>
+<td class="py-3 px-3 font-mono font-bold text-slate-900">#12</td>
+<td class="py-3 px-4">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 rounded-full bg-cyan-100 text-cyan-700 font-bold flex items-center justify-center shrink-0 text-xs">
+                      N
+                    </div>
+<div>
+<a class="font-bold text-slate-900 hover:text-brand-700 transition-colors uppercase" href="#">NGUYỄN MẠNH THẮNG</a>
+<span class="text-[11px] text-slate-400 block font-normal">Chưa liên kết tài khoản</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-4 font-semibold text-slate-700 uppercase">NGUYỄN MẠNH THẮNG</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    3.1 • Khá
+                  </span>
+</td>
+<td class="py-3 px-4">
+<div class="flex flex-col">
+<span class="inline-flex items-center w-max px-2 py-0.5 rounded-full text-[11px] font-bold bg-brand-50 text-brand-700">
+<span class="w-1.5 h-1.5 rounded-full bg-brand-600 mr-1.5"></span>
+                      Đang sinh hoạt
+                    </span>
+<span class="text-[10px] text-slate-400 mt-0.5 font-mono">Từ 2026-01-17</span>
+</div>
+</td>
+<td class="py-3 px-5 text-right space-x-1.5">
+<button class="px-2.5 py-1 text-xs font-semibold rounded-lg text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 transition-colors">Chỉnh sửa</button>
+<button class="px-2.5 py-1 text-xs font-semibold rounded-lg text-rose-600 bg-white border border-rose-200 hover:bg-rose-50 transition-colors">Kết thúc</button>
+</td>
+</tr>
+<!-- ROW 7: #49 BÙI VĂN SƠN (SƠN THỔ ĐỊA) -->
+<tr class="hover:bg-slate-50/70 transition-colors group">
+<td class="py-3 pl-5 pr-2">
+<input class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 h-4 w-4" type="checkbox"/>
+</td>
+<td class="py-3 px-3 font-mono font-bold text-slate-900">#49</td>
+<td class="py-3 px-4">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 rounded-full bg-amber-100 text-amber-800 font-bold flex items-center justify-center shrink-0 text-xs">
+                      B
+                    </div>
+<div>
+<a class="font-bold text-slate-900 hover:text-brand-700 transition-colors uppercase" href="#">BÙI VĂN SƠN</a>
+<span class="flex items-center text-[11px] text-emerald-600 font-medium">
+<svg class="w-3 h-3 mr-1" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
+                        Đã liên kết @son.thodia
+                      </span>
+</div>
+</div>
+</td>
+<td class="py-3 px-4">
+<span class="font-semibold text-slate-900">Sơn Thổ Địa</span>
+<span class="text-[10px] text-slate-400 block">Biệt danh thường dùng</span>
+</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    3.4 • Khá
+                  </span>
+</td>
+<td class="py-3 px-4">
+<div class="flex flex-col">
+<span class="inline-flex items-center w-max px-2 py-0.5 rounded-full text-[11px] font-bold bg-brand-50 text-brand-700">
+<span class="w-1.5 h-1.5 rounded-full bg-brand-600 mr-1.5"></span>
+                      Đang sinh hoạt
+                    </span>
+<span class="text-[10px] text-slate-400 mt-0.5 font-mono">Từ 2026-09-04</span>
+</div>
+</td>
+<td class="py-3 px-5 text-right space-x-1.5">
+<button class="px-2.5 py-1 text-xs font-semibold rounded-lg text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 transition-colors">Chỉnh sửa</button>
+<button class="px-2.5 py-1 text-xs font-semibold rounded-lg text-rose-600 bg-white border border-rose-200 hover:bg-rose-50 transition-colors">Kết thúc</button>
+</td>
+</tr>
+<!-- ROW 8: #35 PHẠM XUÂN NGỌC HOÀNG -->
+<tr class="hover:bg-slate-50/70 transition-colors group">
+<td class="py-3 pl-5 pr-2">
+<input class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 h-4 w-4" type="checkbox"/>
+</td>
+<td class="py-3 px-3 font-mono font-bold text-slate-900">#35</td>
+<td class="py-3 px-4">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 rounded-full bg-pink-100 text-pink-700 font-bold flex items-center justify-center shrink-0 text-xs">
+                      P
+                    </div>
+<div>
+<a class="font-bold text-slate-900 hover:text-brand-700 transition-colors uppercase" href="#">PHẠM XUÂN NGỌC HOÀNG</a>
+<span class="text-[11px] text-slate-400 block font-normal">Chưa liên kết tài khoản</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-4 font-semibold text-slate-700 uppercase">PHẠM XUÂN NGỌC HOÀNG</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-semibold bg-violet-50 text-violet-700 border border-violet-200">
+                    2.7 • Cơ bản
+                  </span>
+</td>
+<td class="py-3 px-4">
+<div class="flex flex-col">
+<span class="inline-flex items-center w-max px-2 py-0.5 rounded-full text-[11px] font-bold bg-brand-50 text-brand-700">
+<span class="w-1.5 h-1.5 rounded-full bg-brand-600 mr-1.5"></span>
+                      Đang sinh hoạt
+                    </span>
+<span class="text-[10px] text-slate-400 mt-0.5 font-mono">Từ 2026-06-16</span>
+</div>
+</td>
+<td class="py-3 px-5 text-right space-x-1.5">
+<button class="px-2.5 py-1 text-xs font-semibold rounded-lg text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 transition-colors">Chỉnh sửa</button>
+<button class="px-2.5 py-1 text-xs font-semibold rounded-lg text-rose-600 bg-white border border-rose-200 hover:bg-rose-50 transition-colors">Kết thúc</button>
+</td>
+</tr>
+<!-- ROW 9: #7 TRẦN TẤT HẢO -->
+<tr class="hover:bg-slate-50/70 transition-colors group">
+<td class="py-3 pl-5 pr-2">
+<input class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 h-4 w-4" type="checkbox"/>
+</td>
+<td class="py-3 px-3 font-mono font-bold text-slate-900">#7</td>
+<td class="py-3 px-4">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 font-bold flex items-center justify-center shrink-0 text-xs">
+                      T
+                    </div>
+<div>
+<a class="font-bold text-slate-900 hover:text-brand-700 transition-colors uppercase" href="#">TRẦN TẤT HẢO</a>
+<span class="flex items-center text-[11px] text-emerald-600 font-medium">
+<svg class="w-3 h-3 mr-1" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
+                        Đã liên kết @hao.tran
+                      </span>
+</div>
+</div>
+</td>
+<td class="py-3 px-4 font-semibold text-slate-700 uppercase">TRẦN TẤT HẢO</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-semibold bg-violet-50 text-violet-700 border border-violet-200">
+                    2.8 • Cơ bản
+                  </span>
+</td>
+<td class="py-3 px-4">
+<div class="flex flex-col">
+<span class="inline-flex items-center w-max px-2 py-0.5 rounded-full text-[11px] font-bold bg-brand-50 text-brand-700">
+<span class="w-1.5 h-1.5 rounded-full bg-brand-600 mr-1.5"></span>
+                      Đang sinh hoạt
+                    </span>
+<span class="text-[10px] text-slate-400 mt-0.5 font-mono">Từ 2026-01-17</span>
+</div>
+</td>
+<td class="py-3 px-5 text-right space-x-1.5">
+<button class="px-2.5 py-1 text-xs font-semibold rounded-lg text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 transition-colors">Chỉnh sửa</button>
+<button class="px-2.5 py-1 text-xs font-semibold rounded-lg text-rose-600 bg-white border border-rose-200 hover:bg-rose-50 transition-colors">Kết thúc</button>
+</td>
+</tr>
+<!-- ROW 10: #3 VŨ DUY TÙNG -->
+<tr class="hover:bg-slate-50/70 transition-colors group">
+<td class="py-3 pl-5 pr-2">
+<input class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 h-4 w-4" type="checkbox"/>
+</td>
+<td class="py-3 px-3 font-mono font-bold text-slate-900">#3</td>
+<td class="py-3 px-4">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 rounded-full bg-teal-100 text-teal-800 font-bold flex items-center justify-center shrink-0 text-xs">
+                      V
+                    </div>
+<div>
+<a class="font-bold text-slate-900 hover:text-brand-700 transition-colors uppercase" href="#">VŨ DUY TÙNG</a>
+<span class="flex items-center text-[11px] text-emerald-600 font-medium">
+<svg class="w-3 h-3 mr-1" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
+                        Đã liên kết @tung.vuduy
+                      </span>
+</div>
+</div>
+</td>
+<td class="py-3 px-4 font-semibold text-slate-700 uppercase">VŨ DUY TÙNG</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    3.0 • Cơ bản+
+                  </span>
+</td>
+<td class="py-3 px-4">
+<div class="flex flex-col">
+<span class="inline-flex items-center w-max px-2 py-0.5 rounded-full text-[11px] font-bold bg-brand-50 text-brand-700">
+<span class="w-1.5 h-1.5 rounded-full bg-brand-600 mr-1.5"></span>
+                      Đang sinh hoạt
+                    </span>
+<span class="text-[10px] text-slate-400 mt-0.5 font-mono">Từ 2026-01-17</span>
+</div>
+</td>
+<td class="py-3 px-5 text-right space-x-1.5">
+<button class="px-2.5 py-1 text-xs font-semibold rounded-lg text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 transition-colors">Chỉnh sửa</button>
+<button class="px-2.5 py-1 text-xs font-semibold rounded-lg text-rose-600 bg-white border border-rose-200 hover:bg-rose-50 transition-colors">Kết thúc</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- BEGIN: TablePagination -->
+<div class="px-6 py-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-slate-50/50">
+<div class="text-xs text-slate-500">
+            Hiển thị <span class="font-bold text-slate-800">1</span> - <span class="font-bold text-slate-800">10</span> trên tổng số <span class="font-bold text-slate-800">23</span> thành viên đang hoạt động
+          </div>
+<div class="flex items-center space-x-1.5">
+<button class="px-3 py-1.5 text-xs font-semibold text-slate-400 bg-white border border-slate-200 rounded-lg cursor-not-allowed opacity-60" disabled="">
+              Trước
+            </button>
+<button class="px-3 py-1.5 text-xs font-bold text-white bg-brand-700 rounded-lg shadow-xs">
+              1
+            </button>
+<button class="px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-100 rounded-lg transition-colors">
+              2
+            </button>
+<button class="px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-100 rounded-lg transition-colors">
+              3
+            </button>
+<button class="px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-100 rounded-lg transition-colors">
+              Sau
+            </button>
+</div>
+</div>
+<!-- END: TablePagination -->
+</div>
+<!-- END: MemberTable -->
+</main>
+<!-- END: MainBodyWrapper -->
+<!-- BEGIN: GlobalFooter -->
+<footer class="mt-auto px-8 py-4 border-t border-slate-200 text-xs text-slate-400 flex flex-col sm:flex-row items-center justify-between bg-white">
+<div class="flex items-center space-x-2">
+<span class="w-2 h-2 rounded-full bg-brand-600"></span>
+<span class="font-semibold text-slate-700">Pickleball 246 Club</span>
+<span>•</span>
+<span>Hệ thống quản lý tài chính &amp; VĐV</span>
+</div>
+<div class="mt-2 sm:mt-0 font-mono text-[11px] text-slate-400">
+        Thiết kế chuẩn Web App • Phiên bản 2.4.0
+      </div>
+</footer>
+<!-- END: GlobalFooter -->
+</div>
+<!-- END: MainContentArea -->
+</body></html>

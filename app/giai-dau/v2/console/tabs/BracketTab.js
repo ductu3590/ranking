@@ -45,6 +45,8 @@ export default function BracketTab({ tournamentId, stageId, stages }) {
     }, [load]);
 
     if (!isKnockout) {
+        // Giải không có chặng loại trực tiếp nào (vd. vòng tròn một chặng): không hiện gì.
+        if (!(stages || []).some((s) => s.schedule_format === 'knockout')) return null;
         return (
             <div className="v2-state v2-empty">
                 <p>Chỉ áp dụng cho thể thức loại trực tiếp.</p>

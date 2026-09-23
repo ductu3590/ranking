@@ -8,6 +8,7 @@ import { getScheduleEngine } from '@/lib/tournament/engines';
 import { loadStageData, loadScoringContext, stageWithResolvedTiebreak } from '@/lib/tournament/standingsService';
 import { isStageComplete, seedNextStage } from '@/lib/tournament/orchestrator';
 import { findNextStage } from '@/lib/tournament/nextStage';
+import { resolveGroupKnockoutAdvance } from '@/lib/tournament/setupPlans/groupKnockout';
 
 // Xung dot nghiep vu nay ERRCODE 'PH409' (migration 078). Truoc day dung 40001,
 // nhung 40001 la serialization_failure nen tang tren tu dong retry va request treo.
@@ -87,7 +88,12 @@ export async function POST(request) {
         }
 
         if (!isStageComplete(loaded.matches)) {
-            return NextResponse.json({ error: 'Stage chưa hoàn tất' }, { status: 400 });
+            return NextResponse.json({
+                error: {
+                    code: 'ADVANCE_RESULTS_INCOMPLETE',
+                    message: 'Stage chưa hoàn tất',
+                },
+            }, { status: 400 });
         }
 
         // 3. Compute standings before advancing
@@ -114,6 +120,54 @@ export async function POST(request) {
         } catch (e) {
             console.error('Advance engine error:', e);
             return NextResponse.json({ error: e.message }, { status: 400 });
+        }
+
+        // Stage do finalize v4 tạo (spec Lát A §11): có suất bù chéo bảng + hoán đổi tránh
+        // cùng bảng. Phân công tính ở server rồi RPC v2 kiểm và ghi. Stage cũ đi nhánh dưới.
+        if (stage.division_id != null && String(stage.config?.setupPlanVersion) === '4') {
+            const { data: edgeRows, error: edgeError } = await db
+                .from('tournament_stage_transitions')
+                .select('id, source_kind, source_group_label, source_rank, source_pool_position, target_match_id, target_slot')
+                .eq('group_id', groupId)
+                .eq('source_stage_id', stage.id)
+                .in('source_kind', ['group_rank', 'group_rank_pool']);
+            if (edgeError) return NextResponse.json({ error: edgeError.message }, { status: 500 });
+            // Vòng tròn (Lát B) không có tuyến đi tiếp: để nhánh chung bên dưới đánh dấu chặng cuối.
+            if ((edgeRows || []).length) {
+                const targetIds = [...new Set((edgeRows || []).map((edge) => edge.target_match_id))];
+                const { data: targetRows, error: targetError } = targetIds.length
+                    ? await db.from('tournament_matches').select('id, match_key').eq('group_id', groupId).in('id', targetIds)
+                    : { data: [], error: null };
+                if (targetError) return NextResponse.json({ error: targetError.message }, { status: 500 });
+                const matchKeyById = new Map((targetRows || []).map((row) => [row.id, row.match_key]));
+                let resolved;
+                try {
+                    resolved = resolveGroupKnockoutAdvance({
+                        edges: (edgeRows || []).map((edge) => ({
+                            id: edge.id,
+                            kind: edge.source_kind,
+                            groupLabel: edge.source_group_label,
+                            rank: edge.source_rank,
+                            poolPosition: edge.source_pool_position,
+                            targetMatchKey: matchKeyById.get(edge.target_match_id) || String(edge.target_match_id),
+                            targetSlot: edge.target_slot,
+                        })),
+                        standings,
+                        seed: expectedResultsFingerprint,
+                    });
+                } catch (e) {
+                    return NextResponse.json({ error: e.message, code: e.code || 'GROUP_RANKING_MISSING' }, { status: 400 });
+                }
+                const { data, error } = await db.rpc('advance_division_group_rank_transitions_v2', {
+                    p_group_id: groupId,
+                    p_stage_id: stage.id,
+                    p_resolved: resolved.map((item) => ({ transition_id: item.transitionId, entry_id: item.entryId, swapped: item.swapped })),
+                    p_idempotency_key: idempotencyKey,
+                    p_expected_results_fingerprint: expectedResultsFingerprint,
+                });
+                if (error) return rpcErrorResponse(error);
+                return NextResponse.json(data || { success: true, transitioned: true });
+            }
         }
 
         // Unified group-to-playoff plans own their destination slots explicitly.

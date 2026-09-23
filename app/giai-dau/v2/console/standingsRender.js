@@ -18,6 +18,8 @@ function RoundRobinStandings({ rows, entrantsById, outlook }) {
         groups[key].push(r);
     }
     const labels = Object.keys(groups).sort();
+    // Chặng cuối (vd. vòng tròn một chặng) không có suất đi tiếp: bỏ hẳn cột.
+    const showOutlook = Boolean(outlook && Object.keys(outlook).length);
 
     return (
         <div className="v2-standings">
@@ -37,7 +39,7 @@ function RoundRobinStandings({ rows, entrantsById, outlook }) {
                                         <th>B</th>
                                         <th>Hiệu số</th>
                                         <th>Điểm</th>
-                                        <th>Suất đi tiếp</th>
+                                        {showOutlook ? <th>Suất đi tiếp</th> : null}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -50,7 +52,7 @@ function RoundRobinStandings({ rows, entrantsById, outlook }) {
                                             <td>{r.lost}</td>
                                             <td>{r.diff > 0 ? `+${r.diff}` : r.diff}</td>
                                             <td className="v2-st-pts">{r.match_points}</td>
-                                            <td>{outlook?.[r.entrant_id]?.label || '—'}</td>
+                                            {showOutlook ? <td>{outlook[r.entrant_id]?.label || '—'}</td> : null}
                                         </tr>
                                     ))}
                                 </tbody>

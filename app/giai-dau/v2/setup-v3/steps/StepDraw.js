@@ -155,7 +155,7 @@ function Criteria({ plan }) {
   return (
     <section className="pc-card">
       <div className="pc-card__head"><h3 className="pc-card__title"><span className="pc-section-key">{plan.counts.knockoutMatches ? 4 : 3}</span>Tiêu chí xếp hạng (chỉ đọc)</h3></div>
-      <p style={{ margin: '0 0 0.5rem' }}><strong>Trong mỗi bảng:</strong> theo quy chế xếp hạng của giải (mặc định: điểm trận → hiệu số điểm → đối đầu → tổng điểm ghi).</p>
+      <p style={{ margin: '0 0 0.5rem' }}><strong>{(plan.groups || []).length > 1 ? 'Trong mỗi bảng:' : 'Bảng xếp hạng:'}</strong> theo quy chế xếp hạng của giải (mặc định: điểm trận → hiệu số điểm → đối đầu → tổng điểm ghi).</p>
       {pool ? (
         <p style={{ margin: 0 }}><strong>So giữa các bảng cho suất bù:</strong> tỉ lệ thắng → hiệu số điểm trung bình mỗi trận → điểm ghi trung bình mỗi trận → bốc thăm. Dùng số trung bình để bảng ít cặp không bị thiệt.</p>
       ) : null}

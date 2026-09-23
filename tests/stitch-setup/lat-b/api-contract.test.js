@@ -7,6 +7,11 @@ const m102 = read('database/migrations/102_finalize_internal_setup_v4.sql').repl
 const advance = read('app/api/tournament-v2/advance/route.js');
 const draw = read('app/giai-dau/v2/setup-v3/steps/StepDraw.js');
 const format = read('app/giai-dau/v2/setup-v3/steps/StepFormatPairing.js');
+const standingsRoute = read('app/api/tournament-v2/standings/route.js');
+const standingsTab = read('app/giai-dau/v2/console/tabs/StandingsTab.js');
+const standingsRender = read('app/giai-dau/v2/console/standingsRender.js');
+const bracketTab = read('app/giai-dau/v2/console/tabs/BracketTab.js');
+const m106 = read('database/migrations/106_fix_advance_division_entry_stage_ambiguity.sql');
 
 suite('lát B — hợp đồng API, migration, UI', {
   'migration 104: mở round_robin, giữ signature/grants, không phá dữ liệu'() {
@@ -46,5 +51,28 @@ suite('lát B — hợp đồng API, migration, UI', {
     assert.ok(draw.includes('`Lượt ${match.round}`'));
     assert.ok(format.includes("draft.format.formatKey === 'round_robin' ?"));
     assert.ok(format.includes('mỗi trận 1 ván (BO1)'));
+    assert.ok(draw.includes("(plan.groups || []).length > 1 ? 'Trong mỗi bảng:' : 'Bảng xếp hạng:'"), 'tiêu chí không nói "mỗi bảng" khi chỉ có một bảng');
+  },
+
+  'standings: stage v4 lấy suất từ advancePerGroup; 0 suất thì không có outlook, bỏ cột'() {
+    assert.ok(standingsRoute.includes("Number(stage.config?.advancePerGroup || 0)"));
+    assert.ok(standingsRoute.includes('advance > 0 ? Object.entries('));
+    assert.ok(standingsRoute.includes("label: 'Xét suất bù'"), 'vòng bảng có suất bù: hạng kế tiếp chưa bị loại');
+    assert.ok(standingsRender.includes('showOutlook ? <th>Suất đi tiếp</th> : null'));
+  },
+
+  'console: chặng cuối là "Kết thúc giải", đã xong thì báo chung cuộc; không có nhánh thì ẩn sơ đồ'() {
+    assert.ok(standingsTab.includes("'Kết thúc giải & chốt xếp hạng'"));
+    assert.ok(standingsTab.includes('canAdvance && !(completed && isLastStage)'));
+    assert.ok(bracketTab.includes("if (!(stages || []).some((s) => s.schedule_format === 'knockout')) return null;"));
+  },
+
+  'migration 106: biến lặp không trùng alias cột seeded(item); signature/grants giữ nguyên'() {
+    const body = m106.slice(m106.indexOf('DECLARE'), m106.indexOf('$$;'));
+    assert.equal(/^\s*item jsonb;/m.test(body), false, 'không còn biến item');
+    assert.ok(body.includes('FOR v_item IN SELECT value FROM jsonb_array_elements(p_seeded) LOOP'));
+    assert.ok(/GRANT EXECUTE ON FUNCTION public\.advance_division_entry_stage\(bigint, bigint, bigint, jsonb, text\)\s+TO service_role;/.test(m106));
+    assert.ok(m106.includes("USING ERRCODE = 'PH409'"), 'giữ mã xung đột của 078');
+    assert.equal(/\b(DROP|TRUNCATE|DELETE\s+FROM)\b/i.test(m106), false);
   },
 });

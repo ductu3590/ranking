@@ -1,0 +1,137 @@
+-- Sửa advance_division_entry_stage (062) chưa từng chạy được: biến PL/pgSQL `item` trùng alias cột
+-- `seeded(item)` → mọi lệnh gọi lỗi 42702 "column reference item is ambiguous" (bảng
+-- tournament_stage_advance_mutations trên production rỗng). Phát hiện khi kết thúc giải vòng tròn
+-- Lát B: stage cuối không có tuyến đi tiếp nên advance route đi nhánh chung gọi hàm này.
+-- Chỉ đổi tên biến cục bộ (v_item, v_payload_fingerprint, v_result); logic, signature, grants giữ
+-- nguyên; ERRCODE 'PH409' giữ theo bản đang chạy (078 đã đổi từ 40001).
+BEGIN;
+
+CREATE OR REPLACE FUNCTION public.advance_division_entry_stage(
+  p_group_id bigint,
+  p_stage_id bigint,
+  p_next_stage_id bigint,
+  p_seeded jsonb,
+  p_idempotency_key text
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  current_stage public.tournament_stages%ROWTYPE;
+  next_stage public.tournament_stages%ROWTYPE;
+  cached public.tournament_stage_advance_mutations%ROWTYPE;
+  v_item jsonb;
+  v_payload_fingerprint text;
+  v_result jsonb;
+BEGIN
+  IF p_idempotency_key IS NULL OR length(btrim(p_idempotency_key)) NOT BETWEEN 1 AND 200 THEN
+    RAISE EXCEPTION 'idempotency key is required' USING ERRCODE = '22023';
+  END IF;
+  IF COALESCE(jsonb_typeof(p_seeded), '') <> 'array' THEN
+    RAISE EXCEPTION 'seeded entries must be an array' USING ERRCODE = '22023';
+  END IF;
+  IF EXISTS (
+    SELECT 1 FROM jsonb_array_elements(p_seeded) seeded(item)
+    WHERE jsonb_typeof(item) <> 'object'
+      OR COALESCE(item->>'entry_id', '') !~ '^\d+$'
+      OR (item ? 'seed_in_stage' AND COALESCE(item->>'seed_in_stage', '') !~ '^\d+$')
+  ) OR EXISTS (
+    SELECT item->>'entry_id' FROM jsonb_array_elements(p_seeded) seeded(item)
+    GROUP BY item->>'entry_id' HAVING count(*) > 1
+  ) THEN
+    RAISE EXCEPTION 'invalid or duplicate seeded entry payload' USING ERRCODE = '22023';
+  END IF;
+
+  v_payload_fingerprint := md5(jsonb_build_object(
+    'stage_id', p_stage_id, 'next_stage_id', p_next_stage_id, 'seeded', p_seeded
+  )::text);
+  PERFORM pg_advisory_xact_lock(hashtextextended(
+    p_group_id::text || ':division-entry-advance:' || p_idempotency_key, 0
+  ));
+  SELECT * INTO cached FROM public.tournament_stage_advance_mutations
+  WHERE group_id = p_group_id
+    AND operation = 'advance_division_entry_stage'
+    AND idempotency_key = p_idempotency_key
+  FOR UPDATE;
+  IF FOUND THEN
+    IF cached.stage_id <> p_stage_id
+      OR cached.next_stage_id IS DISTINCT FROM p_next_stage_id
+      OR cached.payload_fingerprint <> v_payload_fingerprint THEN
+      RAISE EXCEPTION 'IDEMPOTENCY_KEY_REUSED' USING ERRCODE = '22023';
+    END IF;
+    RETURN cached.response;
+  END IF;
+
+  SELECT * INTO current_stage FROM public.tournament_stages
+  WHERE id = p_stage_id AND group_id = p_group_id FOR UPDATE;
+  IF NOT FOUND OR current_stage.division_id IS NULL THEN
+    RAISE EXCEPTION 'division current stage not found' USING ERRCODE = 'P0002';
+  END IF;
+
+  IF p_next_stage_id IS NOT NULL THEN
+    SELECT * INTO next_stage FROM public.tournament_stages
+    WHERE id = p_next_stage_id AND group_id = p_group_id FOR UPDATE;
+    IF NOT FOUND
+      OR next_stage.tournament_id IS DISTINCT FROM current_stage.tournament_id
+      OR next_stage.division_id IS DISTINCT FROM current_stage.division_id
+      OR next_stage.stage_order IS DISTINCT FROM current_stage.stage_order + 1 THEN
+      RAISE EXCEPTION 'next stage is outside the current division transition' USING ERRCODE = '22023';
+    END IF;
+    IF EXISTS (SELECT 1 FROM public.tournament_stage_entrants
+      WHERE group_id = p_group_id AND stage_id = p_next_stage_id) THEN
+      RAISE EXCEPTION 'next stage already has seeded results' USING ERRCODE = 'PH409';
+    END IF;
+  END IF;
+
+  IF EXISTS (
+    SELECT 1 FROM jsonb_array_elements(p_seeded) seeded(item)
+    WHERE NOT EXISTS (
+      SELECT 1 FROM public.tournament_entries entry
+      WHERE entry.id = (item->>'entry_id')::bigint
+        AND entry.group_id = p_group_id
+        AND entry.division_id = current_stage.division_id
+    )
+  ) THEN
+    RAISE EXCEPTION 'seeded entry is outside the stage division' USING ERRCODE = '23503';
+  END IF;
+
+  IF p_next_stage_id IS NULL THEN
+    UPDATE public.tournament_stages SET status = 'completed'
+    WHERE id = p_stage_id AND group_id = p_group_id;
+    v_result := jsonb_build_object('success', true, 'final', true, 'champion', p_seeded);
+  ELSE
+    FOR v_item IN SELECT value FROM jsonb_array_elements(p_seeded) LOOP
+      INSERT INTO public.tournament_stage_entrants (
+        group_id, stage_id, division_id, entry_id, entrant_id, seed_in_stage
+      ) VALUES (
+        p_group_id, p_next_stage_id, current_stage.division_id,
+        (v_item->>'entry_id')::bigint, NULL,
+        COALESCE(NULLIF(v_item->>'seed_in_stage', '')::integer, 1)
+      );
+    END LOOP;
+    UPDATE public.tournament_stages SET status = 'completed'
+    WHERE id = p_stage_id AND group_id = p_group_id;
+    UPDATE public.tournament_stages SET status = 'pending'
+    WHERE id = p_next_stage_id AND group_id = p_group_id;
+    v_result := jsonb_build_object('success', true, 'nextStageId', p_next_stage_id,
+      'advanced', jsonb_array_length(p_seeded));
+  END IF;
+
+  INSERT INTO public.tournament_stage_advance_mutations (
+    group_id, operation, stage_id, next_stage_id, idempotency_key, payload_fingerprint, response
+  ) VALUES (
+    p_group_id, 'advance_division_entry_stage', p_stage_id, p_next_stage_id,
+    p_idempotency_key, v_payload_fingerprint, v_result
+  );
+  RETURN v_result;
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.advance_division_entry_stage(bigint, bigint, bigint, jsonb, text)
+  FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.advance_division_entry_stage(bigint, bigint, bigint, jsonb, text)
+  TO service_role;
+
+COMMIT;

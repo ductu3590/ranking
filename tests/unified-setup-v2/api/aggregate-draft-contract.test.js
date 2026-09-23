@@ -20,7 +20,9 @@ assert.ok(migration.includes('REVOKE ALL ON FUNCTION') && migration.includes('TO
 assert.ok(migration.includes('client_draft_key') && !migration.includes('INSERT INTO public.tournaments'), 'aggregate save uses a durable client key but never bootstraps a tournament');
 assert.ok(migration.includes('SET setup_draft = normalized, setup_revision = setup_revision + 1'), 'successful save atomically stores snapshot and bumps CAS revision');
 assert.ok(migration.includes("operation = 'save_unified_setup_aggregate_draft'") && migration.includes('payload_fingerprint'), 'idempotency uses a canonical payload fingerprint');
-assert.ok(migration.includes('p_tournament_id IS NULL OR p_division_id IS NULL') && route.includes('!hasTournamentId || !hasDivisionId'), 'aggregate save requires both authoritative target ids at both boundaries');
+// ADR-006: production _v1 (099) tạo giải theo client_draft_key ở lần lưu đầu; route cho phép
+// thiếu CẢ HAI id nhưng không cho thiếu một trong hai.
+assert.ok(route.includes('hasTournamentId !== hasDivisionId'), 'aggregate save accepts both ids or neither, never one');
 assert.ok(migration.includes("':aggregate-draft:' || btrim(p_client_draft_key)") && !migration.includes("':aggregate-draft:' || p_idempotency_key"), 'bootstrap lock is scoped by group and durable client draft key');
 assert.ok(migration.includes("'tournament_id', p_tournament_id") && migration.includes("'expected_setup_revision', p_expected_setup_revision"), 'idempotency fingerprint binds target ids and expected revision');
 assert.ok(!migration.includes('SETUP_DRAFT_DIVISION_AMBIGUOUS') && !migration.includes("setup_draft->>'clientDraftKey'"), 'target division is explicit rather than inferred from a bootstrap key');

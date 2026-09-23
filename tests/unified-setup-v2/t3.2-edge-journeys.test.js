@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const root = path.join(__dirname, '..', '..');
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 const { fixtures, requiredEnvironment, missingEnvironment } = require('./browser/fixtures');
-const { createPairingDraft: pairing } = require('../../lib/tournament/pairingDraft');
+const pairing = require('../../lib/tournament/pairingDraft');
 const { normalizeRosterSelection } = require('../../lib/tournament/participantContract');
 const { validateFinalize } = require('../../lib/tournament/setupValidation');
 const { buildReviewSummaryModel, markDrawStaleOnSetupChange } = require('../../app/giai-dau/v2/setup/draw/drawReviewModel');
@@ -36,33 +36,44 @@ check('cross-tenant member is explicit MEMBER_OUTSIDE_GROUP', () => {
   assert.throws(() => normalizeRosterSelection([{ member_id: 1, athlete_id: 2, group_id: 999 }]), (error) => error.code === 'MEMBER_OUTSIDE_GROUP');
 });
 
+// ADR-006: ba ca ghép cặp viết lại trên API chạm-hai-người (lib/tournament/pairingDraft.js).
+const refsOf = (ids) => ids.map((id) => `member:${id}`);
+const idFactory = () => { let n = 0; return () => `pair-${++n}`; };
+const fixedRandom = () => { let n = 0; return () => ((n += 0.37) % 1); };
+
 check('remove middle member preserves unrelated and locked pairs', () => {
-  const start = pairing.pairMembers(pairing({ memberIds: ['m1', 'm2', 'm3', 'm4', 'm5', 'm6'] }), [['m1', 'm2'], ['m3', 'm4'], ['m5', 'm6']]);
-  const locked = pairing.setLocked(start, 'pair-1', true);
-  const after = pairing.removeMember(locked, 'm3');
-  assert.deepEqual(pairing.getPair(after, 'pair-1'), pairing.getPair(locked, 'pair-1'));
-  assert.deepEqual(pairing.getPair(after, 'pair-3'), pairing.getPair(locked, 'pair-3'));
-  assert.ok(pairing.getUnpairedMemberIds(after).includes('m4'));
+  const makeId = idFactory();
+  let state = { pairs: [], unpairedRefs: refsOf([1, 2, 3, 4, 5, 6]) };
+  state = pairing.createPair(state, 'member:1', 'member:2', makeId);
+  state = pairing.createPair(state, 'member:3', 'member:4', makeId);
+  state = pairing.createPair(state, 'member:5', 'member:6', makeId);
+  const locked = pairing.setLocked(state, 'pair-1', true);
+  const after = pairing.syncParticipants(locked, refsOf([1, 2, 4, 5, 6]));
+  assert.deepEqual(after.pairs.find((pair) => pair.pairId === 'pair-1'), locked.pairs.find((pair) => pair.pairId === 'pair-1'));
+  assert.deepEqual(after.pairs.find((pair) => pair.pairId === 'pair-3'), locked.pairs.find((pair) => pair.pairId === 'pair-3'));
+  assert.deepEqual(after.unpairedRefs, ['member:4']);
 });
 
 check('15-person doubles saves but blocks finalize without singleton or BYE teammate', () => {
-  const state = pairing({ memberIds: fixtures.oddFifteen.athletes.map((athlete) => athlete.memberId) });
-  const paired = pairing.regenerateUnlockedPairs(state);
-  assert.equal(pairing.canSaveDraft(paired), true);
-  assert.deepEqual(pairing.finalizeBlockers(paired), ['UNPAIRED_MEMBER']);
-  assert.ok(pairing.getPairs(paired).every((item) => item.memberIds.length === 2));
-  assert.ok(pairing.getPairs(paired).every((item) => !item.memberIds.includes('BYE')));
+  const refs = refsOf(fixtures.oddFifteen.athletes.map((athlete) => athlete.memberId));
+  const paired = pairing.pairRemainingRandomly({ pairs: [], unpairedRefs: refs }, { random: fixedRandom(), makeId: idFactory() });
+  assert.deepEqual(pairing.pairingBlockers(paired).map((item) => item.code), ['UNPAIRED_MEMBER']);
+  assert.ok(paired.pairs.every((item) => item.participantRefs.length === 2));
+  assert.ok(paired.pairs.every((item) => !item.participantRefs.some((ref) => /BYE/i.test(ref))));
+  assert.equal(paired.unpairedRefs.length, 1);
 });
 
 check('pairing rejects duplicate identities and protects locked pairs from manual mutation', () => {
-  const start = pairing.pairMembers(pairing({ memberIds: ['m1', 'm2', 'm3', 'm4'] }), [['m1', 'm2'], ['m3', 'm4']]);
-  const locked = pairing.setLocked(start, 'pair-1', true);
-  assert.throws(() => pairing.pairMembers(start, [['m1', 'm1']]), /PAIR_MEMBER_COUNT_INVALID/);
-  assert.throws(() => pairing.swapPairMembers(locked, 'pair-1', 'm1', 'pair-2', 'm3'), /LOCKED_PAIR_MUTATION_FORBIDDEN/);
-  const odd = pairing.regenerateUnlockedPairs(pairing({ memberIds: ['m1', 'm2', 'm3'] }));
+  const makeId = idFactory();
+  let state = { pairs: [], unpairedRefs: refsOf([1, 2, 3, 4]) };
+  state = pairing.createPair(state, 'member:1', 'member:2', makeId);
+  assert.throws(() => pairing.createPair(state, 'member:3', 'member:3', makeId), /PAIR_MEMBER_COUNT_INVALID/);
+  assert.throws(() => pairing.createPair(state, 'member:1', 'member:3', makeId), /PAIR_MEMBER_COUNT_INVALID/);
+  const locked = pairing.setLocked(state, 'pair-1', true);
+  assert.throws(() => pairing.splitPair(locked, 'pair-1'), /LOCKED_PAIR_MUTATION_FORBIDDEN/);
   assert.equal(typeof pairing.reserveMember, 'undefined');
-  assert.deepEqual(pairing.getUnpairedMemberIds(odd), ['m3']);
-  assert.deepEqual(pairing.oddChoices(odd), ['add_member', 'switch_format']);
+  const odd = pairing.pairRemainingRandomly({ pairs: [], unpairedRefs: refsOf([1, 2, 3]) }, { random: fixedRandom(), makeId: idFactory() });
+  assert.equal(odd.unpairedRefs.length, 1);
 });
 
 check('inactive member remains selected and emits warning', () => {

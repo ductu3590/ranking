@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { listTournaments, listStages, getCourtBoard, listDivisions, getDivisionSetup } from '@/lib/tournamentV2Client';
-import { validateSetup } from '@/lib/tournament/setupValidation';
 import ConsoleShell from './ConsoleShell';
 import CourtsStep from './steps/CourtsStep';
 import ControlStep from './steps/ControlStep';
@@ -21,23 +20,17 @@ function hasSchedule(stages) {
   return (stages || []).some((stage) => Number(stage.match_count || 0) > 0);
 }
 
-function aggregateDraft(setupAggregate, divisionId) {
-  const selected = setupAggregate?.roster?.athlete_ids || [];
-  return {
-    tournament: { name: 'Giải đấu' },
-    participants: { selectedMemberIds: selected.map(String) },
-    pairs: (setupAggregate?.pairs || []).map((pair) => ({ pairId: String(pair.id), memberIds: (pair.members || []).map((member) => String(member.member_id || member.tournament_athlete_id)) })),
-    unpairedMemberIds: [],
-    format: { entrantType: setupAggregate?.division?.play_type || 'doubles' },
-    draw: { stagePlans: setupAggregate?.stages || [] },
-    divisionId,
-  };
+// Readiness thiết lập lấy từ khối `setup` do server tính (spec Lát 0 §8), không tự suy từ roster.
+function setupReady(setupAggregate, stages) {
+  if (hasSchedule(stages)) return true;
+  return Number(setupAggregate?.setup?.readiness?.completedThrough || 0) >= 3;
 }
 
-function setupReason(validation, stages) {
-  if (!validation.ready) return validation.blockers[0] || 'Thiết lập VĐV chưa đủ dữ liệu.';
-  if (!hasSchedule(stages)) return 'Chưa có lịch thi đấu; cần hoàn tất bốc thăm và chốt lịch.';
-  return '';
+function setupReason(setupAggregate, stages) {
+  if (hasSchedule(stages)) return '';
+  const blocker = setupAggregate?.setup?.readiness?.blockers?.[0];
+  if (blocker?.message) return blocker.message;
+  return 'Chưa có lịch thi đấu; cần hoàn tất bốc thăm và chốt lịch.';
 }
 
 export default function TournamentConsoleV2({ tournamentId }) {
@@ -104,23 +97,24 @@ export default function TournamentConsoleV2({ tournamentId }) {
   const effectiveDivisionId = activeStage?.division_id ?? setupDivisionId;
   const effectiveDivision = divisions.find((division) => String(division.id) === String(effectiveDivisionId)) || null;
   const isCommunity = tournament?.organizer_mode === 'community';
-  const setupValidation = useMemo(() => validateSetup(aggregateDraft(setupAggregate, effectiveDivisionId)), [setupAggregate, effectiveDivisionId]);
+  const athletesReady = useMemo(() => setupReady(setupAggregate, stages), [setupAggregate, stages]);
   const scheduleReady = hasSchedule(stages);
   const readiness = {
     config: Boolean(tournament) && divisions.length > 0,
     courts: (board?.courts || []).some((court) => court.active),
-    athletes: setupValidation.ready,
+    athletes: athletesReady,
     draw: scheduleReady,
-    reason: setupReason(setupValidation, stages),
+    reason: setupReason(setupAggregate, stages),
   };
-  const defaultStep = scheduleReady ? 'control' : (!setupValidation.ready ? 'athletes' : 'draw');
+  const defaultStep = scheduleReady ? 'control' : (!athletesReady ? 'athletes' : 'draw');
   const stepProps = { tournamentId, tournament, stageId: activeStageId, stage: activeStage, stages, isAdmin, reload: load };
 
   useEffect(() => {
     if (loading || error || scheduleReady || !isAdmin) return;
     const params = new URLSearchParams({ create: 'internal', tournamentId: String(tournamentId) });
     if (effectiveDivisionId) params.set('divisionId', String(effectiveDivisionId));
-    const resumeStep = Number(setupAggregate?.draft?.currentStep || 1);
+    // Bước resume do server kẹp theo progress: không mở bước chưa đủ điều kiện.
+    const resumeStep = Number(setupAggregate?.setup?.resumeStep || 1);
     params.set('step', String(Math.max(1, Math.min(4, resumeStep))));
     router.replace(`/giai-dau/v2?${params.toString()}`);
   }, [effectiveDivisionId, error, isAdmin, loading, router, scheduleReady, setupAggregate, tournamentId]);

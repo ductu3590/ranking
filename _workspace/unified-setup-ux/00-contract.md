@@ -1,5 +1,31 @@
 # T0.1 Contract — Unified Internal Tournament Setup
 
+> **Cập nhật 2026-09-23 (ADR-005, đợt Stitch).** Các mục dưới đây thay thế phần tương ứng của contract 2026-09-19. Phần cũ giữ lại bên dưới để tra lịch sử; khi mâu thuẫn, mục này thắng.
+>
+> **SetupDraftV3** (normalizer duy nhất: `lib/tournament/setupDraftV3.js`)
+>
+> ```js
+> {
+>   draftVersion: 3, currentStep: 1|2|3|4,
+>   progress: { completedThrough: 0|1|2|3 },          // chỉ server ghi
+>   tournament: { name, eventDate, startTime, courtCount, location, description, posterUrl, organizerMode: 'internal' },
+>   division: { name, playType: 'doubles' },
+>   participants: { memberIds: string[], guests: [{ clientRef, displayName }] },
+>   format: { entrantType: 'doubles', formatKey: 'group_knockout'|'round_robin'|'knockout'|null, config },
+>   pairs: [{ pairId, participantRefs: [ref, ref], locked }],   // ref = 'member:<id>' | 'guest:<clientRef>'
+>   unpairedRefs: ref[],
+>   draw: { status: 'none'|'draft'|'stale', seed, previewFingerprint, plan },
+>   invalidation: { reasonCodes: string[], earliestStep }
+> }
+> ```
+>
+> - Bỏ: `selectedMemberIds`, `reserveMemberIds`, `inactiveSelectedMemberIds`, `invitedClubs`, `pairs[].memberIds`, và lựa chọn "để một người dự bị" khi lẻ người.
+> - Số lẻ: `UNPAIRED_MEMBER` với hai hành động (thêm người / bỏ chọn người lẻ).
+> - Lưu từng bước: route validate bước bằng `setupStepRules.validateStep` rồi đặt `progress.completedThrough`; chỉ mở bước N khi `completedThrough ≥ N-1`.
+> - Thể thức: registry `lib/tournament/setupFormats.js`; thể thức chưa bật → `FORMAT_NOT_AVAILABLE` ở save bước 3, preview, finalize.
+> - Lỗi hiển thị: `lib/tournament/setupMessages.js` (mã → câu tiếng Việt + bước + trường); mã thô không hiện trên UI.
+> - RPC lưu: `save_unified_setup_aggregate_draft` sau migration 100 (replay không ghi đè; fingerprint phủ toàn payload).
+
 Date: 2026-09-19. This is the frozen handoff contract for T1.A, T1.B, T1.C, and T2.*. No production code, migrations, tests, or frozen files are changed by T0.1.
 
 ## SetupDraftV2

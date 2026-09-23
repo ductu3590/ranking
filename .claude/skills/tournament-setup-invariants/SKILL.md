@@ -5,10 +5,15 @@ description: Bất biến nghiệp vụ và ranh giới ownership của đợt "
 
 # Unified Internal Tournament Setup — Bất biến
 
-Plan thi hành đầy đủ: `docs/superpowers/plans/2026-09-19-unified-internal-tournament-setup-parallel.md`
-Audit gốc (vì sao có từng yêu cầu): `docs/superpowers/plans/plan-1.md`
-Prompt bàn giao: `docs/superpowers/plans/2026-09-19-prompt-giao-ide-unified-setup.md`
-Contract khóa ở T0.1: `_workspace/unified-setup-ux/00-contract.md`
+**Đợt hiện hành (từ 2026-09-23): phục hồi theo Stitch, chia lát.**
+Plan: `docs/superpowers/plans/2026-09-23-tournament-setup-stitch-recovery.md`
+Spec theo lát: `docs/superpowers/specs/2026-09-23-stitch-setup/` (README + lat-0/a/b/c)
+Quyết định sản phẩm: `_workspace/unified-setup-ux/ADR-005-stitch-product-overrides.md` (D1–D12)
+Contract: `_workspace/unified-setup-ux/00-contract.md` (đã cập nhật shape v3)
+
+Tài liệu đợt trước (chỉ để tra lịch sử): `docs/superpowers/plans/2026-09-19-unified-internal-tournament-setup-parallel.md`, `docs/superpowers/plans/plan-1.md`.
+
+Đợt hiện hành đã thay các quy tắc sau của đợt trước: **không còn dự bị** (§3.4), ghép cặp **chạm hai người, không kéo-thả**, khách mời là VĐV riêng của giải, cấu trúc giải chỉ sinh từ `lib/tournament/setupPlans/` (§3.1), thể thức bật/tắt qua `lib/tournament/setupFormats.js`.
 
 Skill này là bản rút gọn để **nhớ đúng** giữa các wave. Khi skill và plan mâu thuẫn, **plan thắng** — và báo lead để sửa skill.
 
@@ -48,15 +53,16 @@ Cần sửa thật thì **dừng, nêu lý do, hỏi lead**. Hook `ownership-gua
 Mỗi dòng dưới đây là một câu hỏi bạn phải trả lời "có" trước khi commit.
 
 ### 3.1 Cấu trúc giai đoạn
-`group_knockout` tạo **đủ hai stage** cùng `division_id`, cộng tuyến đi tiếp tường minh: stage nguồn, stage đích, suất dạng `Nhất A` / `Nhì B`, cờ tranh hạng ba.
-Nguồn duy nhất là `buildDivisionStagePayloads()`. **Cấm** viết bộ chuyển đổi thể thức thứ hai.
+`group_knockout` tạo **đủ hai stage** cùng `division_id`, cộng tuyến đi tiếp tường minh: stage nguồn, stage đích, suất dạng `Nhất A` / `Nhì B` / `Ba tốt nhất #1`, cờ tranh hạng ba.
+Từ đợt Stitch: nguồn cấu trúc duy nhất cho setup mới là `buildSetupPlan()` trong `lib/tournament/setupPlans/`; preview và finalize cùng gọi hàm này, finalize tính lại trên server. `buildDivisionStagePayloads()` vẫn là nguồn của luồng v2 cũ. **Cấm** viết bộ chuyển đổi thể thức thứ ba.
 
 ### 3.2 Khung trận knockout
 Chốt setup có thể tạo trận **chờ suất đi tiếp**; chỉ gán entry khi kết quả vòng trước được xác nhận.
 Preview, dữ liệu lưu và màn bracket dùng **chung một** cách biểu diễn. **Cấm** tạo VĐV/entrant giả để lấp chỗ.
 
 ### 3.3 Ổn định ghép cặp
-Cặp có **ID ổn định** + cờ `locked`; không suy ra từ thứ tự danh sách.
+Cặp có **ID ổn định** + cờ `locked`; không suy ra từ thứ tự danh sách. Thành viên cặp là `participantRefs` (`member:<id>` / `guest:<clientRef>`).
+Tạo cặp bằng **chạm/chọn đúng hai người chưa ghép** rồi bấm `Ghép cặp`; không dùng kéo-thả làm hành vi chính.
 
 - Thêm người → chỉ vào danh sách **chưa ghép**, không ghép lại gì.
 - Xóa người → chỉ tách cặp chứa người đó. Mọi cặp khác giữ nguyên, **kể cả cặp chưa khóa**.
@@ -64,13 +70,14 @@ Cặp có **ID ổn định** + cờ `locked`; không suy ra từ thứ tự dan
 - Một người không được xuất hiện ở hai cặp.
 
 ### 3.4 Số người lẻ
-Đánh đôi lẻ người → đưa **ba lựa chọn**: thêm một người cho đủ / để một người dự bị ngoài danh sách thi đấu / đổi thể thức phù hợp nếu đã hỗ trợ.
+Đánh đôi lẻ người → blocker `UNPAIRED_MEMBER` kèm **hai lựa chọn**: thêm một người cho đủ / chủ động bỏ chọn người lẻ. **Không có danh sách dự bị** (ADR-005 D3). Nháp lẻ người vẫn lưu được, nhưng không sang được Bước 4.
 
 **Cấm:** tự bỏ người cuối, tạo cặp một người, dùng BYE thay đồng đội còn thiếu.
 BYE chỉ xử lý suất/cặp **nghỉ lượt**, không giải quyết một cặp thiếu người.
 
 ### 3.5 Danh tính theo ID
 Chọn/bỏ chọn bằng `member_id`; server ánh xạ sang `athlete_id`. Tên chỉ là **snapshot hiển thị**.
+Khách mời định danh bằng `clientRef` ổn định; khi chốt thành `tournament_athletes(source='guest', athlete_id NULL)`, không vào danh bạ/xếp hạng CLB.
 Hai người **trùng tên** là hai bản ghi riêng biệt xuyên suốt roster → cặp → entrant.
 Chưa có `athlete_id` → xử lý tường minh, không im lặng bỏ qua.
 `member_id` ngoài tenant → chặn, mã lỗi ổn định.
@@ -125,6 +132,8 @@ Sửa cấu hình/cặp khiến draw cũ hết hợp lệ → đánh dấu **"c�
 ---
 
 ## 6. Ranh giới ownership
+
+> Bảng dưới là của đợt 2026-09-19 (mã T*). Đợt Stitch chia theo lát 0/A/B/C trong spec; hook `ownership-guard` không có trong mọi worktree.
 
 Hook `.claude/hooks/ownership-guard.js` chặn tự động theo biến môi trường `PICKHUB_TASK_ID`. Đặt đúng mã task trước khi làm việc:
 

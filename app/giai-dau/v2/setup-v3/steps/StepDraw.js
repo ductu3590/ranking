@@ -29,7 +29,9 @@ function DrawIntro({ draft, busy, onDraw }) {
     <section className="pc-card pc-card--hero">
       <p className="pc-eyebrow">Bước 4</p>
       <h2 className="pc-hero-title">Bốc thăm, xem trước lịch &amp; chốt</h2>
-      <p className="pc-lead">Bốc thăm chia {draft.pairs.length} cặp vào {config.groupCount ?? 2} bảng. Có thể bốc lại trước khi chốt.</p>
+      <p className="pc-lead">{draft.format.formatKey === 'round_robin'
+        ? `Bốc thăm xác định thứ tự các lượt đấu của ${draft.pairs.length} cặp. Có thể bốc lại trước khi chốt.`
+        : `Bốc thăm chia ${draft.pairs.length} cặp vào ${config.groupCount ?? 2} bảng. Có thể bốc lại trước khi chốt.`}</p>
       <div className="pc-btn-row" style={{ marginTop: '1rem' }}>
         <button type="button" className="pc-btn pc-btn--primary" disabled={busy} onClick={() => onDraw('draw')}>Bốc thăm</button>
       </div>
@@ -52,16 +54,17 @@ function StaleNotice({ blocker, busy, onDraw }) {
 
 function Groups({ plan, pairName, onRedraw, busy }) {
   const base = useId();
+  const single = plan.groups.length === 1;
   return (
     <section className="pc-card" aria-labelledby={`${base}-t`}>
       <div className="pc-card__head">
-        <h3 id={`${base}-t`} className="pc-card__title"><span className="pc-section-key">1</span>Chia bảng</h3>
+        <h3 id={`${base}-t`} className="pc-card__title"><span className="pc-section-key">1</span>{single ? 'Danh sách cặp' : 'Chia bảng'}</h3>
         <button type="button" className="pc-btn pc-btn--sm" disabled={busy} onClick={onRedraw}>Bốc lại</button>
       </div>
       <div className="pc-groups">
         {plan.groups.map((group) => (
           <div key={group.label} className="pc-group">
-            <div className="pc-group__head"><span className="pc-badge pc-badge--brand">Bảng {group.label}</span><span className="pc-card__hint">{group.entryIds.length} cặp</span></div>
+            <div className="pc-group__head"><span className="pc-badge pc-badge--brand">{single ? 'Vòng tròn' : `Bảng ${group.label}`}</span><span className="pc-card__hint">{group.entryIds.length} cặp</span></div>
             <ol className="pc-group__list">
               {group.entryIds.map((pairId) => <li key={pairId}>{pairName(pairId)}</li>)}
             </ol>
@@ -75,6 +78,7 @@ function Groups({ plan, pairName, onRedraw, busy }) {
 function Bracket({ plan }) {
   const base = useId();
   const knockout = plan.matches.filter((match) => match.stageKind === 'knockout');
+  if (!knockout.length) return null;
   const rounds = [...new Set(knockout.map((match) => match.round))].sort((a, b) => a - b);
   return (
     <section className="pc-card" aria-labelledby={`${base}-t`}>
@@ -111,12 +115,12 @@ function Schedule({ plan, draft, pairName }) {
   return (
     <section className="pc-card" aria-labelledby={`${base}-t`}>
       <div className="pc-card__head">
-        <h3 id={`${base}-t`} className="pc-card__title"><span className="pc-section-key">3</span>Lịch thi đấu dự kiến ({plan.counts.total} trận)</h3>
+        <h3 id={`${base}-t`} className="pc-card__title"><span className="pc-section-key">{plan.counts.knockoutMatches ? 3 : 2}</span>Lịch thi đấu dự kiến ({plan.counts.total} trận)</h3>
         <span className="pc-card__hint">Giờ chỉ là ước tính; xếp sân thật ở màn điều hành</span>
       </div>
       <div className="pc-stats">
         <div><span>Cặp đấu</span><strong>{draft.pairs.length}</strong></div>
-        <div><span>Tổng trận</span><strong>{plan.counts.total}</strong><small>{plan.counts.groupMatches} vòng bảng · {plan.counts.knockoutMatches} loại trực tiếp</small></div>
+        <div><span>Tổng trận</span><strong>{plan.counts.total}</strong><small>{plan.counts.knockoutMatches ? `${plan.counts.groupMatches} vòng bảng · ${plan.counts.knockoutMatches} loại trực tiếp` : `${plan.rounds || 0} lượt đấu`}</small></div>
         <div><span>Số sân</span><strong>{draft.tournament.courtCount || '—'}</strong></div>
         <div><span>Khung giờ</span><strong>{estimate.startsAt ? `${estimate.startsAt} – ${estimate.endsAt}` : '—'}</strong><small>~{hours ? `${hours} giờ ` : ''}{minutes} phút</small></div>
       </div>
@@ -133,7 +137,7 @@ function Schedule({ plan, draft, pairName }) {
                 <tr key={row.matchKey} data-final={match.matchKey === 'F' || undefined}>
                   <td data-label="Giờ">{row.startsAt || '—'}</td>
                   <td data-label="Sân">Sân {row.court}</td>
-                  <td data-label="Vòng">{match.stageKind === 'group' ? `Bảng ${match.groupLabel} · lượt ${match.round}` : roundName(match.matchKey)}</td>
+                  <td data-label="Vòng">{match.stageKind !== 'group' ? roundName(match.matchKey) : plan.groups.length === 1 ? `Lượt ${match.round}` : `Bảng ${match.groupLabel} · lượt ${match.round}`}</td>
                   <td data-label="Cặp đấu">{vs}</td>
                   <td data-label="Số ván">BO{row.bestOf}</td>
                 </tr>
@@ -150,7 +154,7 @@ function Criteria({ plan }) {
   const pool = plan.stages?.[0]?.config?.poolCount || 0;
   return (
     <section className="pc-card">
-      <div className="pc-card__head"><h3 className="pc-card__title"><span className="pc-section-key">4</span>Tiêu chí xếp hạng (chỉ đọc)</h3></div>
+      <div className="pc-card__head"><h3 className="pc-card__title"><span className="pc-section-key">{plan.counts.knockoutMatches ? 4 : 3}</span>Tiêu chí xếp hạng (chỉ đọc)</h3></div>
       <p style={{ margin: '0 0 0.5rem' }}><strong>Trong mỗi bảng:</strong> theo quy chế xếp hạng của giải (mặc định: điểm trận → hiệu số điểm → đối đầu → tổng điểm ghi).</p>
       {pool ? (
         <p style={{ margin: 0 }}><strong>So giữa các bảng cho suất bù:</strong> tỉ lệ thắng → hiệu số điểm trung bình mỗi trận → điểm ghi trung bình mỗi trận → bốc thăm. Dùng số trung bình để bảng ít cặp không bị thiệt.</p>

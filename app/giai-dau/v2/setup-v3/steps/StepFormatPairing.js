@@ -224,6 +224,11 @@ export default function StepFormatPairing({ draft, roster, readiness, showErrors
       </section>
 
       {draft.format.formatKey === 'group_knockout' ? <GroupKnockoutConfig draft={draft} onChange={onChange} /> : null}
+      {draft.format.formatKey === 'round_robin' ? (
+        <div className="pc-notice pc-notice--info">
+          <p><strong>Vòng tròn:</strong> mỗi cặp gặp mọi cặp khác một lần, mỗi trận 1 ván (BO1). Không có chung kết; xếp hạng theo bảng điểm sau lượt cuối.</p>
+        </div>
+      ) : null}
 
       <section className="pc-card" aria-labelledby={`${base}-pairs`}>
         <div className="pc-card__head">

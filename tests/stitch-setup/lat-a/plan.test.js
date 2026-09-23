@@ -70,7 +70,7 @@ suite('lát A — plan vòng bảng → loại trực tiếp', {
     assert.throws(() => plan(8, { groupCount: 2, qualifiersPerGroup: 1 }), (e) => e.code === 'FORMAT_CONFIG_INVALID');
     assert.throws(() => plan(5, { groupCount: 2, qualifiersPerGroup: 2 }), (e) => e.code === 'PAIR_COUNT_BELOW_MINIMUM' && e.params.min === 6);
     assert.throws(() => plan(8, { groupCount: 3, qualifiersPerGroup: 2 }), (e) => e.code === 'PAIR_COUNT_BELOW_MINIMUM');
-    assert.throws(() => buildSetupPlan({ formatKey: 'round_robin', pairIds: pairIds(4), seed: 's' }), (e) => e.code === 'FORMAT_NOT_AVAILABLE');
+    assert.throws(() => buildSetupPlan({ formatKey: 'knockout', pairIds: pairIds(4), seed: 's' }), (e) => e.code === 'FORMAT_NOT_AVAILABLE');
     assert.throws(() => plan(7, { groupCount: 2, qualifiersPerGroup: 2 }, ''), (e) => e.code === 'DRAW_SEED_REQUIRED');
   },
 

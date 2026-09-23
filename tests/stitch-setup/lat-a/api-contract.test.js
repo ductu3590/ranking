@@ -9,6 +9,12 @@ const m101 = read('database/migrations/101_stage_transition_pool_source.sql');
 const m102 = read('database/migrations/102_finalize_internal_setup_v4.sql');
 const m103 = read('database/migrations/103_advance_group_rank_transitions_v2.sql');
 const { FORMATS } = lib('lib/tournament/setupFormats.js');
+const fs = require('node:fs');
+const path = require('node:path');
+const { ROOT } = require('../_harness');
+// Migration MỚI NHẤT định nghĩa finalize_internal_setup_v4 là bản đang chạy.
+const latestFinalize = read('database/migrations/' + fs.readdirSync(path.join(ROOT, 'database/migrations')).filter((name) => /^\d+_.*\.sql$/.test(name)).sort()
+  .filter((name) => read('database/migrations/' + name).includes('CREATE OR REPLACE FUNCTION public.finalize_internal_setup_v4')).pop());
 
 const noDestructive = (sql) => !/\b(DROP\s+(TABLE|FUNCTION|COLUMN|INDEX)|TRUNCATE|DELETE\s+FROM)\b/i.test(sql);
 
@@ -62,7 +68,7 @@ suite('lát A — hợp đồng API & migration', {
   'migration 102: security definer, chỉ service_role, danh sách thể thức khớp registry'() {
     assert.ok(m102.includes('SECURITY DEFINER SET search_path = public'));
     assert.ok(m102.includes('REVOKE ALL ON FUNCTION public.finalize_internal_setup_v4') && m102.includes('TO service_role'));
-    const allowed = (m102.match(/c_allowed_formats constant text\[\] := ARRAY\[([^\]]*)\]/) || [])[1];
+    const allowed = (latestFinalize.match(/c_allowed_formats constant text\[\] := ARRAY\[([^\]]*)\]/) || [])[1];
     const sqlFormats = [...String(allowed).matchAll(/'([a-z_]+)'/g)].map((m) => m[1]).sort();
     const enabled = Object.values(FORMATS).filter((format) => format.enabled).map((format) => format.key).sort();
     assert.deepEqual(sqlFormats, enabled, 'RPC và registry mở cùng thể thức');

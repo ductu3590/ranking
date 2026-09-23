@@ -59,8 +59,8 @@ suite('step rules', {
     assert.deepEqual(warnCodes(result), ['GUEST_NAME_MATCHES_MEMBER']);
   },
 
-  'bước 3: thể thức chưa bật → FORMAT_NOT_AVAILABLE (registry mặc định Lát 0)'() {
-    const result = validateStep(pairedDraft(4), 3);
+  'bước 3: thể thức chưa bật → FORMAT_NOT_AVAILABLE (loại trực tiếp chưa mở tới Lát C)'() {
+    const result = validateStep(pairedDraft(4, { formatKey: 'knockout', config: {} }), 3);
     assert.ok(codes(result).includes('FORMAT_NOT_AVAILABLE'));
   },
 
@@ -94,7 +94,7 @@ suite('step rules', {
   },
 
   'completedThrough đếm bước liên tiếp và hạ khi bước trước hỏng'() {
-    const draft = pairedDraft(4);
+    const draft = pairedDraft(4, { formatKey: 'knockout', config: {} });
     assert.equal(computeCompletedThrough(draft, enabledAll), 3);
     assert.equal(computeCompletedThrough(draft), 2, 'thể thức chưa bật dừng ở bước 2');
     draft.tournament = info({ name: '' });

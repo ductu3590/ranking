@@ -132,39 +132,42 @@ export async function POST(request) {
                 .eq('source_stage_id', stage.id)
                 .in('source_kind', ['group_rank', 'group_rank_pool']);
             if (edgeError) return NextResponse.json({ error: edgeError.message }, { status: 500 });
-            const targetIds = [...new Set((edgeRows || []).map((edge) => edge.target_match_id))];
-            const { data: targetRows, error: targetError } = targetIds.length
-                ? await db.from('tournament_matches').select('id, match_key').eq('group_id', groupId).in('id', targetIds)
-                : { data: [], error: null };
-            if (targetError) return NextResponse.json({ error: targetError.message }, { status: 500 });
-            const matchKeyById = new Map((targetRows || []).map((row) => [row.id, row.match_key]));
-            let resolved;
-            try {
-                resolved = resolveGroupKnockoutAdvance({
-                    edges: (edgeRows || []).map((edge) => ({
-                        id: edge.id,
-                        kind: edge.source_kind,
-                        groupLabel: edge.source_group_label,
-                        rank: edge.source_rank,
-                        poolPosition: edge.source_pool_position,
-                        targetMatchKey: matchKeyById.get(edge.target_match_id) || String(edge.target_match_id),
-                        targetSlot: edge.target_slot,
-                    })),
-                    standings,
-                    seed: expectedResultsFingerprint,
+            // Vòng tròn (Lát B) không có tuyến đi tiếp: để nhánh chung bên dưới đánh dấu chặng cuối.
+            if ((edgeRows || []).length) {
+                const targetIds = [...new Set((edgeRows || []).map((edge) => edge.target_match_id))];
+                const { data: targetRows, error: targetError } = targetIds.length
+                    ? await db.from('tournament_matches').select('id, match_key').eq('group_id', groupId).in('id', targetIds)
+                    : { data: [], error: null };
+                if (targetError) return NextResponse.json({ error: targetError.message }, { status: 500 });
+                const matchKeyById = new Map((targetRows || []).map((row) => [row.id, row.match_key]));
+                let resolved;
+                try {
+                    resolved = resolveGroupKnockoutAdvance({
+                        edges: (edgeRows || []).map((edge) => ({
+                            id: edge.id,
+                            kind: edge.source_kind,
+                            groupLabel: edge.source_group_label,
+                            rank: edge.source_rank,
+                            poolPosition: edge.source_pool_position,
+                            targetMatchKey: matchKeyById.get(edge.target_match_id) || String(edge.target_match_id),
+                            targetSlot: edge.target_slot,
+                        })),
+                        standings,
+                        seed: expectedResultsFingerprint,
+                    });
+                } catch (e) {
+                    return NextResponse.json({ error: e.message, code: e.code || 'GROUP_RANKING_MISSING' }, { status: 400 });
+                }
+                const { data, error } = await db.rpc('advance_division_group_rank_transitions_v2', {
+                    p_group_id: groupId,
+                    p_stage_id: stage.id,
+                    p_resolved: resolved.map((item) => ({ transition_id: item.transitionId, entry_id: item.entryId, swapped: item.swapped })),
+                    p_idempotency_key: idempotencyKey,
+                    p_expected_results_fingerprint: expectedResultsFingerprint,
                 });
-            } catch (e) {
-                return NextResponse.json({ error: e.message, code: e.code || 'GROUP_RANKING_MISSING' }, { status: 400 });
+                if (error) return rpcErrorResponse(error);
+                return NextResponse.json(data || { success: true, transitioned: true });
             }
-            const { data, error } = await db.rpc('advance_division_group_rank_transitions_v2', {
-                p_group_id: groupId,
-                p_stage_id: stage.id,
-                p_resolved: resolved.map((item) => ({ transition_id: item.transitionId, entry_id: item.entryId, swapped: item.swapped })),
-                p_idempotency_key: idempotencyKey,
-                p_expected_results_fingerprint: expectedResultsFingerprint,
-            });
-            if (error) return rpcErrorResponse(error);
-            return NextResponse.json(data || { success: true, transitioned: true });
         }
 
         // Unified group-to-playoff plans own their destination slots explicitly.

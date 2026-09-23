@@ -1,6 +1,12 @@
 # Đánh giá khả năng áp dụng 3 opensource vào module giải đấu PickHub
 
 **Ngày:** 19/9/2026 (số liệu đo trên `main` tại commit `943e539`)
+**Kiểm chứng lại:** 23/9/2026 trên `main` tại `3f3d79f` (sau các lát A/B/C của
+unified setup, migration tới 107). Hai kết luận cốt lõi không đổi: **vẫn chưa có
+Swiss** và **vẫn chưa có phát hiện xung đột lịch thi đấu**, nên cả ba đề xuất ở
+mục 5 còn nguyên giá trị. `lib/tournament` đã tăng lên **8.115 dòng** — càng nới
+rộng khoảng cách với 1.447 dòng logic của bracket. Các con số chi tiết bên dưới
+giữ nguyên mốc `943e539` để nhất quán với thời điểm đo.
 **Phạm vi:** `evroon/bracket`, `bbtheo/bracketeer`, `skrodahl/NewTon`
 **Câu hỏi:** Hệ thống giải đấu PickHub đang phức tạp — có thể thay/bổ sung bằng opensource không?
 

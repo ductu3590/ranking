@@ -1,6 +1,6 @@
 # Lát C — Loại trực tiếp
 
-Trạng thái: spec chờ duyệt · Deploy 3 · Phụ thuộc: Lát B đã deploy · Xem [README](README.md)
+Trạng thái: đã triển khai (2026-09-23) · Deploy 3 · Phụ thuộc: Lát B đã deploy · Xem [README](README.md)
 
 ## 1. Mục tiêu
 

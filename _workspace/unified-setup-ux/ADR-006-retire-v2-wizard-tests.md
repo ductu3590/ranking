@@ -35,3 +35,12 @@ Lát 0 thay wizard v2 bằng `app/giai-dau/v2/setup-v3/`, viết lại `lib/tour
 | `tests/unified-setup-v2/api/finalize-contract.test.js` | Gỡ | Route chốt giải chuyển sang `finalize_internal_setup_v4`. Admin guard, scope group, không dùng `tournament_draw_slots` → `tests/stitch-setup/lat-a/api-contract.test.js` |
 | `tests/unified-setup-v2/api/preview-schedule-contract.test.js` | Gỡ | Preview v3 tự lưu plan qua RPC có CAS (spec Lát A §12 đã sửa), không còn `draftFingerprint`/`draftUpdate`/bốc thủ công. Thay bằng `lat-a/api-contract.test.js` + `lat-a/plan.test.js`. `buildInternalDoublesGroupKnockoutPlan` (luồng v2) vẫn có test domain riêng |
 | `tests/unified-setup-v2/api/finalize-v3-contract.test.js` | Sửa 1 assertion | Kiểm tra migration 095 giữ nguyên; "route gọi v3" đổi thành "luồng mới không gọi v3" |
+
+## Bổ sung — Lát C (2026-09-23)
+
+Cả ba thể thức đã bật, không còn thể thức thật nào để làm ca "chưa bật".
+
+| File | Xử lý | Bất biến còn giá trị → nơi mới |
+|---|---|---|
+| `tests/stitch-setup/lat-0/step-rules.test.js` | Sửa 2 ca | Nhánh `FORMAT_NOT_AVAILABLE` và "`completedThrough` dừng ở bước 2" giả lập registry khóa `knockout` qua `ctx.isFormatEnabled` (cơ chế có sẵn); thêm assertion registry thật cho `knockout` đi tới bước 3 |
+| `tests/stitch-setup/lat-a/plan.test.js` | Sửa 1 assertion | `buildSetupPlan` với key không có builder (`mlp_team`) vẫn ném `FORMAT_NOT_AVAILABLE` |

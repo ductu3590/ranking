@@ -87,7 +87,7 @@ function KnockoutStandings({ rows, entrantsById }) {
                     <li key={r.entrant_id} className="v2-placement-item">
                         <span className="v2-placement-rank">{r.rank}</span>
                         <span className="v2-placement-name">{entrantName(entrantsById, r.entrant_id)}</span>
-                        <span className="v2-placement-label">{koLabel(r.exit_round, maxExit)}</span>
+                        <span className="v2-placement-label">{r.label || koLabel(r.exit_round, maxExit)}</span>
                     </li>
                 ))}
             </ul>

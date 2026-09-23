@@ -13,7 +13,7 @@ function qualifySummary(combo) {
   return `Vào vòng loại: ${directText}${poolText} → ${combo.target === 8 ? 'Tứ kết' : 'Bán kết'}. Cần ít nhất ${combo.minPairs} cặp.`;
 }
 
-function Segmented({ label, options, value, onChange, isDisabled, format }) {
+export function Segmented({ label, options, value, onChange, isDisabled, format }) {
   return (
     <div className="pc-segmented" role="group" aria-label={label}>
       {options.map((option) => {

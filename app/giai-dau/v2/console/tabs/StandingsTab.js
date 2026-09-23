@@ -91,12 +91,14 @@ export default function StandingsTab({ tournamentId, stageId, stages, isAdmin, r
         }
     }
 
-    const canAdvance = Boolean(isAdmin && stageId
-        && (data.schedule_format || stage?.schedule_format) === 'round_robin');
     // Chặng cuối (vd. giải vòng tròn một chặng): không có play-off, nút là "kết thúc giải".
     const isLastStage = !(stages || []).some((other) => stage && other.id !== stage.id
         && String(other.division_id ?? '') === String(stage.division_id ?? '')
         && Number(other.stage_order) > Number(stage.stage_order));
+    const format = data.schedule_format || stage?.schedule_format;
+    // Nhánh loại trực tiếp của setup v4 (Lát C) cũng cần chốt chặng cuối; stage knockout cũ giữ nguyên.
+    const canAdvance = Boolean(isAdmin && stageId && (format === 'round_robin'
+        || (format === 'knockout' && isLastStage && String(stage?.config?.setupPlanVersion) === '4')));
     const completed = stage?.status === 'completed';
 
     return (

@@ -8,6 +8,8 @@ const { messageFor } = lib('lib/tournament/setupMessages.js');
 const codes = (result) => result.blockers.map((item) => item.code);
 const warnCodes = (result) => result.warnings.map((item) => item.code);
 const enabledAll = { isFormatEnabled: () => true };
+// Cả ba thể thức đã bật (Lát C); giả lập registry còn khóa knockout để kiểm nhánh "chưa bật".
+const knockoutLocked = { isFormatEnabled: (key) => key !== 'knockout' };
 
 function info(overrides = {}) {
   return { name: 'Giải tháng 10', eventDate: '2026-10-12', startTime: '07:30', courtCount: 4, ...overrides };
@@ -59,8 +61,8 @@ suite('step rules', {
     assert.deepEqual(warnCodes(result), ['GUEST_NAME_MATCHES_MEMBER']);
   },
 
-  'bước 3: thể thức chưa bật → FORMAT_NOT_AVAILABLE (loại trực tiếp chưa mở tới Lát C)'() {
-    const result = validateStep(pairedDraft(4, { formatKey: 'knockout', config: {} }), 3);
+  'bước 3: thể thức chưa bật → FORMAT_NOT_AVAILABLE'() {
+    const result = validateStep(pairedDraft(4, { formatKey: 'knockout', config: {} }), 3, knockoutLocked);
     assert.ok(codes(result).includes('FORMAT_NOT_AVAILABLE'));
   },
 
@@ -96,7 +98,8 @@ suite('step rules', {
   'completedThrough đếm bước liên tiếp và hạ khi bước trước hỏng'() {
     const draft = pairedDraft(4, { formatKey: 'knockout', config: {} });
     assert.equal(computeCompletedThrough(draft, enabledAll), 3);
-    assert.equal(computeCompletedThrough(draft), 2, 'thể thức chưa bật dừng ở bước 2');
+    assert.equal(computeCompletedThrough(draft, knockoutLocked), 2, 'thể thức chưa bật dừng ở bước 2');
+    assert.equal(computeCompletedThrough(draft), 3, 'registry thật: loại trực tiếp đã bật');
     draft.tournament = info({ name: '' });
     assert.equal(computeCompletedThrough(draft, enabledAll), 0);
   },

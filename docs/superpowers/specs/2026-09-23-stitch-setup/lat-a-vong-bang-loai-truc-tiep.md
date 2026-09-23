@@ -1,6 +1,6 @@
 # Lát A — Vòng bảng → Loại trực tiếp
 
-Trạng thái: spec chờ duyệt · Deploy 1 (cùng Lát 0) · Phụ thuộc: Lát 0 xanh · Xem [README](README.md)
+Trạng thái: đã triển khai (2026-09-23) · Deploy 1 (cùng Lát 0) · Phụ thuộc: Lát 0 xanh · Xem [README](README.md)
 
 ## 1. Mục tiêu
 

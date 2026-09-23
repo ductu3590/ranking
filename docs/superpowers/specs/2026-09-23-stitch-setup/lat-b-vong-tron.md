@@ -1,6 +1,6 @@
 # Lát B — Vòng tròn tính điểm
 
-Trạng thái: spec chờ duyệt · Deploy 2 · Phụ thuộc: Lát A đã deploy · Xem [README](README.md)
+Trạng thái: đã triển khai (2026-09-23) · Deploy 2 · Phụ thuộc: Lát A đã deploy · Xem [README](README.md)
 
 ## 1. Mục tiêu
 

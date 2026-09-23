@@ -65,3 +65,40 @@ Project `uhhlelemewilgsdijwja`, apply qua Supabase MCP `apply_migration`.
 | Chốt | 1 stage `round_robin`, 10 trận, 0 transition; khách `athlete_id` NULL; giải vẫn `draft`; bàn điều hành 0/10 |
 | Nhập 10 tỉ số (sau 105) | Mọi trận `finalized` sau 1 ván; 11–10 bị từ chối đúng luật cách 2 |
 | Kết thúc chặng (sau 106) | `final: true`; gọi lại cùng key trả kết quả cũ; stage `completed`; màn xếp hạng báo chung cuộc |
+
+## Lát C — 2026-09-23
+
+| Migration | Nội dung | Ảnh hưởng dữ liệu |
+|---|---|---|
+| 107_finalize_v4_knockout | `finalize_internal_setup_v4` mở `knockout` + nhánh bất biến spec §6; kiểm "trận knockout để trống, hai nguồn" chỉ áp cho `group_knockout`; stage entrants ghi theo `groups[].stagePlanKey` (mặc định `group-stage`) | Không (chỉ thay hàm). md5 `prosrc` trên production = md5 thân hàm trong file (`d1049809…d253`) |
+
+Test `tests/stitch-setup/lat-c/api-contract.test.js` khóa: 107 chỉ khác 104 ở bốn điểm trên.
+
+### Kiểm thử tích hợp (một transaction, ROLLBACK) — sau khi apply 107
+
+Sinh bằng `node scripts/qa/stitch-lat-c-integration.js --applied` (bản đầy đủ nạp cả thân hàm: `database/tests/stitch_lat_c_integration.sql`).
+
+| Kiểm tra | Kết quả |
+|---|---|
+| K6 (6 cặp, 1 khách, hạng ba, F BO3): 5 plan sửa tay (bỏ trận, ô bye kiêm tuyến, cạnh thua vào F, cặp lạ, 2 stage) | Cả 5 `FINALIZE_PLAN_INVALID`; 0 stage được ghi |
+| K6 chốt | 6 trận; `knockout:F=3:bo=1`; 6 stage entrants không nhãn; `QF2,QF3@r1:AB, SF1@r2:A_, SF2@r2:_B, BRONZE,F@r3:__`; `winner=4, loser=2`; khách `athlete_id NULL`; giải vẫn `draft` |
+| K6 gọi lại cùng key | response giống hệt, vẫn 6 trận |
+| K6 đánh qua `replace_tournament_games_with_transitions` | QF → SF điền đúng ô (ô bye giữ nguyên); SF → F (thắng) + BRONZE (thua) đúng; 6/6 `finalized` |
+| K8 (8 cặp, không hạng ba) | 7 trận `QF1–4@r1, SF1–2@r2, F@r3`; 6 tuyến; không `match_scoring` |
+| Hồi quy GK (vòng bảng 2×2) / RR (vòng tròn 5 cặp) | 13 trận / 10 trận; entrants 7 + 0 / 5 |
+
+Sau rollback: 0 group `itlc-%`, 0 thành viên `IT VĐV %`, 0 mutation `it-fin-%`.
+
+### Chạy thật trên browser (dev, DB production, CLB test 59, giải 210 / division 194)
+
+| Bước | Kết quả |
+|---|---|
+| 11 TV + 1 khách → 6 cặp, thẻ "Loại trực tiếp" | Cảnh báo 8–32 cặp (không chặn); "6 cặp → nhánh 8, 3 vòng, bắt đầu từ tứ kết. 2 cặp được vào thẳng vòng 2"; hạng ba + chung kết BO3 |
+| Bốc thăm | Cảnh báo `KNOCKOUT_BYE`; danh sách cặp vào thẳng; nhánh Tứ kết 1–2 → Bán kết 1–2 (cặp bye + "Thắng tứ kết N") → Tranh hạng ba, Chung kết BO3; lịch 6 trận 2 sân; 375px không tràn ngang |
+| Chốt | DB khớp xem trước từng ô; 6 tuyến; khách `athlete_id NULL`; bàn điều hành 0/6 |
+| Nhập tỉ số | Điền cặp tự động qua từng vòng; F 1 ván `complete=false`, 3 ván `complete=true` |
+| Kết thúc giải | "Kết thúc giải & chốt xếp hạng" → stage `completed`, `final: true` |
+
+### Lỗi phát hiện khi chạy thật
+
+- **Nhãn BXH loại trực tiếp sai** (có từ trước, ảnh hưởng cả Lát A có hạng ba): hạng ba hiện "Bán kết", hạng tư "Tứ kết", thua tứ kết "Vòng 1". `koLabel` suy nhãn từ khoảng cách tới `exit_round` lớn nhất, trong khi engine cộng điểm thứ bậc. Sửa: `knockoutPlacementLabels` (qualification.js) gắn nhãn trong `computeStageStandings` theo số vòng thật; trang công khai giữ trường `label`.

@@ -33,10 +33,16 @@
   color: var(--pc-text);
   background: var(--pc-bg);
   min-height: 100dvh;
-  padding-bottom: 6.5rem;
+  padding-bottom: 1rem;
+  /* Thanh tab của app (components/MobileBottomNav) hiện dưới 1120px, cao --ph-bottom-nav-height. */
+  --pc-app-nav: 0px;
+  --pc-app-header: 0px;
   font-size: 0.875rem;
   line-height: 1.25rem;
 }
+
+/* Dưới 1120px app có header dính đầu (~79px) và thanh tab dính đáy. */
+@media (max-width: 1119px) { .pc-studio { --pc-app-nav: calc(var(--ph-bottom-nav-height, 78px)); --pc-app-header: 80px; } }
 
 .pc-studio *,
 .pc-studio *::before,
@@ -207,9 +213,10 @@
 
 /* ---------- Action bar ---------- */
 .pc-actionbar {
-  position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; background: rgba(255, 255, 255, 0.97);
+  /* sticky trong workspace: không đè sidebar desktop, nằm ngay trên thanh tab app ở màn hẹp */
+  position: sticky; bottom: calc(var(--pc-app-nav) + env(safe-area-inset-bottom)); z-index: 30; background: rgba(255, 255, 255, 0.97);
   border-top: 1px solid var(--pc-border); box-shadow: 0 -4px 16px rgba(15, 23, 42, 0.06);
-  padding: 0.625rem 1rem calc(0.625rem + env(safe-area-inset-bottom));
+  padding: 0.625rem 1rem;
 }
 .pc-actionbar__inner { max-width: 80rem; margin: 0 auto; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
 .pc-actionbar__status { flex: 1 1 10rem; min-width: 0; font-size: 0.75rem; color: var(--pc-muted); }
@@ -272,7 +279,7 @@
 }
 .pc-composer__slot { flex: 1 1 8rem; min-height: 44px; border-radius: var(--pc-radius); border: 1px solid var(--pc-brand-200); background: #fff; padding: 0.5rem 0.625rem; display: flex; align-items: center; }
 .pc-composer__slot[data-empty='true'] { color: var(--pc-subtle); border-style: dashed; }
-@media (max-width: 899px) { .pc-composer { position: sticky; bottom: 7rem; z-index: 5; } }
+.pc-composer { position: sticky; top: calc(var(--pc-app-header) + 0.5rem); z-index: 5; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06); }
 .pc-pairs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
 .pc-pair {
   display: grid; grid-template-columns: 2.25rem minmax(0, 1fr) auto; gap: 0.5rem; align-items: center;

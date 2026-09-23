@@ -49,6 +49,8 @@ export function useSetupStudio({ tournamentId: initialTournamentId, divisionId: 
   useEffect(() => {
     let alive = true;
     listClubRoster().then((rows) => { if (alive) setRoster(Array.isArray(rows) ? rows : []); }).catch(() => {});
+    // Id vừa do chính lần lưu đầu tạo ra (URL cập nhật theo) → đã có dữ liệu, không tải lại.
+    if (initialTournamentId && saveRef.current.tournamentId === String(initialTournamentId)) return () => { alive = false; };
     if (!(initialTournamentId && initialDivisionId)) {
       setStep(1);
       return () => { alive = false; };

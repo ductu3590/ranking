@@ -17,7 +17,7 @@ function usePairNames(draft, roster) {
   return useMemo(() => {
     const people = new Map();
     for (const row of roster || []) people.set(`member:${row.member_id}`, row.full_name);
-    for (const guest of draft.participants.guests) people.set(`guest:${guest.clientRef}`, guest.displayName);
+    for (const guest of draft.participants.guests) people.set(`guest:${guest.clientRef}`, `${guest.displayName} (khách)`);
     const pairs = new Map(draft.pairs.map((pair) => [pair.pairId, pair.participantRefs.map((ref) => people.get(ref) || '—').join(' / ')]));
     return (pairId) => pairs.get(pairId) || 'Cặp';
   }, [draft.pairs, draft.participants.guests, roster]);
@@ -41,7 +41,7 @@ function StaleNotice({ blocker, busy, onDraw }) {
   const groupsChanged = blocker.params?.groupsChanged !== false;
   return (
     <div className="pc-notice pc-notice--warn" role="alert" style={{ flexDirection: 'column' }} data-code="DRAW_STALE">
-      <p><strong>{messageFor('DRAW_STALE').text}</strong> {groupsChanged ? 'Cặp hoặc cách chia bảng đã đổi nên cần bốc thăm lại.' : 'Chỉ đổi tranh hạng ba hoặc số ván: cập nhật xem trước là đủ, giữ nguyên kết quả chia bảng.'}</p>
+      <p><strong>Cấu hình đã thay đổi so với lần bốc thăm.</strong> {groupsChanged ? 'Cặp hoặc cách chia bảng đã đổi nên cần bốc thăm lại.' : 'Chỉ đổi tranh hạng ba hoặc số ván: cập nhật xem trước là đủ, giữ nguyên kết quả chia bảng.'}</p>
       <div className="pc-btn-row">
         {!groupsChanged ? <button type="button" className="pc-btn pc-btn--primary" disabled={busy} onClick={() => onDraw('preview')}>Cập nhật xem trước</button> : null}
         <button type="button" className={`pc-btn ${groupsChanged ? 'pc-btn--primary' : ''}`} disabled={busy} onClick={() => onDraw('draw')}>Bốc thăm lại</button>

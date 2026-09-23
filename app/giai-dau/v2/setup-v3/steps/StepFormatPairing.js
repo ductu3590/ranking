@@ -44,6 +44,7 @@ function FormatCards({ draft, onChange }) {
       {listFormats().map((format) => (
         <button
           key={format.key} type="button" role="radio" className="pc-format"
+          aria-label={format.enabled ? format.label : `${format.label} (sắp có)`}
           aria-checked={current === format.key} aria-disabled={!format.enabled || undefined}
           onClick={() => choose(format)}
         >
@@ -115,6 +116,13 @@ function PairingBoard({ draft, roster, onChange, onAddPerson, stepResult, showEr
         <p>Chạm lần lượt hai người ở danh sách <strong>Chưa ghép</strong>, rồi bấm <strong>Ghép cặp</strong>. Chạm lại người đã chọn để hủy. Trên máy tính dùng Tab và Enter, Esc để bỏ chọn.</p>
       </div>
 
+      {/* Thanh soạn cặp đặt TRÊN danh sách và dính đầu màn hình: chọn xong người thứ hai là thấy ngay nút Ghép cặp, kể cả trên điện thoại. */}
+      <div className="pc-composer" aria-live="polite">
+        <span className="pc-composer__slot" data-empty={!selection.first || undefined}>{selection.first ? nameOf(selection.first).name : 'Chọn người thứ nhất'}</span>
+        <span aria-hidden="true">+</span>
+        <span className="pc-composer__slot" data-empty={!selection.second || undefined}>{selection.second ? nameOf(selection.second).name : 'Chọn người thứ hai'}</span>
+        <button type="button" className="pc-btn pc-btn--primary" disabled={phase !== 'ready'} onClick={confirmPair}>Ghép cặp</button>
+      </div>
       <div className="pc-pairing">
         <div className="pc-pool">
           <h4 id={`${base}-pool`} style={{ margin: 0 }}>Chưa ghép ({draft.unpairedRefs.length})</h4>
@@ -138,12 +146,6 @@ function PairingBoard({ draft, roster, onChange, onAddPerson, stepResult, showEr
         </div>
 
         <div>
-          <div className="pc-composer" aria-live="polite">
-            <span className="pc-composer__slot" data-empty={!selection.first || undefined}>{selection.first ? nameOf(selection.first).name : 'Chọn người thứ nhất'}</span>
-            <span aria-hidden="true">+</span>
-            <span className="pc-composer__slot" data-empty={!selection.second || undefined}>{selection.second ? nameOf(selection.second).name : 'Chọn người thứ hai'}</span>
-            <button type="button" className="pc-btn pc-btn--primary" disabled={phase !== 'ready'} onClick={confirmPair}>Ghép cặp</button>
-          </div>
           <h4 style={{ margin: '0 0 0.5rem' }}>Các cặp ({draft.pairs.length})</h4>
           {draft.pairs.length ? (
             <ol className="pc-pairs">
@@ -153,7 +155,7 @@ function PairingBoard({ draft, roster, onChange, onAddPerson, stepResult, showEr
                 return (
                   <li key={pair.pairId} className="pc-pair" data-locked={pair.locked || undefined}>
                     <span className="pc-pair__no">{String(index + 1).padStart(2, '0')}</span>
-                    <span className="pc-pair__names"><span>{a.name}</span><span>{b.name}</span></span>
+                    <span className="pc-pair__names"><span>{a.name}{a.guest ? ' (khách)' : ''}</span><span>{b.name}{b.guest ? ' (khách)' : ''}</span></span>
                     <span className="pc-pair__actions">
                       <button type="button" className="pc-icon-btn" aria-pressed={pair.locked} aria-label={`${pair.locked ? 'Mở khóa' : 'Khóa'} ${label}`}
                         onClick={() => apply((state) => Pairing.setLocked(state, pair.pairId, !pair.locked))}>{pair.locked ? '🔒' : '🔓'}</button>

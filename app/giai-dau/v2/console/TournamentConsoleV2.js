@@ -16,8 +16,10 @@ import SettingsTab from './tabs/SettingsTab';
 import OpenRegTab from './tabs/OpenRegTab';
 import './console.css';
 
+// API /stages không trả match_count, nên chỉ dựa vào nó thì giải đã chốt vẫn bị coi là
+// "chưa có lịch" và admin bị đẩy ngược về màn thiết lập. Stage chỉ được tạo khi chốt giải.
 function hasSchedule(stages) {
-  return (stages || []).some((stage) => Number(stage.match_count || 0) > 0);
+  return (stages || []).length > 0;
 }
 
 // Readiness thiết lập lấy từ khối `setup` do server tính (spec Lát 0 §8), không tự suy từ roster.

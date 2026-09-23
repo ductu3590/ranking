@@ -94,6 +94,22 @@ suite('ui contract lát 0', {
     assert.equal(consoleSrc.includes('selectedMemberIds'), false);
   },
 
+  'hồi quy browser 2026-09-23: thanh hành động không bị thanh tab app che, nút Ghép cặp luôn thấy'() {
+    assert.ok(/\.pc-actionbar \{[\s\S]*?position: sticky; bottom: calc\(var\(--pc-app-nav\)/.test(css), 'action bar sticky trên thanh tab');
+    assert.ok(css.includes('--pc-app-nav: calc(var(--ph-bottom-nav-height, 78px))'));
+    assert.equal(/\.pc-actionbar \{[^}]*position: fixed/.test(css), false);
+    const board = read(`${DIR}/steps/StepFormatPairing.js`);
+    assert.ok(board.indexOf('className="pc-composer"') < board.indexOf('className="pc-pairing"'), 'thanh soạn cặp đứng trước danh sách');
+    assert.ok(css.includes('.pc-composer { position: sticky; top: calc(var(--pc-app-header)'));
+  },
+
+  'giải đã chốt không mở lại setup; console coi có stage là đã có lịch'() {
+    assert.ok(read(`${DIR}/SetupStudio.js`).includes("save.draft.state === 'finalized'"));
+    const consoleSrc = read('app/giai-dau/v2/console/TournamentConsoleV2.js');
+    assert.ok(consoleSrc.includes('return (stages || []).length > 0;'));
+    assert.equal(stripComments(consoleSrc).includes('match_count'), false, 'API /stages không trả match_count');
+  },
+
   'console không có editor setup thứ hai (chuyển từ ui-unified-wizard, ADR-006)'() {
     const consoleSrc = read('app/giai-dau/v2/console/TournamentConsoleV2.js');
     assert.equal(/DivisionSetupPanel/.test(consoleSrc), false, 'console không render setup editor riêng');

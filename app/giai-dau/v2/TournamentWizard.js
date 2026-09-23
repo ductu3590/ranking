@@ -14,7 +14,6 @@ export default function TournamentWizard({ onDone }) {
 
     return (
         <SetupStudio
-            key={`${tournamentId || 'new'}:${divisionId || ''}`}
             tournamentId={tournamentId}
             divisionId={divisionId}
             step={step}

@@ -56,6 +56,7 @@ export function StudioStepper({ step, completedThrough, summaries, onSelect }) {
               <button
                 ref={current ? currentRef : undefined}
                 type="button" className="pc-step" disabled={!open}
+                aria-label={`Bước ${item.id}: ${item.title}${done && !current ? ' (đã xong)' : ''}${!open ? ' (chưa mở)' : ''}`}
                 aria-current={current ? 'step' : undefined} data-done={done && !current ? 'true' : undefined}
                 onClick={() => onSelect(item.id)}
               >

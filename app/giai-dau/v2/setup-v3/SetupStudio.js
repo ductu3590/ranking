@@ -39,6 +39,11 @@ export default function SetupStudio({ tournamentId, divisionId, step: requestedS
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   }, [pathname, router, save.tournamentId, save.divisionId, step]);
 
+  // Giải đã chốt không mở lại màn thiết lập (spec Lát 0 §10): chuyển tới lịch.
+  useEffect(() => {
+    if (save.draft.state === 'finalized' && save.tournamentId) router.replace(`/dieu-hanh-giai/${save.tournamentId}?step=schedule`);
+  }, [router, save.draft.state, save.tournamentId]);
+
   useEffect(() => {
     if (!dirty) return undefined;
     const warn = (event) => { event.preventDefault(); event.returnValue = ''; };

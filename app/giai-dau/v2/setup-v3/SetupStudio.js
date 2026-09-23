@@ -26,7 +26,7 @@ export default function SetupStudio({ tournamentId, divisionId, step: requestedS
   const router = useRouter();
   const pathname = usePathname();
   const studio = useSetupStudio({ tournamentId, divisionId, step: requestedStep });
-  const { save, step, setStep, readiness, dirty, edit, persist, discard, reloadFromServer } = studio;
+  const { save, step, setStep, readiness, dirty, edit, persist, discard, reloadFromServer, draw, finalize } = studio;
   const [busy, setBusy] = useState(false);
   const [showErrors, setShowErrors] = useState({});
   const [pendingNav, setPendingNav] = useState(null);
@@ -143,7 +143,20 @@ export default function SetupStudio({ tournamentId, divisionId, step: requestedS
               {step === 1 ? <StepInfo {...stepProps} /> : null}
               {step === 2 ? <StepParticipants {...stepProps} roster={studio.roster} rosterLoading={!studio.roster.length && studio.loading} /> : null}
               {step === 3 ? <StepFormatPairing {...stepProps} roster={studio.roster} onGoToStep={requestNav} /> : null}
-              {step === 4 ? <StepDraw {...stepProps} /> : null}
+              {step === 4 ? (
+                <StepDraw
+                  {...stepProps}
+                  roster={studio.roster}
+                  busy={busy || save.status === 'saving'}
+                  finalizing={studio.finalizing}
+                  finalizeError={studio.finalizeError}
+                  onDraw={async (action) => { setBusy(true); try { await draw(action); } finally { setBusy(false); } }}
+                  onFinalize={async () => {
+                    const outcome = await finalize();
+                    if (outcome.ok) router.push(outcome.result?.redirect || '/giai-dau/v2');
+                  }}
+                />
+              ) : null}
             </>
           )}
         </main>

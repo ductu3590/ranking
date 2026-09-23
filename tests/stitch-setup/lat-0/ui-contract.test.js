@@ -16,7 +16,12 @@ const css = read(`${DIR}/studio.css`);
 const all = sources.map((item) => item.text).join('\n');
 
 // Chuỗi hiển thị trong JSX: nội dung giữa > và <, cộng các literal tiếng Việt trong nháy.
-function visibleStrings(text) {
+function stripComments(text) {
+  return text.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`])\/\/.*$/gm, '$1');
+}
+
+function visibleStrings(raw) {
+  const text = stripComments(raw);
   // Bỏ đoạn là code (sau `=>`, chứa ===, ;, (, =) — chỉ giữ văn bản JSX thật.
   const jsxText = [...text.matchAll(/>([^<>{}]+)</g)].map((match) => match[1]).filter((chunk) => !/[=;()]/.test(chunk));
   const literals = [...text.matchAll(/'([^'\n]*[À-ỹ][^'\n]*)'/g)].map((match) => match[1]);

@@ -6,6 +6,7 @@ import { messageFor } from '@/lib/tournament/setupMessages';
 import { parseRef } from '@/lib/tournament/setupDraftV3';
 import * as Pairing from '@/lib/tournament/pairingDraft';
 import { newIdempotencyKey } from '@/lib/tournamentV2Client';
+import GroupKnockoutConfig from './GroupKnockoutConfig';
 
 const FORMAT_BLURB = {
   group_knockout: 'Chia bảng đấu vòng tròn, các cặp dẫn đầu vào vòng loại trực tiếp.',
@@ -220,9 +221,11 @@ export default function StepFormatPairing({ draft, roster, readiness, showErrors
         ) : null}
       </section>
 
+      {draft.format.formatKey === 'group_knockout' ? <GroupKnockoutConfig draft={draft} onChange={onChange} /> : null}
+
       <section className="pc-card" aria-labelledby={`${base}-pairs`}>
         <div className="pc-card__head">
-          <h3 id={`${base}-pairs`} className="pc-card__title"><span className="pc-section-key">B</span>Bảng ghép cặp thi đấu</h3>
+          <h3 id={`${base}-pairs`} className="pc-card__title"><span className="pc-section-key">{draft.format.formatKey === 'group_knockout' ? 'D' : 'B'}</span>Bảng ghép cặp thi đấu</h3>
           <span className="pc-card__hint">Không có danh sách dự bị</span>
         </div>
         <PairingBoard draft={draft} roster={roster} onChange={onChange} stepResult={stepResult} showErrors={showErrors} onAddPerson={() => onGoToStep(2)} />

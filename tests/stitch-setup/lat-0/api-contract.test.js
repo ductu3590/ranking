@@ -3,6 +3,7 @@
 const { assert, read, suite } = require('../_harness');
 
 const setup = read('app/api/tournament-v2/setup/route.js');
+const server = read('lib/tournament/setupServer.js');
 const preview = read('app/api/tournament-v2/preview-schedule/route.js');
 const finalize = read('app/api/tournament-v2/setup/finalize/route.js');
 const client = read('lib/tournamentV2Client.js');
@@ -31,7 +32,8 @@ suite('api contract lát 0', {
   },
 
   'save: định danh thành viên kiểm theo group trong session'() {
-    assert.ok(setup.includes(".from('club_members').select('id, full_name, is_active').eq('group_id', Number(groupId))"));
+    assert.ok(server.includes("db.from('club_members').select('id, full_name, is_active').eq('group_id', Number(groupId))"));
+    assert.ok(setup.includes('loadMemberContext(db, groupId'));
     assert.ok(setup.includes('requireValidatedGroupAdmin'));
   },
 
@@ -51,13 +53,14 @@ suite('api contract lát 0', {
   },
 
   'GET: trả khối setup (draft v3 + progress + resumeStep + readiness)'() {
-    assert.ok(setup.includes('const setup = await setupView(groupId, division.setup_draft)'));
-    assert.ok(/draft: \{ \.\.\.draft, progress: \{ completedThrough \}, currentStep: resumeStep \}/.test(setup));
+    assert.ok(setup.includes('const setup = await buildSetupView(db, groupId, division.setup_draft)'));
+    assert.ok(/draft: \{ \.\.\.draft, progress: \{ completedThrough \}, currentStep: resumeStep \}/.test(server));
   },
 
   'preview và finalize chặn thể thức chưa bật trước khi tính/ghi'() {
-    assert.ok(preview.includes("throw previewError('FORMAT_NOT_AVAILABLE'"));
-    assert.ok(finalize.includes("throw finalizeError('FORMAT_NOT_AVAILABLE'"));
+    assert.ok(preview.includes("return fail('FORMAT_NOT_AVAILABLE', 409)"));
+    assert.ok(preview.indexOf('FORMAT_NOT_AVAILABLE') < preview.indexOf('buildSetupPlan({'), 'kiểm tra trước khi dựng plan');
+    assert.ok(finalize.includes("return fail('FORMAT_NOT_AVAILABLE', 409)"));
     assert.ok(finalize.indexOf('FORMAT_NOT_AVAILABLE') < finalize.indexOf("db.rpc("), 'kiểm tra trước RPC');
   },
 

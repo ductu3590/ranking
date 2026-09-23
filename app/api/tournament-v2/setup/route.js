@@ -7,6 +7,7 @@ import { normalizeDraft, toSavePayload } from '@/lib/tournament/setupDraftV3';
 import { computeCompletedThrough, allowedStep } from '@/lib/tournament/setupStepRules';
 import { isFormatEnabled } from '@/lib/tournament/setupFormats';
 import { messageFor } from '@/lib/tournament/setupMessages';
+import { loadMemberContext, setupView as buildSetupView, todayInVietnam } from '@/lib/tournament/setupServer';
 import { actorName } from '@/lib/tournament/actorName';
 import { normalizeParticipants } from '@/lib/tournament/setupParticipants';
 import { resolveRepairMode, normalizeRepairReport } from '@/lib/tournament/legacyPairRepair';
@@ -68,40 +69,6 @@ function setupIssueError(code, status = 400, params) {
     return NextResponse.json({ error: message.text, code, step: message.step, field: message.field }, { status });
 }
 
-// Định danh thành viên cho luật Bước 2: chỉ thành viên thuộc group trong session,
-// và có athlete (athletes.legacy_club_member_id) mới được coi là hợp lệ.
-async function loadMemberContext(groupId, memberIds) {
-    const ids = [...new Set((memberIds || []).map(Number).filter((id) => Number.isSafeInteger(id) && id > 0))];
-    if (!ids.length) return new Map();
-    const [{ data: members, error: membersError }, { data: athletes, error: athletesError }] = await Promise.all([
-        db.from('club_members').select('id, full_name, is_active').eq('group_id', Number(groupId)).in('id', ids),
-        db.from('athletes').select('legacy_club_member_id').in('legacy_club_member_id', ids),
-    ]);
-    if (membersError || athletesError) throw Object.assign(new Error('Không thể xác thực danh tính VĐV'), { code: 'SETUP_READ_FAILED' });
-    const withAthlete = new Set((athletes || []).map((row) => String(row.legacy_club_member_id)));
-    return new Map((members || []).map((member) => [String(member.id), {
-        name: member.full_name,
-        active: member.is_active !== false,
-        hasAthlete: withAthlete.has(String(member.id)),
-    }]));
-}
-
-function todayInVietnam() {
-    return new Date(Date.now() + 7 * 3600 * 1000).toISOString().slice(0, 10);
-}
-
-// Draft v3 kèm progress do server tính. Client không tự nâng progress (spec Lát 0 §4.1).
-async function setupView(groupId, rawDraft) {
-    const draft = normalizeDraft(rawDraft);
-    const ctx = { members: await loadMemberContext(groupId, draft.participants.memberIds), today: todayInVietnam() };
-    const completedThrough = computeCompletedThrough(draft, ctx);
-    const resumeStep = allowedStep(draft.currentStep, completedThrough);
-    return {
-        draft: { ...draft, progress: { completedThrough }, currentStep: resumeStep },
-        resumeStep,
-        readiness: computeSetupReadiness(draft, ctx),
-    };
-}
 
 export async function GET(request) {
     try {
@@ -170,7 +137,7 @@ export async function GET(request) {
             invitedSystemIds.length ? db.from('groups').select('id, name').in('id', invitedSystemIds) : Promise.resolve({ data: [] }),
             invitedExternalIds.length ? db.from('tournament_external_clubs').select('id, name').eq('group_id', Number(groupId)).in('id', invitedExternalIds) : Promise.resolve({ data: [] }),
         ]);
-        const setup = await setupView(groupId, division.setup_draft);
+        const setup = await buildSetupView(db, groupId, division.setup_draft);
         const invitedSystemNames = new Map((invitedSystemResult.data || []).map((row) => [String(row.id), row.name]));
         const invitedExternalNames = new Map((invitedExternalResult.data || []).map((row) => [String(row.id), row.name]));
         return NextResponse.json({
@@ -243,7 +210,7 @@ export async function POST(request) {
             }
             let ctx;
             try {
-                ctx = { members: await loadMemberContext(groupId, payload.participants.memberIds), today: todayInVietnam() };
+                ctx = { members: await loadMemberContext(db, groupId, payload.participants.memberIds), today: todayInVietnam() };
             } catch (contextError) {
                 return NextResponse.json({ error: contextError.message, code: 'SETUP_READ_FAILED' }, { status: 500 });
             }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
-import { listClubRoster, loadSetupDraft, newIdempotencyKey, saveSetupDraft } from '@/lib/tournamentV2Client';
+import { drawSetup, finalizeSetup, listClubRoster, loadSetupDraft, newIdempotencyKey, saveSetupDraft } from '@/lib/tournamentV2Client';
 import { initialSaveState, isDirty, keyForNextSave, saveReducer } from '@/lib/tournament/setupSaveState';
 import { computeSetupReadiness } from '@/lib/tournament/setupReadiness';
 import { allowedStep } from '@/lib/tournament/setupStepRules';
@@ -75,33 +75,77 @@ export function useSetupStudio({ tournamentId: initialTournamentId, divisionId: 
 
   const edit = useCallback((update) => dispatch({ type: 'edit', update }), []);
 
-  const persist = useCallback(async () => {
+  // Mọi thao tác ghi bản nháp (lưu, bốc thăm) đi qua cùng máy trạng thái lưu.
+  const runMutation = useCallback(async (send, { freshKey = false } = {}) => {
     const current = saveRef.current;
-    const key = keyForNextSave(current, newIdempotencyKey);
+    const key = freshKey ? newIdempotencyKey() : keyForNextSave(current, newIdempotencyKey);
     const seq = ++seqRef.current;
     dispatch({ type: 'saveStart', key, seq });
     const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
     const timer = controller ? setTimeout(() => controller.abort(), SAVE_TIMEOUT_MS) : null;
     try {
-      const response = await saveSetupDraft({
-        draft: { ...current.draft, currentStep: step },
-        tournamentId: current.tournamentId,
-        divisionId: current.divisionId,
-        revision: current.revision,
-        clientDraftKey: clientDraftKeyRef.current,
-        idempotencyKey: key,
-        signal: controller?.signal,
-      });
+      const response = await send({ current, key, signal: controller?.signal });
       dispatch({ type: 'saveSuccess', seq, response });
       return { ok: true, completedThrough: response?.draft?.progress?.completedThrough ?? 0, response };
     } catch (error) {
-      const failure = { code: error?.name === 'AbortError' ? 'SETUP_SAVE_TIMEOUT' : (error?.code || 'SETUP_SAVE_FAILED'), message: error?.message };
-      dispatch({ type: 'saveFailure', seq, error: failure });
+      const failure = {
+        code: error?.name === 'AbortError' ? 'SETUP_SAVE_TIMEOUT' : (error?.code || 'SETUP_SAVE_FAILED'),
+        message: error?.message,
+        params: error?.details?.params,
+      };
+      dispatch({ type: 'saveFailure', seq, error: failure, retryable: !freshKey });
       return { ok: false, error: failure };
     } finally {
       if (timer) clearTimeout(timer);
     }
-  }, [step]);
+  }, []);
+
+  const persist = useCallback(() => runMutation(({ current, key, signal }) => saveSetupDraft({
+    draft: { ...current.draft, currentStep: step },
+    tournamentId: current.tournamentId,
+    divisionId: current.divisionId,
+    revision: current.revision,
+    clientDraftKey: clientDraftKeyRef.current,
+    idempotencyKey: key,
+    signal,
+  })), [runMutation, step]);
+
+  // Bốc thăm ('draw') hoặc cập nhật xem trước giữ seed ('preview'); server lưu vào nháp.
+  const draw = useCallback((action = 'draw') => runMutation(({ current, key }) => drawSetup({
+    tournamentId: current.tournamentId,
+    divisionId: current.divisionId,
+    revision: current.revision,
+    idempotencyKey: key,
+    action,
+  }), { freshKey: true }), [runMutation]);
+
+  // Chốt: một key cho cùng (revision, fingerprint) để thử lại không tạo hai giải.
+  const finalizeKeyRef = useRef({ scope: null, key: null });
+  const [finalizing, setFinalizing] = useState(false);
+  const [finalizeError, setFinalizeError] = useState(null);
+  const finalize = useCallback(async () => {
+    const current = saveRef.current;
+    const scope = `${current.revision}:${current.draft.draw.previewFingerprint}`;
+    if (finalizeKeyRef.current.scope !== scope) finalizeKeyRef.current = { scope, key: newIdempotencyKey() };
+    setFinalizing(true);
+    setFinalizeError(null);
+    try {
+      const result = await finalizeSetup({
+        tournamentId: current.tournamentId,
+        divisionId: current.divisionId,
+        revision: current.revision,
+        idempotencyKey: finalizeKeyRef.current.key,
+        previewFingerprint: current.draft.draw.previewFingerprint,
+      });
+      return { ok: true, result };
+    } catch (error) {
+      const failure = { code: error?.code || 'FINALIZE_NOT_ATOMIC', message: error?.message, params: error?.details?.params };
+      setFinalizeError(failure);
+      return { ok: false, error: failure };
+    } finally {
+      setFinalizing(false);
+    }
+  }, []);
 
   const reloadFromServer = useCallback(async (mode) => {
     const current = saveRef.current;
@@ -128,6 +172,10 @@ export function useSetupStudio({ tournamentId: initialTournamentId, divisionId: 
     dirty: isDirty(save),
     edit,
     persist,
+    draw,
+    finalize,
+    finalizing,
+    finalizeError,
     discard,
     reloadFromServer,
   };

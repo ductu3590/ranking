@@ -137,8 +137,8 @@ Thứ hạng trong từng bảng vẫn theo tiebreak hiện có, không đổi. 
 ## 9. Database (migration additive, đánh số tiếp sau P0.3)
 
 | Migration | Nội dung |
+| *(bỏ)* index `client_ref` | P0.7 xác nhận production đã có `idx_tournament_athletes_client_ref (group_id, tournament_id, client_ref)` |
 |---|---|
-| `…_setup_guest_client_ref_index.sql` | Unique index `(tournament_id, client_ref) WHERE client_ref IS NOT NULL` trên `tournament_athletes` (nếu chưa có) |
 | `…_stage_transition_pool_source.sql` | Thêm cột `source_pool_position integer`. Thay CHECK `tournament_stage_transitions_check` bằng bản mở rộng cho `source_kind='group_rank_pool'` (`source_group_label IS NULL`, `source_rank > 0`, `source_pool_position > 0`). Mở rộng `source_kind_check`. Dùng `ADD CONSTRAINT … NOT VALID` rồi `VALIDATE`; không xóa dữ liệu |
 | `…_finalize_internal_setup_v4.sql` | RPC chung §10 |
 | `…_advance_group_rank_transitions_v2.sql` | RPC tiến cấp §11 |
@@ -186,7 +186,8 @@ Lỗi ở bất kỳ bước nào → rollback toàn bộ; response không mang 
 - Đọc draft v3 và validate bước 1–3; `formatKey` phải được registry bật.
 - Kiểm tra định danh: member active, thuộc đúng group, có `athlete`; guest có tên hợp lệ.
 - Entries lấy từ `pairId`. Nếu `action` là `draw` thì sinh seed mới; ngược lại dùng seed trong draft (không có seed → `DRAW_REQUIRED`).
-- Trả `{ plan, schedule, fingerprint, revision, draftUpdate }`. Client lưu `draftUpdate` qua `save_aggregate`. Preview không tự ghi DB.
+- Body có thêm `idempotencyKey`. Route **tự lưu** plan + seed + fingerprint vào bản nháp qua RPC lưu (CAS theo `expectedRevision`), rồi trả `{ draft, readiness, setup_revision, fingerprint }` cùng shape với lưu nháp. *(Sửa khi triển khai: bản trước để client lưu `draftUpdate` — hai lượt gọi, dễ lệch; một lượt ghi có CAS an toàn hơn. `draftFingerprint` bỏ vì CAS revision đã đủ.)*
+- Ước tính lịch (§13) tính phía client từ `draft.draw.plan`, không trả từ route.
 - Bỏ các nhánh `reserveMemberIds` và `selectedMemberIds`.
 
 ## 13. Ước tính lịch

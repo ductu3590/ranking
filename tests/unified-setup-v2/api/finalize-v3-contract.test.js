@@ -14,6 +14,7 @@ assert.ok(migration.includes("jsonb_build_object('round_scoring'") && migration.
 assert.ok(migration.includes('DRAW_FINGERPRINT_MISMATCH') && migration.includes('SETUP_REVISION_CONFLICT'), 'v3 guards canonical fingerprint and revision');
 assert.ok(migration.includes("'finalize_internal_doubles_group_knockout_v2'") && migration.includes('idempotent_replay'), 'v3 replays the v2 atomic writer response on a safe retry');
 assert.ok(!/tournament_matches\.best_of|ADD COLUMN[^;]*best_of/i.test(migration), 'v3 does not add per-match BO storage');
-assert.ok(route.includes("db.rpc('finalize_internal_doubles_group_knockout_v3'"), 'route invokes v3');
+// ADR-006 (Lát A): route chốt giải dùng finalize_internal_setup_v4; v3 giữ lại cho dữ liệu cũ.
+assert.ok(!route.includes('finalize_internal_doubles_group_knockout_v3'), 'luồng mới không gọi v3');
 
 console.log('unified setup finalize v3 contract ok');

@@ -91,7 +91,7 @@ Mọi bước chỉ đọc production. Tuyệt đối không reset/drop/truncate
 - Rời bước (quay lại, bấm stepper, back của trình duyệt, đóng tab) khi đang có thay đổi chưa lưu: hiện hộp thoại `Lưu` / `Bỏ thay đổi chưa lưu` / `Ở lại`. Đóng tab dùng `beforeunload`.
 - Mỗi lần lưu có `idempotencyKey` riêng. Thử lại sau timeout dùng lại đúng key đó.
 - Response trả về muộn (so theo sequence của request) không được ghi đè edit mới hơn. Giữ nguyên hành vi `hydrate` của `SetupContext`: đang dirty/saving thì bỏ qua dữ liệu hydrate.
-- `SETUP_REVISION_CONFLICT`: giữ dữ liệu đang nhập, hiện `Bản nháp vừa được sửa ở nơi khác` với hai lựa chọn `Tải bản mới (mất thay đổi của tôi)` / `Giữ lại để so sánh`. Không bao giờ tự ghi đè.
+- `SETUP_REVISION_CONFLICT`: giữ dữ liệu đang nhập, hiện `Bản nháp vừa được sửa ở nơi khác` với hai lựa chọn `Tải bản mới (bỏ thay đổi của tôi)` / `Giữ bản của tôi` (lấy revision mới nhất; lần lưu sau ghi đè có chủ đích). Không bao giờ tự ghi đè. Logic nằm ở `lib/tournament/setupSaveState.js`.
 
 ### 4.3 Vô hiệu hóa (stale)
 

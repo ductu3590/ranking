@@ -310,7 +310,7 @@ function TournamentV2DashboardClientInner() {
     function handleWizardDone(id) {
         load();
         if (id) openTournament(id);
-        else setCreateMode(false);
+        else router.push('/giai-dau/v2');
     }
 
     function handleEditDone() {
@@ -356,16 +356,9 @@ function TournamentV2DashboardClientInner() {
         );
     }
 
-    /* --- Wizard tạo giải --- */
+    /* --- Wizard tạo giải: header của workspace có nút quay lại kèm chặn thay đổi chưa lưu --- */
     if (creating) {
-        return (
-            <div className="v2-page">
-                <button type="button" className="v2-back" onClick={() => setCreateMode(false)}>
-                    ‹ Hủy tạo giải
-                </button>
-                <TournamentWizard onDone={handleWizardDone} />
-            </div>
-        );
+        return <TournamentWizard onDone={handleWizardDone} />;
     }
 
     /* --- Danh sách giải --- */

@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tạo giải nội bộ - Bước 2: Người tham gia | PickHub</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f5f3ff',
+              100: '#ede9fe',
+              200: '#ddd6fe',
+              500: '#8b5cf6',
+              600: '#7c3aed',
+              700: '#6d28d9',
+              800: '#5b21b6',
+              900: '#4c1d95',
+              primary: '#7c3aed',
+              'primary-dark': '#6d28d9',
+              glow: 'rgba(124, 58, 237, 0.2)'
+            },
+            surface: {
+              bg: '#f8f9ff',
+              card: '#ffffff',
+              dim: '#f1f5f9',
+              container: '#eff4ff',
+              highlight: '#f8fafc',
+              border: '#e2e8f0',
+              'border-subtle': '#cbdbf5'
+            },
+            text: {
+              main: '#0b1c30',
+              muted: '#64748b'
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"Space Grotesk"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    body {
+      background-color: #f8f9ff;
+      color: #0b1c30;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .court-grid-pattern {
+      background-image: radial-gradient(rgba(124, 58, 237, 0.07) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #7c3aed;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-[#f8f9ff] text-[#0b1c30] antialiased court-grid-pattern pb-28 md:pb-24 selection:bg-[#7c3aed] selection:text-white">
+<!-- ================= TOP HEADER (SHELL CỐ ĐỊNH) ================= -->
+<header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#e2e8f0] px-4 md:px-8 py-3.5 flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-3">
+<button class="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 hover:text-slate-900 transition flex items-center justify-center shadow-xs">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10 19l-7-7m0 0l7-7m-7 7h18" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<div class="flex flex-wrap items-center gap-2">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-[#7c3aed] shadow-[0_0_8px_#7c3aed]"></span>
+<h1 class="text-base md:text-lg font-bold tracking-tight text-slate-900 font-mono flex items-center gap-2">
+            Tạo giải nội bộ
+            <span class="text-slate-300 font-normal text-sm font-sans hidden sm:inline">|</span>
+<span class="text-[#7c3aed] font-semibold text-sm md:text-base font-sans">Giải nội bộ tháng 10</span>
+</h1>
+</div>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+          NHÁP
+        </span>
+<span class="text-xs text-slate-500 flex items-center gap-1.5 ml-1">
+<span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+          Đã lưu tự động lúc 09:42
+        </span>
+</div>
+</div>
+<!-- Quick info / Context -->
+<div class="flex items-center gap-3">
+<div class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-xs">
+<span class="text-slate-500">Không gian:</span>
+<span class="font-semibold text-slate-900">PickHub 246 Club</span>
+<span class="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[11px] font-medium border border-emerald-200">Quyền Admin</span>
+</div>
+<button class="text-xs text-slate-600 hover:text-slate-900 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-200 hover:border-purple-300 transition shadow-xs">
+<svg class="w-3.5 h-3.5 text-[#7c3aed]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="hidden sm:inline font-medium">Quy chế giải</span>
+</button>
+</div>
+</header>
+<!-- ================= STEPPER 4 BƯỚC ================= -->
+<nav aria-label="Tiến trình tạo giải" class="bg-white border-b border-slate-200 px-4 md:px-8 py-3 overflow-x-auto custom-scrollbar">
+<div class="max-w-7xl mx-auto flex items-center justify-between min-w-[620px] gap-4">
+<!-- BƯỚC 1: Đã tick hoàn tất -->
+<div class="flex items-center gap-3 opacity-90 group cursor-pointer">
+<div class="w-8 h-8 rounded-lg bg-purple-100 border border-purple-300 text-[#7c3aed] flex items-center justify-center font-bold text-sm shadow-xs">
+<svg class="w-4 h-4 stroke-[3]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</div>
+<div class="text-left">
+<p class="text-[11px] text-[#7c3aed] font-semibold tracking-wider uppercase">BƯỚC 1 • ĐÃ LƯU</p>
+<p class="text-sm font-semibold text-slate-800 group-hover:text-purple-700">Thông tin giải</p>
+</div>
+</div>
+<div class="flex-1 h-[2px] bg-purple-200 mx-2"></div>
+<!-- BƯỚC 2: Người tham gia (ĐANG ACTIVE) -->
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-[#7c3aed] text-white flex items-center justify-center font-extrabold text-sm shadow-[0_0_12px_rgba(124,58,237,0.35)]">
+          2
+        </div>
+<div class="text-left">
+<p class="text-[11px] text-[#7c3aed] font-bold tracking-wider uppercase flex items-center gap-1">
+            BƯỚC 2 <span class="w-1.5 h-1.5 rounded-full bg-[#7c3aed] animate-ping"></span>
+</p>
+<p class="text-sm font-bold text-slate-900 tracking-wide">Người tham gia</p>
+</div>
+</div>
+<div class="flex-1 h-[2px] bg-slate-200 mx-2"></div>
+<!-- BƯỚC 3: Thể thức & ghép cặp -->
+<div class="flex items-center gap-3 opacity-60">
+<div class="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200 text-slate-500 flex items-center justify-center font-bold text-sm">
+          3
+        </div>
+<div class="text-left">
+<p class="text-[11px] text-slate-500 font-semibold tracking-wider uppercase">BƯỚC 3</p>
+<p class="text-sm font-medium text-slate-700">Thể thức &amp; ghép cặp</p>
+</div>
+</div>
+<div class="flex-1 h-[2px] bg-slate-200 mx-2"></div>
+<!-- BƯỚC 4: Bốc thăm & chốt -->
+<div class="flex items-center gap-3 opacity-60">
+<div class="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200 text-slate-500 flex items-center justify-center font-bold text-sm">
+          4
+        </div>
+<div class="text-left">
+<p class="text-[11px] text-slate-500 font-semibold tracking-wider uppercase">BƯỚC 4</p>
+<p class="text-sm font-medium text-slate-700">Bốc thăm &amp; chốt</p>
+</div>
+</div>
+</div>
+</nav>
+<!-- ================= BANNER CẢNH BÁO KHI SỬA DANH SÁCH ================= -->
+<div class="bg-amber-50 border-b border-amber-200 px-4 md:px-8 py-2.5">
+<div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs md:text-sm">
+<div class="flex items-center gap-2.5 text-amber-900">
+<div class="w-6 h-6 rounded-full bg-amber-100 border border-amber-300 flex items-center justify-center shrink-0 text-amber-700 font-bold">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<p class="leading-relaxed">
+<strong class="font-semibold text-amber-950">Lưu ý cập nhật:</strong> Thay đổi danh sách người tham gia sẽ làm cấu hình ghép cặp và bảng bốc thăm ở Bước 3 &amp; 4 cần cập nhật lại tương ứng.
+        </p>
+</div>
+<div class="flex items-center gap-2 self-end sm:self-auto shrink-0">
+<button class="px-2.5 py-1 rounded bg-amber-100 hover:bg-amber-200 text-amber-800 border border-amber-300 font-medium text-xs transition">
+          Đã hiểu &amp; Xác nhận
+        </button>
+</div>
+</div>
+</div>
+<!-- ================= MAIN CONTAINER 2 CỘT (CONTENT + PANEL SẴN SÀNG) ================= -->
+<main class="flex-1 max-w-7xl w-full mx-auto px-4 md:px-8 py-6">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+<!-- ================= CỘT TRÁI (LỚN): 2 KHU VỰC THÀNH VIÊN CLB & KHÁCH MỜI ================= -->
+<section class="lg:col-span-8 space-y-6">
+<!-- INTRO & STATS BANNER -->
+<div class="bg-white border border-[#e2e8f0] rounded-xl p-4 md:p-5 relative overflow-hidden shadow-sm">
+<div class="absolute -right-10 -bottom-10 w-44 h-44 bg-purple-50 rounded-full blur-2xl pointer-events-none"></div>
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="text-xs uppercase font-mono font-bold tracking-wider text-[#7c3aed] px-2 py-0.5 rounded bg-purple-50 border border-purple-200">QUẢN LÝ VĐV THI ĐẤU</span>
+<span class="text-xs text-slate-500">• Không có danh sách dự bị</span>
+</div>
+<h2 class="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">Danh sách người tham gia chính thức</h2>
+<p class="text-xs md:text-sm text-slate-600 mt-1">
+                Chọn vận động viên từ Roster CLB và thêm khách mời trực tiếp vào giải. Tất cả người được chọn đều là VĐV thi đấu chính thức.
+              </p>
+</div>
+<!-- Quick selection counter chip -->
+<div class="flex items-center gap-2 bg-[#eff4ff] border border-blue-100 px-3.5 py-2.5 rounded-lg shrink-0">
+<div class="text-right">
+<div class="text-[11px] text-slate-500 uppercase font-medium">Đã chọn vào giải</div>
+<div class="text-lg font-bold text-slate-900 font-mono flex items-center gap-1 justify-end">
+<span class="text-[#7c3aed]">14</span>
+<span class="text-xs text-slate-500 font-sans">/ 14 VĐV</span>
+</div>
+</div>
+<div class="w-10 h-10 rounded-lg bg-purple-100 border border-purple-200 flex items-center justify-center text-[#7c3aed]">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+</div>
+</div>
+<!-- TAB NAVIGATION (SWITCH HOẶC NHÌN TỔNG QUAN) -->
+<div class="flex items-center justify-between border-b border-slate-200 pb-1">
+<div class="flex items-center gap-2 md:gap-4">
+<button class="relative pb-3 px-1 text-sm md:text-base font-bold text-[#7c3aed] flex items-center gap-2 group">
+<span class="w-2 h-2 rounded-full bg-[#7c3aed]"></span>
+<span>1. Thành viên CLB</span>
+<span class="px-2 py-0.5 text-xs rounded-full bg-purple-50 border border-purple-200 text-[#7c3aed] font-mono">12 đã chọn</span>
+<span class="absolute bottom-0 left-0 right-0 h-0.5 bg-[#7c3aed] shadow-[0_0_8px_rgba(124,58,237,0.5)]"></span>
+</button>
+<button class="relative pb-3 px-1 text-sm md:text-base font-bold text-slate-500 hover:text-slate-700 flex items-center gap-2 group">
+<span>2. Khách mời</span>
+<span class="px-2 py-0.5 text-xs rounded-full bg-cyan-50 border border-cyan-200 text-cyan-700 font-mono">2 khách</span>
+</button>
+</div>
+<div class="text-xs text-slate-500 hidden sm:block">
+            Hiển thị 2 khu vực liền mạch để thao tác nhanh
+          </div>
+</div>
+<!-- ================= KHU VỰC 1: THÀNH VIÊN CLB (ROSTER) ================= -->
+<div class="bg-white border border-[#cbdbf5] rounded-xl overflow-hidden shadow-sm">
+<!-- Header Roster Bar & Search / Filter Controls -->
+<div class="p-4 bg-slate-50 border-b border-slate-200 space-y-3">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+<div>
+<h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+<svg class="w-4 h-4 text-[#7c3aed]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                  Roster thành viên CLB
+                  <span class="text-xs font-normal text-slate-500 font-mono">(Tổng: 16 hội viên trong CLB)</span>
+</h3>
+<p class="text-xs text-slate-600 mt-0.5">Tick chọn các thành viên chính thức sẽ thi đấu trong giải nội bộ tháng 10 này.</p>
+</div>
+<!-- Filter "Đang hoạt động" -->
+<div class="flex items-center gap-2">
+<span class="text-xs text-slate-500">Bộ lọc:</span>
+<div class="inline-flex rounded-lg p-0.5 bg-white border border-slate-200 shadow-xs">
+<button class="px-2.5 py-1 text-xs font-semibold rounded bg-purple-50 text-[#7c3aed] border border-purple-200 flex items-center gap-1.5 shadow-2xs">
+<span class="w-1.5 h-1.5 rounded-full bg-[#7c3aed]"></span>
+                    Đang hoạt động (14)
+                  </button>
+<button class="px-2.5 py-1 text-xs font-medium rounded text-slate-600 hover:text-slate-900 transition">
+                    Tất cả (16)
+                  </button>
+</div>
+</div>
+</div>
+<!-- Sticky-friendly Search & Bulk Select Bar -->
+<div class="pt-1 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+<!-- Search box -->
+<div class="relative flex-1">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<input class="w-full pl-9 pr-8 py-2 bg-white border border-slate-200 focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed] rounded-lg text-sm text-slate-900 placeholder-slate-400 outline-none transition font-sans shadow-2xs" placeholder="Tìm theo tên thành viên, mã VĐV (#1, #4...), biệt danh..." type="text"/>
+<button class="absolute inset-y-0 right-0 pr-2.5 flex items-center text-slate-400 hover:text-slate-600 text-xs">
+                  ✕
+                </button>
+</div>
+<!-- Select all visible checkbox button -->
+<div class="flex items-center justify-between sm:justify-end gap-3 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-2xs">
+<label class="flex items-center gap-2 cursor-pointer select-none">
+<input checked="" class="w-4 h-4 rounded bg-white border-slate-300 text-[#7c3aed] focus:ring-[#7c3aed] cursor-pointer" type="checkbox"/>
+<span class="text-xs font-semibold text-slate-800">Chọn tất cả đang hiển thị</span>
+</label>
+<span class="text-xs text-[#7c3aed] font-mono font-bold bg-purple-50 px-2 py-0.5 rounded border border-purple-200">12/14</span>
+</div>
+</div>
+</div>
+<!-- Member List (Desktop Table / Responsive Cards) -->
+<div class="divide-y divide-slate-100 max-h-[460px] overflow-y-auto custom-scrollbar">
+<!-- Item 1 (Đặng Ngọc Dương - Selected) -->
+<div class="p-3.5 hover:bg-purple-50/50 transition flex items-center justify-between gap-3 bg-purple-50/20">
+<div class="flex items-center gap-3 min-w-0">
+<input checked="" class="w-5 h-5 rounded bg-white border-2 border-slate-300 text-[#7c3aed] focus:ring-[#7c3aed] cursor-pointer shrink-0" type="checkbox"/>
+<div class="w-10 h-10 rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 text-white font-bold flex items-center justify-center text-sm shadow-sm shrink-0">
+                  D
+                </div>
+<div class="min-w-0">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="text-sm font-bold text-slate-900 truncate">Đặng Ngọc Dương</span>
+<span class="text-[11px] font-mono text-slate-500">#4</span>
+<span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-medium bg-purple-100 text-purple-700 border border-purple-200">
+                      Thành viên
+                    </span>
+<span class="text-[11px] text-amber-700 font-mono font-semibold bg-amber-50 px-1 rounded border border-amber-200">DUPR 2.9</span>
+</div>
+<div class="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
+<span class="truncate">Biệt danh: <span class="text-slate-700 font-medium">Dương Cắt Cầu</span></span>
+<span>•</span>
+<span class="text-emerald-600 flex items-center gap-1 font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Đang hoạt động
+                    </span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<span class="text-xs font-mono text-slate-500 hidden md:inline">Athlete_ID: <span class="text-slate-800 font-medium">VĐV-004</span></span>
+<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-purple-100 text-purple-700 border border-purple-200 font-mono">
+                  ĐÃ CHỌN
+                </span>
+</div>
+</div>
+<!-- Item 2 (Đỗ Đức Tú - Selected) -->
+<div class="p-3.5 hover:bg-purple-50/50 transition flex items-center justify-between gap-3 bg-purple-50/20">
+<div class="flex items-center gap-3 min-w-0">
+<input checked="" class="w-5 h-5 rounded bg-white border-2 border-slate-300 text-[#7c3aed] focus:ring-[#7c3aed] cursor-pointer shrink-0" type="checkbox"/>
+<div class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-600 to-teal-700 text-white font-bold flex items-center justify-center text-sm shadow-sm shrink-0">
+                  T
+                </div>
+<div class="min-w-0">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="text-sm font-bold text-slate-900 truncate">Đỗ Đức Tú</span>
+<span class="text-[11px] font-mono text-slate-500">#1</span>
+<span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-medium bg-purple-100 text-purple-700 border border-purple-200">
+                      Thành viên
+                    </span>
+<span class="text-[11px] text-amber-700 font-mono font-semibold bg-amber-50 px-1 rounded border border-amber-200">DUPR 3.2</span>
+</div>
+<div class="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
+<span class="truncate">Biệt danh: <span class="text-slate-700 font-medium">Tú Smash</span></span>
+<span>•</span>
+<span class="text-emerald-600 flex items-center gap-1 font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Đang hoạt động
+                    </span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<span class="text-xs font-mono text-slate-500 hidden md:inline">Athlete_ID: <span class="text-slate-800 font-medium">VĐV-001</span></span>
+<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-purple-100 text-purple-700 border border-purple-200 font-mono">
+                  ĐÃ CHỌN
+                </span>
+</div>
+</div>
+<!-- Item 3 (Bùi Văn Sơn - Selected) -->
+<div class="p-3.5 hover:bg-purple-50/50 transition flex items-center justify-between gap-3 bg-purple-50/20">
+<div class="flex items-center gap-3 min-w-0">
+<input checked="" class="w-5 h-5 rounded bg-white border-2 border-slate-300 text-[#7c3aed] focus:ring-[#7c3aed] cursor-pointer shrink-0" type="checkbox"/>
+<div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-600 to-orange-600 text-white font-bold flex items-center justify-center text-sm shadow-sm shrink-0">
+                  S
+                </div>
+<div class="min-w-0">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="text-sm font-bold text-slate-900 truncate">Bùi Văn Sơn</span>
+<span class="text-[11px] font-mono text-slate-500">#49</span>
+<span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-medium bg-purple-100 text-purple-700 border border-purple-200">
+                      Thành viên
+                    </span>
+<span class="text-[11px] text-amber-700 font-mono font-semibold bg-amber-50 px-1 rounded border border-amber-200">DUPR 2.8</span>
+</div>
+<div class="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
+<span class="truncate">Biệt danh: <span class="text-slate-700 font-medium">Sơn Thổ Địa</span></span>
+<span>•</span>
+<span class="text-emerald-600 flex items-center gap-1 font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Đang hoạt động
+                    </span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<span class="text-xs font-mono text-slate-500 hidden md:inline">Athlete_ID: <span class="text-slate-800 font-medium">VĐV-049</span></span>
+<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-purple-100 text-purple-700 border border-purple-200 font-mono">
+                  ĐÃ CHỌN
+                </span>
+</div>
+</div>
+<!-- Item 4 (Nguyễn Chương Long - Selected) -->
+<div class="p-3.5 hover:bg-purple-50/50 transition flex items-center justify-between gap-3 bg-purple-50/20">
+<div class="flex items-center gap-3 min-w-0">
+<input checked="" class="w-5 h-5 rounded bg-white border-2 border-slate-300 text-[#7c3aed] focus:ring-[#7c3aed] cursor-pointer shrink-0" type="checkbox"/>
+<div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-bold flex items-center justify-center text-sm shadow-sm shrink-0">
+                  L
+                </div>
+<div class="min-w-0">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="text-sm font-bold text-slate-900 truncate">Nguyễn Chương Long</span>
+<span class="text-[11px] font-mono text-slate-500">#5</span>
+<span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-medium bg-purple-100 text-purple-700 border border-purple-200">
+                      Thành viên
+                    </span>
+<span class="text-[11px] text-amber-700 font-mono font-semibold bg-amber-50 px-1 rounded border border-amber-200">DUPR 3.0</span>
+</div>
+<div class="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
+<span class="truncate">Biệt danh: <span class="text-slate-700 font-medium">Long Pickle</span></span>
+<span>•</span>
+<span class="text-emerald-600 flex items-center gap-1 font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Đang hoạt động
+                    </span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<span class="text-xs font-mono text-slate-500 hidden md:inline">Athlete_ID: <span class="text-slate-800 font-medium">VĐV-005</span></span>
+<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-purple-100 text-purple-700 border border-purple-200 font-mono">
+                  ĐÃ CHỌN
+                </span>
+</div>
+</div>
+<!-- Item 5 (Đổng Mạnh Linh - Selected) -->
+<div class="p-3.5 hover:bg-purple-50/50 transition flex items-center justify-between gap-3 bg-purple-50/20">
+<div class="flex items-center gap-3 min-w-0">
+<input checked="" class="w-5 h-5 rounded bg-white border-2 border-slate-300 text-[#7c3aed] focus:ring-[#7c3aed] cursor-pointer shrink-0" type="checkbox"/>
+<div class="w-10 h-10 rounded-full bg-gradient-to-br from-pink-600 to-rose-600 text-white font-bold flex items-center justify-center text-sm shadow-sm shrink-0">
+                  L
+                </div>
+<div class="min-w-0">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="text-sm font-bold text-slate-900 truncate">Đổng Mạnh Linh</span>
+<span class="text-[11px] font-mono text-slate-500">#6</span>
+<span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-medium bg-purple-100 text-purple-700 border border-purple-200">
+                      Thành viên
+                    </span>
+<span class="text-[11px] text-amber-700 font-mono font-semibold bg-amber-50 px-1 rounded border border-amber-200">DUPR 2.7</span>
+</div>
+<div class="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
+<span class="truncate">Biệt danh: <span class="text-slate-700 font-medium">Linh Đổng</span></span>
+<span>•</span>
+<span class="text-emerald-600 flex items-center gap-1 font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Đang hoạt động
+                    </span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<span class="text-xs font-mono text-slate-500 hidden md:inline">Athlete_ID: <span class="text-slate-800 font-medium">VĐV-006</span></span>
+<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-purple-100 text-purple-700 border border-purple-200 font-mono">
+                  ĐÃ CHỌN
+                </span>
+</div>
+</div>
+<!-- Item 6 (Nguyễn Nhật Quang - Selected) -->
+<div class="p-3.5 hover:bg-purple-50/50 transition flex items-center justify-between gap-3 bg-purple-50/20">
+<div class="flex items-center gap-3 min-w-0">
+<input checked="" class="w-5 h-5 rounded bg-white border-2 border-slate-300 text-[#7c3aed] focus:ring-[#7c3aed] cursor-pointer shrink-0" type="checkbox"/>
+<div class="w-10 h-10 rounded-full bg-gradient-to-br from-teal-600 to-cyan-700 text-white font-bold flex items-center justify-center text-sm shadow-sm shrink-0">
+                  Q
+                </div>
+<div class="min-w-0">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="text-sm font-bold text-slate-900 truncate">Nguyễn Nhật Quang</span>
+<span class="text-[11px] font-mono text-slate-500">#9</span>
+<span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-medium bg-purple-100 text-purple-700 border border-purple-200">
+                      Thành viên
+                    </span>
+<span class="text-[11px] text-amber-700 font-mono font-semibold bg-amber-50 px-1 rounded border border-amber-200">DUPR 3.1</span>
+</div>
+<div class="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
+<span class="truncate">Biệt danh: <span class="text-slate-700 font-medium">Quang Quang</span></span>
+<span>•</span>
+<span class="text-emerald-600 flex items-center gap-1 font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Đang hoạt động
+                    </span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<span class="text-xs font-mono text-slate-500 hidden md:inline">Athlete_ID: <span class="text-slate-800 font-medium">VĐV-009</span></span>
+<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-purple-100 text-purple-700 border border-purple-200 font-mono">
+                  ĐÃ CHỌN
+                </span>
+</div>
+</div>
+<!-- Item 7 (Vũ Ngọc Hưng - Selected) -->
+<div class="p-3.5 hover:bg-purple-50/50 transition flex items-center justify-between gap-3 bg-purple-50/20">
+<div class="flex items-center gap-3 min-w-0">
+<input checked="" class="w-5 h-5 rounded bg-white border-2 border-slate-300 text-[#7c3aed] focus:ring-[#7c3aed] cursor-pointer shrink-0" type="checkbox"/>
+<div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-600 to-blue-700 text-white font-bold flex items-center justify-center text-sm shadow-sm shrink-0">
+                  H
+                </div>
+<div class="min-w-0">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="text-sm font-bold text-slate-900 truncate">Vũ Ngọc Hưng</span>
+<span class="text-[11px] font-mono text-slate-500">#10</span>
+<span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-medium bg-purple-100 text-purple-700 border border-purple-200">
+                      Thành viên
+                    </span>
+<span class="text-[11px] text-amber-700 font-mono font-semibold bg-amber-50 px-1 rounded border border-amber-200">DUPR 2.6</span>
+</div>
+<div class="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
+<span class="truncate">Biệt danh: <span class="text-slate-700 font-medium">Hưng Lốp</span></span>
+<span>•</span>
+<span class="text-emerald-600 flex items-center gap-1 font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Đang hoạt động
+                    </span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<span class="text-xs font-mono text-slate-500 hidden md:inline">Athlete_ID: <span class="text-slate-800 font-medium">VĐV-010</span></span>
+<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-purple-100 text-purple-700 border border-purple-200 font-mono">
+                  ĐÃ CHỌN
+                </span>
+</div>
+</div>
+<!-- Item 8 (Phạm Xuân Ngọc Hoàng - Selected) -->
+<div class="p-3.5 hover:bg-purple-50/50 transition flex items-center justify-between gap-3 bg-purple-50/20">
+<div class="flex items-center gap-3 min-w-0">
+<input checked="" class="w-5 h-5 rounded bg-white border-2 border-slate-300 text-[#7c3aed] focus:ring-[#7c3aed] cursor-pointer shrink-0" type="checkbox"/>
+<div class="w-10 h-10 rounded-full bg-gradient-to-br from-red-500 to-rose-600 text-white font-bold flex items-center justify-center text-sm shadow-sm shrink-0">
+                  H
+                </div>
+<div class="min-w-0">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="text-sm font-bold text-slate-900 truncate">Phạm Xuân Ngọc Hoàng</span>
+<span class="text-[11px] font-mono text-slate-500">#35</span>
+<span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-medium bg-purple-100 text-purple-700 border border-purple-200">
+                      Thành viên
+                    </span>
+<span class="text-[11px] text-amber-700 font-mono font-semibold bg-amber-50 px-1 rounded border border-amber-200">DUPR 3.0</span>
+</div>
+<div class="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
+<span class="truncate">Biệt danh: <span class="text-slate-700 font-medium">Hoàng Cổ Tay</span></span>
+<span>•</span>
+<span class="text-emerald-600 flex items-center gap-1 font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Đang hoạt động
+                    </span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<span class="text-xs font-mono text-slate-500 hidden md:inline">Athlete_ID: <span class="text-slate-800 font-medium">VĐV-035</span></span>
+<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-purple-100 text-purple-700 border border-purple-200 font-mono">
+                  ĐÃ CHỌN
+                </span>
+</div>
+</div>
+<!-- Item 9 (Nguyễn Thanh Hải - Selected) -->
+<div class="p-3.5 hover:bg-purple-50/50 transition flex items-center justify-between gap-3 bg-purple-50/20">
+<div class="flex items-center gap-3 min-w-0">
+<input checked="" class="w-5 h-5 rounded bg-white border-2 border-slate-300 text-[#7c3aed] focus:ring-[#7c3aed] cursor-pointer shrink-0" type="checkbox"/>
+<div class="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-600 to-blue-700 text-white font-bold flex items-center justify-center text-sm shadow-sm shrink-0">
+                  H
+                </div>
+<div class="min-w-0">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="text-sm font-bold text-slate-900 truncate">Nguyễn Thanh Hải</span>
+<span class="text-[11px] font-mono text-slate-500">#31</span>
+<span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-medium bg-purple-100 text-purple-700 border border-purple-200">
+                      Thành viên
+                    </span>
+<span class="text-[11px] text-amber-700 font-mono font-semibold bg-amber-50 px-1 rounded border border-amber-200">DUPR 2.9</span>
+</div>
+<div class="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
+<span class="truncate">Biệt danh: <span class="text-slate-700 font-medium">Hải Bền Bỉ</span></span>
+<span>•</span>
+<span class="text-emerald-600 flex items-center gap-1 font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Đang hoạt động
+                    </span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<span class="text-xs font-mono text-slate-500 hidden md:inline">Athlete_ID: <span class="text-slate-800 font-medium">VĐV-031</span></span>
+<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-purple-100 text-purple-700 border border-purple-200 font-mono">
+                  ĐÃ CHỌN
+                </span>
+</div>
+</div>
+<!-- Item 10 (Nguyễn Văn Thành - Selected) -->
+<div class="p-3.5 hover:bg-purple-50/50 transition flex items-center justify-between gap-3 bg-purple-50/20">
+<div class="flex items-center gap-3 min-w-0">
+<input checked="" class="w-5 h-5 rounded bg-white border-2 border-slate-300 text-[#7c3aed] focus:ring-[#7c3aed] cursor-pointer shrink-0" type="checkbox"/>
+<div class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-600 to-green-700 text-white font-bold flex items-center justify-center text-sm shadow-sm shrink-0">
+                  T
+                </div>
+<div class="min-w-0">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="text-sm font-bold text-slate-900 truncate">Nguyễn Văn Thành</span>
+<span class="text-[11px] font-mono text-slate-500">#11</span>
+<span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-medium bg-purple-100 text-purple-700 border border-purple-200">
+                      Thành viên
+                    </span>
+<span class="text-[11px] text-amber-700 font-mono font-semibold bg-amber-50 px-1 rounded border border-amber-200">DUPR 2.8</span>
+</div>
+<div class="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
+<span class="truncate">Biệt danh: <span class="text-slate-700 font-medium">Thành Tay Trái</span></span>
+<span>•</span>
+<span class="text-emerald-600 flex items-center gap-1 font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Đang hoạt động
+                    </span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<span class="text-xs font-mono text-slate-500 hidden md:inline">Athlete_ID: <span class="text-slate-800 font-medium">VĐV-011</span></span>
+<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-purple-100 text-purple-700 border border-purple-200 font-mono">
+                  ĐÃ CHỌN
+                </span>
+</div>
+</div>
+<!-- Item 11 (Vũ Duy Tùng - Selected) -->
+<div class="p-3.5 hover:bg-purple-50/50 transition flex items-center justify-between gap-3 bg-purple-50/20">
+<div class="flex items-center gap-3 min-w-0">
+<input checked="" class="w-5 h-5 rounded bg-white border-2 border-slate-300 text-[#7c3aed] focus:ring-[#7c3aed] cursor-pointer shrink-0" type="checkbox"/>
+<div class="w-10 h-10 rounded-full bg-gradient-to-br from-fuchsia-600 to-purple-700 text-white font-bold flex items-center justify-center text-sm shadow-sm shrink-0">
+                  T
+                </div>
+<div class="min-w-0">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="text-sm font-bold text-slate-900 truncate">Vũ Duy Tùng</span>
+<span class="text-[11px] font-mono text-slate-500">#3</span>
+<span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-medium bg-purple-100 text-purple-700 border border-purple-200">
+                      Thành viên
+                    </span>
+<span class="text-[11px] text-amber-700 font-mono font-semibold bg-amber-50 px-1 rounded border border-amber-200">DUPR 3.1</span>
+</div>
+<div class="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
+<span class="truncate">Biệt danh: <span class="text-slate-700 font-medium">Tùng Dink Pro</span></span>
+<span>•</span>
+<span class="text-emerald-600 flex items-center gap-1 font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Đang hoạt động
+                    </span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<span class="text-xs font-mono text-slate-500 hidden md:inline">Athlete_ID: <span class="text-slate-800 font-medium">VĐV-003</span></span>
+<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-purple-100 text-purple-700 border border-purple-200 font-mono">
+                  ĐÃ CHỌN
+                </span>
+</div>
+</div>
+<!-- Item 12 (Trần Tất Hảo - Selected) -->
+<div class="p-3.5 hover:bg-purple-50/50 transition flex items-center justify-between gap-3 bg-purple-50/20">
+<div class="flex items-center gap-3 min-w-0">
+<input checked="" class="w-5 h-5 rounded bg-white border-2 border-slate-300 text-[#7c3aed] focus:ring-[#7c3aed] cursor-pointer shrink-0" type="checkbox"/>
+<div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-600 to-yellow-600 text-white font-bold flex items-center justify-center text-sm shadow-sm shrink-0">
+                  H
+                </div>
+<div class="min-w-0">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="text-sm font-bold text-slate-900 truncate">Trần Tất Hảo</span>
+<span class="text-[11px] font-mono text-slate-500">#7</span>
+<span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-medium bg-purple-100 text-purple-700 border border-purple-200">
+                      Thành viên
+                    </span>
+<span class="text-[11px] text-amber-700 font-mono font-semibold bg-amber-50 px-1 rounded border border-amber-200">DUPR 2.7</span>
+</div>
+<div class="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
+<span class="truncate">Biệt danh: <span class="text-slate-700 font-medium">Hảo Hảo</span></span>
+<span>•</span>
+<span class="text-emerald-600 flex items-center gap-1 font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Đang hoạt động
+                    </span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<span class="text-xs font-mono text-slate-500 hidden md:inline">Athlete_ID: <span class="text-slate-800 font-medium">VĐV-007</span></span>
+<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-purple-100 text-purple-700 border border-purple-200 font-mono">
+                  ĐÃ CHỌN
+                </span>
+</div>
+</div>
+<!-- Item 13 (Đặng Tiến Anh - UNSELECTED trong roster) -->
+<div class="p-3.5 hover:bg-slate-50 transition flex items-center justify-between gap-3 opacity-60 hover:opacity-100 bg-white">
+<div class="flex items-center gap-3 min-w-0">
+<input class="w-5 h-5 rounded bg-white border-2 border-slate-300 text-[#7c3aed] focus:ring-[#7c3aed] cursor-pointer shrink-0" type="checkbox"/>
+<div class="w-10 h-10 rounded-full bg-slate-100 text-slate-500 font-bold flex items-center justify-center text-sm shrink-0 border border-slate-200">
+                  A
+                </div>
+<div class="min-w-0">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="text-sm font-semibold text-slate-600 truncate">Đặng Tiến Anh</span>
+<span class="text-[11px] font-mono text-slate-400">#2</span>
+<span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-medium bg-slate-100 text-slate-500 border border-slate-200">
+                      Thành viên
+                    </span>
+<span class="text-[11px] text-slate-500 font-mono">DUPR 2.5</span>
+</div>
+<div class="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
+<span class="truncate">Biệt danh: <span class="text-slate-600">Tiến Anh</span></span>
+<span>•</span>
+<span class="text-slate-500">Chưa tham gia giải</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<span class="text-xs font-mono text-slate-400 hidden md:inline">Athlete_ID: <span class="text-slate-500">VĐV-002</span></span>
+<span class="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-500 border border-slate-200 font-mono">
+                  CHƯA CHỌN
+                </span>
+</div>
+</div>
+<!-- Item 14 (Nguyễn Mạnh Thắng - UNSELECTED trong roster) -->
+<div class="p-3.5 hover:bg-slate-50 transition flex items-center justify-between gap-3 opacity-60 hover:opacity-100 bg-white">
+<div class="flex items-center gap-3 min-w-0">
+<input class="w-5 h-5 rounded bg-white border-2 border-slate-300 text-[#7c3aed] focus:ring-[#7c3aed] cursor-pointer shrink-0" type="checkbox"/>
+<div class="w-10 h-10 rounded-full bg-slate-100 text-slate-500 font-bold flex items-center justify-center text-sm shrink-0 border border-slate-200">
+                  T
+                </div>
+<div class="min-w-0">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="text-sm font-semibold text-slate-600 truncate">Nguyễn Mạnh Thắng</span>
+<span class="text-[11px] font-mono text-slate-400">#12</span>
+<span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-medium bg-slate-100 text-slate-500 border border-slate-200">
+                      Thành viên
+                    </span>
+<span class="text-[11px] text-slate-500 font-mono">DUPR 2.9</span>
+</div>
+<div class="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
+<span class="truncate">Biệt danh: <span class="text-slate-600">Thắng Bác Sĩ</span></span>
+<span>•</span>
+<span class="text-slate-500">Bận lịch trực</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<span class="text-xs font-mono text-slate-400 hidden md:inline">Athlete_ID: <span class="text-slate-500">VĐV-012</span></span>
+<span class="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-500 border border-slate-200 font-mono">
+                  CHƯA CHỌN
+                </span>
+</div>
+</div>
+</div>
+<!-- Roster Footer Info Bar -->
+<div class="p-3 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between text-xs text-slate-600 gap-2">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-[#7c3aed]"></span>
+<span>Đang chọn <strong class="text-[#7c3aed] font-mono font-bold">12</strong> / 16 thành viên CLB</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-slate-500 hidden sm:inline">Phím tắt: Giữ Shift để chọn dải liên tiếp</span>
+<button class="text-xs text-[#7c3aed] hover:underline font-semibold">Bỏ chọn tất cả</button>
+</div>
+</div>
+</div>
+<!-- ================= KHU VỰC 2: KHÁCH MỜI (GUESTS) ================= -->
+<div class="bg-white border border-cyan-200 rounded-xl overflow-hidden shadow-sm">
+<!-- Guest Header -->
+<div class="p-4 bg-gradient-to-r from-cyan-50/70 to-blue-50/50 border-b border-cyan-100">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+<div>
+<h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.6)]"></span>
+                  VĐV Khách mời tham dự
+                  <span class="px-2 py-0.5 text-xs rounded-full bg-cyan-100 border border-cyan-300 text-cyan-800 font-mono font-semibold">
+                    2 khách đã thêm
+                  </span>
+</h3>
+<p class="text-xs text-slate-600 mt-1">
+                  Thêm VĐV giao lưu ngoài CLB. Khách mời được gắn mã định danh tạm thời và ghép cặp trực tiếp trong giải này.
+                </p>
+</div>
+<!-- Badge phân loại phạm vi -->
+<span class="self-start sm:self-auto px-2.5 py-1 rounded bg-white border border-cyan-200 text-cyan-700 text-xs font-medium flex items-center gap-1.5 shadow-2xs">
+<svg class="w-3.5 h-3.5 text-cyan-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                Phạm vi: Cục bộ theo giải
+              </span>
+</div>
+<!-- INPUT THÊM KHÁCH MỜI -->
+<div class="mt-4 pt-3 border-t border-cyan-100">
+<label class="block text-xs font-semibold text-slate-700 mb-1.5">Thêm VĐV khách mời mới</label>
+<div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+<div class="relative flex-1">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-cyan-600">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<input class="w-full pl-9 pr-3 py-2.5 bg-white border border-slate-300 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 rounded-lg text-sm text-slate-900 placeholder-slate-400 outline-none transition shadow-2xs" placeholder="Nhập tên VĐV khách mời (vd: Lê Hoàng Long, CLB Ba Đình...)" type="text"/>
+</div>
+<button class="px-5 py-2.5 rounded-lg bg-cyan-600 hover:bg-cyan-700 active:bg-cyan-800 text-white font-bold text-sm transition flex items-center justify-center gap-2 shadow-sm shrink-0">
+<svg class="w-4 h-4 stroke-[2.5]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                  Thêm khách mời
+                </button>
+</div>
+<!-- HELPER TEXT QUAN TRỌNG -->
+<p class="text-xs text-slate-600 mt-2 flex items-center gap-1.5">
+<svg class="w-3.5 h-3.5 text-cyan-600 shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span><strong>Khách mời chỉ tồn tại trong giải này</strong>, không tạo hồ sơ VĐV toàn cục.</span>
+</p>
+</div>
+</div>
+<!-- DANH SÁCH KHÁCH MỜI ĐÃ THÊM -->
+<div class="p-4 space-y-3 bg-white">
+<!-- KHÁCH 1: NGUYỄN MINH ANH (CÓ WARNING TÊN TRÙNG KHÔNG CHẶN) -->
+<div class="bg-amber-50/40 border border-amber-300 rounded-xl p-3.5 relative overflow-hidden transition hover:border-amber-400">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+<div class="flex items-center gap-3">
+<!-- Checkbox mặc định tick tham gia -->
+<input checked="" class="w-5 h-5 rounded bg-white border-2 border-cyan-500 text-cyan-600 focus:ring-cyan-500 cursor-pointer shrink-0" type="checkbox"/>
+<div class="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-600 to-teal-700 text-white font-bold flex items-center justify-center text-sm shadow-sm shrink-0">
+                    MA
+                  </div>
+<div>
+<div class="flex items-center gap-2 flex-wrap">
+<span class="text-sm font-bold text-slate-900">Nguyễn Minh Anh</span>
+<!-- Nhãn phụ ref ổn định không UUID kỹ thuật -->
+<span class="px-1.5 py-0.5 rounded text-[11px] font-mono bg-white text-cyan-800 border border-cyan-300">
+                        Khách #1
+                      </span>
+<!-- Badge màu khác khách mời -->
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-cyan-100 text-cyan-800 border border-cyan-300">
+                        Khách mời
+                      </span>
+</div>
+<div class="text-xs text-slate-600 mt-0.5">
+                      VĐV tự do • Đã xác nhận tham gia thi đấu
+                    </div>
+</div>
+</div>
+<!-- Action buttons: Sửa tên & Xóa -->
+<div class="flex items-center gap-2 self-end sm:self-auto">
+<button class="px-2.5 py-1 text-xs rounded bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 transition flex items-center gap-1 shadow-2xs">
+<svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                    Sửa tên
+                  </button>
+<button class="px-2.5 py-1 text-xs rounded bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 transition flex items-center gap-1 shadow-2xs">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                    Xóa
+                  </button>
+</div>
+</div>
+<!-- WARNING KHÔNG CHẶN CHO TÊN TRÙNG -->
+<div class="mt-2.5 pt-2.5 border-t border-amber-200 flex items-start gap-2 bg-amber-100/60 -mx-3.5 -mb-3.5 p-2.5 rounded-b-xl text-xs text-amber-900">
+<svg class="w-4 h-4 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<div class="flex-1">
+<span class="font-semibold text-amber-950">Cảnh báo tên trùng (Không chặn):</span> Tên này trùng với một thành viên CLB. Hãy kiểm tra để tránh nhầm người.
+                </div>
+<button class="text-amber-800 hover:underline font-semibold text-[11px] shrink-0">Bỏ qua cảnh báo</button>
+</div>
+</div>
+<!-- KHÁCH 2: TRẦN QUỐC BẢO -->
+<div class="bg-white border border-slate-200 hover:border-cyan-400 rounded-xl p-3.5 transition shadow-2xs">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+<div class="flex items-center gap-3">
+<input checked="" class="w-5 h-5 rounded bg-white border-2 border-cyan-500 text-cyan-600 focus:ring-cyan-500 cursor-pointer shrink-0" type="checkbox"/>
+<div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-white font-bold flex items-center justify-center text-sm shadow-sm shrink-0">
+                    QB
+                  </div>
+<div>
+<div class="flex items-center gap-2 flex-wrap">
+<span class="text-sm font-bold text-slate-900">Trần Quốc Bảo</span>
+<!-- Nhãn phụ ref ổn định không UUID kỹ thuật -->
+<span class="px-1.5 py-0.5 rounded text-[11px] font-mono bg-slate-50 text-cyan-800 border border-cyan-300">
+                        Khách #2
+                      </span>
+<!-- Badge màu khác khách mời -->
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-cyan-100 text-cyan-800 border border-cyan-300">
+                        Khách mời
+                      </span>
+</div>
+<div class="text-xs text-slate-600 mt-0.5">
+                      VĐV giao lưu Cầu Giấy • Khách không yêu cầu Athlete_ID
+                    </div>
+</div>
+</div>
+<!-- Action buttons: Sửa tên & Xóa -->
+<div class="flex items-center gap-2 self-end sm:self-auto">
+<button class="px-2.5 py-1 text-xs rounded bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 transition flex items-center gap-1 shadow-2xs">
+<svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                    Sửa tên
+                  </button>
+<button class="px-2.5 py-1 text-xs rounded bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 transition flex items-center gap-1 shadow-2xs">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                    Xóa
+                  </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- ================= HỆ THỐNG BLOCKER SPEC & TRẠNG THÁI KIỂM SOÁT ================= -->
+<div class="bg-white border border-[#cbdbf5] rounded-xl p-4 text-xs text-slate-600 shadow-sm">
+<div class="flex items-center justify-between mb-2">
+<span class="font-mono text-slate-800 font-bold uppercase tracking-wider flex items-center gap-1.5">
+<svg class="w-3.5 h-3.5 text-[#7c3aed]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+              Đặc tả quy tắc kiểm soát hệ thống (Blocker Spec)
+            </span>
+<span class="text-[11px] text-emerald-700 font-bold">Trạng thái: 0 Lỗi chặn (Pass)</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+<div class="p-2.5 rounded-lg bg-emerald-50/60 border border-emerald-200">
+<span class="font-mono text-emerald-800 font-semibold">ROSTER_EMPTY:</span>
+<p class="text-[11px] text-slate-700 mt-0.5">Yêu cầu tối thiểu 4 người để bốc thăm. (Hiện tại: 14 VĐV ✓)</p>
+</div>
+<div class="p-2.5 rounded-lg bg-emerald-50/60 border border-emerald-200">
+<span class="font-mono text-emerald-800 font-semibold">MEMBER_OUTSIDE_GROUP:</span>
+<p class="text-[11px] text-slate-700 mt-0.5">Chỉ chấp nhận VĐV trong CLB hoặc gán role Khách mời ✓</p>
+</div>
+<div class="p-2.5 rounded-lg bg-emerald-50/60 border border-emerald-200">
+<span class="font-mono text-emerald-800 font-semibold">ATHLETE_ID_MISSING:</span>
+<p class="text-[11px] text-slate-700 mt-0.5">Chỉ áp dụng cho Member; Khách mời không bị ràng buộc ✓</p>
+</div>
+</div>
+</div>
+</section>
+<!-- ================= CỘT PHẢI (DESKTOP PANEL SẴN SÀNG) ================= -->
+<aside class="lg:col-span-4 space-y-5 sticky top-24">
+<!-- PANEL KIỂM TRA SẴN SÀNG -->
+<div class="bg-white border border-[#cbdbf5] rounded-xl overflow-hidden shadow-sm">
+<!-- Panel Header -->
+<div class="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-[#7c3aed] shadow-[0_0_8px_#7c3aed]"></span>
+<h3 class="text-sm font-bold tracking-tight text-slate-900 uppercase font-mono">KIỂM TRA SẴN SÀNG</h3>
+</div>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-purple-100 text-[#7c3aed] border border-purple-200 font-mono">
+              3/3 ĐẠT
+            </span>
+</div>
+<div class="p-4 space-y-4">
+<!-- TỔNG SỐ LƯỢNG NGƯỜI THAM GIA -->
+<div class="bg-[#eff4ff] border border-blue-100 rounded-lg p-3.5">
+<div class="flex items-center justify-between">
+<span class="text-xs text-slate-500 uppercase font-semibold">Tổng người tham gia</span>
+<span class="text-2xl font-black text-slate-900 font-mono flex items-baseline gap-1">
+                  14 <span class="text-xs text-slate-500 font-sans font-normal">VĐV</span>
+</span>
+</div>
+<!-- Breakdown thành viên & khách -->
+<div class="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-blue-200/60">
+<div class="flex items-center gap-2">
+<div class="w-2.5 h-2.5 rounded bg-purple-600"></div>
+<div>
+<div class="text-[11px] text-slate-500">Thành viên CLB</div>
+<div class="text-sm font-bold text-slate-900 font-mono">12 người</div>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-2.5 h-2.5 rounded bg-cyan-500"></div>
+<div>
+<div class="text-[11px] text-slate-500">Khách mời</div>
+<div class="text-sm font-bold text-cyan-800 font-mono">2 người</div>
+</div>
+</div>
+</div>
+</div>
+<!-- TIẾN ĐỘ & NĂNG LỰC GHÉP CẶP -->
+<div class="space-y-2">
+<div class="flex items-center justify-between text-xs">
+<span class="text-slate-800 font-semibold flex items-center gap-1.5">
+<svg class="w-4 h-4 text-[#7c3aed]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                  Đủ điều kiện thể thức
+                </span>
+<span class="text-[#7c3aed] font-mono font-bold">14/14 VĐV (100%)</span>
+</div>
+<!-- Progress bar -->
+<div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden p-0.5 border border-slate-200">
+<div class="bg-gradient-to-r from-purple-600 to-[#7c3aed] h-full rounded-full shadow-sm" style="width: 100%"></div>
+</div>
+<p class="text-xs text-emerald-700 font-medium flex items-center gap-1">
+<span>✓</span> Đã chọn đủ để tạo tối thiểu 4 cặp (Khả dụng: 7 cặp đấu).
+              </p>
+</div>
+<!-- DANH SÁCH CHECKLIST TRẠNG THÁI -->
+<div class="space-y-2 pt-2 border-t border-slate-200">
+<!-- Check 1: Không có blocker -->
+<div class="flex items-center justify-between text-xs p-2 rounded-lg bg-emerald-50/70 border border-emerald-200">
+<div class="flex items-center gap-2">
+<span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-[11px]">✓</span>
+<span class="text-slate-800 font-medium">Không có lỗi chặn (Blocker)</span>
+</div>
+<span class="text-emerald-700 font-bold font-mono">0 lỗi</span>
+</div>
+<!-- Check 2: Cảnh báo tên trùng -->
+<div class="flex items-center justify-between text-xs p-2 rounded-lg bg-amber-50 border border-amber-200">
+<div class="flex items-center gap-2">
+<span class="w-5 h-5 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-[11px]">!</span>
+<span class="text-amber-900 font-medium">Cảnh báo không chặn: 1 tên trùng</span>
+</div>
+<span class="text-amber-700 font-bold font-mono">1 warning</span>
+</div>
+<!-- Check 3: Hồ sơ VĐV thành viên -->
+<div class="flex items-center justify-between text-xs p-2 rounded-lg bg-emerald-50/70 border border-emerald-200">
+<div class="flex items-center gap-2">
+<span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-[11px]">✓</span>
+<span class="text-slate-800 font-medium">12/12 Thành viên hợp lệ Athlete_ID</span>
+</div>
+<span class="text-emerald-700 font-bold font-mono">Đạt</span>
+</div>
+</div>
+<!-- BƯỚC TIẾP THEO PREVIEW -->
+<div class="p-3 rounded-lg bg-slate-50 border border-slate-200 space-y-1.5">
+<div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Bước kế tiếp trong quy trình:</div>
+<div class="flex items-center justify-between text-xs font-bold text-slate-900">
+<span class="flex items-center gap-1.5">
+<span class="w-4 h-4 rounded bg-purple-100 text-[#7c3aed] flex items-center justify-center text-[10px]">3</span>
+                  Thể thức &amp; ghép cặp thi đấu
+                </span>
+<span class="text-slate-500 font-normal">Tự động / Thủ công</span>
+</div>
+</div>
+</div>
+</div>
+<!-- THÔNG BÁO QUY CHUẨN THỂ THAO -->
+<div class="p-3.5 rounded-xl bg-white border border-[#cbdbf5] text-xs text-slate-600 space-y-1 shadow-xs">
+<div class="font-semibold text-slate-800 flex items-center gap-1.5">
+<svg class="w-3.5 h-3.5 text-[#7c3aed]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+            Bảo mật danh sách &amp; DUPR
+          </div>
+<p class="leading-relaxed">
+            Dữ liệu DUPR và điểm đánh giá nội bộ của thành viên được mã hóa bảo mật, dùng để phân loại nhánh hạt giống ở Bước 3.
+          </p>
+</div>
+</aside>
+</div>
+</main>
+<!-- ================= FOOTER STICKY CỐ ĐỊNH ================= -->
+<footer class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 md:px-8 py-3.5 shadow-[0_-4px_16px_rgba(0,0,0,0.04)]">
+<div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+<!-- Nút Quay lại (Về Bước 1) -->
+<button class="px-4 py-2.5 rounded-lg bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 hover:text-slate-900 font-semibold text-sm transition flex items-center gap-2 shadow-xs">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10 19l-7-7m0 0l7-7m-7 7h18" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Quay lại</span>
+<span class="text-xs text-slate-400 hidden sm:inline">(Thông tin giải)</span>
+</button>
+<!-- Center info / autosave status (Desktop) -->
+<div class="hidden md:flex items-center gap-2 text-xs text-slate-500">
+<span class="w-2 h-2 rounded-full bg-[#7c3aed] animate-pulse"></span>
+<span>Hệ thống tự động lưu danh sách: <strong class="text-slate-800">14 VĐV đã chọn</strong></span>
+</div>
+<!-- Action CTAs -->
+<div class="flex items-center gap-3">
+<!-- Lưu nháp -->
+<button class="px-4 py-2.5 rounded-lg bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 hover:text-slate-900 font-semibold text-sm transition flex items-center gap-2 shadow-xs">
+<svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="hidden sm:inline">Lưu nháp</span>
+</button>
+<!-- Tiếp tục (Bước 3) - ENABLED -->
+<button class="px-6 py-2.5 rounded-lg bg-[#7c3aed] hover:bg-[#6d28d9] active:bg-[#5b21b6] text-white font-extrabold text-sm md:text-base transition flex items-center gap-2 shadow-[0_4px_14px_rgba(124,58,237,0.35)] cursor-pointer">
+<span>Tiếp tục (Bước 3)</span>
+<svg class="w-4 h-4 stroke-[3]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</button>
+</div>
+</div>
+</footer>
+</body></html>

@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tạo giải nội bộ - Bước 1: Thông tin giải | PickHub</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"Space Grotesk"', 'monospace']
+          },
+          colors: {
+            brand: {
+              50: '#f5f3ff',
+              100: '#ede9fe',
+              200: '#ddd6fe',
+              500: '#8b5cf6',
+              600: '#7c3aed',
+              700: '#6d28d9',
+              800: '#5b21b6',
+              900: '#4c1d95',
+            },
+            surface: {
+              bg: '#f8f9ff',
+              card: '#ffffff',
+              low: '#eff4ff',
+              container: '#e5eeff',
+              dim: '#cbdbf5',
+            },
+            court: {
+              border: '#dbeafe',
+              borderLight: '#cbd5e1',
+              accent: '#7c3aed',
+              accentGlow: 'rgba(124, 58, 237, 0.15)',
+              success: '#059669',
+              successBg: '#ecfdf5',
+              warning: '#d97706',
+              muted: '#64748b',
+              text: '#0b1c30',
+            }
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    body {
+      background-color: #f8f9ff;
+      color: #0b1c30;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-[#f8f9ff] text-[#0b1c30] selection:bg-brand-500 selection:text-white">
+<!-- ================= TOP HEADER (Sticky Workspace Header) ================= -->
+<header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-[#cbdbf5] px-4 lg:px-8 py-3.5 flex items-center justify-between transition-all shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
+<div class="flex items-center gap-3 md:gap-4 min-w-0">
+<!-- Back to tournaments -->
+<a class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-surface-low hover:bg-brand-50 border border-[#cbdbf5] text-slate-600 hover:text-brand-700 transition-colors shadow-sm" href="javascript:void(0)" title="Quay lại danh sách giải đấu">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M10 19l-7-7m0 0l7-7m-7 7h18" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</a>
+<!-- Title & Context -->
+<div class="flex items-center gap-2 md:gap-3 truncate">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-brand-600 shadow-[0_0_8px_rgba(124,58,237,0.4)]"></span>
+<h1 class="text-base md:text-lg font-bold text-[#0b1c30] tracking-tight truncate">Tạo giải nội bộ</h1>
+</div>
+<span class="px-2 py-0.5 text-xs font-semibold rounded bg-amber-50 text-amber-700 border border-amber-200 uppercase tracking-wider">Nháp</span>
+<div class="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 border-l border-[#cbdbf5] pl-3">
+<span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+<span>Chưa lưu trên hệ thống</span>
+</div>
+</div>
+</div>
+<!-- Right Header Actions (Workspace info & user) -->
+<div class="flex items-center gap-3">
+<div class="hidden md:flex items-center text-xs text-slate-600 bg-surface-low px-3 py-1.5 rounded-md border border-[#cbdbf5]">
+<span class="text-brand-700 mr-1 font-semibold">PickHub 246 Club</span>
+<span>• Quyền Quản trị viên</span>
+</div>
+<button class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-brand-700 bg-white hover:bg-brand-50 border border-[#cbdbf5] rounded-lg shadow-sm transition-colors" title="Trợ giúp thiết lập">
+<svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="hidden sm:inline">Quy chế giải</span>
+</button>
+</div>
+</header>
+<!-- ================= STEPPER BAR (4 Steps) ================= -->
+<section class="bg-white border-b border-[#cbdbf5] px-4 lg:px-8 py-3 overflow-x-auto shadow-sm">
+<div class="max-w-7xl mx-auto flex items-center justify-between min-w-[620px] gap-4">
+<!-- Step 1: Active -->
+<div class="flex items-center gap-3 flex-1">
+<div class="flex items-center justify-center w-8 h-8 rounded-lg bg-brand-600 text-white font-extrabold text-sm shadow-[0_0_12px_rgba(124,58,237,0.3)] ring-2 ring-brand-100">
+          1
+        </div>
+<div class="min-w-0">
+<div class="flex items-center gap-2">
+<span class="text-xs font-bold uppercase tracking-wider text-brand-700">Bước 1</span>
+<span class="w-1.5 h-1.5 rounded-full bg-brand-600 animate-pulse"></span>
+</div>
+<p class="text-xs sm:text-sm font-semibold text-[#0b1c30] truncate">Thông tin giải</p>
+</div>
+</div>
+<!-- Connector 1-2 -->
+<div class="w-8 lg:w-12 h-0.5 bg-[#cbdbf5] shrink-0"></div>
+<!-- Step 2: Next -->
+<div class="flex items-center gap-3 opacity-70 flex-1">
+<div class="flex items-center justify-center w-8 h-8 rounded-lg bg-surface-low border border-[#cbdbf5] text-slate-500 font-bold text-sm">
+          2
+        </div>
+<div class="min-w-0">
+<span class="text-xs uppercase tracking-wider text-slate-400 block">Bước 2</span>
+<p class="text-xs sm:text-sm font-medium text-slate-600 truncate">Người tham gia</p>
+</div>
+</div>
+<!-- Connector 2-3 -->
+<div class="w-8 lg:w-12 h-0.5 bg-[#cbdbf5] shrink-0"></div>
+<!-- Step 3: Next -->
+<div class="flex items-center gap-3 opacity-70 flex-1">
+<div class="flex items-center justify-center w-8 h-8 rounded-lg bg-surface-low border border-[#cbdbf5] text-slate-500 font-bold text-sm">
+          3
+        </div>
+<div class="min-w-0">
+<span class="text-xs uppercase tracking-wider text-slate-400 block">Bước 3</span>
+<p class="text-xs sm:text-sm font-medium text-slate-600 truncate">Thể thức &amp; ghép cặp</p>
+</div>
+</div>
+<!-- Connector 3-4 -->
+<div class="w-8 lg:w-12 h-0.5 bg-[#cbdbf5] shrink-0"></div>
+<!-- Step 4: Next -->
+<div class="flex items-center gap-3 opacity-70 flex-1">
+<div class="flex items-center justify-center w-8 h-8 rounded-lg bg-surface-low border border-[#cbdbf5] text-slate-500 font-bold text-sm">
+          4
+        </div>
+<div class="min-w-0">
+<span class="text-xs uppercase tracking-wider text-slate-400 block">Bước 4</span>
+<p class="text-xs sm:text-sm font-medium text-slate-600 truncate">Bốc thăm &amp; chốt</p>
+</div>
+</div>
+</div>
+</section>
+<!-- ================= MAIN WORKSPACE (Form + Readiness Rail) ================= -->
+<main class="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 pb-28">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- LEFT COLUMN: FORM SECTION (lg:col-span-8) -->
+<div class="lg:col-span-8 space-y-6">
+<!-- Header Title Banner -->
+<div class="bg-gradient-to-r from-white via-brand-50/50 to-surface-low border border-[#cbdbf5] rounded-xl p-5 relative overflow-hidden shadow-sm">
+<div class="absolute -right-6 -bottom-6 w-32 h-32 bg-brand-500/10 rounded-full blur-2xl pointer-events-none"></div>
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+<div>
+<div class="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-brand-100 text-brand-700 border border-brand-200 text-xs font-semibold uppercase tracking-wider mb-2">
+<svg class="w-3.5 h-3.5 text-brand-700" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+                Thiết lập cốt lõi
+              </div>
+<h2 class="text-xl sm:text-2xl font-bold text-[#0b1c30] tracking-tight">Thông tin giải đấu</h2>
+<p class="text-slate-500 text-sm mt-1">Thiết lập thời gian và nguồn lực để hệ thống dự kiến lịch đấu tự động và chuẩn bị sân bãi.</p>
+</div>
+<div class="shrink-0 bg-white border border-[#cbdbf5] rounded-lg p-2.5 text-right hidden sm:block shadow-sm">
+<span class="text-[11px] text-slate-500 block">Tiến độ tạo giải</span>
+<span class="text-sm font-mono font-bold text-brand-700">25% Hoàn tất</span>
+</div>
+</div>
+</div>
+<!-- System Helper Notice -->
+<div class="flex items-start gap-3 p-3.5 rounded-lg bg-white border border-[#cbdbf5] text-xs text-slate-600 shadow-sm">
+<div class="w-5 h-5 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center shrink-0 mt-0.5">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<p class="leading-relaxed">
+<span class="text-[#0b1c30] font-semibold">Lưu ý quản trị:</span> Bản ghi giải và nội dung thi đấu chỉ được chính thức tạo tại hệ thống ở lần lưu đầu tiên khi <strong class="text-brand-700 font-semibold">Tên giải hợp lệ</strong>. Mọi điều chỉnh về số sân và giờ giấc đều có thể cập nhật lại trước giờ khai mạc.
+          </p>
+</div>
+<!-- FORM CONTAINER -->
+<form class="space-y-6" onsubmit="event.preventDefault();">
+<!-- GROUP 1: THÔNG TIN BẮT BUỘC -->
+<div class="bg-white border border-[#cbdbf5] rounded-xl p-5 md:p-6 space-y-5 shadow-sm">
+<div class="flex items-center justify-between border-b border-[#e2e8f0] pb-3">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-brand-600"></span>
+<h3 class="text-sm font-bold uppercase tracking-wider text-[#0b1c30]">1. Thời gian &amp; Tài nguyên thi đấu</h3>
+</div>
+<span class="text-xs text-slate-500">Trường có <span class="text-brand-600 font-bold">*</span> là bắt buộc</span>
+</div>
+<!-- Tên giải đấu -->
+<div class="space-y-2">
+<div class="flex items-center justify-between">
+<label class="text-xs sm:text-sm font-semibold text-slate-800 flex items-center gap-1" for="tournament-name">
+                  Tên giải đấu <span class="text-brand-600 font-bold">*</span>
+</label>
+<span class="text-xs text-emerald-600 font-semibold flex items-center gap-1">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+                  Tên hợp lệ
+                </span>
+</div>
+<div class="relative">
+<input class="w-full px-4 py-3 bg-surface-low border border-brand-500 focus:border-brand-600 focus:ring-2 focus:ring-brand-100 rounded-lg text-[#0b1c30] font-semibold text-sm transition outline-none" id="tournament-name" placeholder="Ví dụ: Giải Pickleball Thu Đào 2026..." type="text" value="Giải nội bộ tháng 10"/>
+<div class="absolute right-3.5 top-1/2 -translate-y-1/2 text-emerald-600 pointer-events-none">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</div>
+<p class="text-[11px] text-slate-500">Tên giải sẽ hiển thị trên bảng thi đấu, kết quả DUPR và thẻ chứng nhận điện tử cho VĐV.</p>
+</div>
+<!-- 3 Fields: Ngày thi đấu, Giờ bắt đầu, Số sân -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+<!-- Ngày thi đấu -->
+<div class="space-y-2">
+<label class="text-xs sm:text-sm font-semibold text-slate-800 flex items-center gap-1" for="tour-date">
+                  Ngày thi đấu <span class="text-brand-600 font-bold">*</span>
+</label>
+<div class="relative">
+<input class="w-full px-3.5 py-3 bg-white border border-[#cbdbf5] focus:border-brand-600 focus:ring-1 focus:ring-brand-600 rounded-lg text-[#0b1c30] font-medium text-sm transition outline-none cursor-pointer" id="tour-date" type="date" value="2026-10-12"/>
+</div>
+<p class="text-[11px] text-slate-500">Dự kiến: Thứ Hai, 12/10/2026</p>
+</div>
+<!-- Giờ bắt đầu -->
+<div class="space-y-2">
+<label class="text-xs sm:text-sm font-semibold text-slate-800 flex items-center gap-1" for="tour-time">
+                  Giờ bắt đầu <span class="text-brand-600 font-bold">*</span>
+</label>
+<div class="relative">
+<input class="w-full px-3.5 py-3 bg-white border border-[#cbdbf5] focus:border-brand-600 focus:ring-1 focus:ring-brand-600 rounded-lg text-[#0b1c30] font-mono font-medium text-sm transition outline-none cursor-pointer" id="tour-time" type="time" value="07:30"/>
+</div>
+<p class="text-[11px] text-slate-500">Khởi động 15p trước giờ đấu</p>
+</div>
+<!-- Số sân sử dụng (Stepper 1-20) -->
+<div class="space-y-2">
+<div class="flex items-center justify-between">
+<label class="text-xs sm:text-sm font-semibold text-slate-800 flex items-center gap-1">
+                    Số sân sử dụng <span class="text-brand-600 font-bold">*</span>
+</label>
+<span class="text-[11px] text-slate-500">(1 – 20 sân)</span>
+</div>
+<div class="flex items-center bg-white border border-[#cbdbf5] focus-within:border-brand-600 rounded-lg overflow-hidden h-[46px] shadow-sm">
+<button class="w-12 h-full flex items-center justify-center bg-surface-low hover:bg-brand-50 text-slate-600 hover:text-brand-700 transition-colors border-r border-[#cbdbf5]" title="Giảm số sân" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M20 12H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+</svg>
+</button>
+<div class="flex-1 text-center font-mono font-bold text-[#0b1c30] text-base">
+                    4 <span class="text-xs text-slate-500 font-normal">sân</span>
+</div>
+<button class="w-12 h-full flex items-center justify-center bg-surface-low hover:bg-brand-50 text-slate-600 hover:text-brand-700 transition-colors border-l border-[#cbdbf5]" title="Tăng số sân" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+</svg>
+</button>
+</div>
+<p class="text-[11px] text-brand-700 font-medium flex items-center gap-1">
+<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+                  Đủ xếp 4 trận/lượt đồng thời
+                </p>
+</div>
+</div>
+</div>
+<!-- GROUP 2: THÔNG TIN TÙY CHỌN & ÁP PHÍCH -->
+<div class="bg-white border border-[#cbdbf5] rounded-xl p-5 md:p-6 space-y-5 shadow-sm">
+<div class="flex items-center justify-between border-b border-[#e2e8f0] pb-3">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-slate-400"></span>
+<h3 class="text-sm font-bold uppercase tracking-wider text-[#0b1c30]">2. Thông tin bổ sung &amp; Áp phích</h3>
+</div>
+<span class="text-xs text-slate-500 italic">Tùy chọn (Có thể bổ sung sau)</span>
+</div>
+<!-- Địa điểm tổ chức -->
+<div class="space-y-2">
+<label class="text-xs sm:text-sm font-semibold text-slate-800 flex items-center gap-1" for="court-location">
+                Địa điểm thi đấu
+                <span class="text-xs text-slate-500 font-normal">(Không bắt buộc)</span>
+</label>
+<div class="relative">
+<div class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<input class="w-full pl-10 pr-4 py-3 bg-white border border-[#cbdbf5] focus:border-brand-600 focus:ring-1 focus:ring-brand-600 rounded-lg text-[#0b1c30] font-medium text-sm transition outline-none" id="court-location" placeholder="Nhập tên cụm sân, địa chỉ sân đấu..." type="text" value="Cụm sân PickHub 246"/>
+</div>
+<p class="text-[11px] text-slate-500">Sân mặc định của CLB: Sân 246 Hoàng Hoa Thám, Ba Đình, Hà Nội.</p>
+</div>
+<!-- Mô tả & Ghi chú giải đấu -->
+<div class="space-y-2">
+<div class="flex items-center justify-between">
+<label class="text-xs sm:text-sm font-semibold text-slate-800" for="tour-desc">
+                  Mô tả giải &amp; Thể lệ ban đầu
+                </label>
+<span class="text-[11px] text-slate-500">Tối đa 500 ký tự</span>
+</div>
+<textarea class="w-full px-4 py-3 bg-white border border-[#cbdbf5] focus:border-brand-600 focus:ring-1 focus:ring-brand-600 rounded-lg text-[#0b1c30] text-sm transition outline-none resize-none leading-relaxed" id="tour-desc" placeholder="Ví dụ: Giải đấu nội bộ chào mừng thành viên mới và chuẩn hóa điểm trình DUPR CLB. VĐV có mặt trước 15 phút để làm thủ tục nhận mã sân..." rows="3"></textarea>
+<p class="text-[11px] text-slate-500">Thông tin này sẽ hiển thị tại trang chi tiết giải đấu cho các thành viên theo dõi.</p>
+</div>
+<!-- Áp phích giải đấu (Banner / Poster) -->
+<div class="space-y-3 pt-1">
+<label class="text-xs sm:text-sm font-semibold text-slate-800 flex items-center justify-between">
+<span>Áp phích / Ảnh bìa giải đấu</span>
+<span class="text-xs text-slate-500 font-normal">Tỷ lệ khuyến nghị 16:9 hoặc 3:2</span>
+</label>
+<!-- Tabs: Dán URL vs Tải ảnh -->
+<div class="flex items-center gap-2 p-1 bg-surface-low border border-[#cbdbf5] rounded-lg w-fit">
+<button class="px-3 py-1.5 rounded text-xs font-semibold bg-brand-600 text-white shadow-sm flex items-center gap-1.5 transition" type="button">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+                  Dán URL
+                </button>
+<button class="px-3 py-1.5 rounded text-xs font-medium text-slate-600 hover:text-brand-700 flex items-center gap-1.5 transition" type="button">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+                  Tải ảnh từ máy
+                </button>
+</div>
+<!-- Input URL -->
+<div class="relative">
+<input class="w-full px-3.5 py-2.5 bg-white border border-[#cbdbf5] focus:border-brand-600 rounded-lg text-[#0b1c30] text-xs sm:text-sm transition outline-none placeholder-slate-400" placeholder="https://example.com/poster-giai-dau.jpg" type="url"/>
+</div>
+<!-- Preview Frame Rỗng (Empty State) -->
+<div class="border-2 border-dashed border-[#cbdbf5] rounded-xl p-6 flex flex-col items-center justify-center text-center bg-surface-low/60 hover:border-brand-500 transition-colors">
+<div class="w-12 h-12 rounded-full bg-white border border-[#cbdbf5] flex items-center justify-center text-brand-600 mb-2 shadow-sm">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path>
+</svg>
+</div>
+<span class="text-xs font-semibold text-[#0b1c30]">Khung xem trước áp phích đang trống</span>
+<p class="text-[11px] text-slate-500 max-w-sm mt-0.5">Dán đường dẫn ảnh hợp lệ hoặc tải tệp PNG/JPG (tối đa 5MB) để hiển thị banner giải đấu.</p>
+</div>
+</div>
+</div>
+</form>
+</div>
+<!-- RIGHT COLUMN: READINESS RAIL (lg:col-span-4 - 320px Sticky Rail on Desktop) -->
+<div class="hidden lg:block lg:col-span-4">
+<div class="sticky top-20 space-y-4">
+<!-- READINESS PANEL CARD -->
+<div class="bg-white border border-[#cbdbf5] rounded-xl p-5 shadow-md relative overflow-hidden">
+<!-- Top bar indicator -->
+<div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-brand-600 via-brand-500 to-indigo-500"></div>
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-brand-600 animate-ping"></div>
+<h3 class="text-sm font-bold uppercase tracking-wider text-[#0b1c30]">Kiểm tra sẵn sàng</h3>
+</div>
+<span class="px-2 py-0.5 text-[11px] font-mono font-bold rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
+                4/4 Đạt
+              </span>
+</div>
+<!-- Readiness Checklist Items -->
+<div class="space-y-3 bg-surface-low p-3.5 rounded-lg border border-[#cbdbf5]">
+<!-- Item 1 -->
+<div class="flex items-start gap-2.5 text-xs">
+<div class="w-4 h-4 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
+<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+</svg>
+</div>
+<div class="flex-1">
+<div class="flex items-center justify-between">
+<span class="font-semibold text-[#0b1c30]">Tên giải hợp lệ</span>
+<span class="text-[10px] text-emerald-700 font-mono font-semibold">Đạt</span>
+</div>
+<p class="text-[11px] text-slate-500 truncate">"Giải nội bộ tháng 10"</p>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="flex items-start gap-2.5 text-xs pt-1 border-t border-[#cbdbf5]">
+<div class="w-4 h-4 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
+<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+</svg>
+</div>
+<div class="flex-1">
+<div class="flex items-center justify-between">
+<span class="font-semibold text-[#0b1c30]">Ngày thi đấu</span>
+<span class="text-[10px] text-brand-700 font-mono font-semibold">12/10/2026</span>
+</div>
+<p class="text-[11px] text-slate-500">Lịch định kỳ CLB</p>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="flex items-start gap-2.5 text-xs pt-1 border-t border-[#cbdbf5]">
+<div class="w-4 h-4 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
+<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+</svg>
+</div>
+<div class="flex-1">
+<div class="flex items-center justify-between">
+<span class="font-semibold text-[#0b1c30]">Giờ bắt đầu</span>
+<span class="text-[10px] text-brand-700 font-mono font-semibold">07:30</span>
+</div>
+<p class="text-[11px] text-slate-500">Trận khai mạc mở màn</p>
+</div>
+</div>
+<!-- Item 4 -->
+<div class="flex items-start gap-2.5 text-xs pt-1 border-t border-[#cbdbf5]">
+<div class="w-4 h-4 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
+<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+</svg>
+</div>
+<div class="flex-1">
+<div class="flex items-center justify-between">
+<span class="font-semibold text-[#0b1c30]">4 sân sử dụng</span>
+<span class="text-[10px] text-emerald-700 font-mono font-semibold">Đạt chuẩn</span>
+</div>
+<p class="text-[11px] text-slate-500">Hỗ trợ tối đa 16 - 24 VĐV</p>
+</div>
+</div>
+</div>
+<!-- Estimated Metric Pill -->
+<div class="mt-4 p-3 rounded-lg bg-surface-low border border-[#cbdbf5] flex items-center justify-between">
+<span class="text-xs text-slate-600 flex items-center gap-1.5 font-medium">
+<svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+                Dự kiến bắt đầu:
+              </span>
+<span class="text-xs font-mono font-bold text-brand-800 bg-white px-2.5 py-1 rounded border border-[#cbdbf5] shadow-sm">
+                07:30 Sáng
+              </span>
+</div>
+<!-- Soft Warning Box -->
+<div class="mt-4 flex items-start gap-2.5 p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-xs leading-relaxed">
+<svg class="w-4 h-4 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Bạn có thể bổ sung <strong>địa điểm</strong> và <strong>áp phích</strong> sau khi hoàn thành bốc thăm.</span>
+</div>
+<!-- Quick Step Roadmap Summary -->
+<div class="mt-5 pt-4 border-t border-[#cbdbf5]">
+<span class="text-[11px] uppercase tracking-wider text-slate-500 font-bold block mb-2">Bước kế tiếp</span>
+<div class="flex items-center gap-2 p-2.5 rounded-lg bg-surface-low border border-[#cbdbf5] text-xs text-slate-700">
+<span class="w-5 h-5 rounded bg-white border border-[#cbdbf5] flex items-center justify-center font-bold text-brand-700 text-[10px] shadow-sm">2</span>
+<span class="font-medium text-[#0b1c30]">Thêm danh sách VĐV &amp; Cặp đôi</span>
+<svg class="w-4 h-4 ml-auto text-brand-600" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</div>
+</div>
+<!-- Operator Info Helper -->
+<div class="p-3.5 rounded-lg bg-white border border-[#cbdbf5] text-xs text-slate-500 space-y-1.5 shadow-sm">
+<div class="flex items-center gap-1.5 text-[#0b1c30] font-semibold">
+<svg class="w-3.5 h-3.5 text-brand-600" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+              Không gian quản trị tập trung
+            </div>
+<p class="text-[11px] leading-relaxed">Giao diện tối giản hóa sidebar, tập trung tối đa thao tác của BTC tại sân trước giờ thi đấu.</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- ================= MOBILE READINESS DRAWER / ACCORDION (Visible on Mobile only) ================= -->
+<div class="block lg:hidden bg-white border-t border-[#cbdbf5] px-4 py-2.5 fixed bottom-[72px] left-0 right-0 z-30 shadow-lg">
+<details class="group">
+<summary class="flex items-center justify-between cursor-pointer list-none py-1">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-brand-600"></span>
+<span class="text-xs font-bold uppercase tracking-wider text-[#0b1c30]">Sẵn sàng (4/4 điều kiện)</span>
+</div>
+<div class="flex items-center gap-1 text-xs text-brand-700 font-semibold">
+<span>Xem checklist</span>
+<svg class="w-4 h-4 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</summary>
+<div class="pt-3 pb-2 space-y-2 text-xs border-t border-[#cbdbf5] mt-2">
+<div class="flex items-center justify-between text-slate-700">
+<span class="flex items-center gap-1.5 text-emerald-700 font-medium">✓ Tên giải: Giải nội bộ tháng 10</span>
+<span class="text-slate-500 font-mono">Hợp lệ</span>
+</div>
+<div class="flex items-center justify-between text-slate-700">
+<span class="flex items-center gap-1.5 text-emerald-700 font-medium">✓ Ngày thi đấu: 12/10/2026</span>
+<span class="text-slate-500 font-mono">07:30</span>
+</div>
+<div class="flex items-center justify-between text-slate-700">
+<span class="flex items-center gap-1.5 text-emerald-700 font-medium">✓ Số sân sử dụng: 4 sân</span>
+<span class="text-slate-500 font-mono">16 VĐV</span>
+</div>
+<div class="p-2 rounded bg-amber-50 border border-amber-200 text-amber-800 text-[11px]">
+          Bạn có thể bổ sung địa điểm và áp phích sau.
+        </div>
+</div>
+</details>
+</div>
+<!-- ================= FIXED FOOTER (Actions: Back - Save Draft - Next) ================= -->
+<footer class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#cbdbf5] px-4 lg:px-8 py-3.5 shadow-[0_-4px_12px_rgba(0,0,0,0.03)]">
+<div class="max-w-7xl mx-auto flex items-center justify-between gap-3">
+<!-- Left Action: Back -->
+<button class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-[#cbdbf5] bg-white hover:bg-surface-low text-slate-600 hover:text-[#0b1c30] text-xs sm:text-sm font-semibold transition-colors shadow-sm min-h-[44px]" onclick="window.history.back()" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Quay lại</span>
+</button>
+<!-- Center Status & Save Draft -->
+<div class="flex items-center gap-3">
+<!-- Subtle saving/auto-saved indicator -->
+<div class="hidden sm:flex items-center gap-2 text-xs text-slate-500">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<span>Đã lưu nháp tự động lúc 14:28</span>
+</div>
+<button class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-[#cbdbf5] bg-surface-low hover:bg-brand-50 text-[#0b1c30] hover:text-brand-700 text-xs sm:text-sm font-medium transition-colors shadow-sm min-h-[44px]" type="button">
+<svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Lưu nháp</span>
+</button>
+</div>
+<!-- Right Action: Continue (Step 2) -->
+<button class="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 rounded-lg bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs sm:text-sm shadow-[0_4px_14px_rgba(124,58,237,0.35)] transition-all transform active:scale-95 min-h-[44px]" type="button">
+<span>Tiếp tục (Bước 2)</span>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+</svg>
+</button>
+</div>
+</footer>
+</body></html>

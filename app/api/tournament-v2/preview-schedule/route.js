@@ -6,6 +6,7 @@ import {
     buildInternalDoublesGroupKnockoutPlan,
     stableStringify,
 } from '@/lib/tournament/internalDoublesGroupKnockoutPlan';
+import { isFormatEnabled } from '@/lib/tournament/setupFormats';
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -115,6 +116,10 @@ function buildPairEntries(draft) {
 function validateSupportedDraft(draft) {
     if (!draft || typeof draft !== 'object' || Array.isArray(draft)) {
         throw previewError('SETUP_DRAFT_INVALID', 'Không có bản nháp setup hợp lệ');
+    }
+    // Registry thể thức (ADR-005 D5): thể thức chưa mở thì server từ chối, kể cả khi UI bị bỏ qua.
+    if (!isFormatEnabled(draft?.format?.formatKey)) {
+        throw previewError('FORMAT_NOT_AVAILABLE', 'Thể thức này sắp có. Hãy chọn thể thức khác.', 409);
     }
     if (draft?.tournament?.organizerMode !== 'internal') {
         throw previewError('UNSUPPORTED_ORGANIZER_MODE', 'Preview này chỉ hỗ trợ giải nội bộ');

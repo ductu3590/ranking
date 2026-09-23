@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { requireValidatedGroupAdmin } from '@/lib/groupSession';
+import { isFormatEnabled } from '@/lib/tournament/setupFormats';
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -39,6 +40,16 @@ export async function POST(request) {
         if (!validId(tournamentId) || !validId(divisionId) || !Number.isSafeInteger(expectedRevision) || expectedRevision < 1
             || !idempotencyKey || idempotencyKey.length > 200 || !/^[a-f0-9]{64}$/i.test(previewFingerprint)) {
             throw finalizeError('SETUP_PAYLOAD_INVALID', 'Thông tin chốt bốc thăm không hợp lệ.');
+        }
+        // Registry thể thức (ADR-005 D5): chặn trước khi chạm RPC ghi.
+        const { data: division, error: divisionError } = await db.from('tournament_divisions')
+            .select('setup_draft')
+            .eq('id', Number(divisionId)).eq('tournament_id', Number(tournamentId)).eq('group_id', Number(admin.groupId))
+            .maybeSingle();
+        if (divisionError) throw finalizeError('FINALIZE_READ_FAILED', 'Không thể tải bản nháp thiết lập.', 500);
+        if (!division) throw finalizeError('DIVISION_NOT_FOUND', 'Không tìm thấy nội dung trong giải đấu.', 404);
+        if (!isFormatEnabled(division.setup_draft?.format?.formatKey)) {
+            throw finalizeError('FORMAT_NOT_AVAILABLE', 'Thể thức này sắp có. Hãy chọn thể thức khác.', 409);
         }
         const { data, error } = await db.rpc('finalize_internal_doubles_group_knockout_v3', {
             p_group_id: Number(admin.groupId),

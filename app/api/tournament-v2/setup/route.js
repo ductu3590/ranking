@@ -2,7 +2,11 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { requireValidatedGroupAdmin } from '@/lib/groupSession';
-import { normalizeSetupReadiness } from '@/lib/tournament/setupReadiness';
+import { normalizeSetupReadiness, computeSetupReadiness } from '@/lib/tournament/setupReadiness';
+import { normalizeDraft, toSavePayload } from '@/lib/tournament/setupDraftV3';
+import { computeCompletedThrough, allowedStep } from '@/lib/tournament/setupStepRules';
+import { isFormatEnabled } from '@/lib/tournament/setupFormats';
+import { messageFor } from '@/lib/tournament/setupMessages';
 import { actorName } from '@/lib/tournament/actorName';
 import { normalizeParticipants } from '@/lib/tournament/setupParticipants';
 import { resolveRepairMode, normalizeRepairReport } from '@/lib/tournament/legacyPairRepair';
@@ -28,6 +32,7 @@ const NAMED_MUTATION_CODES = [
     'UNSEED_BLOCKED_MATCH_STARTED', 'GROUP_SEEDING_IN_PROGRESS',
     'GROUP_CORRECTION_BLOCKED_QUALIFICATION_SEEDED', 'GROUP_RESULTS_CHANGED',
     'GROUP_TOO_SMALL_FOR_TOP_TWO', 'GROUP_RANK_ENTRY_DUPLICATE', 'SETUP_DRAFT_DIVISION_AMBIGUOUS',
+    'SETUP_DRAFT_TARGET_REQUIRED', 'SETUP_DRAFT_TARGET_AMBIGUOUS', 'DIVISION_NOT_FOUND',
 ];
 const CONFLICT_MUTATION_CODES = [
     'SETUP_REVISION_CONFLICT', 'ROSTER_LOCKED', 'SETUP_NOT_READY', 'ROSTER_UNLOCK_BLOCKED',
@@ -56,6 +61,46 @@ function mutationError(error) {
 
 function payloadError(message) {
     return NextResponse.json({ error: message, code: 'SETUP_PAYLOAD_INVALID' }, { status: 400 });
+}
+
+function setupIssueError(code, status = 400, params) {
+    const message = messageFor(code, params);
+    return NextResponse.json({ error: message.text, code, step: message.step, field: message.field }, { status });
+}
+
+// Định danh thành viên cho luật Bước 2: chỉ thành viên thuộc group trong session,
+// và có athlete (athletes.legacy_club_member_id) mới được coi là hợp lệ.
+async function loadMemberContext(groupId, memberIds) {
+    const ids = [...new Set((memberIds || []).map(Number).filter((id) => Number.isSafeInteger(id) && id > 0))];
+    if (!ids.length) return new Map();
+    const [{ data: members, error: membersError }, { data: athletes, error: athletesError }] = await Promise.all([
+        db.from('club_members').select('id, full_name, is_active').eq('group_id', Number(groupId)).in('id', ids),
+        db.from('athletes').select('legacy_club_member_id').in('legacy_club_member_id', ids),
+    ]);
+    if (membersError || athletesError) throw Object.assign(new Error('Không thể xác thực danh tính VĐV'), { code: 'SETUP_READ_FAILED' });
+    const withAthlete = new Set((athletes || []).map((row) => String(row.legacy_club_member_id)));
+    return new Map((members || []).map((member) => [String(member.id), {
+        name: member.full_name,
+        active: member.is_active !== false,
+        hasAthlete: withAthlete.has(String(member.id)),
+    }]));
+}
+
+function todayInVietnam() {
+    return new Date(Date.now() + 7 * 3600 * 1000).toISOString().slice(0, 10);
+}
+
+// Draft v3 kèm progress do server tính. Client không tự nâng progress (spec Lát 0 §4.1).
+async function setupView(groupId, rawDraft) {
+    const draft = normalizeDraft(rawDraft);
+    const ctx = { members: await loadMemberContext(groupId, draft.participants.memberIds), today: todayInVietnam() };
+    const completedThrough = computeCompletedThrough(draft, ctx);
+    const resumeStep = allowedStep(draft.currentStep, completedThrough);
+    return {
+        draft: { ...draft, progress: { completedThrough }, currentStep: resumeStep },
+        resumeStep,
+        readiness: computeSetupReadiness(draft, ctx),
+    };
 }
 
 export async function GET(request) {
@@ -125,6 +170,7 @@ export async function GET(request) {
             invitedSystemIds.length ? db.from('groups').select('id, name').in('id', invitedSystemIds) : Promise.resolve({ data: [] }),
             invitedExternalIds.length ? db.from('tournament_external_clubs').select('id, name').eq('group_id', Number(groupId)).in('id', invitedExternalIds) : Promise.resolve({ data: [] }),
         ]);
+        const setup = await setupView(groupId, division.setup_draft);
         const invitedSystemNames = new Map((invitedSystemResult.data || []).map((row) => [String(row.id), row.name]));
         const invitedExternalNames = new Map((invitedExternalResult.data || []).map((row) => [String(row.id), row.name]));
         return NextResponse.json({
@@ -133,6 +179,8 @@ export async function GET(request) {
             // Aggregate draft is an opaque, allowlisted snapshot produced by the RPC.
             // It carries member ids, never tournament-athlete ids as client identity.
             draft: division.setup_draft || null,
+            // Luồng v3: draft đã chuẩn hóa + progress/readiness do server tính.
+            setup,
             invitedClubs: invitedRows.map((club) => ({
                 tournamentClubId: club.id,
                 clubId: club.club_id,
@@ -172,7 +220,8 @@ export async function POST(request) {
         const isAggregateSave = action === 'save_aggregate';
         const hasTournamentId = tournamentId != null;
         const hasDivisionId = divisionId != null;
-        if ((!isAggregateSave && (!validId(tournamentId) || !validId(divisionId))) || (isAggregateSave && (!hasTournamentId || !hasDivisionId || !validId(tournamentId) || !validId(divisionId))) || !Number.isSafeInteger(expectedRevision) || expectedRevision < 1) {
+        // Lần lưu đầu của giải mới chưa có id: RPC tự tạo giải + nội dung theo client_draft_key.
+        if ((!isAggregateSave && (!validId(tournamentId) || !validId(divisionId))) || (isAggregateSave && (hasTournamentId !== hasDivisionId || (hasTournamentId && (!validId(tournamentId) || !validId(divisionId))))) || !Number.isSafeInteger(expectedRevision) || expectedRevision < 1) {
             return NextResponse.json({ error: 'tournament_id, division_id và expected_setup_revision hợp lệ là bắt buộc', code: 'SETUP_PAYLOAD_INVALID' }, { status: 400 });
         }
         if (rawIdempotencyKey == null || !idempotencyKey || idempotencyKey.length > 200) {
@@ -185,17 +234,40 @@ export async function POST(request) {
             if (!clientDraftKey || clientDraftKey.length > 200 || !draft || typeof draft !== 'object' || Array.isArray(draft)) {
                 return payloadError('client_draft_key và draft aggregate hợp lệ là bắt buộc');
             }
+            // Luật lưu từng bước (spec Lát 0 §4): nháp chưa hợp lệ vẫn lưu được; server tự
+            // tính progress, client không nâng được bước mở.
+            const payload = toSavePayload(draft, draft.currentStep);
+            if (!payload.tournament.name) return setupIssueError('TOURNAMENT_NAME_REQUIRED');
+            if (payload.currentStep >= 3 && payload.format.formatKey && !isFormatEnabled(payload.format.formatKey)) {
+                return setupIssueError('FORMAT_NOT_AVAILABLE', 409);
+            }
+            let ctx;
+            try {
+                ctx = { members: await loadMemberContext(groupId, payload.participants.memberIds), today: todayInVietnam() };
+            } catch (contextError) {
+                return NextResponse.json({ error: contextError.message, code: 'SETUP_READ_FAILED' }, { status: 500 });
+            }
+            const completedThrough = computeCompletedThrough(payload, ctx);
+            payload.progress = { completedThrough };
+            payload.currentStep = allowedStep(payload.currentStep, completedThrough);
             const { data, error } = await db.rpc('save_unified_setup_aggregate_draft', {
                 p_group_id: Number(groupId),
                 p_tournament_id: validId(tournamentId) ? Number(tournamentId) : null,
                 p_division_id: validId(divisionId) ? Number(divisionId) : null,
                 p_client_draft_key: clientDraftKey,
-                p_draft: draft,
+                p_draft: payload,
                 p_expected_setup_revision: expectedRevision,
                 p_idempotency_key: idempotencyKey,
             });
             if (error) return mutationError(error);
-            return NextResponse.json({ success: true, ...(data || {}) });
+            // Replay (cùng idempotency key) trả trạng thái hiện tại của server, không phải payload vừa gửi.
+            const savedDraft = normalizeDraft(data?.draft || payload);
+            return NextResponse.json({
+                success: true,
+                ...(data || {}),
+                draft: savedDraft,
+                readiness: computeSetupReadiness(savedDraft, ctx),
+            });
         }
 
         if (action === 'replace_roster') {

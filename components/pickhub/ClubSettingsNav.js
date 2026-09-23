@@ -8,7 +8,6 @@ const SECTIONS = [
     { id: 'set-code', label: 'Mã CLB' },
     { id: 'set-pw-admin', label: 'MK quản trị' },
     { id: 'set-pw-member', label: 'MK thành viên' },
-    { id: 'set-qr', label: 'QR nhận quỹ' },
     { id: 'set-sepay', label: 'SePay' },
     { id: 'set-bank', label: 'Ngân hàng' },
 ];

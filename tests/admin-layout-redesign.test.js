@@ -10,13 +10,16 @@ const styles = read('app/admin/club-settings.css');
 
 assert.match(settings, /className="club-settings__grid"/, 'Cài đặt phải dùng lưới hai cột trên màn hình rộng.');
 assert.match(settings, /className="club-settings__left"/, 'Cột trái phải gom phần nhận diện và bảo mật.');
-assert.match(settings, /className="club-settings__right"/, 'Cột phải phải gom mã CLB và QR nhận quỹ.');
+assert.match(settings, /className="club-settings__right"/, 'Cột phải phải gom mã CLB.');
 assert.match(settings, /className="club-settings__automation"/, 'SePay và ngân hàng phải nằm trong hàng tự động hoá riêng.');
 assert.match(settings, /id="set-brand"/, 'Nhận diện phải giữ neo điều hướng hiện có.');
 assert.match(settings, /id="set-code"/, 'Mã CLB phải giữ neo điều hướng hiện có.');
 assert.match(settings, /id="set-pw-admin"/, 'Mật khẩu quản trị phải giữ neo điều hướng hiện có.');
 assert.match(settings, /id="set-pw-member"/, 'Mật khẩu thành viên phải giữ neo điều hướng hiện có.');
-assert.match(settings, /id="set-qr"/, 'QR nhận quỹ phải giữ neo điều hướng hiện có.');
+// SUA VONG 4 (anh Tu chot, bo dieu kien): muc "QR nhan quy thanh vien" (#set-qr)
+// bi xoa han — khong con upload nguoc tu SePay qua nua. QR gio chi con o khoi
+// Auto Quy (#set-sepay). Giu assert AM de bao ve khoi hoi sinh nham.
+assert.doesNotMatch(settings, /id="set-qr"/, 'Muc QR nhan quy rieng (#set-qr) phai da bi xoa theo yeu cau anh Tu vong 4.');
 assert.match(settings, /id="set-sepay"/, 'SePay phải giữ neo điều hướng hiện có.');
 assert.match(settings, /id="set-bank"/, 'Ngân hàng phải giữ neo điều hướng hiện có.');
 assert.match(styles, /\.club-settings__grid\s*\{[\s\S]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/, 'CSS phải định nghĩa lưới hai cột desktop.');

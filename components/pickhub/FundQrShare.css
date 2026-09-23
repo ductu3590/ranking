@@ -1,0 +1,41 @@
+/* Phat QR nhan quy. Mobile-first ~380px, chi dung token --ph-*. */
+
+.fqs { display: grid; gap: var(--ph-space-4); }
+.fqs__loading { margin: 0; font-size: 13px; color: var(--ph-muted); }
+.fqs__error { margin: 0; padding: 10px 12px; border-radius: var(--ph-radius-sm); background: var(--ph-tint-negative); border: 1px solid var(--ph-negative); color: var(--ph-negative); font-size: 12.5px; font-weight: 600; line-height: 1.55; }
+.fqs__hintline { margin: 0; font-size: 11.5px; color: var(--ph-muted); line-height: 1.55; }
+.fqs__actions { display: flex; align-items: center; gap: var(--ph-space-3); flex-wrap: wrap; }
+.fqs__actions--secondary { margin-top: -4px; }
+.fqs__muted { background: none; border: none; padding: 0; font-size: 12px; font-weight: 700; color: var(--ph-ink-2); text-decoration: underline; cursor: pointer; }
+
+/* ---- Chua co tai khoan ---- */
+.fqs__empty { display: flex; gap: var(--ph-space-3); padding: var(--ph-space-4); border-radius: var(--ph-radius-sm); background: var(--ph-tint-gold); border: 1px solid var(--ph-tint-gold-line); }
+.fqs__empty > span { flex: none; font-size: 20px; line-height: 1.3; }
+.fqs__empty b { display: block; margin-bottom: 4px; color: var(--ph-ink); }
+.fqs__empty p { margin: 0; font-size: 12.5px; line-height: 1.6; color: var(--ph-tint-gold-text); }
+
+/* ---- Canh bao tai khoan doi ---- */
+.fqs__warn { display: flex; gap: var(--ph-space-3); padding: var(--ph-space-3) var(--ph-space-4); border-radius: var(--ph-radius-sm); background: var(--ph-tint-gold); border: 1px solid var(--ph-tint-gold-line); font-size: 12.5px; line-height: 1.6; color: var(--ph-tint-gold-text); font-weight: 600; }
+
+/* ---- Form chon ngan hang ---- */
+.fqs__form { display: grid; gap: var(--ph-space-4); }
+.fqs__field { display: grid; gap: 6px; }
+.fqs__label { font-size: 12px; font-weight: 700; color: var(--ph-ink); }
+.fqs__select, .fqs__input { width: 100%; min-height: 44px; padding: 0 12px; border: 1px solid var(--ph-line); border-radius: var(--ph-radius-sm); background: var(--ph-card); font: inherit; font-size: 15px; font-weight: 700; color: var(--ph-ink); }
+.fqs__select:focus-visible, .fqs__input:focus-visible { outline: none; box-shadow: var(--ph-focus-ring); border-color: var(--ph-indigo); }
+.fqs__accno { margin: 0; font-size: 15px; font-weight: 800; letter-spacing: -.01em; color: var(--ph-ink); font-variant-numeric: tabular-nums; }
+
+/* ---- Anh QR + canh bao dinh danh ---- */
+.fqs__preview { display: grid; justify-items: center; gap: var(--ph-space-3); padding: var(--ph-space-4); border-radius: var(--ph-radius-md); background: var(--ph-card); border: 1px solid var(--ph-line); text-align: center; }
+.fqs__img { width: 220px; height: 220px; max-width: 100%; border-radius: var(--ph-radius-sm); border: 1px solid var(--ph-line); background: #fff; object-fit: contain; }
+.fqs__warnbox { display: flex; gap: 8px; align-items: flex-start; padding: 10px 12px; border-radius: var(--ph-radius-xs); background: var(--ph-tint-gold); border: 1px solid var(--ph-tint-gold-line); font-size: 12.5px; line-height: 1.6; color: var(--ph-tint-gold-text); text-align: left; }
+
+/* ---- Goi y phat QR (thay cho nut chia se/sao chep loi nhan da bo) ---- */
+.fqs__tip { display: flex; gap: var(--ph-space-3); padding: var(--ph-space-3) var(--ph-space-4); border-radius: var(--ph-radius-sm); background: var(--ph-tint-cyan); border: 1px solid var(--ph-tint-cyan-line); font-size: 12.5px; line-height: 1.65; color: var(--ph-ink-2); }
+.fqs__tip > span { flex: none; font-size: 16px; line-height: 1.4; }
+.fqs__tip b { color: var(--ph-ink); }
+
+@media (max-width: 640px) {
+    .fqs__actions .ph-btn { width: 100%; }
+    .fqs__actions--secondary { justify-content: center; }
+}

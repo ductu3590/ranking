@@ -19,10 +19,8 @@
 .club-settings-form label,
 .club-settings-account label,
 .club-settings-code label,
-.set-qr-side > label,
 .club-settings-bank-form label { display: grid; gap: 7px; color: var(--ph-ink-2); font-size: 12px; font-weight: 750; }
-.club-settings-form small,
-.set-qr-side small { color: var(--ph-muted); font-size: 11px; font-weight: 550; line-height: 1.5; }
+.club-settings-form small { color: var(--ph-muted); font-size: 11px; font-weight: 550; line-height: 1.5; }
 .club-settings input,
 .club-settings textarea,
 .club-settings select { width: 100%; min-height: 42px; border: 1px solid var(--ph-line); border-radius: var(--ph-radius-sm); padding: 10px 12px; background: var(--ph-tint-neutral-strong); color: var(--ph-ink); font: inherit; font-size: 14px; }
@@ -54,14 +52,6 @@
 .club-settings-code img { width: min(196px, 100%); justify-self: center; padding: 10px; border: 1px solid var(--ph-line); border-radius: var(--ph-radius-sm); background: var(--ph-card); }
 .set-note { margin: 0; padding: 12px; border: 1px solid var(--ph-line); border-radius: var(--ph-radius-xs); background: var(--ph-tint-neutral-strong); color: var(--ph-muted); font-size: 11px; font-weight: 600; line-height: 1.65; }
 .set-note--warn { border-color: var(--ph-tint-gold-line); background: var(--ph-tint-gold); color: var(--ph-tint-gold-text); }
-
-.set-qr-row { display: flex; gap: 18px; align-items: center; }
-.set-qr-preview,
-.set-qr-empty { display: grid; place-items: center; width: 136px; height: 136px; flex: 0 0 136px; padding: 10px; border: 2px dashed var(--ph-line); border-radius: var(--ph-radius-card); background: var(--ph-tint-neutral-strong); object-fit: contain; color: var(--ph-muted); font-size: 11px; font-weight: 750; text-align: center; }
-.set-qr-preview { border-style: solid; background: var(--ph-card); }
-.set-qr-side { display: grid; flex: 1; min-width: 0; gap: 12px; }
-.set-qr-side input[type='file'] { padding: 8px; font-size: 11px; }
-.set-qr-actions { display: flex; gap: 8px; }
 
 .club-settings__password-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
 .club-settings-account { scroll-margin-top: 148px; padding: 16px; border: 1px solid var(--ph-line); border-radius: var(--ph-radius-sm); background: var(--ph-tint-neutral-strong); }
@@ -103,9 +93,6 @@
   .set-group { padding: 18px; }
   .club-settings-card__heading { display: grid; }
   .club-settings-card__heading > span { justify-self: start; }
-  .set-qr-row { align-items: stretch; flex-direction: column; }
-  .set-qr-preview,
-  .set-qr-empty { width: 100%; height: 164px; flex-basis: auto; }
   .club-settings-sepay-url { flex-direction: column; }
   .club-settings-card__action .club-settings-save { width: 100%; }
 }

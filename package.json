@@ -15,6 +15,7 @@
     "migration:ledger": "node scripts/migration-ledger.js --directory database/migrations",
     "test:sepay-verify": "node tests/sepay-verify.test.js",
     "test:onboarding": "node tests/club-onboarding.test.js",
+    "test:fund-qr": "node tests/fund-qr-share.test.js",
     "test:ph-ui": "node tests/ph-design-system.test.js",
     "test:mobile-nav": "node tests/mobile-bottom-tabs.test.js",
     "test:ui-preview": "node tests/pickhub-ui-preview.test.js",

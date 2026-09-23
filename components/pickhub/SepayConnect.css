@@ -77,6 +77,10 @@
 .spc__ok b { display: block; font-size: 14px; font-weight: 800; color: var(--ph-positive); }
 .spc__ok span { display: block; margin-top: 3px; font-size: 13px; color: var(--ph-ink-2); }
 
+/* ---- Viec cuoi cung: phat QR ---- */
+.spc__final { padding: var(--ph-space-4); border-radius: var(--ph-radius-sm); background: var(--ph-tint-indigo); border: 1px solid var(--ph-tint-indigo-line); }
+.spc__final .fqs { margin-top: var(--ph-space-3); }
+
 .spc__grid2 { display: grid; gap: var(--ph-space-3); grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
 .spc__stat { padding: var(--ph-space-4); border-radius: var(--ph-radius-sm); border: 1px solid var(--ph-line); background: var(--ph-card); }
 .spc__stat.is-warn { background: var(--ph-tint-gold); border-color: var(--ph-tint-gold-line); }

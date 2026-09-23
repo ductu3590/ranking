@@ -43,3 +43,6 @@ next-env.d.ts
 .codex/
 .playwright-cli/
 output/
+
+# Ban giao noi bo cua day chuyen /ship — khong commit
+.bangiao/

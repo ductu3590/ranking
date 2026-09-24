@@ -39,3 +39,6 @@ Chốt bằng AskUserQuestion. Brief thiết kế: `_workspace/epic-2-operations
 | D26 | Lát đầu Epic 2 là **trung tâm điều hành theo sân/lượt**, gom luôn các nợ liên quan (ô chờ theo nguồn, bỏ ô BO theo lượt, lỗi phiên bản trận sau tiến cấp, chặn Back khi chưa lưu) | Người dùng ưu tiên màn chạy giải trong ngày |
 | D27 | Deploy Epic 2 như D24: nhánh + PR nháp, agent apply migration (nếu có) và kiểm thử tích hợp; người dùng chạy browser CLB 59 rồi merge | Người dùng giữ quyền lên production |
 | D28 | Phạm vi nợ = danh sách đã ghi trong roadmap mục Epic 2; không thêm lỗi mới ở vòng này | Người dùng xác nhận |
+| D29 | Bàn điều hành sau khi chốt còn **4 mục**: `Điều hành` (mặc định; gộp trung tâm điều hành + sân + nhập tỉ số) · `Trận đấu` · `Sơ đồ & xếp hạng` · `Cài đặt` (thông tin, link/chia sẻ, sân, vùng nguy hiểm, nhật ký). Bỏ bước Cấu hình / VĐV & cặp / Bốc thăm khỏi sidebar (đã có workspace setup 4 bước); mobile dùng thanh tab đáy | So sánh Sportix (`_workspace/epic-2-operations/02_sportix_benchmark.md`); BTC dùng chính mục Điều hành |
+| D30 | Trang công khai giữ **4 tab** như OPS-07: Trực tiếp · Lịch · Xếp hạng · Sơ đồ | Người dùng chọn |
+| D31 | Không làm "Nhánh Bạc" (nhánh an ủi). Sơ đồ nhánh thắng/thua theo OPS-05 | Người dùng chọn |

@@ -196,3 +196,21 @@
     font-weight: 700;
     color: var(--warning);
 }
+
+/* Loại kép: ba khung Nhánh thắng / Nhánh thua / Chung kết tổng xếp dọc, mỗi khung cuộn ngang riêng. */
+.v2-de-bracket {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.v2-de-section-title {
+    margin: 0 0 8px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.v2-de-section[data-bracket="GF"] .v2-br-match {
+    border-color: var(--primary);
+}

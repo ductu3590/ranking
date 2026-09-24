@@ -42,6 +42,7 @@ function DrawIntro({ draft, busy, onDraw }) {
       <p className="pc-lead">{{
         round_robin: `Bốc thăm xác định thứ tự các lượt đấu của ${draft.pairs.length} cặp.`,
         knockout: `Bốc thăm xếp ${draft.pairs.length} cặp vào nhánh loại trực tiếp.`,
+        double_elimination: `Bốc thăm xếp ${draft.pairs.length} cặp vào nhánh loại kép.`,
       }[draft.format.formatKey] || `Bốc thăm chia ${draft.pairs.length} cặp vào ${config.groupCount ?? 2} bảng.`} Có thể bốc lại trước khi chốt.</p>
       <div className="pc-btn-row" style={{ marginTop: '1rem' }}>
         <button type="button" className="pc-btn pc-btn--primary" disabled={busy} onClick={() => onDraw('draw')}>Bốc thăm</button>
@@ -86,27 +87,80 @@ function Groups({ plan, pairName, onRedraw, busy }) {
   );
 }
 
+const isBracketPlan = (plan) => plan.formatKey === 'knockout' || plan.formatKey === 'double_elimination';
+
 function KnockoutDraw({ plan, pairName, onRedraw, busy }) {
   const base = useId();
   const byes = plan.byeEntryIds || [];
+  const doubleElim = plan.formatKey === 'double_elimination';
   return (
     <section className="pc-card" aria-labelledby={`${base}-t`}>
       <div className="pc-card__head">
         <h3 id={`${base}-t`} className="pc-card__title"><span className="pc-section-key">1</span>Kết quả bốc thăm</h3>
         <button type="button" className="pc-btn pc-btn--sm" disabled={busy} onClick={onRedraw}>Bốc lại</button>
       </div>
-      <p className="pc-card__hint" style={{ margin: 0 }}>{plan.groups[0].entryIds.length} cặp · nhánh {2 ** plan.rounds} · {plan.rounds} vòng</p>
+      <p className="pc-card__hint" style={{ margin: 0 }}>{doubleElim
+        ? `${plan.groups[0].entryIds.length} cặp · nhánh ${2 ** plan.winnersRounds} · ${plan.counts.total} trận`
+        : `${plan.groups[0].entryIds.length} cặp · nhánh ${2 ** plan.rounds} · ${plan.rounds} vòng`}</p>
       {byes.length ? (
         <p style={{ margin: '0.5rem 0 0' }} data-testid="knockout-byes">
-          <strong>Cặp được vào thẳng vòng 2:</strong> {byes.map(pairName).join('; ')}
+          <strong>{doubleElim ? 'Cặp được vào thẳng vòng 2 nhánh thắng:' : 'Cặp được vào thẳng vòng 2:'}</strong> {byes.map(pairName).join('; ')}
         </p>
       ) : null}
     </section>
   );
 }
 
+function BracketMatch({ match, plan, pairName }) {
+  const final = match.matchKey === 'F' || match.matchKey === 'GF';
+  return (
+    <div className="pc-bracket__match" data-final={final || undefined}>
+      <div className="pc-bracket__title">
+        <span>{roundName(match.matchKey, match)}</span>
+        <span className="pc-badge pc-badge--muted">BO{final ? plan.finalBestOf || 1 : 1}</span>
+      </div>
+      <div className="pc-bracket__slot" data-known={match.slotA?.kind === 'entry' || undefined}>{slotLabel(match.slotA, pairName)}</div>
+      <div className="pc-bracket__slot" data-known={match.slotB?.kind === 'entry' || undefined}>{slotLabel(match.slotB, pairName)}</div>
+    </div>
+  );
+}
+
+// Loại kép (Epic 1 D2 §3): ba khung Nhánh thắng / Nhánh thua / Chung kết tổng, cột theo vòng trong nhánh.
+const DE_SECTIONS = [['W', 'Nhánh thắng'], ['L', 'Nhánh thua'], ['GF', 'Chung kết tổng']];
+
+function DoubleElimBracket({ plan, pairName }) {
+  return (
+    <section className="pc-card" aria-label="Sơ đồ loại kép" data-testid="double-elim-bracket">
+      <div className="pc-card__head">
+        <h3 className="pc-card__title"><span className="pc-section-key">2</span>Sơ đồ loại kép</h3>
+        <span className="pc-card__hint">Cuộn ngang để xem hết các vòng</span>
+      </div>
+      {DE_SECTIONS.map(([bracket, title]) => {
+        const inBracket = plan.matches.filter((match) => match.bracket === bracket);
+        const rounds = [...new Set(inBracket.map((match) => match.bracketRound))].sort((a, b) => a - b);
+        return (
+          <div key={bracket} data-bracket={bracket} style={{ marginTop: '0.75rem' }}>
+            <p className="pc-eyebrow" style={{ margin: '0 0 0.25rem' }}>{title}</p>
+            <div className="pc-bracket" tabIndex={0} aria-label={`${title}, cuộn ngang để xem hết`}>
+              {rounds.map((round) => {
+                const column = inBracket.filter((match) => match.bracketRound === round);
+                return (
+                  <div key={round} className="pc-bracket__round" aria-label={column[0].roundLabel}>
+                    {column.map((match) => <BracketMatch key={match.matchKey} match={match} plan={plan} pairName={pairName} />)}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
+    </section>
+  );
+}
+
 function Bracket({ plan, pairName }) {
   const base = useId();
+  if (plan.formatKey === 'double_elimination') return <DoubleElimBracket plan={plan} pairName={pairName} />;
   const knockout = plan.matches.filter((match) => match.stageKind === 'knockout');
   if (!knockout.length) return null;
   const rounds = [...new Set(knockout.map((match) => match.round))].sort((a, b) => a - b);
@@ -120,14 +174,7 @@ function Bracket({ plan, pairName }) {
         {rounds.map((round) => (
           <div key={round} className="pc-bracket__round">
             {knockout.filter((match) => match.round === round).map((match) => (
-              <div key={match.matchKey} className="pc-bracket__match" data-final={match.matchKey === 'F' || undefined}>
-                <div className="pc-bracket__title">
-                  <span>{roundName(match.matchKey, match)}</span>
-                  <span className="pc-badge pc-badge--muted">BO{match.matchKey === 'F' ? plan.finalBestOf || 1 : 1}</span>
-                </div>
-                <div className="pc-bracket__slot" data-known={match.slotA?.kind === 'entry' || undefined}>{slotLabel(match.slotA, pairName)}</div>
-                <div className="pc-bracket__slot" data-known={match.slotB?.kind === 'entry' || undefined}>{slotLabel(match.slotB, pairName)}</div>
-              </div>
+              <BracketMatch key={match.matchKey} match={match} plan={plan} pairName={pairName} />
             ))}
           </div>
         ))}
@@ -150,7 +197,7 @@ function Schedule({ plan, draft, pairName }) {
       </div>
       <div className="pc-stats">
         <div><span>Cặp đấu</span><strong>{draft.pairs.length}</strong></div>
-        <div><span>Tổng trận</span><strong>{plan.counts.total}</strong><small>{plan.formatKey === 'knockout' ? `${plan.rounds} vòng` : plan.counts.knockoutMatches ? `${plan.counts.groupMatches} vòng bảng · ${plan.counts.knockoutMatches} loại trực tiếp` : `${plan.rounds || 0} lượt đấu`}</small></div>
+        <div><span>Tổng trận</span><strong>{plan.counts.total}</strong><small>{plan.formatKey === 'double_elimination' ? `nhánh thắng ${plan.counts.winners} · nhánh thua ${plan.counts.losers} · CK tổng 1` : plan.formatKey === 'knockout' ? `${plan.rounds} vòng` : plan.counts.knockoutMatches ? `${plan.counts.groupMatches} vòng bảng · ${plan.counts.knockoutMatches} loại trực tiếp` : `${plan.rounds || 0} lượt đấu`}</small></div>
         <div><span>Số sân</span><strong>{draft.tournament.courtCount || '—'}</strong></div>
         <div><span>Khung giờ</span><strong>{estimate.startsAt ? `${estimate.startsAt} – ${estimate.endsAt}` : '—'}</strong><small>~{hours ? `${hours} giờ ` : ''}{minutes} phút</small></div>
       </div>
@@ -164,7 +211,7 @@ function Schedule({ plan, draft, pairName }) {
                 ? `${pairName(match.entryAId)} gặp ${pairName(match.entryBId)}`
                 : `${slotLabel(match.slotA, pairName)} gặp ${slotLabel(match.slotB, pairName)}`;
               return (
-                <tr key={row.matchKey} data-final={match.matchKey === 'F' || undefined}>
+                <tr key={row.matchKey} data-final={match.matchKey === 'F' || match.matchKey === 'GF' || undefined}>
                   <td data-label="Giờ">{row.startsAt || '—'}</td>
                   <td data-label="Sân">Sân {row.court}</td>
                   <td data-label="Vòng">{match.stageKind !== 'group' ? scheduleRound(match) : plan.groups.length === 1 ? `Lượt ${match.round}` : `Bảng ${match.groupLabel} · lượt ${match.round}`}</td>
@@ -182,6 +229,14 @@ function Schedule({ plan, draft, pairName }) {
 
 function Criteria({ plan }) {
   const pool = plan.stages?.[0]?.config?.poolCount || 0;
+  if (plan.formatKey === 'double_elimination') {
+    return (
+      <section className="pc-card" data-testid="double-elim-criteria">
+        <div className="pc-card__head"><h3 className="pc-card__title"><span className="pc-section-key">4</span>Xếp hạng chung cuộc (chỉ đọc)</h3></div>
+        <p style={{ margin: 0 }}>Thắng chung kết tổng: vô địch; thua: á quân (không đá lại). Thua chung kết nhánh thua: hạng 3; thua trận nhánh thua ngay trước đó: hạng 4. Các cặp còn lại đồng hạng theo vòng bị loại ở nhánh thua.</p>
+      </section>
+    );
+  }
   if (plan.formatKey === 'knockout') {
     const bronze = plan.matches.some((match) => match.matchKey === 'BRONZE');
     return (
@@ -221,7 +276,7 @@ export default function StepDraw({ draft, roster, readiness, busy, onDraw, onFin
           <p>{messageFor(item.code, item.params).text}</p>
         </div>
       ))}
-      {plan.formatKey === 'knockout'
+      {plan.formatKey === 'double_elimination' || plan.formatKey === 'knockout'
         ? <KnockoutDraw plan={plan} pairName={pairName} busy={busy} onRedraw={() => setConfirm('redraw')} />
         : <Groups plan={plan} pairName={pairName} busy={busy} onRedraw={() => setConfirm('redraw')} />}
       <Bracket plan={plan} pairName={pairName} />
@@ -255,7 +310,7 @@ export default function StepDraw({ draft, roster, readiness, busy, onDraw, onFin
             </>
           )}
         >
-          <p>{plan.formatKey === 'knockout' ? 'Vị trí các cặp trong nhánh' : 'Kết quả chia bảng'} hiện tại sẽ được thay bằng lần bốc mới.</p>
+          <p>{isBracketPlan(plan) ? 'Vị trí các cặp trong nhánh' : 'Kết quả chia bảng'} hiện tại sẽ được thay bằng lần bốc mới.</p>
         </StudioDialog>
       ) : null}
       {confirm === 'finalize' ? (

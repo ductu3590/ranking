@@ -47,6 +47,7 @@ const ORGANIZER_MODE_LABELS = {
 const SCHEDULE_FORMAT_LABELS = {
     round_robin: 'Vòng tròn',
     knockout: 'Loại trực tiếp',
+    double_elim: 'Loại kép',
 };
 
 function formatTags(tournament) {

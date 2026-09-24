@@ -5,7 +5,7 @@ import { getStandings, listEntrants, advanceStage } from '@/lib/tournamentV2Clie
 import { StandingsView } from '../standingsRender';
 import '../bracket.css';
 
-// Tab Bảng xếp hạng — nhánh theo schedule_format (round_robin | knockout).
+// Tab Bảng xếp hạng — nhánh theo schedule_format (round_robin | knockout | double_elim).
 export default function StandingsTab({ tournamentId, stageId, stages, isAdmin, reload }) {
     const [data, setData] = useState(null); // { schedule_format, standings }
     const [entrantsById, setEntrantsById] = useState({});
@@ -96,9 +96,10 @@ export default function StandingsTab({ tournamentId, stageId, stages, isAdmin, r
         && String(other.division_id ?? '') === String(stage.division_id ?? '')
         && Number(other.stage_order) > Number(stage.stage_order));
     const format = data.schedule_format || stage?.schedule_format;
-    // Nhánh loại trực tiếp của setup v4 (Lát C) cũng cần chốt chặng cuối; stage knockout cũ giữ nguyên.
+    // Nhánh loại trực tiếp (Lát C) và loại kép (Epic 1) của setup v4 cũng cần chốt chặng cuối; stage knockout cũ giữ nguyên.
     const canAdvance = Boolean(isAdmin && stageId && (format === 'round_robin'
-        || (format === 'knockout' && isLastStage && String(stage?.config?.setupPlanVersion) === '4')));
+        || (format === 'knockout' && isLastStage && String(stage?.config?.setupPlanVersion) === '4')
+        || (format === 'double_elim' && isLastStage && String(stage?.config?.setupPlanVersion) === '4')));
     const completed = stage?.status === 'completed';
 
     return (

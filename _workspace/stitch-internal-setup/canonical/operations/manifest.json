@@ -1,0 +1,127 @@
+{
+  "stitchProject": "16224817196221939744",
+  "designSystem": "assets/ca3eeb22ca9e4f738817511ae0f13aae (Pro Court OS, light)",
+  "importedAt": "2026-09-24",
+  "files": [
+    {
+      "path": "operations/01-control-center/reference.html",
+      "stitchScreenId": "ec17ef7d2c4845c1b99d6fc75bd27542",
+      "bytes": 26713,
+      "sha256": "7d7a4fd1f01728a5828814bc40ce9f0f09ea8c3f35d5a78ba52e1019e5d80e92"
+    },
+    {
+      "path": "operations/01-control-center/reference.png",
+      "stitchScreenId": "ec17ef7d2c4845c1b99d6fc75bd27542",
+      "bytes": 239762,
+      "sha256": "e58ede0e140239d57668eb75aff139b17e4638e1d5efc2025b488bd94464f63f"
+    },
+    {
+      "path": "operations/01-control-center/reference-390.html",
+      "stitchScreenId": "44de736709fb41389f93febcba2e0b0d",
+      "bytes": 13672,
+      "sha256": "9a1e51c2e98f50c5677ae2da3a3adf791772070a06e92afc454ade03fb8c1849"
+    },
+    {
+      "path": "operations/01-control-center/reference-390.png",
+      "stitchScreenId": "44de736709fb41389f93febcba2e0b0d",
+      "bytes": 62109,
+      "sha256": "3b36b643cba6ce44765a846273e7defccc44ffe3c6089edec91438c0828cb133"
+    },
+    {
+      "path": "operations/02-call-card/reference.html",
+      "stitchScreenId": "62873a9b955142a4b44b6ed87637af70",
+      "bytes": 27414,
+      "sha256": "c9ba20a8841f09aa5df4f8908abf139218a75c626e1eb1409356ef2a4167c7b7"
+    },
+    {
+      "path": "operations/02-call-card/reference.png",
+      "stitchScreenId": "62873a9b955142a4b44b6ed87637af70",
+      "bytes": 287514,
+      "sha256": "e3a79c4cb45f3bc5dfd14610f815cf2108ffaf48d31a7e804c917ffc99d1e2d4"
+    },
+    {
+      "path": "operations/03-score-entry/reference.html",
+      "stitchScreenId": "8ef3c079f84d40aaac8f8397ffdd140b",
+      "bytes": 25310,
+      "sha256": "4d6f02d7c56ffdfeb00b093474f787ddcc56fbc54dd409848c60a7cc46794be3"
+    },
+    {
+      "path": "operations/03-score-entry/reference.png",
+      "stitchScreenId": "8ef3c079f84d40aaac8f8397ffdd140b",
+      "bytes": 200069,
+      "sha256": "c24206fc1264df87fcbc83990afaacde9c144d98c490f60ade87908fe9351e06"
+    },
+    {
+      "path": "operations/03-score-entry/reference-390.html",
+      "stitchScreenId": "74de019abd3d4ea78e81596b0696e81e",
+      "bytes": 21211,
+      "sha256": "f270539a686db04b9f70df13fa1d591c4d9ef379c015bfb311ab047b9849bf80"
+    },
+    {
+      "path": "operations/03-score-entry/reference-390.png",
+      "stitchScreenId": "74de019abd3d4ea78e81596b0696e81e",
+      "bytes": 46910,
+      "sha256": "dd7d3d147e455244b8b38323647fd1d568913ed83fbec85e11c864a652c90d72"
+    },
+    {
+      "path": "operations/04-schedule-results/reference.html",
+      "stitchScreenId": "f0c1bb0dadf64f80ae4479d4e3413ff8",
+      "bytes": 38383,
+      "sha256": "62e5807ec4e6b256652a4416d9ff34c42939294e72545395aec58c35a4901d22"
+    },
+    {
+      "path": "operations/04-schedule-results/reference.png",
+      "stitchScreenId": "f0c1bb0dadf64f80ae4479d4e3413ff8",
+      "bytes": 275067,
+      "sha256": "873e88af94ed3389a2a45640d40b559082aedb50a1066c0d128dfcdb136c1d31"
+    },
+    {
+      "path": "operations/05-bracket/reference-knockout.html",
+      "stitchScreenId": "b3225ac23fdc4fd9bf833873911dd929",
+      "bytes": 26990,
+      "sha256": "813c92cbc0c2e6c7bcc0439be2a1ba58ba5ec32dfb178741f851bcfecf1b5f0e"
+    },
+    {
+      "path": "operations/05-bracket/reference-knockout.png",
+      "stitchScreenId": "b3225ac23fdc4fd9bf833873911dd929",
+      "bytes": 219632,
+      "sha256": "4316b4aa5a92935ef2b1ab3c6c3cb175765956f84f69e9f971c7568f681da5c4"
+    },
+    {
+      "path": "operations/05-bracket/reference-double-elim.html",
+      "stitchScreenId": "cf055aeb4bd84a8095525f631b2ce049",
+      "bytes": 35541,
+      "sha256": "694075b9568552baf4b60284ab1b449ecb14549e4daede911a8e0cca18fef813"
+    },
+    {
+      "path": "operations/05-bracket/reference-double-elim.png",
+      "stitchScreenId": "cf055aeb4bd84a8095525f631b2ce049",
+      "bytes": 317163,
+      "sha256": "25b3899c3db4e7d89e2ddc8714b86dd93618ac3dc6281b453369eab3a5c468fd"
+    },
+    {
+      "path": "operations/06-standings-finish/reference.html",
+      "stitchScreenId": "63aa855d71c7487ba1e091f03b8ef439",
+      "bytes": 24678,
+      "sha256": "24c3ac65e41428d7fbde90cb08a45b8d09b4432ada4a96af3cb2bca61c1e75e2"
+    },
+    {
+      "path": "operations/06-standings-finish/reference.png",
+      "stitchScreenId": "63aa855d71c7487ba1e091f03b8ef439",
+      "bytes": 228708,
+      "sha256": "5dd0dc98a74f8d83d259671348f864b845639bfa9c9a9df1e1725e7bea778471"
+    },
+    {
+      "path": "operations/07-public-live/reference-390.html",
+      "stitchScreenId": "ae763f78319a48718b7deac5507b416b",
+      "bytes": 18465,
+      "sha256": "10beb37a10677a31fab6747a40b766429b843ce058f33b0f5fe418aa558f5bd2"
+    },
+    {
+      "path": "operations/07-public-live/reference-390.png",
+      "stitchScreenId": "ae763f78319a48718b7deac5507b416b",
+      "bytes": 105990,
+      "sha256": "6324beee6440655bd8cbc92afedb14e3fab8794898a49e4302386c3d8bbd4b67"
+    }
+  ]
+}

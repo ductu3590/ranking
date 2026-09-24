@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Nhập tỉ số - Chung kết · Sân 01 | Pro Court OS Sáng</title>
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <!-- Material Symbols Outlined -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f5f3ff',
+              100: '#ede9fe',
+              200: '#ddd6fe',
+              500: '#8b5cf6',
+              600: '#7c3aed',
+              700: '#6d28d9',
+            },
+            court: {
+              bg: '#f8f9ff',
+              card: '#ffffff',
+              subtle: '#eff4ff',
+              border: '#cbdbf5',
+            }
+          },
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      line-height: 1;
+      display: inline-block;
+    }
+    .material-symbols-outlined.fill-1 {
+      font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+    }
+    /* Hide scrollbars */
+    ::-webkit-scrollbar { display: none; }
+    * { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="h-full bg-slate-900 text-slate-800 font-sans antialiased overflow-hidden flex justify-center items-end sm:items-center">
+
+  <!-- Mobile Simulator Frame (390px width container) -->
+  <div class="relative w-[390px] h-[844px] max-h-screen bg-slate-900 overflow-hidden flex flex-col justify-end shadow-2xl">
+
+    <!-- Dimmed Operations Console Background (Mimicking Sân 01, Header, Queue) -->
+    <div class="absolute inset-0 bg-slate-100 flex flex-col select-none pointer-events-none opacity-40 blur-[1.5px] scale-[0.99] origin-top">
+      <!-- Faux Top Bar -->
+      <div class="h-14 bg-white border-b border-slate-200 px-4 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-violet-700 text-xl">sports_tennis</span>
+          <span class="font-bold text-sm text-slate-800">Giải nội bộ tháng 10</span>
+        </div>
+        <span class="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-semibold">Đang diễn ra</span>
+      </div>
+      <!-- Faux KPI Bar -->
+      <div class="p-3 bg-violet-50/70 border-b border-violet-100 flex justify-between text-xs">
+        <span class="font-bold text-violet-900">18/31 trận đã chốt</span>
+        <span class="text-slate-500">4 sân đang dùng</span>
+      </div>
+      <!-- Faux Court 1 Card -->
+      <div class="m-3 p-3.5 bg-white rounded-xl border border-slate-200 shadow-sm space-y-2">
+        <div class="flex justify-between items-center">
+          <span class="font-bold text-slate-900">Sân 01</span>
+          <span class="text-[11px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full">Đang đấu · 12:48</span>
+        </div>
+        <div class="text-xs text-slate-500">Chung kết · BO3 · tới 11 điểm</div>
+        <div class="py-2 px-3 bg-slate-50 rounded-lg text-xs font-semibold text-slate-700 flex justify-between">
+          <span>Minh Tuấn + Hoàng Nam</span>
+          <span class="text-slate-400">vs</span>
+          <span>Quốc Khánh + Bảo Long</span>
+        </div>
+      </div>
+      <!-- Faux Court 2 Card -->
+      <div class="mx-3 p-3.5 bg-white rounded-xl border border-slate-200 shadow-sm space-y-2 opacity-70">
+        <div class="flex justify-between items-center">
+          <span class="font-bold text-slate-900">Sân 02</span>
+          <span class="text-[11px] bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full">Khởi động · còn 02:15</span>
+        </div>
+        <div class="text-xs text-slate-500">Tranh hạng ba · BO1</div>
+      </div>
+    </div>
+
+    <!-- Backdrop Dark Overlay -->
+    <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-[2px] transition-opacity"></div>
+
+    <!-- BOTTOM SHEET CONTAINER (~90% height) -->
+    <div class="relative w-full h-[90%] bg-white rounded-t-[28px] shadow-2xl flex flex-col overflow-hidden border-t border-slate-100 z-10">
+
+      <!-- Drag Handle -->
+      <div class="w-full pt-3 pb-1 flex justify-center items-center cursor-grab active:cursor-grabbing">
+        <div class="w-10 h-1 bg-slate-300 rounded-full"></div>
+      </div>
+
+      <!-- Sheet Header -->
+      <div class="px-5 pt-1.5 pb-3 border-b border-slate-100 flex-shrink-0">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="flex size-7 rounded-lg bg-violet-100 text-violet-700 items-center justify-center">
+              <span class="material-symbols-outlined text-base">emoji_events</span>
+            </span>
+            <div>
+              <h1 class="text-base font-bold text-slate-900 leading-tight">Chung kết · Sân 01</h1>
+              <p class="text-[11px] font-medium text-slate-500">Nhập kết quả các ván đấu</p>
+            </div>
+          </div>
+          <!-- Close button "✕" -->
+          <button type="button" aria-label="Đóng" class="size-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors">
+            <span class="material-symbols-outlined text-lg">close</span>
+          </button>
+        </div>
+
+        <!-- Read-only rule chip -->
+        <div class="mt-2.5 flex items-center justify-between gap-2 bg-slate-50 border border-slate-200/90 rounded-lg px-2.5 py-1.5">
+          <div class="flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-xs text-slate-500">lock</span>
+            <span class="text-[11px] font-mono font-bold text-slate-700">BO3 · tới 11 · cách 2</span>
+          </div>
+          <span class="text-[10px] font-medium text-slate-400 text-right">Luật trận cố định từ lúc chốt giải</span>
+        </div>
+      </div>
+
+      <!-- Scrollable Main Content -->
+      <div class="flex-1 overflow-y-auto px-4 py-3 space-y-3.5">
+
+        <!-- Two Pairs Facing Header (VS Banner) -->
+        <div class="bg-gradient-to-r from-violet-50/70 via-white to-violet-50/70 border border-violet-100 rounded-xl p-3 shadow-xs">
+          <div class="grid grid-cols-11 items-center gap-1">
+            <!-- Pair A (Left) -->
+            <div class="col-span-5 text-left">
+              <span class="inline-block text-[10px] font-mono font-bold uppercase tracking-wider text-violet-600 bg-violet-100/70 px-1.5 py-0.5 rounded">
+                Cặp A
+              </span>
+              <div class="text-xs font-bold text-slate-900 mt-1 leading-snug break-words">
+                Minh Tuấn + Hoàng Nam
+              </div>
+            </div>
+
+            <!-- VS Icon / Pill -->
+            <div class="col-span-1 text-center flex justify-center">
+              <span class="size-6 rounded-full bg-slate-200/80 text-slate-500 text-[10px] font-mono font-bold flex items-center justify-center shadow-2xs">
+                vs
+              </span>
+            </div>
+
+            <!-- Pair B (Right) -->
+            <div class="col-span-5 text-right">
+              <span class="inline-block text-[10px] font-mono font-bold uppercase tracking-wider text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded">
+                Cặp B
+              </span>
+              <div class="text-xs font-bold text-slate-900 mt-1 leading-snug break-words">
+                Quốc Khánh + Bảo Long
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- GAME ROWS CONTAINER -->
+        <div class="space-y-3">
+
+          <!-- VÁN 1: 11 - 7 (Pair A win tick) -->
+          <div class="bg-white rounded-xl border border-slate-200 p-3 shadow-2xs">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-1.5">
+                <span class="size-2 rounded-full bg-emerald-500"></span>
+                <span class="text-xs font-bold text-slate-800 uppercase tracking-wide">Ván 1</span>
+              </div>
+              <!-- Pair A Win Tick indicator -->
+              <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                <span class="material-symbols-outlined fill-1 text-xs">check_circle</span>
+                Cặp A thắng ván
+              </span>
+            </div>
+
+            <div class="grid grid-cols-11 items-center gap-2">
+              <!-- Pair A Score Input + Steppers -->
+              <div class="col-span-5 flex flex-col items-center">
+                <!-- Big Numeric Input Box (Winner style) -->
+                <div class="w-full h-13 bg-emerald-50/70 border-2 border-emerald-500 rounded-xl flex items-center justify-center shadow-xs">
+                  <span class="font-mono text-2xl font-extrabold text-emerald-700 tracking-tight">11</span>
+                </div>
+                <!-- Steppers (44px touch target) -->
+                <div class="grid grid-cols-2 gap-1.5 w-full mt-2">
+                  <button type="button" aria-label="Giảm điểm cặp A" class="h-11 rounded-lg bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-mono text-lg font-bold flex items-center justify-center transition">
+                    −
+                  </button>
+                  <button type="button" aria-label="Tăng điểm cặp A" class="h-11 rounded-lg bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-mono text-lg font-bold flex items-center justify-center transition">
+                    +
+                  </button>
+                </div>
+              </div>
+
+              <!-- Dash Separator -->
+              <div class="col-span-1 text-center">
+                <span class="font-mono text-xl font-bold text-slate-400">–</span>
+              </div>
+
+              <!-- Pair B Score Input + Steppers -->
+              <div class="col-span-5 flex flex-col items-center">
+                <!-- Big Numeric Input Box -->
+                <div class="w-full h-13 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-center">
+                  <span class="font-mono text-2xl font-bold text-slate-700 tracking-tight">7</span>
+                </div>
+                <!-- Steppers (44px touch target) -->
+                <div class="grid grid-cols-2 gap-1.5 w-full mt-2">
+                  <button type="button" aria-label="Giảm điểm cặp B" class="h-11 rounded-lg bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-mono text-lg font-bold flex items-center justify-center transition">
+                    −
+                  </button>
+                  <button type="button" aria-label="Tăng điểm cặp B" class="h-11 rounded-lg bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-mono text-lg font-bold flex items-center justify-center transition">
+                    +
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- VÁN 2: 9 - 11 (Pair B win tick) -->
+          <div class="bg-white rounded-xl border border-slate-200 p-3 shadow-2xs">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-1.5">
+                <span class="size-2 rounded-full bg-emerald-500"></span>
+                <span class="text-xs font-bold text-slate-800 uppercase tracking-wide">Ván 2</span>
+              </div>
+              <!-- Pair B Win Tick indicator -->
+              <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                <span class="material-symbols-outlined fill-1 text-xs">check_circle</span>
+                Cặp B thắng ván
+              </span>
+            </div>
+
+            <div class="grid grid-cols-11 items-center gap-2">
+              <!-- Pair A Score Input + Steppers -->
+              <div class="col-span-5 flex flex-col items-center">
+                <div class="w-full h-13 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-center">
+                  <span class="font-mono text-2xl font-bold text-slate-700 tracking-tight">9</span>
+                </div>
+                <div class="grid grid-cols-2 gap-1.5 w-full mt-2">
+                  <button type="button" aria-label="Giảm điểm cặp A ván 2" class="h-11 rounded-lg bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-mono text-lg font-bold flex items-center justify-center transition">
+                    −
+                  </button>
+                  <button type="button" aria-label="Tăng điểm cặp A ván 2" class="h-11 rounded-lg bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-mono text-lg font-bold flex items-center justify-center transition">
+                    +
+                  </button>
+                </div>
+              </div>
+
+              <!-- Dash Separator -->
+              <div class="col-span-1 text-center">
+                <span class="font-mono text-xl font-bold text-slate-400">–</span>
+              </div>
+
+              <!-- Pair B Score Input + Steppers (Winner style) -->
+              <div class="col-span-5 flex flex-col items-center">
+                <div class="w-full h-13 bg-emerald-50/70 border-2 border-emerald-500 rounded-xl flex items-center justify-center shadow-xs">
+                  <span class="font-mono text-2xl font-extrabold text-emerald-700 tracking-tight">11</span>
+                </div>
+                <div class="grid grid-cols-2 gap-1.5 w-full mt-2">
+                  <button type="button" aria-label="Giảm điểm cặp B ván 2" class="h-11 rounded-lg bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-mono text-lg font-bold flex items-center justify-center transition">
+                    −
+                  </button>
+                  <button type="button" aria-label="Tăng điểm cặp B ván 2" class="h-11 rounded-lg bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-mono text-lg font-bold flex items-center justify-center transition">
+                    +
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- VÁN 3: 11 - 10 (Amber Error State: phải thắng cách 2 điểm) -->
+          <div class="bg-amber-50/30 rounded-xl border-2 border-amber-300 p-3 shadow-2xs">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-1.5">
+                <span class="size-2 rounded-full bg-amber-500 animate-pulse"></span>
+                <span class="text-xs font-bold text-amber-900 uppercase tracking-wide">Ván 3 (Quyết định)</span>
+              </div>
+              <span class="text-[10px] font-mono font-bold text-amber-700 bg-amber-100/90 px-1.5 py-0.5 rounded">
+                Tỉ số đang 1 - 1
+              </span>
+            </div>
+
+            <div class="grid grid-cols-11 items-center gap-2">
+              <!-- Pair A Input: 11 (Outlined Amber) -->
+              <div class="col-span-5 flex flex-col items-center">
+                <div class="w-full h-13 bg-white border-2 border-amber-500 rounded-xl flex items-center justify-center ring-2 ring-amber-100 shadow-xs">
+                  <span class="font-mono text-2xl font-extrabold text-amber-900 tracking-tight">11</span>
+                </div>
+                <div class="grid grid-cols-2 gap-1.5 w-full mt-2">
+                  <button type="button" aria-label="Giảm điểm cặp A ván 3" class="h-11 rounded-lg bg-white border border-amber-200 hover:bg-amber-50 active:scale-95 text-slate-800 font-mono text-lg font-bold flex items-center justify-center transition">
+                    −
+                  </button>
+                  <button type="button" aria-label="Tăng điểm cặp A ván 3" class="h-11 rounded-lg bg-white border border-amber-200 hover:bg-amber-50 active:scale-95 text-slate-800 font-mono text-lg font-bold flex items-center justify-center transition">
+                    +
+                  </button>
+                </div>
+              </div>
+
+              <!-- Dash Separator -->
+              <div class="col-span-1 text-center">
+                <span class="font-mono text-xl font-bold text-amber-400">–</span>
+              </div>
+
+              <!-- Pair B Input: 10 (Outlined Amber) -->
+              <div class="col-span-5 flex flex-col items-center">
+                <div class="w-full h-13 bg-white border-2 border-amber-500 rounded-xl flex items-center justify-center ring-2 ring-amber-100 shadow-xs">
+                  <span class="font-mono text-2xl font-extrabold text-amber-900 tracking-tight">10</span>
+                </div>
+                <div class="grid grid-cols-2 gap-1.5 w-full mt-2">
+                  <button type="button" aria-label="Giảm điểm cặp B ván 3" class="h-11 rounded-lg bg-white border border-amber-200 hover:bg-amber-50 active:scale-95 text-slate-800 font-mono text-lg font-bold flex items-center justify-center transition">
+                    −
+                  </button>
+                  <button type="button" aria-label="Tăng điểm cặp B ván 3" class="h-11 rounded-lg bg-white border border-amber-200 hover:bg-amber-50 active:scale-95 text-slate-800 font-mono text-lg font-bold flex items-center justify-center transition">
+                    +
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Inline Amber Error Banner -->
+            <div class="mt-2.5 flex items-center gap-1.5 px-2.5 py-1.5 bg-amber-100/80 border border-amber-300 rounded-lg text-amber-800">
+              <span class="material-symbols-outlined text-sm text-amber-600">warning</span>
+              <span class="text-[11px] font-semibold leading-tight">Ván 3: phải thắng cách 2 điểm (ví dụ: 12 – 10, 13 – 11)</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Result Summary Card (Neutral While Invalid) -->
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-3">
+          <div class="size-8 rounded-lg bg-slate-200/80 text-slate-500 flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-lg">pending</span>
+          </div>
+          <div class="flex-1">
+            <div class="text-xs font-bold text-slate-700">Chưa xác định cặp thắng — sửa ván 3</div>
+            <div class="text-[11px] text-slate-500 mt-0.5">Tổng tỉ số tạm tính: 1 – 1 (chưa hoàn thành ván 3)</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- STICKY FOOTER -->
+      <div class="border-t border-slate-200 bg-white px-4 py-3 flex-shrink-0 space-y-2.5">
+        <!-- Status indicator: Amber dot text -->
+        <div class="flex items-center justify-between text-xs">
+          <div class="flex items-center gap-1.5">
+            <span class="size-2 rounded-full bg-amber-500 animate-pulse"></span>
+            <span class="text-[11px] font-medium text-amber-700">Chưa lưu thay đổi</span>
+          </div>
+          <span class="text-[11px] font-mono text-slate-400">Tự động kiểm tra luật</span>
+        </div>
+
+        <!-- Actions: Lưu nháp + Lưu & chốt trận -->
+        <div class="flex items-center gap-2">
+          <!-- Secondary: Lưu nháp -->
+          <button type="button" class="w-[36%] h-12 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-[0.98] text-slate-700 font-bold text-xs flex items-center justify-center gap-1.5 transition-all">
+            <span class="material-symbols-outlined text-base">save</span>
+            Lưu nháp
+          </button>
+
+          <!-- Primary: Lưu & chốt trận (Disabled while invalid) -->
+          <button type="button" disabled class="w-[64%] h-12 rounded-xl bg-violet-600/40 text-white/80 font-bold text-xs flex items-center justify-center gap-1.5 cursor-not-allowed shadow-none transition-all">
+            <span class="material-symbols-outlined text-base">check_circle</span>
+            Lưu &amp; chốt trận
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</body>
+</html>

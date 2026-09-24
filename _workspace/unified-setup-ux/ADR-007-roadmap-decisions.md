@@ -35,7 +35,7 @@ Chốt bằng AskUserQuestion. Brief thiết kế: `_workspace/epic-2-operations
 
 | Mã | Quyết định | Lý do |
 |---|---|---|
-| D25 | Giữ D16: người dùng làm màn điều hành trên **Stitch** theo brief; agent không tự dựng mockup thay Stitch, chỉ chia lát code sau khi màn được xuất về `canonical/operations/` | Nhất quán với bộ setup đã duyệt |
+| D25 | Giữ D16: màn điều hành làm trên **Stitch** theo brief (không mockup HTML tự dựng); chỉ chia lát code sau khi màn có ở `canonical/operations/`. Cập nhật cùng ngày: người dùng kết nối Stitch connector và yêu cầu agent tương tác trực tiếp → agent sinh OPS-01…07 | Nhất quán với bộ setup đã duyệt |
 | D26 | Lát đầu Epic 2 là **trung tâm điều hành theo sân/lượt**, gom luôn các nợ liên quan (ô chờ theo nguồn, bỏ ô BO theo lượt, lỗi phiên bản trận sau tiến cấp, chặn Back khi chưa lưu) | Người dùng ưu tiên màn chạy giải trong ngày |
 | D27 | Deploy Epic 2 như D24: nhánh + PR nháp, agent apply migration (nếu có) và kiểm thử tích hợp; người dùng chạy browser CLB 59 rồi merge | Người dùng giữ quyền lên production |
 | D28 | Phạm vi nợ = danh sách đã ghi trong roadmap mục Epic 2; không thêm lỗi mới ở vòng này | Người dùng xác nhận |

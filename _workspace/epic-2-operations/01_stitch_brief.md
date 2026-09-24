@@ -163,6 +163,10 @@ thu hồi được). Trọng tài mở link trên điện thoại → chỉ th�
 
 ## 7. Bàn giao sau khi thiết kế xong
 
+**Trạng thái 2026-09-24:** agent đã sinh đủ OPS-01…07 qua Stitch connector (theo yêu cầu người dùng) và lưu vào
+`canonical/operations/` — xem `canonical/operations/README.md` (screen ID, lưu ý lệch). OPS-08 chưa làm.
+
+
 1. Xuất từng màn Stitch (HTML + PNG) vào `_workspace/stitch-internal-setup/canonical/operations/<key>/`
    (`reference.html`, `reference.png`; bản mobile đặt `reference-390.png` nếu tách màn).
 2. Bổ sung bảng "Operations Screens" (key + Stitch screen ID) vào `canonical/README.md` và file manifest.

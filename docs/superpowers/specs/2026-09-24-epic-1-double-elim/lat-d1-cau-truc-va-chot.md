@@ -4,7 +4,7 @@ Trạng thái: spec · Phụ thuộc: Lát C đã lên production (migration 107
 
 ## 1. Mục tiêu
 
-Sinh đúng cấu trúc loại kép cho 4–32 cặp (có bye, không trận một bên), chốt được qua `finalize_internal_setup_v4`, tiến cấp được qua 068 tới hết giải, và xếp hạng đúng D22. Chưa bật thẻ thể thức cho người dùng (bật ở D2).
+Sinh đúng cấu trúc loại kép cho 4–32 cặp (có bye, không trận một bên), chốt được qua `finalize_internal_setup_v4`, tiến cấp được qua 068 tới hết giải, và xếp hạng đúng D22. Registry bật cùng migration 108 (test Lát A khóa RPC = registry); người dùng chỉ thấy thẻ sau khi PR D1 + D2 được deploy.
 
 ## 2. Cấu hình và registry
 
@@ -20,7 +20,7 @@ format: {
 
 | Trường | Giá trị |
 |---|---|
-| `enabled` | `false` ở D1, `true` ở D2 |
+| `enabled` | `true` (khớp danh sách SQL của 108) |
 | `label` | `Loại kép` |
 | `supportsFinalBestOf` | `true` |
 | `recommended` | `[6, 16]` (ngoài khoảng chỉ cảnh báo, D9) |
@@ -115,7 +115,8 @@ Chỉ trận L vòng 1 và vòng 2 có thể bị bỏ (W vòng 1 luôn có ít 
 Dựng từ **107**. Số 108 kiểm lại trên `origin/main` ngay trước khi apply (roadmap §1.3).
 
 1. **CHECK `tournament_stages.schedule_format`:** thay bằng CHECK rộng hơn thêm `'double_elim'` (mẫu 101: `DROP CONSTRAINT IF EXISTS` rồi `ADD CONSTRAINT` ngay trong cùng transaction; không đụng dữ liệu).
-2. **`finalize_internal_setup_v4`** (`CREATE OR REPLACE`, giữ signature/grants). Chỉ khác 107 ở:
+2. **`save_unified_setup_aggregate_draft_v1`** (phát hiện khi chạy tích hợp): hàm lưu nháp có danh sách `formatKey` riêng (`round_robin, knockout, group_knockout, mlp`), nên bản nháp loại kép bị từ chối `SETUP_PAYLOAD_INVALID`. `CREATE OR REPLACE` chép nguyên thân 099 (production đang chạy đúng bản này, md5 `31da06b4…2984`), chỉ thêm `'double_elimination'` vào danh sách.
+3. **`finalize_internal_setup_v4`** (`CREATE OR REPLACE`, giữ signature/grants). Chỉ khác 107 ở:
    - `c_allowed_formats` thêm `'double_elimination'`.
    - Danh sách `scheduleFormat` hợp lệ thêm `'double_elim'`.
    - Nhánh bất biến `double_elimination` (lỗi → `FINALIZE_PLAN_INVALID`):
@@ -128,7 +129,7 @@ Dựng từ **107**. Số 108 kiểm lại trên `origin/main` ngay trước khi
      - **cạnh thua:** mọi trận W (kể cả `WF`) có đúng một cạnh thua đi ra và đích là trận L; trận L và `GF` không có cạnh thua;
      - `GF` không có cạnh nào đi ra.
    - Phần ghi (VĐV, cặp, entry, stage, trận, tuyến) **không đổi**.
-3. Test khóa `tests/stitch-setup/epic-1/api-contract.test.js`: bỏ các điểm trên khỏi 108 thì thân hàm phải bằng đúng 107 (mẫu `lat-c/api-contract.test.js`).
+4. Test khóa `tests/stitch-setup/epic-1/api-contract.test.js`: bỏ các điểm trên khỏi 108 thì thân `finalize` phải bằng đúng 107 và khối `_v1` phải bằng đúng 099 (mẫu `lat-c/api-contract.test.js`).
 
 Apply: kiểm trước bằng script tích hợp nạp thân hàm trong transaction ROLLBACK (§8), apply qua Supabase MCP, so `md5(prosrc)` với thân hàm trong file.
 
@@ -164,10 +165,10 @@ Apply: kiểm trước bằng script tích hợp nạp thân hàm trong transact
 | `plan.test.js` (chống gặp lại) | B = 8/16/32: không trận L "nhận" nào có thể là tái đấu với cặp vừa bị chính người thua W loại ở vòng trước, trừ `LF` |
 | `simulate.test.js` | n = 4..32 × 3 seed: mô phỏng định tuyến như 068 (điền theo cạnh), kết quả ngẫu nhiên: mọi trận khi tới lượt có đủ hai cặp, chơi đúng `2n − 2` trận, mỗi cặp bị loại sau đúng hai trận thua, vô địch thua ≤ 1 trận; BXH: hạng 1..n phủ đủ, dải đồng hạng khớp D22 |
 | `standings.test.js` | Nhãn Vô địch/Á quân/Hạng 3/Hạng 4/Hạng 5–6…; giải đang chạy → `Đang thi đấu`, hạng đã loại không đổi; `finalStandingsFrom` rỗng khi GF chưa xong; nhánh cũ của engine không đổi |
-| `registry.test.js` | `double_elimination` có trong registry, `enabled=false` ở D1; min 4, max 32 → blocker `PAIR_COUNT_ABOVE_MAXIMUM`; `validateConfig` BO |
+| `registry.test.js` | `double_elimination` có trong registry, `enabled=true` khớp SQL; min 4, max 32 → blocker `PAIR_COUNT_ABOVE_MAXIMUM`; `validateConfig` BO |
 | `api-contract.test.js` | Migration 108 chỉ khác 107 ở các điểm §6; không `DROP TABLE/FUNCTION/COLUMN`, `TRUNCATE`, `DELETE FROM`; registry khớp danh sách SQL; SQL tích hợp kết thúc bằng `ROLLBACK;` |
 | Hồi quy | `npm run test:stitch-setup` (lat-0/a/b/c) + `tests/tournament/double-elim-*.test.js` + `tests/tournament/registry.test.js` xanh |
 
 ## 10. Không làm ở D1
 
-UI; bật thẻ thể thức; BO theo từng trận ở bàn điều hành (Epic 2); đá lại GF (D14).
+UI (D2); BO theo từng trận ở bàn điều hành (Epic 2); đá lại GF (D14).

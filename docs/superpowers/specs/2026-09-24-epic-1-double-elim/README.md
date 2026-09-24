@@ -8,10 +8,10 @@ Bất biến: skill `tournament-setup-invariants`. Nền tảng: spec Stitch `do
 
 | Lát | File | Nội dung | Deploy |
 |---|---|---|---|
-| D1 | [lat-d1-cau-truc-va-chot.md](lat-d1-cau-truc-va-chot.md) | Registry, builder `setupPlans/doubleElim.js` (đảo thứ tự + thu gọn bye), xếp hạng, migration 108 (CHECK + finalize v4), kiểm thử tích hợp SQL | Không deploy riêng. Thẻ thể thức vẫn **tắt** tới hết D2 |
+| D1 | [lat-d1-cau-truc-va-chot.md](lat-d1-cau-truc-va-chot.md) | Registry, builder `setupPlans/doubleElim.js` (đảo thứ tự + thu gọn bye), xếp hạng, migration 108 (CHECK + lưu nháp + finalize v4), kiểm thử tích hợp SQL | Migration apply ngay; code không deploy riêng (đi cùng D2 trong một PR) |
 | D2 | [lat-d2-giao-dien-va-dieu-hanh.md](lat-d2-giao-dien-va-dieu-hanh.md) | Bước 3/4, sơ đồ W/L/GF ở bàn điều hành + trang công khai, BXH, kết thúc giải; bật thẻ | Deploy Epic 1 |
 
-D1 không bật thể thức: nếu chỉ có D1, server vẫn từ chối `double_elimination` bằng `FORMAT_NOT_AVAILABLE` vì registry còn `enabled: false`. RPC v4 (migration 108) đã nhận thể thức từ D1 để kiểm thử tích hợp được.
+Registry bật `double_elimination` ngay ở D1 vì test Lát A khóa bất biến "RPC và registry mở cùng thể thức" (migration 108 đã mở phía SQL). Người dùng chưa chạm được thể thức cho tới khi PR (D1 + D2) được merge và Vercel deploy: code production hiện tại không có builder/registry loại kép.
 
 ## Quyết định
 

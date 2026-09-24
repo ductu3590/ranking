@@ -4,7 +4,7 @@ Trạng thái: spec · Phụ thuộc: Lát D1 xanh test, migration 108 đã appl
 
 ## 1. Mục tiêu
 
-Người dùng tạo được giải loại kép qua luồng 4 bước, điều hành tới hết giải trên bàn điều hành (sơ đồ W/L/GF, nhập tỉ số, BXH, kết thúc giải) và xem trang công khai. Bật `double_elimination.enabled = true`.
+Người dùng tạo được giải loại kép qua luồng 4 bước, điều hành tới hết giải trên bàn điều hành (sơ đồ W/L/GF, nhập tỉ số, BXH, kết thúc giải) và xem trang công khai. (Registry đã bật ở D1; D2 hoàn thiện giao diện để deploy chung.)
 
 ## 2. Bước 3 — Thể thức (`app/giai-dau/v2/setup-v3/steps/`)
 
@@ -42,7 +42,7 @@ Dùng chung một bộ đọc khóa: `lib/tournament/doubleElimKeys.js` (thuần
 
 | Nhóm | Ca |
 |---|---|
-| `ui-contract.test.js` | Registry `double_elimination.enabled = true`; `StepFormatPairing` render `DoubleElimConfig`; `StepDraw` có ba khung W/L/GF và `data-testid` ổn định; `BracketTab`, `StandingsTab`, trang công khai nhận `double_elim`; `setupSchedule` BO cho `GF` |
+| `ui-contract.test.js` | `StepFormatPairing` render `DoubleElimConfig`; `StepDraw` có ba khung W/L/GF và `data-testid` ổn định; `BracketTab`, `StandingsTab`, trang công khai nhận `double_elim`; `setupSchedule` BO cho `GF` |
 | `keys.test.js` | `parseDoubleElimKey` cho `W1-3`, `WF`, `L2-1`, `LF`, `GF`; khóa lạ → `null` |
 | Hồi quy | `npm run test:stitch-setup` toàn bộ + `npm run build` |
 | Browser (người dùng, CLB 59) | Hành trình 4 bước với 7 cặp (1 bye) và 5 cặp; 390px / tablet / desktop; chốt; nhập hết tỉ số tới GF; BXH đúng D22; Kết thúc giải; trang công khai |

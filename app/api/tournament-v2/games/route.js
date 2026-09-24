@@ -9,18 +9,33 @@ import { validateGameScore } from '@/lib/tournament/rules/scoring';
 import { resolveMatchScoring } from '@/lib/tournament/rules/roundScoring';
 
 import { hashScorekeeperToken, validateScorekeeperToken } from '@/lib/tournament/scorekeeperToken';
-
-// Xung dot nghiep vu nay ERRCODE 'PH409' (migration 078). Truoc day dung 40001,
-// nhung 40001 la serialization_failure nen tang tren tu dong retry va request treo.
-const CONFLICT_CODES = ['PH409', '40001'];
+import { assertScoreSavable, statusForSave, classifyRpcConflict } from '@/lib/tournament/scoreEntry';
 
 const db = supabaseAdmin || supabaseServer;
 
+// Xung đột nghiệp vụ trên production là 'PH409' (migration 078); phân loại theo thông điệp
+// exception vì lỗi phiên bản và lỗi trận đích (068) dùng chung mã (spec Epic 2 E1 §6.2).
 function rpcErrorResponse(error) {
+    const conflict = classifyRpcConflict(error);
+    if (conflict) return NextResponse.json({ error: conflict.message, code: conflict.code }, { status: conflict.status });
     const code = error?.code;
-    const status = CONFLICT_CODES.includes(code) ? 409 : code === '22023' ? 400 : code === 'P0002' ? 404 : 500;
-    const message = CONFLICT_CODES.includes(code) ? 'Dữ liệu trận đã thay đổi, hãy tải lại.' : error?.message || 'Không lưu được tỉ số.';
-    return NextResponse.json({ error: message, code: code || 'MUTATION_FAILED' }, { status });
+    const status = code === '22023' ? 400 : code === 'P0002' ? 404 : 500;
+    return NextResponse.json({ error: error?.message || 'Không lưu được tỉ số.', code: code || 'MUTATION_FAILED' }, { status });
+}
+
+function guardResponse(verdict) {
+    return NextResponse.json({ error: verdict.message, code: verdict.code }, { status: verdict.status });
+}
+
+// ended_at: RPC không ghi. Một UPDATE có điều kiện, không tăng version, không ghi đè, no-op nếu
+// trận đã đổi ở máy khác. started_at chỉ do match-transition ghi (spec E1 §6.3).
+async function stampEndedAt(groupId, matchId, version) {
+    if (!Number.isInteger(Number(version))) return;
+    const { error } = await db.from('tournament_matches')
+        .update({ ended_at: new Date().toISOString() })
+        .eq('id', matchId).eq('group_id', groupId).eq('status', 'finalized')
+        .eq('version', Number(version)).is('ended_at', null);
+    if (error) console.error('Stamp ended_at failed:', error);
 }
 
 function normalizeGames(games) {
@@ -73,6 +88,10 @@ async function handleGames(request) {
             .eq('group_id', groupId)
             .single();
         if (stageErr || !stage) return NextResponse.json({ error: 'Stage không tồn tại' }, { status: 404 });
+
+        // Chặn sớm: trận đã chốt (sửa đi route corrections), thiếu cặp, không có ván.
+        const precheck = assertScoreSavable({ match, games, complete: true });
+        if (!precheck.ok) return guardResponse(precheck);
 
         // Luật đem ra kiểm là luật của VÒNG chứa trận này, không phải luật chung
         // của giải. Cần cả tournament và division để resolve đủ 4 tầng.
@@ -135,6 +154,10 @@ async function handleGames(request) {
             return NextResponse.json({ error: error.message }, { status: 400 });
         }
 
+        // Lưu dở chỉ khi trận đang đấu/tạm dừng — nguyên nhân trận "live một bên" của Epic 1.
+        const verdict = assertScoreSavable({ match, games: normalizedGames, complete: resolved.complete });
+        if (!verdict.ok) return guardResponse(verdict);
+
         const advancement = resolved.complete
             ? advanceWinner({
                 winner_entrant_id: resolved.winner_entrant_id,
@@ -165,12 +188,14 @@ async function handleGames(request) {
             // tournament_matches_status_phase3_ck chỉ nhận pending|live|finalized.
             // Các engine dùng 'done' làm từ vựng nội bộ và có tầng dịch riêng ở
             // standingsService — không đụng vào đó.
-            p_status: resolved.complete ? 'finalized' : 'live',
+            p_status: resolved.complete ? 'finalized' : statusForSave(match, false),
             p_parent_field: advancement?.field || null,
             p_expected_version: expectedVersion,
             p_idempotency_key: idempotencyKey,
         });
         if (error) return rpcErrorResponse(error);
+
+        if (resolved.complete) await stampEndedAt(groupId, matchId, data?.version);
 
         if (scorekeeperToken) {
             // Chỉ ghi dấu để audit. Tỉ số đã lưu xong ở trên nên lỗi ở bước này

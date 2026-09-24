@@ -1,0 +1,37 @@
+# Epic 2 — Bằng chứng triển khai
+
+Project Supabase `uhhlelemewilgsdijwja`. Spec: `docs/superpowers/specs/2026-09-24-epic-2-operations/`.
+
+## Sửa dữ liệu hỏng (E1 §6.6) — 2026-09-24, người dùng đồng ý
+
+Trận `GF` id 1469, giải "Nhanhthangthua" (group 1): `live`, mới một bên, 0 ván — nguyên nhân lỗi "Dữ liệu trận đã
+thay đổi" khi chốt `LF` (xem README spec §Hiện trạng 1).
+
+```sql
+UPDATE tournament_matches SET status = 'pending'
+WHERE id = 1469 AND group_id = 1 AND match_key = 'GF' AND status = 'live'
+  AND entry_b_id IS NULL AND started_at IS NULL
+  AND NOT EXISTS (SELECT 1 FROM tournament_games g WHERE g.match_id = 1469)
+RETURNING id, status, version, entry_a_id IS NOT NULL AS has_a, entry_b_id IS NOT NULL AS has_b;
+```
+
+Kết quả: đúng 1 dòng `{id: 1469, status: pending, version: 4, has_a: true, has_b: false}`. Không đổi `version`, không
+migration. Trước khi sửa đã kiểm: toàn database chỉ có trận này ở trạng thái `live|warmup|paused` mà thiếu cặp.
+Giải có thể chơi tiếp: chốt `LF` sẽ điền cặp thắng vào ô `b` của `GF`.
+
+## Lát E1 — code (2026-09-24)
+
+Không migration. Thay đổi: `lib/tournament/{matchLabels,scoreEntry,operationsBoard}.js` (mới, thuần);
+`GET /api/tournament-v2/operations` (mới); `POST /games`, `POST /withdraw`, `POST /match-transition` (chặn dữ liệu);
+console 4 mục (`ConsoleShell`, `TournamentConsoleV2`, `control/ControlCenter`, `control/ScoreSheet`, `leaveGuard`);
+`ResultsTab` (ẩn ô BO theo lượt với stage v4, bỏ "Đội A/B"); gỡ `steps/ControlStep.js`.
+
+| Kiểm | Kết quả |
+|---|---|
+| `tests/stitch-setup/epic-2/*` | labels 10/10, score-entry 8/8, board 7/7, api-contract 8/8, ui-contract 11/11 |
+| `npm run test:stitch-setup` | xanh trừ `epic-1/ui-contract` (đỏ cục bộ do CRLF của `StepDraw.js`, có từ trước) |
+| `npm run test:tournament`, `test:open-registration` | xanh (sau khi sửa 6 test khóa chuỗi — ADR-006 mục Epic 2) |
+| `npx next build` | OK |
+| Trang xem trước tạm (dựng từ `buildSetupPlan` + `buildOperationsBoard` thật, fetch giả lập; đã xoá, không commit) | 1280px: thẻ sân live/khởi động/trống/ngưng, gợi ý không trùng, "Cặp đang đấu ở Sân 01", ô chờ "Nhất bảng A"; sheet: 11–10 báo "phải thắng cách 2 điểm" + khóa nút chốt, 12–10 mở khóa; xung đột phiên bản hiện 2 cột, khóa lưu tới khi chọn; Back khi chưa lưu → hộp "Bạn có tỉ số chưa lưu", "Bỏ thay đổi" đóng sheet giữ trang; lịch sử: mở +1 mục, đóng gỡ đúng 1. 375px: không tràn ngang, thanh tab đáy, bottom sheet vừa khít, thẻ gọi sân đúng thiết kế. Không lỗi console |
+
+Chưa làm — cần người dùng (D27): chạy thật K1/K2/K3/K4 trên CLB 59 (đăng nhập admin), đặc biệt K2 chạy tới `GF`.

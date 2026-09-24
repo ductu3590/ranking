@@ -44,6 +44,7 @@ assert(/\.v2-console-draw-slot\.is-picked/.test(css), 'ô được chọn có tr
 
 const con = read('app/giai-dau/v2/console/TournamentConsoleV2.js');
 assert(/DrawStep/.test(con), 'bước 4 mount DrawStep');
-assert(/step === 'draw' \? <DrawStep/.test(con), 'mount đúng vào bước draw');
+// Epic 2 D29: bước draw gộp vào mục Cài đặt (link cũ ?step=draw → settings); chỉ admin thấy (huỷ chốt).
+assert(/step === 'settings' \?[\s\S]*\{isAdmin \? <DrawStep/.test(con), 'DrawStep nằm trong mục Cài đặt, chỉ admin');
 
 console.log('ui-draw-step contract ok');

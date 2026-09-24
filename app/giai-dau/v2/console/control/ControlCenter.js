@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { getOperationsBoard, transitionMatch, withdrawMatch, setCourtActive } from '@/lib/tournamentV2Client';
 import { nextPollingDelay } from '@/lib/pollingBackoff';
 import ScoreSheet from './ScoreSheet';
+import NextStepCard from './NextStepCard';
 import './control.css';
 
 // Mục "Điều hành" (spec Epic 2, Lát E1 §5; thiết kế canonical/operations/01-control-center, 02-call-card).
@@ -25,7 +26,8 @@ function hhmm(value) {
 
 function nameOf(side) { return side?.name || side?.source || 'Chờ xác định'; }
 
-function ruleChip(rule) { return rule ? `BO${rule.bestOf} · ${rule.pointsTo} điểm` : ''; }
+// D34: không còn mốc điểm cố định — chỉ hiện số ván.
+function ruleChip(rule) { return rule ? `BO${rule.bestOf}` : ''; }
 
 function Pairs({ match }) {
   return <div className="ops-pairs">
@@ -162,12 +164,13 @@ function ReasonDialog({ dialog, busy, onSubmit, onClose }) {
   </div>;
 }
 
-export default function ControlCenter({ tournamentId, isAdmin, onSettings }) {
+export default function ControlCenter({ tournamentId, isAdmin, onSettings, onStandings, onMatches, onChanged }) {
   const [board, setBoard] = useState(null);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
   const [segment, setSegment] = useState('courts');
+  const [stageFilter, setStageFilter] = useState('all');
   const [sheet, setSheet] = useState(null);
   const [call, setCall] = useState(null);
   const [menu, setMenu] = useState(null);
@@ -261,11 +264,19 @@ export default function ControlCenter({ tournamentId, isAdmin, onSettings }) {
   if (!board && !error) return <div className="ops-state"><span className="v2-spinner" aria-hidden="true" /><p>Đang tải bàn điều hành…</p></div>;
   if (!board) return <div className="ops-state"><p className="ops-banner is-error">{error}</p><button type="button" className="ops-btn" onClick={load}>Thử lại</button></div>;
 
-  const { progress, courts, queue, recent, settings } = board;
+  const { progress, courts, settings } = board;
   const percent = progress.total ? Math.round((progress.finalized / progress.total) * 100) : 0;
-  const queueCount = queue.reduce((sum, group) => sum + group.matches.length, 0);
   const now = Date.now();
   const allDone = progress.total > 0 && progress.finalized === progress.total;
+  // Bộ lọc theo giai đoạn (Stitch OPS-01: "Tất cả nội dung · Vòng bảng · Loại trực tiếp") áp cho hàng chờ + vừa chốt.
+  const stageOptions = board.stages || [];
+  const inStage = (item) => stageFilter === 'all' || String(item.stageId) === String(stageFilter);
+  const queue = board.queue.filter(inStage);
+  const recent = board.recent.filter(inStage);
+  const queueCount = queue.reduce((sum, group) => sum + group.matches.length, 0);
+  const idleCourts = courts.filter((court) => court.state === 'idle').length;
+  // Hết trận để gọi (mọi trận đã chốt hoặc đang chờ chốt chặng): thu gọn lưới sân, nhường chỗ cho thẻ việc tiếp theo.
+  const nothingToRun = !courts.some((court) => court.match) && board.queue.every((group) => group.matches.every((item) => item.readiness === 'waiting'));
 
   return <div className={`ops-center is-seg-${segment}`}>
     <section className="ops-progress" aria-label="Tiến độ giải">
@@ -273,32 +284,51 @@ export default function ControlCenter({ tournamentId, isAdmin, onSettings }) {
         <p><b>{progress.finalized}/{progress.total}</b> trận đã chốt <span className="ops-muted">({percent}%)</span></p>
         <div className="ops-progress-bar" aria-hidden="true"><i style={{ width: `${percent}%` }} /></div>
       </div>
+      {stageOptions.length > 1 ? <div className="ops-filter" role="tablist" aria-label="Lọc theo giai đoạn">
+        {[{ id: 'all', name: 'Tất cả' }, ...stageOptions].map((option) => <button key={option.id} type="button" role="tab" aria-selected={String(stageFilter) === String(option.id)} onClick={() => setStageFilter(option.id)}>{option.name}</button>)}
+      </div> : null}
       <dl className="ops-progress-stats">
         <div><dt>Dự kiến xong</dt><dd>{hhmm(progress.finishAt)}</dd></div>
         <div><dt>TB mỗi trận</dt><dd>{progress.averageMatchMinutes == null ? '—' : `${progress.averageMatchMinutes} phút`}</dd></div>
-        <div><dt>Sân đang dùng</dt><dd>{progress.activeCourts}</dd></div>
+        <div><dt>Sân đang dùng</dt><dd>{progress.busyCourts ?? 0}/{progress.activeCourts}</dd></div>
       </dl>
     </section>
 
     {error ? <p className="ops-banner is-error" role="alert">{error}</p> : null}
     {notice ? <p className="ops-banner is-ok" role="status">{notice} <button type="button" className="ops-link" onClick={() => setNotice('')}>Đóng</button></p> : null}
-    {allDone ? <p className="ops-banner is-ok">Đã chốt toàn bộ trận. Xem xếp hạng và kết thúc giải ở mục “Sơ đồ & xếp hạng”.</p> : null}
+    {board.stageAction ? <NextStepCard action={board.stageAction} tournamentId={tournamentId} isAdmin={isAdmin}
+      onStandings={onStandings}
+      onDone={(message) => { setNotice(message); load(); if (onChanged) onChanged(); }} /> : null}
+    {allDone && !board.stageAction ? <p className="ops-banner is-ok">Giải đã kết thúc. Xếp hạng chung cuộc ở mục “Sơ đồ & xếp hạng”.</p> : null}
 
     <div className="ops-segments" role="tablist" aria-label="Xem theo">
       {[['courts', `Sân (${courts.length})`], ['queue', `Hàng chờ (${queueCount})`], ['recent', 'Vừa chốt']].map(([key, label]) => <button key={key} type="button" role="tab" aria-selected={segment === key} onClick={() => setSegment(key)}>{label}</button>)}
     </div>
 
     <div className="ops-layout">
-      <section className="ops-courts" aria-label="Sân thi đấu">
+      <div className="ops-main">
+      {courts.length && nothingToRun ? <p className="ops-courts-done">Tất cả {courts.length} sân đang trống — {allDone ? 'không còn trận nào để gọi.' : 'các trận còn lại chờ kết quả vòng trước.'}</p> : null}
+      {courts.length && !nothingToRun ? <div className="ops-section-head"><h2>Sân thi đấu trực tiếp <span className="ops-count-pill">{courts.length} sân</span></h2><span className="ops-muted">{idleCourts ? `${idleCourts} sân trống chờ gọi` : 'Tất cả sân đang có trận'}</span></div> : null}
+      {nothingToRun && courts.length ? null : <section className="ops-courts" aria-label="Sân thi đấu">
         {courts.length ? courts.map((court) => <CourtCard key={court.id} court={court} warmupMinutes={settings.warmupMinutes} isAdmin={isAdmin} busy={busy} now={now}
           onCall={(match, courtId) => setCall({ match, courtId })}
           onAction={onAction}
           onScore={(match) => setSheet(match)}
           onMenu={(match, courtItem) => setMenu({ match, court: courtItem })} />)
           : <div className="ops-empty"><b>Chưa khai báo sân nào</b><p>Khai báo sân để gọi trận và theo dõi giờ dự kiến. Vẫn nhập tỉ số được ở mục Trận đấu.</p>{isAdmin ? <button type="button" className="ops-btn is-primary" onClick={onSettings}>Khai báo sân</button> : null}</div>}
-      </section>
+      </section>}
 
-      <aside className="ops-queue" aria-label="Hàng chờ theo lượt">
+      <section className="ops-recent" aria-label="Trận vừa chốt">
+        <h2><span>Trận vừa chốt <small className="ops-muted">(gần nhất)</small></span>{onMatches && progress.finalized ? <button type="button" className="ops-link-plain" onClick={onMatches}>Xem toàn bộ {progress.finalized} trận →</button> : null}</h2>
+        {recent.length ? recent.map((item) => <button key={item.id} type="button" className="ops-recent-row" onClick={() => setSheet(item)}>
+          <span className="ops-recent-title">{item.title}</span>
+          <span className="ops-recent-body"><b>{item.winnerName || '—'}</b>{item.resultType === 'walkover' ? ' thắng W.O.' : <> thắng <em className="ops-score-text">{item.scoreText || ''}</em></>}{item.loserName ? <> trước <span className="ops-recent-loser">{item.loserName}</span></> : null}</span>
+          <span className="ops-recent-meta">{item.court || ''} {hhmm(item.endedAt)}<span className="ops-recent-open">Xem</span></span>
+        </button>) : <p className="ops-muted">Chưa có trận nào chốt.</p>}
+      </section>
+      </div>
+
+      {nothingToRun && !queueCount ? null : <aside className="ops-queue" aria-label="Hàng chờ theo lượt">
         <h2>Hàng chờ theo lượt <span className="ops-count">{queueCount} trận</span></h2>
         {queue.length ? queue.map((group) => <div key={group.key} className="ops-queue-group">
           <h3>{group.label}<span>{group.matches.length} trận{group.stageName ? ` · ${group.stageName}` : ''}</span></h3>
@@ -313,16 +343,8 @@ export default function ControlCenter({ tournamentId, isAdmin, onSettings }) {
             </div>
           </div>)}
         </div>) : <p className="ops-muted">Không còn trận nào chờ.</p>}
-      </aside>
+      </aside>}
 
-      <section className="ops-recent" aria-label="Trận vừa chốt">
-        <h2>Trận vừa chốt</h2>
-        {recent.length ? recent.map((item) => <button key={item.id} type="button" className="ops-recent-row" onClick={() => setSheet(item)}>
-          <span className="ops-recent-title">{item.title}</span>
-          <span className="ops-recent-body"><b>{item.winnerName || '—'}</b>{item.resultType === 'walkover' ? ' thắng W.O.' : ` thắng ${item.scoreText || ''}`}</span>
-          <span className="ops-muted">{item.court || ''} {hhmm(item.endedAt)}</span>
-        </button>) : <p className="ops-muted">Chưa có trận nào chốt.</p>}
-      </section>
     </div>
 
     {sheet ? <ScoreSheet match={sheet} isAdmin={isAdmin} onClose={() => setSheet(null)} onSaved={(message) => { setSheet(null); setNotice(message); load(); }} /> : null}

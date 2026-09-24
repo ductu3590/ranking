@@ -99,12 +99,13 @@ export default function TournamentConsoleV2({ tournamentId }) {
     if (card) card.scrollIntoView({ block: 'start' });
   }, [isCommunity, loading, openRegLink]);
 
-  function goSettings() {
+  function goStep(step) {
     const params = new URLSearchParams(searchParams.toString());
-    params.set('step', 'settings');
+    params.set('step', step);
     params.delete('tab');
     router.push(`?${params.toString()}`);
   }
+  const goSettings = () => goStep('settings');
 
   if (loading && !tournament) return <div className="v2-state v2-loading"><span className="v2-spinner" aria-hidden="true" /><p>Đang tải dữ liệu giải...</p></div>;
   if (error) return <div className="v2-state v2-error"><p>{error}</p><button type="button" className="v2-btn-secondary" onClick={load}>Thử lại</button></div>;
@@ -116,7 +117,7 @@ export default function TournamentConsoleV2({ tournamentId }) {
 
   return <ConsoleShell tournament={tournament} tournamentId={tournamentId} progress={board?.progress} actor={session}>
     {(step) => <>
-      {step === 'control' ? <ControlCenter tournamentId={tournamentId} isAdmin={isAdmin} onSettings={goSettings} /> : null}
+      {step === 'control' ? <ControlCenter tournamentId={tournamentId} isAdmin={isAdmin} onSettings={goSettings} onStandings={() => goStep('bracket')} onMatches={() => goStep('matches')} onChanged={load} /> : null}
       {step === 'matches' ? <>{stagePicker}<ResultsTab {...stepProps} /></> : null}
       {step === 'bracket' ? <>{stagePicker}<StandingsTab {...stepProps} /><BracketTab {...stepProps} /></> : null}
       {step === 'settings' ? <div className="v2-console-settings">

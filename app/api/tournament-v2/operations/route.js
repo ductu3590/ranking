@@ -23,9 +23,9 @@ export async function GET(request) {
     const groupId = access.groupId;
 
     const [tournamentResult, divisionResult, stageResult, courtResult, assignmentResult] = await Promise.all([
-      db.from('tournaments').select('id, settings, default_scoring').eq('id', tournamentId).eq('group_id', groupId).maybeSingle(),
+      db.from('tournaments').select('id, status, settings, default_scoring').eq('id', tournamentId).eq('group_id', groupId).maybeSingle(),
       db.from('tournament_divisions').select('id, scoring_override').eq('group_id', groupId).eq('tournament_id', tournamentId),
-      db.from('tournament_stages').select('id, name, division_id, stage_order, schedule_format, match_format, config').eq('group_id', groupId).eq('tournament_id', tournamentId).order('stage_order', { ascending: true }),
+      db.from('tournament_stages').select('id, name, status, division_id, stage_order, schedule_format, match_format, config').eq('group_id', groupId).eq('tournament_id', tournamentId).order('stage_order', { ascending: true }),
       db.from('tournament_courts').select('id, label, surface, active').eq('group_id', groupId).eq('tournament_id', tournamentId),
       db.from('tournament_match_assignments').select('match_id, court_id, scheduled_start, locked').eq('group_id', groupId).eq('tournament_id', tournamentId),
     ]);

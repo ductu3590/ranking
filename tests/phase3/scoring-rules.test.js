@@ -15,8 +15,12 @@ const legacyRows = computeStandings({ config: { tiebreak: 'legacy_v2' } }, [{ id
   { entrant_a_id: 2, entrant_b_id: 3, winner_entrant_id: 2, points_a: 21, points_b: 19, games_a: 2, games_b: 1, status: 'done', group_label: 'A' },
 ]);
 assert.deepStrictEqual(legacyRows.map((row) => row.entrant_id), [1, 2, 3], 'legacy_v2 giữ đúng thứ tự fixture hiện hành');
+// D34 (nghiệm thu Epic 2): bên nhiều điểm hơn thắng; không kiểm mốc tới / cách / trần (ADR-006 mục Epic 2 E1.1).
 assert(validateGameScore({ score_a: 11, score_b: 9 }, { points_to: 11, win_by: 1 }).ok, 'điểm hợp lệ');
-assert.strictEqual(validateGameScore({ score_a: 11, score_b: 10 }, { points_to: 11, win_by: 2 }).code, 'WIN_BY_NOT_MET', 'win_by được kiểm tra');
-assert(validateGameScore({ score_a: 15, score_b: 14 }, { points_to: 11, win_by: 2, cap: 15 }).ok, 'cap cho phép kết thúc 15-14');
-assert.strictEqual(validateGameScore({ score_a: 16, score_b: 14 }, { points_to: 11, win_by: 2, cap: 15 }).code, 'SCORE_CAP_EXCEEDED', 'cap được kiểm tra');
+assert(validateGameScore({ score_a: 11, score_b: 10 }, { points_to: 11, win_by: 2 }).ok, 'không còn chặn thắng cách 1');
+assert(validateGameScore({ score_a: 17, score_b: 15 }, { points_to: 15, win_by: 2, cap: 15 }).ok, 'vượt 15 khi thắng cách 2 được lưu');
+assert(validateGameScore({ score_a: 7, score_b: 21 }, { points_to: 11, win_by: 2, cap: 15 }).ok, 'không cố định 11/15/21');
+assert.strictEqual(validateGameScore({ score_a: 12, score_b: 12 }, {}).code, 'INVALID_SCORE', 'hoà bị chặn');
+assert.strictEqual(validateGameScore({ score_a: -1, score_b: 11 }, {}).code, 'INVALID_SCORE', 'điểm âm bị chặn');
+assert.strictEqual(validateGameScore({ score_a: 11.5, score_b: 3 }, {}).code, 'INVALID_SCORE', 'điểm lẻ bị chặn');
 console.log('phase3 scoring rules ok');

@@ -78,3 +78,10 @@ Số sân chuyển từ Bước 1 sang Bước 3 (sau khi ghép cặp mới gợ
 `tests/unified-setup/release-hardening.contract.test.js` từng đỏ sau E1 (route `games` bỏ khai báo
 `CONFLICT_CODES`): khai báo lại và dùng làm mã 409 dự phòng — không sửa test.
 `tests/unified-setup/legacy-wizard-retired.contract.test.js` (3 ca soi wizard v2 đã gỡ) đỏ từ trước, không đụng.
+
+## Bổ sung — Epic 2 lát E1.1, sửa sau nghiệm thu (2026-09-24)
+
+| File | Xử lý | Lý do |
+|---|---|---|
+| `tests/phase3/scoring-rules.test.js` | Ca `WIN_BY_NOT_MET` (11–10) và `SCORE_CAP_EXCEEDED` (16–14) đổi thành hợp lệ; thêm ca 17–15, 7–21, hoà, âm, lẻ | D34: bên nhiều điểm hơn thắng, không kiểm mốc tới / cách / trần |
+| `tests/stitch-setup/epic-2/board.test.js` | "Trận vừa chốt" `7–11` → `11–7` | Điểm cặp thắng đứng trước (đọc "X thắng 7–11" bị ngược nghĩa) |

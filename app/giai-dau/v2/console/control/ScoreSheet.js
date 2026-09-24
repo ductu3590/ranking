@@ -9,16 +9,13 @@ import { registerLeaveGuard } from '../leaveGuard';
 // Luật trận chỉ đọc (D8/D14). Chốt đủ ván thắng → server tiến cấp. Trận đã chốt: chỉ xem.
 
 const ERROR_TEXT = {
-  INVALID_SCORE: 'tỉ số không hợp lệ (hai bên không được bằng nhau)',
-  SCORE_CAP_EXCEEDED: 'vượt điểm trần',
-  POINTS_TO_NOT_REACHED: 'bên thắng chưa đạt điểm tới',
-  WIN_BY_NOT_MET: 'phải thắng cách',
+  INVALID_SCORE: 'hai bên không được bằng điểm',
 };
 
+// D34: bên nhiều điểm hơn thắng ván — không có mốc tới/cách/trần để hiện.
 function ruleText(rule) {
   if (!rule) return '';
-  const cap = rule.cap ? ` · trần ${rule.cap}` : '';
-  return `BO${rule.bestOf} · tới ${rule.pointsTo} · cách ${rule.winBy}${cap}`;
+  return `BO${rule.bestOf} · bên nhiều điểm hơn thắng ván`;
 }
 
 function emptyRow() { return { a: '', b: '' }; }
@@ -39,7 +36,6 @@ function sameRows(left, right) {
 // Đánh giá form: từng ván hợp lệ?, số ván thắng mỗi bên, đã đủ thắng chưa.
 function evaluate(rows, rule) {
   const needed = Math.floor((rule?.bestOf || 1) / 2) + 1;
-  const scoring = { points_to: rule?.pointsTo, win_by: rule?.winBy, cap: rule?.cap };
   let winsA = 0;
   let winsB = 0;
   let decidedAt = -1;
@@ -47,7 +43,7 @@ function evaluate(rows, rule) {
     if (row.a === '' && row.b === '') return { state: 'empty' };
     if (decidedAt >= 0) return { state: 'extra' };
     const game = { score_a: Number(row.a), score_b: Number(row.b) };
-    const verdict = validateGameScore(game, scoring, index);
+    const verdict = validateGameScore(game, {}, index);
     if (!verdict.ok) return { state: 'invalid', code: verdict.code };
     if (game.score_a > game.score_b) winsA += 1; else winsB += 1;
     if (winsA >= needed || winsB >= needed) decidedAt = index;
@@ -284,7 +280,7 @@ export default function ScoreSheet({ match, isAdmin, onClose, onSaved }) {
                 {!readOnly ? <button type="button" className="ops-step" aria-label={`Tăng điểm ${label} ${side === 'a' ? 'cặp A' : 'cặp B'}`} onClick={() => step(index, side, 1)}>+</button> : null}
               </div>).reduce((acc, node, i) => (i === 0 ? [node] : [...acc, <span key="dash" className="ops-dash" aria-hidden="true">–</span>, node]), [])}
             </div>
-            {check.state === 'invalid' ? <p className="ops-field-error">{label}: {ERROR_TEXT[check.code] || 'tỉ số không hợp lệ'}{check.code === 'WIN_BY_NOT_MET' ? ` ${rule?.winBy} điểm` : ''}{check.code === 'POINTS_TO_NOT_REACHED' ? ` (${rule?.pointsTo})` : ''}.</p> : null}
+            {check.state === 'invalid' ? <p className="ops-field-error">{label}: {ERROR_TEXT[check.code] || 'tỉ số không hợp lệ'}.</p> : null}
             {check.state === 'extra' ? <p className="ops-field-error">Đã đủ ván thắng — {label.toLowerCase()} không cần nhập.</p> : null}
           </div>;
         })}

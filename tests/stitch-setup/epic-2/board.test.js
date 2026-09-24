@@ -97,7 +97,7 @@ suite('epic-2 · operationsBoard', {
     Object.assign(second, { status: 'finalized', ended_at: '2026-10-12T08:10:00Z', winner_entry_id: second.entry_b_id });
     const view = board(db, { gamesByMatchId: { [second.id]: [{ game_no: 1, kind: 'game', score_a: 7, score_b: 11 }] } });
     assert.equal(view.recent[0].id, second.id);
-    assert.equal(view.recent[0].scoreText, '7–11');
+    assert.equal(view.recent[0].scoreText, '11–7'); // E1.1: điểm cặp thắng đứng trước (ADR-006 mục Epic 2 E1.1)
     assert.ok(view.recent[0].winnerName);
     assert.equal(view.progress.finalized, 2);
   },

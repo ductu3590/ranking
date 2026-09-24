@@ -44,3 +44,14 @@ Chốt bằng AskUserQuestion. Brief thiết kế: `_workspace/epic-2-operations
 | D31 | Không làm "Nhánh Bạc" (nhánh an ủi). Sơ đồ nhánh thắng/thua theo OPS-05 | Người dùng chọn |
 | D32 | Epic 2 **không** làm link cho trọng tài nhập điểm bằng điện thoại (API `score-tokens` giữ nguyên, không giao diện) | Người dùng chọn |
 | D33 | Hàng chờ chỉ có nút **"Gọi vào sân…"** (chọn sân trống), không kéo-thả | Người dùng chọn |
+
+## Bổ sung — nghiệm thu Epic 2 lát E1 (2026-09-24)
+
+Người dùng chạy thật một giải vòng bảng → loại trực tiếp trên CLB 59 (giải 220) tới hết: luồng nghiệp vụ hoàn tất
+100%, giao diện chưa đạt. Chốt bằng AskUserQuestion. Spec: `docs/superpowers/specs/2026-09-24-epic-2-operations/lat-e1-1-sua-sau-nghiem-thu.md`.
+
+| Mã | Quyết định | Lý do |
+|---|---|---|
+| D34 | Luật tỉ số một ván: **bên nhiều điểm hơn thắng**. Chỉ chặn hoà, số âm, số lẻ; bỏ kiểm mốc tới / cách / trần ở server (`games`, `corrections`) và sheet nhập tỉ số. `points_to` còn dùng cho tỉ số W.O. (096) | Nhiều giải đánh 15 thắng cách 2 nên có 17–15; giải phong trào không cố định 11/15/21 |
+| D35 | Khi mọi trận của một chặng đã chốt, mục **Điều hành** hiện thẻ "việc tiếp theo": BXH tóm tắt (suất đi tiếp) + nút "Chốt … & vào …" / "Kết thúc giải & chốt xếp hạng", bấm hai lần để xác nhận. Nút cũ ở "Sơ đồ & xếp hạng" giữ nguyên, dùng chung `stageAction.js` | Phải sang mục khác để tiến vòng là không hợp lý; vẫn cần bước xem lại khi đồng điểm |
+| D36 | "Kết thúc giải" ở cả hai lối vào chuyển giải sang `completed` qua PATCH `tournaments` (vòng đời `live → completed`, ghi hạng chung cuộc). Giải đã chốt hết chặng nhưng còn `live` (vd 220) có nút "Kết thúc giải" riêng | Giải 220 xong 15/15 trận mà vẫn "Đang diễn ra" |

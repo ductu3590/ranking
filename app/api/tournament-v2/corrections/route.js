@@ -136,7 +136,7 @@ export async function POST(request) {
             const v = validateGameScore(normalized[i], scoring, i);
             if (!v.ok) {
                 return NextResponse.json({
-                    error: `Tỉ số ván ${i + 1} không hợp lệ với luật của vòng ${scoring.round_key} (tới ${scoring.points_to}, cách ${scoring.win_by}${scoring.cap ? `, cap ${scoring.cap}` : ''}).`,
+                    error: `Tỉ số ván ${i + 1} không hợp lệ: điểm phải là số không âm và hai bên không được bằng nhau.`,
                     code: v.code,
                 }, { status: 400 });
             }

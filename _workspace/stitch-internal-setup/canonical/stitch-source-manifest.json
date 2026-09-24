@@ -1,0 +1,104 @@
+{
+  "projectId": "16224817196221939744",
+  "importedAt": "2026-09-23",
+  "sourceWorktree": "C:\\Users\\ductu\\ranking-unified-setup-ux",
+  "sourceExport": "_workspace/stitch-internal-setup/stitch_pickleball_tournament_management_dashboard",
+  "design": {
+    "path": "DESIGN.md",
+    "sha256": "df96b440bd2343c83127ad4a8c22b1338a13f21ebf11194d0478c1bd9d5c4580",
+    "bytes": 9103
+  },
+  "screens": [
+    {
+      "key": "setup/01-tournament-info",
+      "screenId": "eb47d977df8544ec85215565c840d0d9",
+      "role": "Step 1: tournament information",
+      "files": [
+        {
+          "path": "setup/01-tournament-info/reference.html",
+          "sha256": "92c3ed5be0f940b8c133f252aa816e734db5f4b67620982edad8d292a6a9e3f5",
+          "bytes": 31801
+        },
+        {
+          "path": "setup/01-tournament-info/reference.png",
+          "sha256": "034ea5c87ed1d68a4bb3080e5139164d95eebb58c39d30ce05ce57b0f00bc17b",
+          "bytes": 359767
+        }
+      ]
+    },
+    {
+      "key": "setup/02-participants",
+      "screenId": "d4fd143f81474548bbcfde53d6184394",
+      "role": "Step 2: participants",
+      "files": [
+        {
+          "path": "setup/02-participants/reference.html",
+          "sha256": "b6084b355a5a6875ba490706a619687620f227111cf43786d053a7241e14e1bc",
+          "bytes": 62531
+        },
+        {
+          "path": "setup/02-participants/reference.png",
+          "sha256": "f482575b637bcb728f89350c384fa92587b815afd026ced1f45ebdae5ef9ac50",
+          "bytes": 654281
+        }
+      ]
+    },
+    {
+      "key": "setup/03-format-pairing",
+      "screenId": "f182baaf80914de7bdb7c8d78d121e2a",
+      "role": "Step 3: format and pairing",
+      "files": [
+        {
+          "path": "setup/03-format-pairing/reference.html",
+          "sha256": "a941f7e3868813cb6a404c3638846941bd82f73fce8807630d3278e8054a64f2",
+          "bytes": 50726
+        },
+        {
+          "path": "setup/03-format-pairing/reference.png",
+          "sha256": "ed7517d994499c8eb5f8fd97fdf59569d6f4d7c351220627488badbc19c2aaae",
+          "bytes": 397721
+        },
+        {
+          "path": "setup/03-format-pairing/tap-to-pair.html",
+          "sha256": "42c7c5f5e150985f14d421c617d0a6b590c3023b0577e7e3be93a71b0d8c336b",
+          "bytes": 59614
+        },
+        {
+          "path": "setup/03-format-pairing/tap-to-pair.png",
+          "sha256": "20668279c330a0b55fc2bf23e5745fb97316171d5eb70b6ba1e6abe4b9802a7a",
+          "bytes": 387669
+        }
+      ]
+    },
+    {
+      "key": "setup/04-draw-preview-finalize",
+      "screenId": "f96d2e8bf77943e2a8511acce797b022",
+      "role": "Step 4: draw, preview, and finalization",
+      "files": [
+        {
+          "path": "setup/04-draw-preview-finalize/reference.html",
+          "sha256": "73bfd6d5ef5b0c0fa097d3b8511c6d6d0e4a71234209b4dd53188bfd354d8378",
+          "bytes": 59190
+        },
+        {
+          "path": "setup/04-draw-preview-finalize/reference.png",
+          "sha256": "856de33024610715c3b6e1375905ec357b2007d3b25fcd84a13153d925773b25",
+          "bytes": 339693
+        }
+      ]
+    }
+  ],
+  "referenceOnly": {
+    "path": "shell-references/",
+    "reason": "Club-shell visual inspiration only; not a tournament setup behavior source."
+  },
+  "unclassified": {
+    "path": "unclassified/image.png",
+    "reason": "No reliable functional role in the source export."
+  },
+  "exclusions": [
+    "No CDN dependencies are imported into production.",
+    "No remote avatars, dummy participants, fake save state, seed/hash, DUPR, PDF, upload, or rest guarantee becomes a product requirement.",
+    "Raw source export remains unchanged in the audit worktree."
+  ]
+}

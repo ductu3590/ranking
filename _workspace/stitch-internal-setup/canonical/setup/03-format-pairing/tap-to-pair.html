@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tạo giải nội bộ - Bước 3: Thể thức &amp; Ghép cặp | Pro Court OS</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "background": "#f8f9ff",
+            "surface": "#f8f9ff",
+            "surface-card": "#ffffff",
+            "surface-dim": "#cbdbf5",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#eff4ff",
+            "surface-container": "#e5eeff",
+            "surface-container-high": "#dce9ff",
+            "surface-container-highest": "#d3e4fe",
+            "surface-variant": "#d3e4fe",
+            "primary": "#7c3aed",
+            "primary-container": "#ede0ff",
+            "on-primary": "#ffffff",
+            "on-primary-container": "#25005a",
+            "primary-hover": "#6d28d9",
+            "secondary": "#4b41e1",
+            "secondary-container": "#e2dfff",
+            "tertiary": "#b45309",
+            "tertiary-container": "#fef3c7",
+            "text-main": "#0f172a",
+            "text-muted": "#64748b",
+            "outline": "#94a3b8",
+            "outline-variant": "#cbdbf5",
+            "border-subtle": "#e2e8f0",
+            "badge-emerald-bg": "#ecfdf5",
+            "badge-emerald-text": "#047857",
+            "badge-amber-bg": "#fffbeb",
+            "badge-amber-text": "#b45309",
+            "error": "#ba1a1a",
+            "error-container": "#ffdad6"
+          },
+          fontFamily: {
+            "sans": ["Plus Jakarta Sans", "sans-serif"],
+            "headline": ["Plus Jakarta Sans", "sans-serif"],
+            "body": ["Plus Jakarta Sans", "sans-serif"],
+            "mono": ["JetBrains Mono", "monospace"]
+          }
+        }
+      }
+    };
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      line-height: 1;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .court-card {
+      background: #ffffff;
+      border: 1px solid #dce9ff;
+      box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 1px 2px -1px rgba(15, 23, 42, 0.03);
+    }
+    .purple-active {
+      border: 2px solid #7c3aed !important;
+      background: #ffffff;
+      box-shadow: 0 4px 14px -2px rgba(124, 58, 237, 0.16);
+    }
+    .glow-purple {
+      box-shadow: 0 2px 10px rgba(124, 58, 237, 0.35);
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #eff4ff;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbdbf5;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="bg-background text-text-main font-sans min-h-screen flex flex-col selection:bg-primary/20 selection:text-primary">
+<!-- TOP HEADER -->
+<header class="border-b border-surface-container-high bg-white/95 backdrop-blur-md sticky top-0 z-40 px-4 md:px-8 py-3.5 shadow-sm">
+<div class="max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-4">
+<!-- Left: Back link & Title -->
+<div class="flex items-center gap-3">
+<button class="flex items-center justify-center size-9 rounded-lg bg-surface-container-low hover:bg-surface-container text-text-main transition-colors border border-outline-variant focus:outline-none" title="Quay lại danh sách giải">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+</button>
+<div class="flex items-center gap-2.5 flex-wrap">
+<span class="font-headline text-text-main font-bold text-base md:text-lg tracking-tight">Giải nội bộ tháng 10</span>
+<span class="px-2 py-0.5 text-[11px] font-mono font-semibold uppercase rounded bg-badge-amber-bg text-badge-amber-text border border-amber-200">NHÁP</span>
+<span class="text-text-muted text-xs flex items-center gap-1.5 font-mono">
+<span class="size-1.5 rounded-full bg-primary animate-pulse"></span>
+            Đã lưu tự động lúc 09:45
+          </span>
+</div>
+</div>
+<!-- Right: Badges & Policy -->
+<div class="flex items-center gap-3">
+<div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-low border border-outline-variant text-xs">
+<span class="size-2 rounded-full bg-emerald-500"></span>
+<span class="text-text-main font-semibold">PickHub 246 Club</span>
+<span class="text-outline">|</span>
+<span class="text-primary font-mono font-semibold">Quản trị viên (Admin)</span>
+</div>
+<button class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-medium rounded-lg bg-surface-container-low hover:bg-surface-container text-text-main border border-outline-variant transition-colors">
+<span class="material-symbols-outlined text-sm text-text-muted">menu_book</span>
+<span>Quy chế giải</span>
+</button>
+</div>
+</div>
+</header>
+<!-- STEPPER BAR (Horizontal 4 Steps) -->
+<nav class="bg-surface-container-low/70 border-b border-surface-container-high px-4 md:px-8 py-3 overflow-x-auto">
+<div class="max-w-[1600px] mx-auto min-w-[700px] flex items-center justify-between gap-4">
+<!-- Step 1: Done -->
+<div class="flex items-center gap-2.5 text-xs">
+<span class="flex items-center justify-center size-6 rounded-full bg-badge-emerald-bg text-badge-emerald-text border border-emerald-300 font-mono font-bold">
+<span class="material-symbols-outlined text-sm font-bold">check</span>
+</span>
+<span class="text-text-main font-semibold">1. Thông tin giải</span>
+<span class="text-badge-emerald-text font-mono text-[11px] font-semibold">✓ Đã xong</span>
+</div>
+<div class="h-0.5 flex-1 max-w-[60px] bg-emerald-200"></div>
+<!-- Step 2: Done -->
+<div class="flex items-center gap-2.5 text-xs">
+<span class="flex items-center justify-center size-6 rounded-full bg-badge-emerald-bg text-badge-emerald-text border border-emerald-300 font-mono font-bold">
+<span class="material-symbols-outlined text-sm font-bold">check</span>
+</span>
+<span class="text-text-main font-semibold">2. Người tham gia</span>
+<span class="text-badge-emerald-text font-mono text-[11px] font-semibold">✓ 14 VĐV</span>
+</div>
+<div class="h-0.5 flex-1 max-w-[60px] bg-primary/40"></div>
+<!-- Step 3: ACTIVE -->
+<div class="flex items-center gap-2.5">
+<span class="flex items-center justify-center size-7 rounded-full bg-primary text-white font-mono font-bold text-sm shadow-[0_2px_8px_rgba(124,58,237,0.4)] ring-2 ring-primary/20 ring-offset-2 ring-offset-white">
+          3
+        </span>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-headline text-sm text-primary font-bold tracking-tight">3. Thể thức &amp; Ghép cặp</span>
+<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-primary/10 text-primary border border-primary/20 uppercase tracking-wider">Đang cấu hình</span>
+</div>
+</div>
+</div>
+<div class="h-0.5 flex-1 max-w-[60px] bg-outline-variant"></div>
+<!-- Step 4: Pending -->
+<div class="flex items-center gap-2.5 text-xs text-text-muted opacity-70">
+<span class="flex items-center justify-center size-6 rounded-full bg-surface-container text-text-muted border border-outline-variant font-mono text-xs font-semibold">
+          4
+        </span>
+<span class="font-medium">4. Bốc thăm &amp; Chốt</span>
+</div>
+</div>
+</nav>
+<!-- MAIN WIZARD CONTAINER -->
+<main class="flex-1 max-w-[1600px] w-full mx-auto px-4 md:px-8 py-6">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+<!-- CỘT CHÍNH (BÊN TRÁI - 8/12) -->
+<section class="lg:col-span-8 flex flex-col gap-6">
+<!-- Banner Header bước 3 -->
+<div class="court-card rounded-2xl p-5 md:p-6 relative overflow-hidden bg-gradient-to-r from-white via-surface-container-low/40 to-brand-50/60 border border-surface-container-high">
+<div class="absolute -right-16 -top-16 size-48 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+<div class="flex flex-wrap items-center justify-between gap-3 mb-2">
+<span class="px-2.5 py-0.5 text-[11px] font-mono font-bold tracking-wider uppercase rounded-full bg-primary/10 text-primary border border-primary/20">
+              THIẾT LẬP THI ĐẤU
+            </span>
+<div class="flex items-center gap-2 text-xs font-mono text-text-muted bg-white/80 px-2.5 py-1 rounded-lg border border-surface-container-high">
+<span class="size-2 rounded-full bg-amber-500 animate-pulse"></span>
+<span class="text-amber-800 font-semibold">1/14 VĐV</span> đã chia vào <span class="text-primary font-bold">1/7 CẶP ĐẤU</span>
+</div>
+</div>
+<h1 class="text-text-main font-headline text-2xl md:text-3xl font-extrabold tracking-tight">
+            Thể thức giải &amp; Ghép cặp thi đấu
+          </h1>
+<p class="text-text-muted text-sm mt-1.5 max-w-2xl leading-relaxed">
+            Cấu hình cấu trúc vòng đấu, số ván mỗi trận (BO) và quản lý phân bổ 14 vận động viên thành 7 cặp đấu chính thức. Sẵn sàng bốc thăm chia bảng.
+          </p>
+</div>
+<!-- PHẦN A: THỂ THỨC GIẢI -->
+<div class="court-card rounded-2xl p-5 md:p-6 flex flex-col gap-5">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="flex items-center justify-center size-6 rounded bg-primary/10 text-primary font-mono text-xs font-bold border border-primary/20">A</span>
+<h2 class="text-text-main font-headline text-base md:text-lg font-bold tracking-tight uppercase">
+                1. Chọn thể thức thi đấu
+              </h2>
+</div>
+<span class="text-xs text-text-muted font-mono font-medium">Tối ưu 6 - 12 cặp đôi</span>
+</div>
+<!-- Grid 3 Format Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+<!-- Card 1: ACTIVE (Vòng bảng -> Loại trực tiếp) -->
+<div class="purple-active relative rounded-xl p-4 cursor-pointer flex flex-col justify-between transition-all group">
+<div>
+<div class="flex items-start justify-between gap-2 mb-2.5">
+<div class="flex items-center gap-2">
+<span class="flex items-center justify-center size-5 rounded-full border-2 border-primary bg-primary text-white">
+<span class="size-2 rounded-full bg-white"></span>
+</span>
+<span class="font-headline text-sm text-text-main font-bold">Vòng bảng → Playoff</span>
+</div>
+</div>
+<p class="text-text-muted text-xs leading-relaxed">
+                  Chia 2 bảng A/B, lấy 2 cặp nhất nhì mỗi bảng vào Bán kết chéo (Nhất A vs Nhì B, Nhất B vs Nhì A) và Chung kết.
+                </p>
+</div>
+<div class="mt-4 pt-3 border-t border-purple-100 flex items-center justify-between">
+<span class="px-2 py-0.5 text-[10px] font-mono font-semibold rounded bg-primary/10 text-primary border border-primary/20">
+                  Khuyên dùng cho 6-12 cặp
+                </span>
+<span class="material-symbols-outlined text-primary text-base font-bold">check_circle</span>
+</div>
+</div>
+<!-- Card 2: DISABLED (Vòng tròn) -->
+<div class="relative rounded-xl p-4 bg-surface-container-low/40 border border-outline-variant opacity-60 cursor-not-allowed flex flex-col justify-between select-none">
+<div>
+<div class="flex items-start justify-between gap-2 mb-2.5">
+<div class="flex items-center gap-2">
+<span class="size-4 rounded-full border border-outline bg-transparent"></span>
+<span class="font-headline text-sm text-text-muted font-semibold">Vòng tròn tính điểm</span>
+</div>
+<span class="px-1.5 py-0.5 text-[9px] font-mono uppercase font-bold rounded bg-slate-200 text-slate-600 border border-slate-300">Sắp ra mắt</span>
+</div>
+<p class="text-text-muted text-xs leading-relaxed">
+                  Đấu vòng tròn một lượt tính điểm toàn giải (Round Robin). Thích hợp giải mở rộng quy mô trên 16 cặp.
+                </p>
+</div>
+<div class="mt-4 pt-3 border-t border-outline-variant/60 flex items-center justify-between">
+<span class="text-[11px] text-text-muted font-mono">Chưa khả dụng</span>
+<span class="material-symbols-outlined text-outline text-sm">lock</span>
+</div>
+</div>
+<!-- Card 3: DISABLED (Loại trực tiếp) -->
+<div class="relative rounded-xl p-4 bg-surface-container-low/40 border border-outline-variant opacity-60 cursor-not-allowed flex flex-col justify-between select-none">
+<div>
+<div class="flex items-start justify-between gap-2 mb-2.5">
+<div class="flex items-center gap-2">
+<span class="size-4 rounded-full border border-outline bg-transparent"></span>
+<span class="font-headline text-sm text-text-muted font-semibold">Loại trực tiếp</span>
+</div>
+<span class="px-1.5 py-0.5 text-[9px] font-mono uppercase font-bold rounded bg-slate-200 text-slate-600 border border-slate-300">Sắp ra mắt</span>
+</div>
+<p class="text-text-muted text-xs leading-relaxed">
+                  Thua 1 trận bị loại trực tiếp (Knock-out). Phù hợp giải đấu diễn ra gấp trong thời gian ngắn.
+                </p>
+</div>
+<div class="mt-4 pt-3 border-t border-outline-variant/60 flex items-center justify-between">
+<span class="text-[11px] text-text-muted font-mono">Chưa khả dụng</span>
+<span class="material-symbols-outlined text-outline text-sm">lock</span>
+</div>
+</div>
+</div>
+<!-- Toggle: Tranh hạng ba -->
+<div class="pt-3 border-t border-surface-container-high flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-lg bg-surface-container-low flex items-center justify-center text-text-muted border border-outline-variant">
+<span class="material-symbols-outlined text-lg">military_tech</span>
+</div>
+<div>
+<p class="text-sm text-text-main font-semibold">Có trận tranh hạng ba (HCĐ)</p>
+<p class="text-xs text-text-muted">Thi đấu giữa 2 cặp thua ở vòng Bán kết để phân định Huy chương Đồng</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-200 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+<!-- PHẦN B: THỂ THỨC TRẬN (Best Of) -->
+<div class="court-card rounded-2xl p-5 md:p-6 flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="flex items-center justify-center size-6 rounded bg-primary/10 text-primary font-mono text-xs font-bold border border-primary/20">B</span>
+<h2 class="text-text-main font-headline text-base md:text-lg font-bold tracking-tight uppercase">
+                2. Cấu hình số ván mỗi trận (Best Of)
+              </h2>
+</div>
+<span class="text-xs text-text-muted font-mono font-medium">Ước tính nhịp thi đấu</span>
+</div>
+<!-- 4 Hàng Compact -->
+<div class="space-y-2.5">
+<!-- Row 1: Vòng bảng -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl bg-surface-container-low/70 border border-outline-variant">
+<div class="flex items-center gap-2.5 min-w-[140px]">
+<span class="size-2.5 rounded-full bg-primary"></span>
+<span class="text-sm font-bold text-text-main">Vòng bảng</span>
+</div>
+<div class="flex items-center gap-4 flex-1 justify-between sm:justify-end">
+<div class="flex items-center bg-white p-1 rounded-lg border border-outline-variant shadow-sm">
+<button class="px-3.5 py-1 rounded-md text-xs font-mono font-bold bg-primary text-white glow-purple">BO1</button>
+<button class="px-3.5 py-1 rounded-md text-xs font-mono text-text-muted hover:text-text-main transition-colors">BO3</button>
+<button class="px-3.5 py-1 rounded-md text-xs font-mono text-text-muted hover:text-text-main transition-colors">BO5</button>
+</div>
+<span class="text-xs font-mono text-text-muted min-w-[180px] text-right font-medium">≈ 15 phút/trận (1 ván)</span>
+</div>
+</div>
+<!-- Row 2: Bán kết -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl bg-surface-container-low/70 border border-outline-variant">
+<div class="flex items-center gap-2.5 min-w-[140px]">
+<span class="size-2.5 rounded-full bg-secondary"></span>
+<span class="text-sm font-bold text-text-main">Bán kết</span>
+</div>
+<div class="flex items-center gap-4 flex-1 justify-between sm:justify-end">
+<div class="flex items-center bg-white p-1 rounded-lg border border-outline-variant shadow-sm">
+<button class="px-3.5 py-1 rounded-md text-xs font-mono font-bold bg-primary text-white glow-purple">BO1</button>
+<button class="px-3.5 py-1 rounded-md text-xs font-mono text-text-muted hover:text-text-main transition-colors">BO3</button>
+<button class="px-3.5 py-1 rounded-md text-xs font-mono text-text-muted hover:text-text-main transition-colors">BO5</button>
+</div>
+<span class="text-xs font-mono text-text-muted min-w-[180px] text-right font-medium">≈ 15 phút/trận (1 ván)</span>
+</div>
+</div>
+<!-- Row 3: Chung kết -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl bg-surface-container-low/70 border border-outline-variant">
+<div class="flex items-center gap-2.5 min-w-[140px]">
+<span class="size-2.5 rounded-full bg-amber-500"></span>
+<span class="text-sm font-bold text-text-main">Chung kết</span>
+</div>
+<div class="flex items-center gap-4 flex-1 justify-between sm:justify-end">
+<div class="flex items-center bg-white p-1 rounded-lg border border-outline-variant shadow-sm">
+<button class="px-3.5 py-1 rounded-md text-xs font-mono text-text-muted hover:text-text-main transition-colors">BO1</button>
+<button class="px-3.5 py-1 rounded-md text-xs font-mono font-bold bg-primary text-white glow-purple">BO3</button>
+<button class="px-3.5 py-1 rounded-md text-xs font-mono text-text-muted hover:text-text-main transition-colors">BO5</button>
+</div>
+<span class="text-xs font-mono text-primary min-w-[180px] text-right font-bold">≈ 35 phút/trận (thắng 2)</span>
+</div>
+</div>
+<!-- Row 4: Tranh hạng ba (Disabled) -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl bg-slate-100/60 border border-slate-200 opacity-60 select-none">
+<div class="flex items-center gap-2.5 min-w-[140px]">
+<span class="size-2.5 rounded-full bg-outline"></span>
+<span class="text-sm font-medium text-text-muted">Tranh hạng ba</span>
+</div>
+<div class="flex items-center gap-4 flex-1 justify-between sm:justify-end">
+<div class="flex items-center bg-white/70 p-1 rounded-lg border border-slate-200">
+<span class="px-3.5 py-1 rounded text-xs font-mono text-outline">BO1</span>
+<span class="px-3.5 py-1 rounded text-xs font-mono text-outline">BO3</span>
+<span class="px-3.5 py-1 rounded text-xs font-mono text-outline">BO5</span>
+</div>
+<span class="text-xs font-sans text-text-muted italic min-w-[180px] text-right">Chỉ áp dụng khi bật tranh hạng ba</span>
+</div>
+</div>
+</div>
+<!-- Helper Warning khi đổi BO -->
+<div class="flex items-center gap-2.5 p-3 rounded-xl bg-purple-50 border border-purple-200 text-xs text-text-main">
+<span class="material-symbols-outlined text-primary text-base">info</span>
+<span><strong>Lưu ý:</strong> Đổi số ván (BO) sẽ làm bảng preview lịch thi đấu bị stale và tự động tính toán lại tổng thời lượng dự kiến.</span>
+</div>
+</div>
+<!-- PHẦN C: BẢNG GHÉP CẶP THI ĐẤU -->
+<div class="court-card rounded-2xl p-5 md:p-6 flex flex-col gap-4">
+<!-- Header Phần C -->
+<div class="flex flex-wrap items-center justify-between gap-3 pb-1 border-b border-surface-container-high">
+<div class="flex items-center gap-2.5">
+<span class="flex items-center justify-center size-6 rounded bg-primary/10 text-primary font-mono text-xs font-bold border border-primary/20">C</span>
+<div class="flex items-center gap-2.5 flex-wrap">
+<h2 class="text-text-main font-headline text-base md:text-lg font-bold tracking-tight uppercase">
+                  3. BẢNG GHÉP CẶP THI ĐẤU
+                </h2>
+<span class="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-primary/10 text-primary border border-primary/20">
+                  Quy chuẩn 14 VĐV • 7 CẶP CHÍNH THỨC
+                </span>
+</div>
+</div>
+<div class="flex items-center gap-2 flex-wrap">
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-white text-xs font-mono font-bold shadow-sm transition-colors">
+<span class="material-symbols-outlined text-sm font-bold">bolt</span>
+<span>Ghép ngẫu nhiên tất cả</span>
+</button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 hover:bg-primary/20 text-xs font-mono font-bold text-primary border border-primary/25 transition-colors">
+<span class="material-symbols-outlined text-sm font-bold">balance</span>
+<span>Tự động cân bằng DUPR</span>
+</button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-low text-xs font-mono text-text-muted opacity-50 cursor-not-allowed border border-outline-variant" disabled="">
+<span class="material-symbols-outlined text-sm">restart_alt</span>
+<span>Xóa tất cả</span>
+</button>
+</div>
+</div>
+<!-- Thanh hướng dẫn nổi bật Tap-to-Pair -->
+<div class="p-3.5 rounded-xl bg-purple-50/80 border border-purple-200 flex items-start gap-3 text-xs leading-relaxed text-slate-700 shadow-xs">
+<span class="text-base select-none shrink-0 mt-0.5">👉</span>
+<div>
+<strong class="text-primary font-bold">Cơ chế Chạm (Tap-to-Pair) tối ưu cho Mobile &amp; Tablet:</strong>
+<span> Chạm lần lượt 2 VĐV bất kỳ ở danh sách bên trái để ghép vào một cặp ở cột bên phải. Muốn đổi hoặc hủy, chỉ cần chạm lại vào VĐV đã ghép.</span>
+</div>
+</div>
+<!-- BỐ CỤC 2 CỘT: Cột Trái 5/12 - Cột Phải 7/12 -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+<!-- CỘT TRÁI (5/12): DANH SÁCH VĐV CHỜ GHÉP -->
+<div class="lg:col-span-5 rounded-xl p-3.5 bg-surface-container-low/60 border border-outline-variant flex flex-col gap-3">
+<div class="flex items-center justify-between border-b border-outline-variant pb-2.5">
+<div class="flex items-center gap-2">
+<span class="size-2 rounded-full bg-amber-500 animate-pulse"></span>
+<span class="text-xs font-mono text-text-main font-bold uppercase">VĐV chưa ghép (13/14)</span>
+</div>
+<span class="text-[11px] font-mono text-primary font-bold bg-primary/10 px-2 py-0.5 rounded border border-primary/20">
+                  Chạm lần lượt
+                </span>
+</div>
+<!-- Danh sách VĐV cuộn mượt -->
+<div class="space-y-2 max-h-[640px] overflow-y-auto pr-1">
+<!-- Thẻ VĐV 1: Đặng Ngọc Dương (ĐÃ SANG CẶP 01) -->
+<div class="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-300 shadow-xs transition-all">
+<div class="flex items-center gap-2.5 min-w-0">
+<span class="size-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold shrink-0">
+<span class="material-symbols-outlined text-sm font-bold">check</span>
+</span>
+<div class="size-7 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-xs font-bold font-mono shrink-0">D</div>
+<div class="min-w-0">
+<p class="text-xs font-bold text-text-main truncate">Đặng Ngọc Dương</p>
+<p class="text-[10px] font-mono text-emerald-700 font-semibold truncate">✓ Đã vào Cặp 01 (Vị trí 1)</p>
+</div>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="px-1.5 py-0.5 rounded text-[11px] font-mono font-bold bg-white text-emerald-700 border border-emerald-200">2.9</span>
+<button class="px-2 py-1 rounded-lg bg-white hover:bg-red-50 text-text-muted hover:text-error text-[10px] font-mono border border-outline-variant hover:border-red-200 transition-colors flex items-center gap-0.5">
+<span class="material-symbols-outlined text-xs">undo</span>
+<span>Hoàn tác</span>
+</button>
+</div>
+</div>
+<!-- Thẻ VĐV 2: Đỗ Đức Tú (CHỈ ĐỊNH CHẠM TIẾP THEO) -->
+<div class="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-violet-50 border-2 border-violet-500 ring-2 ring-violet-500/20 shadow-md transition-all">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="size-7 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold font-mono shrink-0 shadow-xs">T</div>
+<div class="min-w-0">
+<div class="flex items-center gap-1.5">
+<p class="text-xs font-bold text-primary truncate">Đỗ Đức Tú</p>
+<span class="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-primary text-white uppercase">Tiếp theo</span>
+</div>
+<p class="text-[10px] font-mono text-text-muted truncate">TV #01 • CLB</p>
+</div>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="px-1.5 py-0.5 rounded text-[11px] font-mono font-bold bg-white text-primary border border-purple-200">3.0</span>
+<button class="px-2.5 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-white text-[11px] font-mono font-bold flex items-center gap-1 shadow-sm transition-transform active:scale-95">
+<span class="material-symbols-outlined text-sm animate-bounce">touch_app</span>
+<span>👉 Chạm để vào Cặp 01</span>
+</button>
+</div>
+</div>
+<!-- Thẻ VĐV 3: Bùi Văn Sơn -->
+<div class="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-white hover:bg-slate-50 border border-outline-variant hover:border-primary shadow-xs transition-all cursor-pointer group">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="size-7 rounded-full bg-brand-100 text-primary flex items-center justify-center text-xs font-bold font-mono shrink-0">S</div>
+<div class="min-w-0">
+<p class="text-xs font-semibold text-text-main truncate group-hover:text-primary transition-colors">Bùi Văn Sơn</p>
+<p class="text-[10px] font-mono text-text-muted">TV #49 • CLB</p>
+</div>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="px-1.5 py-0.5 rounded text-[11px] font-mono font-bold bg-surface-container-low text-primary border border-outline-variant">2.8</span>
+<button class="px-2.5 py-1 rounded-lg bg-surface-container-low group-hover:bg-primary group-hover:text-white text-text-main text-[11px] font-mono font-semibold border border-outline-variant group-hover:border-primary transition-all flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">touch_app</span>
+<span>+ Chạm chọn</span>
+</button>
+</div>
+</div>
+<!-- Thẻ VĐV 4: Nguyễn Chương Long -->
+<div class="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-white hover:bg-slate-50 border border-outline-variant hover:border-primary shadow-xs transition-all cursor-pointer group">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="size-7 rounded-full bg-brand-100 text-primary flex items-center justify-center text-xs font-bold font-mono shrink-0">L</div>
+<div class="min-w-0">
+<p class="text-xs font-semibold text-text-main truncate group-hover:text-primary transition-colors">Nguyễn Chương Long</p>
+<p class="text-[10px] font-mono text-text-muted">TV #05 • CLB</p>
+</div>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="px-1.5 py-0.5 rounded text-[11px] font-mono font-bold bg-surface-container-low text-primary border border-outline-variant">2.5</span>
+<button class="px-2.5 py-1 rounded-lg bg-surface-container-low group-hover:bg-primary group-hover:text-white text-text-main text-[11px] font-mono font-semibold border border-outline-variant group-hover:border-primary transition-all flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">touch_app</span>
+<span>+ Chạm chọn</span>
+</button>
+</div>
+</div>
+<!-- Thẻ VĐV 5: Đồng Mạnh Linh -->
+<div class="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-white hover:bg-slate-50 border border-outline-variant hover:border-primary shadow-xs transition-all cursor-pointer group">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="size-7 rounded-full bg-brand-100 text-primary flex items-center justify-center text-xs font-bold font-mono shrink-0">L</div>
+<div class="min-w-0">
+<p class="text-xs font-semibold text-text-main truncate group-hover:text-primary transition-colors">Đồng Mạnh Linh</p>
+<p class="text-[10px] font-mono text-text-muted">TV #06 • CLB</p>
+</div>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="px-1.5 py-0.5 rounded text-[11px] font-mono font-bold bg-surface-container-low text-primary border border-outline-variant">3.1</span>
+<button class="px-2.5 py-1 rounded-lg bg-surface-container-low group-hover:bg-primary group-hover:text-white text-text-main text-[11px] font-mono font-semibold border border-outline-variant group-hover:border-primary transition-all flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">touch_app</span>
+<span>+ Chạm chọn</span>
+</button>
+</div>
+</div>
+<!-- Thẻ VĐV 6: Hoàng Long (Guest) -->
+<div class="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-amber-50/70 hover:bg-amber-100/70 border border-amber-300 shadow-xs transition-all cursor-pointer group">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="size-7 rounded-full bg-amber-200 text-amber-900 flex items-center justify-center text-xs font-bold font-mono shrink-0">G</div>
+<div class="min-w-0">
+<div class="flex items-center gap-1.5">
+<p class="text-xs font-bold text-text-main truncate">Hoàng Long</p>
+<span class="px-1 rounded text-[9px] font-mono font-bold bg-amber-200 text-amber-900 uppercase">Guest</span>
+</div>
+<p class="text-[10px] font-mono text-text-muted">Khách mời đối tác</p>
+</div>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="px-1.5 py-0.5 rounded text-[11px] font-mono font-bold bg-badge-amber-bg text-badge-amber-text border border-amber-300">3.1</span>
+<button class="px-2.5 py-1 rounded-lg bg-amber-200/80 group-hover:bg-amber-500 group-hover:text-white text-amber-900 text-[11px] font-mono font-semibold border border-amber-300 transition-all flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">touch_app</span>
+<span>+ Chạm chọn</span>
+</button>
+</div>
+</div>
+<!-- Thẻ VĐV 7: Nguyễn Mạnh Thắng -->
+<div class="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-white hover:bg-slate-50 border border-outline-variant hover:border-primary shadow-xs transition-all cursor-pointer group">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="size-7 rounded-full bg-brand-100 text-primary flex items-center justify-center text-xs font-bold font-mono shrink-0">T</div>
+<div class="min-w-0">
+<p class="text-xs font-semibold text-text-main truncate group-hover:text-primary transition-colors">Nguyễn Mạnh Thắng</p>
+<p class="text-[10px] font-mono text-text-muted">TV #12 • CLB</p>
+</div>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="px-1.5 py-0.5 rounded text-[11px] font-mono font-bold bg-surface-container-low text-primary border border-outline-variant">2.7</span>
+<button class="px-2.5 py-1 rounded-lg bg-surface-container-low group-hover:bg-primary group-hover:text-white text-text-main text-[11px] font-mono font-semibold border border-outline-variant group-hover:border-primary transition-all flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">touch_app</span>
+<span>+ Chạm chọn</span>
+</button>
+</div>
+</div>
+<!-- Thẻ VĐV 8: Nguyễn Nhật Quang -->
+<div class="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-white hover:bg-slate-50 border border-outline-variant hover:border-primary shadow-xs transition-all cursor-pointer group">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="size-7 rounded-full bg-brand-100 text-primary flex items-center justify-center text-xs font-bold font-mono shrink-0">Q</div>
+<div class="min-w-0">
+<p class="text-xs font-semibold text-text-main truncate group-hover:text-primary transition-colors">Nguyễn Nhật Quang</p>
+<p class="text-[10px] font-mono text-text-muted">TV #09 • CLB</p>
+</div>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="px-1.5 py-0.5 rounded text-[11px] font-mono font-bold bg-surface-container-low text-primary border border-outline-variant">3.2</span>
+<button class="px-2.5 py-1 rounded-lg bg-surface-container-low group-hover:bg-primary group-hover:text-white text-text-main text-[11px] font-mono font-semibold border border-outline-variant group-hover:border-primary transition-all flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">touch_app</span>
+<span>+ Chạm chọn</span>
+</button>
+</div>
+</div>
+<!-- Thẻ VĐV 9: Vũ Ngọc Hưng -->
+<div class="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-white hover:bg-slate-50 border border-outline-variant hover:border-primary shadow-xs transition-all cursor-pointer group">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="size-7 rounded-full bg-brand-100 text-primary flex items-center justify-center text-xs font-bold font-mono shrink-0">H</div>
+<div class="min-w-0">
+<p class="text-xs font-semibold text-text-main truncate group-hover:text-primary transition-colors">Vũ Ngọc Hưng</p>
+<p class="text-[10px] font-mono text-text-muted">TV #10 • CLB</p>
+</div>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="px-1.5 py-0.5 rounded text-[11px] font-mono font-bold bg-surface-container-low text-primary border border-outline-variant">2.8</span>
+<button class="px-2.5 py-1 rounded-lg bg-surface-container-low group-hover:bg-primary group-hover:text-white text-text-main text-[11px] font-mono font-semibold border border-outline-variant group-hover:border-primary transition-all flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">touch_app</span>
+<span>+ Chạm chọn</span>
+</button>
+</div>
+</div>
+<!-- Thẻ VĐV 10: Minh Trí (Guest) -->
+<div class="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-amber-50/70 hover:bg-amber-100/70 border border-amber-300 shadow-xs transition-all cursor-pointer group">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="size-7 rounded-full bg-amber-200 text-amber-900 flex items-center justify-center text-xs font-bold font-mono shrink-0">G</div>
+<div class="min-w-0">
+<div class="flex items-center gap-1.5">
+<p class="text-xs font-bold text-text-main truncate">Minh Trí</p>
+<span class="px-1 rounded text-[9px] font-mono font-bold bg-amber-200 text-amber-900 uppercase">Guest</span>
+</div>
+<p class="text-[10px] font-mono text-text-muted">Khách mời đối tác</p>
+</div>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="px-1.5 py-0.5 rounded text-[11px] font-mono font-bold bg-badge-amber-bg text-badge-amber-text border border-amber-300">2.8</span>
+<button class="px-2.5 py-1 rounded-lg bg-amber-200/80 group-hover:bg-amber-500 group-hover:text-white text-amber-900 text-[11px] font-mono font-semibold border border-amber-300 transition-all flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">touch_app</span>
+<span>+ Chạm chọn</span>
+</button>
+</div>
+</div>
+<!-- Thẻ VĐV 11: Phạm X. Ngọc Hoàng -->
+<div class="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-white hover:bg-slate-50 border border-outline-variant hover:border-primary shadow-xs transition-all cursor-pointer group">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="size-7 rounded-full bg-brand-100 text-primary flex items-center justify-center text-xs font-bold font-mono shrink-0">H</div>
+<div class="min-w-0">
+<p class="text-xs font-semibold text-text-main truncate group-hover:text-primary transition-colors">Phạm X. Ngọc Hoàng</p>
+<p class="text-[10px] font-mono text-text-muted">TV #35 • CLB</p>
+</div>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="px-1.5 py-0.5 rounded text-[11px] font-mono font-bold bg-surface-container-low text-primary border border-outline-variant">2.6</span>
+<button class="px-2.5 py-1 rounded-lg bg-surface-container-low group-hover:bg-primary group-hover:text-white text-text-main text-[11px] font-mono font-semibold border border-outline-variant group-hover:border-primary transition-all flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">touch_app</span>
+<span>+ Chạm chọn</span>
+</button>
+</div>
+</div>
+<!-- Thẻ VĐV 12: Nguyễn Thanh Hải -->
+<div class="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-white hover:bg-slate-50 border border-outline-variant hover:border-primary shadow-xs transition-all cursor-pointer group">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="size-7 rounded-full bg-brand-100 text-primary flex items-center justify-center text-xs font-bold font-mono shrink-0">H</div>
+<div class="min-w-0">
+<p class="text-xs font-semibold text-text-main truncate group-hover:text-primary transition-colors">Nguyễn Thanh Hải</p>
+<p class="text-[10px] font-mono text-text-muted">TV #31 • CLB</p>
+</div>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="px-1.5 py-0.5 rounded text-[11px] font-mono font-bold bg-surface-container-low text-primary border border-outline-variant">3.0</span>
+<button class="px-2.5 py-1 rounded-lg bg-surface-container-low group-hover:bg-primary group-hover:text-white text-text-main text-[11px] font-mono font-semibold border border-outline-variant group-hover:border-primary transition-all flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">touch_app</span>
+<span>+ Chạm chọn</span>
+</button>
+</div>
+</div>
+<!-- Thẻ VĐV 13: Nguyễn Văn Thành -->
+<div class="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-white hover:bg-slate-50 border border-outline-variant hover:border-primary shadow-xs transition-all cursor-pointer group">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="size-7 rounded-full bg-brand-100 text-primary flex items-center justify-center text-xs font-bold font-mono shrink-0">T</div>
+<div class="min-w-0">
+<p class="text-xs font-semibold text-text-main truncate group-hover:text-primary transition-colors">Nguyễn Văn Thành</p>
+<p class="text-[10px] font-mono text-text-muted">TV #11 • CLB</p>
+</div>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="px-1.5 py-0.5 rounded text-[11px] font-mono font-bold bg-surface-container-low text-primary border border-outline-variant">2.7</span>
+<button class="px-2.5 py-1 rounded-lg bg-surface-container-low group-hover:bg-primary group-hover:text-white text-text-main text-[11px] font-mono font-semibold border border-outline-variant group-hover:border-primary transition-all flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">touch_app</span>
+<span>+ Chạm chọn</span>
+</button>
+</div>
+</div>
+<!-- Thẻ VĐV 14: Trần Tất Hảo -->
+<div class="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-white hover:bg-slate-50 border border-outline-variant hover:border-primary shadow-xs transition-all cursor-pointer group">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="size-7 rounded-full bg-brand-100 text-primary flex items-center justify-center text-xs font-bold font-mono shrink-0">H</div>
+<div class="min-w-0">
+<p class="text-xs font-semibold text-text-main truncate group-hover:text-primary transition-colors">Trần Tất Hảo</p>
+<p class="text-[10px] font-mono text-text-muted">TV #07 • CLB</p>
+</div>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="px-1.5 py-0.5 rounded text-[11px] font-mono font-bold bg-surface-container-low text-primary border border-outline-variant">2.9</span>
+<button class="px-2.5 py-1 rounded-lg bg-surface-container-low group-hover:bg-primary group-hover:text-white text-text-main text-[11px] font-mono font-semibold border border-outline-variant group-hover:border-primary transition-all flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">touch_app</span>
+<span>+ Chạm chọn</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- CỘT PHẢI (7/12): 7 KHUNG VỊ TRÍ CẶP ĐẤU -->
+<div class="lg:col-span-7 flex flex-col gap-3">
+<div class="flex items-center justify-between px-1">
+<span class="text-xs font-mono text-text-muted font-bold uppercase">
+                  7 KHUNG VỊ TRÍ CẶP ĐẤU (ĐANG GHÉP CẶP 01)
+                </span>
+<span class="text-[11px] font-mono text-text-muted">
+                  DUPR TB Cặp 01: <strong class="text-primary font-bold">2.95</strong>
+</span>
+</div>
+<!-- CẶP 01: ĐANG DIỄN RA THAO TÁC GHÉP -->
+<div class="border-2 border-dashed border-violet-500 bg-violet-50/50 p-4 rounded-xl flex flex-col gap-3 shadow-xs">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="size-6 rounded-md bg-primary text-white font-mono font-bold text-xs flex items-center justify-center">01</div>
+<span class="text-xs font-bold text-primary flex items-center gap-1.5">
+<span class="size-2 rounded-full bg-primary animate-ping"></span>
+                      CẶP 01 (Đang chờ ghép VĐV thứ 2)
+                    </span>
+</div>
+<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-primary text-white">
+                    1/2 VĐV
+                  </span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+<!-- Vị trí 1: Đã có Đặng Ngọc Dương (DUPR 2.9) -->
+<div class="border border-emerald-300 rounded-lg p-3 bg-white flex items-center justify-between gap-2 shadow-xs">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="size-7 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-xs font-bold font-mono shrink-0">D</div>
+<div class="min-w-0">
+<p class="text-xs font-bold text-text-main truncate">Đặng Ngọc Dương</p>
+<p class="text-[10px] font-mono text-emerald-700 font-semibold">Vị trí 1 • DUPR 2.9</p>
+</div>
+</div>
+<button class="size-6 rounded bg-surface-container-low hover:bg-red-50 text-text-muted hover:text-error flex items-center justify-center transition-colors border border-outline-variant shrink-0" title="Chạm gỡ">
+<span class="material-symbols-outlined text-sm font-bold">close</span>
+</button>
+</div>
+<!-- Vị trí 2: Đang chờ với hiệu ứng viền tím nhấp nháy -->
+<div class="border-2 border-dashed border-primary rounded-lg p-3 bg-purple-50 hover:bg-purple-100/70 flex items-center gap-2.5 transition-all cursor-pointer ring-2 ring-primary/20 animate-pulse">
+<span class="material-symbols-outlined text-primary text-xl font-bold animate-bounce shrink-0">touch_app</span>
+<div class="min-w-0">
+<span class="text-xs font-bold text-primary block truncate">Chờ chạm VĐV thứ 2 (Đỗ Đức Tú)...</span>
+<span class="text-[10px] text-text-muted font-mono truncate block">Chạm Đỗ Đức Tú ở cột trái để ghép</span>
+</div>
+</div>
+</div>
+</div>
+<!-- CẶP 02: Hàng card sạch sẽ -->
+<div class="rounded-xl p-3 bg-white border border-outline-variant hover:border-primary/50 transition-all flex items-center justify-between gap-3 shadow-xs">
+<div class="flex items-center gap-2 min-w-[70px]">
+<div class="size-6 rounded bg-surface-container font-mono font-bold text-xs text-text-muted flex items-center justify-center border border-outline-variant">02</div>
+<span class="text-xs font-semibold text-text-muted">Cặp 02</span>
+</div>
+<div class="flex-1 grid grid-cols-2 gap-2 text-xs">
+<div class="py-2 px-2.5 rounded-lg border border-dashed border-slate-300 text-center text-text-muted text-[11px] bg-slate-50/50 flex items-center justify-center gap-1.5">
+<span class="size-1.5 rounded-full bg-slate-300"></span>
+<span>Trống (Vị trí 1)</span>
+</div>
+<div class="py-2 px-2.5 rounded-lg border border-dashed border-slate-300 text-center text-text-muted text-[11px] bg-slate-50/50 flex items-center justify-center gap-1.5">
+<span class="size-1.5 rounded-full bg-slate-300"></span>
+<span>Trống (Vị trí 2)</span>
+</div>
+</div>
+<button class="px-3 py-1.5 text-[11px] font-mono text-primary font-bold hover:bg-purple-50 rounded-lg border border-primary/25 transition-colors shrink-0 flex items-center gap-1 shadow-xs">
+<span class="material-symbols-outlined text-sm">touch_app</span>
+<span>+ Gán nhanh</span>
+</button>
+</div>
+<!-- CẶP 03 -->
+<div class="rounded-xl p-3 bg-white border border-outline-variant hover:border-primary/50 transition-all flex items-center justify-between gap-3 shadow-xs">
+<div class="flex items-center gap-2 min-w-[70px]">
+<div class="size-6 rounded bg-surface-container font-mono font-bold text-xs text-text-muted flex items-center justify-center border border-outline-variant">03</div>
+<span class="text-xs font-semibold text-text-muted">Cặp 03</span>
+</div>
+<div class="flex-1 grid grid-cols-2 gap-2 text-xs">
+<div class="py-2 px-2.5 rounded-lg border border-dashed border-slate-300 text-center text-text-muted text-[11px] bg-slate-50/50 flex items-center justify-center gap-1.5">
+<span class="size-1.5 rounded-full bg-slate-300"></span>
+<span>Trống (Vị trí 1)</span>
+</div>
+<div class="py-2 px-2.5 rounded-lg border border-dashed border-slate-300 text-center text-text-muted text-[11px] bg-slate-50/50 flex items-center justify-center gap-1.5">
+<span class="size-1.5 rounded-full bg-slate-300"></span>
+<span>Trống (Vị trí 2)</span>
+</div>
+</div>
+<button class="px-3 py-1.5 text-[11px] font-mono text-primary font-bold hover:bg-purple-50 rounded-lg border border-primary/25 transition-colors shrink-0 flex items-center gap-1 shadow-xs">
+<span class="material-symbols-outlined text-sm">touch_app</span>
+<span>+ Gán nhanh</span>
+</button>
+</div>
+<!-- CẶP 04 -->
+<div class="rounded-xl p-3 bg-white border border-outline-variant hover:border-primary/50 transition-all flex items-center justify-between gap-3 shadow-xs">
+<div class="flex items-center gap-2 min-w-[70px]">
+<div class="size-6 rounded bg-surface-container font-mono font-bold text-xs text-text-muted flex items-center justify-center border border-outline-variant">04</div>
+<span class="text-xs font-semibold text-text-muted">Cặp 04</span>
+</div>
+<div class="flex-1 grid grid-cols-2 gap-2 text-xs">
+<div class="py-2 px-2.5 rounded-lg border border-dashed border-slate-300 text-center text-text-muted text-[11px] bg-slate-50/50 flex items-center justify-center gap-1.5">
+<span class="size-1.5 rounded-full bg-slate-300"></span>
+<span>Trống (Vị trí 1)</span>
+</div>
+<div class="py-2 px-2.5 rounded-lg border border-dashed border-slate-300 text-center text-text-muted text-[11px] bg-slate-50/50 flex items-center justify-center gap-1.5">
+<span class="size-1.5 rounded-full bg-slate-300"></span>
+<span>Trống (Vị trí 2)</span>
+</div>
+</div>
+<button class="px-3 py-1.5 text-[11px] font-mono text-primary font-bold hover:bg-purple-50 rounded-lg border border-primary/25 transition-colors shrink-0 flex items-center gap-1 shadow-xs">
+<span class="material-symbols-outlined text-sm">touch_app</span>
+<span>+ Gán nhanh</span>
+</button>
+</div>
+<!-- CẶP 05 -->
+<div class="rounded-xl p-3 bg-white border border-outline-variant hover:border-primary/50 transition-all flex items-center justify-between gap-3 shadow-xs">
+<div class="flex items-center gap-2 min-w-[70px]">
+<div class="size-6 rounded bg-surface-container font-mono font-bold text-xs text-text-muted flex items-center justify-center border border-outline-variant">05</div>
+<span class="text-xs font-semibold text-text-muted">Cặp 05</span>
+</div>
+<div class="flex-1 grid grid-cols-2 gap-2 text-xs">
+<div class="py-2 px-2.5 rounded-lg border border-dashed border-slate-300 text-center text-text-muted text-[11px] bg-slate-50/50 flex items-center justify-center gap-1.5">
+<span class="size-1.5 rounded-full bg-slate-300"></span>
+<span>Trống (Vị trí 1)</span>
+</div>
+<div class="py-2 px-2.5 rounded-lg border border-dashed border-slate-300 text-center text-text-muted text-[11px] bg-slate-50/50 flex items-center justify-center gap-1.5">
+<span class="size-1.5 rounded-full bg-slate-300"></span>
+<span>Trống (Vị trí 2)</span>
+</div>
+</div>
+<button class="px-3 py-1.5 text-[11px] font-mono text-primary font-bold hover:bg-purple-50 rounded-lg border border-primary/25 transition-colors shrink-0 flex items-center gap-1 shadow-xs">
+<span class="material-symbols-outlined text-sm">touch_app</span>
+<span>+ Gán nhanh</span>
+</button>
+</div>
+<!-- CẶP 06 -->
+<div class="rounded-xl p-3 bg-white border border-outline-variant hover:border-primary/50 transition-all flex items-center justify-between gap-3 shadow-xs">
+<div class="flex items-center gap-2 min-w-[70px]">
+<div class="size-6 rounded bg-surface-container font-mono font-bold text-xs text-text-muted flex items-center justify-center border border-outline-variant">06</div>
+<span class="text-xs font-semibold text-text-muted">Cặp 06</span>
+</div>
+<div class="flex-1 grid grid-cols-2 gap-2 text-xs">
+<div class="py-2 px-2.5 rounded-lg border border-dashed border-slate-300 text-center text-text-muted text-[11px] bg-slate-50/50 flex items-center justify-center gap-1.5">
+<span class="size-1.5 rounded-full bg-slate-300"></span>
+<span>Trống (Vị trí 1)</span>
+</div>
+<div class="py-2 px-2.5 rounded-lg border border-dashed border-slate-300 text-center text-text-muted text-[11px] bg-slate-50/50 flex items-center justify-center gap-1.5">
+<span class="size-1.5 rounded-full bg-slate-300"></span>
+<span>Trống (Vị trí 2)</span>
+</div>
+</div>
+<button class="px-3 py-1.5 text-[11px] font-mono text-primary font-bold hover:bg-purple-50 rounded-lg border border-primary/25 transition-colors shrink-0 flex items-center gap-1 shadow-xs">
+<span class="material-symbols-outlined text-sm">touch_app</span>
+<span>+ Gán nhanh</span>
+</button>
+</div>
+<!-- CẶP 07 -->
+<div class="rounded-xl p-3 bg-white border border-outline-variant hover:border-primary/50 transition-all flex items-center justify-between gap-3 shadow-xs">
+<div class="flex items-center gap-2 min-w-[70px]">
+<div class="size-6 rounded bg-surface-container font-mono font-bold text-xs text-text-muted flex items-center justify-center border border-outline-variant">07</div>
+<span class="text-xs font-semibold text-text-muted">Cặp 07</span>
+</div>
+<div class="flex-1 grid grid-cols-2 gap-2 text-xs">
+<div class="py-2 px-2.5 rounded-lg border border-dashed border-slate-300 text-center text-text-muted text-[11px] bg-slate-50/50 flex items-center justify-center gap-1.5">
+<span class="size-1.5 rounded-full bg-slate-300"></span>
+<span>Trống (Vị trí 1)</span>
+</div>
+<div class="py-2 px-2.5 rounded-lg border border-dashed border-slate-300 text-center text-text-muted text-[11px] bg-slate-50/50 flex items-center justify-center gap-1.5">
+<span class="size-1.5 rounded-full bg-slate-300"></span>
+<span>Trống (Vị trí 2)</span>
+</div>
+</div>
+<button class="px-3 py-1.5 text-[11px] font-mono text-primary font-bold hover:bg-purple-50 rounded-lg border border-primary/25 transition-colors shrink-0 flex items-center gap-1 shadow-xs">
+<span class="material-symbols-outlined text-sm">touch_app</span>
+<span>+ Gán nhanh</span>
+</button>
+</div>
+</div>
+</div>
+<!-- BLOCKER ALERT / QUY TẮC NGHIỆP VỤ -->
+<div class="p-4 rounded-xl bg-amber-50/70 border border-amber-200 flex items-start gap-3 mt-2">
+<span class="material-symbols-outlined text-amber-600 text-xl mt-0.5">security</span>
+<div class="text-xs">
+<span class="font-mono text-amber-800 font-bold uppercase tracking-wider">Quy chuẩn bốc thăm &amp; ghép đôi:</span>
+<p class="text-slate-700 mt-1 leading-relaxed">
+                Hệ thống <strong>không áp dụng VĐV dự bị</strong>. Khi số lượng VĐV bị lẻ hoặc còn người chưa ghép, Blocker <code class="font-mono text-error bg-red-100 px-1.5 py-0.5 rounded border border-red-200 font-semibold">UNPAIRED_MEMBER</code> sẽ chặn chuyển sang Bước 4 và chỉ dẫn đúng 2 lựa chọn: <strong>"Thêm 1 người"</strong> hoặc <strong>"Bỏ chọn người lẻ"</strong>.
+              </p>
+</div>
+</div>
+</div>
+</section>
+<!-- READINESS RAIL (BÊN PHẢI - 4/12) -->
+<aside class="lg:col-span-4 flex flex-col gap-6 sticky top-24">
+<!-- Card: KIỂM TRA SẴN SÀNG -->
+<div class="court-card rounded-2xl p-5 flex flex-col gap-4">
+<div class="flex items-center justify-between border-b border-surface-container-high pb-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-amber-600 text-xl">pending_actions</span>
+<h3 class="text-text-main font-headline text-sm font-bold tracking-tight uppercase">Kiểm tra sẵn sàng</h3>
+</div>
+<span class="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-badge-amber-bg text-badge-amber-text border border-amber-300">3/5 ĐẠT</span>
+</div>
+<div class="space-y-3 text-xs">
+<div class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-emerald-600 text-base mt-0.5 font-bold">check_circle</span>
+<div class="flex-1">
+<p class="text-text-main font-bold">Thể thức thi đấu</p>
+<p class="text-text-muted text-[11px]">Vòng bảng → Playoff (Hợp lệ)</p>
+</div>
+</div>
+<div class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-emerald-600 text-base mt-0.5 font-bold">check_circle</span>
+<div class="flex-1">
+<p class="text-text-main font-bold">Cấu hình số ván (BO)</p>
+<p class="text-text-muted text-[11px]">Vòng bảng BO1, CK BO3 (Đã cấu hình)</p>
+</div>
+</div>
+<div class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-emerald-600 text-base mt-0.5 font-bold">check_circle</span>
+<div class="flex-1">
+<p class="text-text-main font-bold">Số lượng vận động viên</p>
+<p class="text-text-muted text-[11px]">14/14 người (Số chẵn, không có người lẻ)</p>
+</div>
+</div>
+<div class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-error text-base mt-0.5 font-bold">cancel</span>
+<div class="flex-1">
+<p class="text-error font-bold">Trạng thái ghép cặp</p>
+<p class="text-error text-[11px] font-mono font-semibold">0/7 cặp đã tạo (Còn thiếu 7 cặp)</p>
+</div>
+</div>
+<div class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-amber-600 text-base mt-0.5 font-bold">warning</span>
+<div class="flex-1">
+<p class="text-text-main font-bold">Chỉ số tối thiểu</p>
+<p class="text-amber-600 text-[11px] font-mono font-bold">Chưa đạt: Yêu cầu tối thiểu 4 cặp chính thức</p>
+</div>
+</div>
+</div>
+<div class="p-3.5 rounded-xl bg-surface-container-low border border-outline-variant space-y-2.5 font-mono">
+<span class="text-[10px] text-text-muted uppercase tracking-wider block font-bold">Ước tính nguồn lực &amp; Thời gian:</span>
+<div class="flex justify-between items-center text-xs">
+<span class="text-text-muted font-sans">Tổng trận dự kiến:</span>
+<span class="text-text-muted font-bold">Đang chờ ghép cặp</span>
+</div>
+<div class="flex justify-between items-center text-xs">
+<span class="text-text-muted font-sans">Thời lượng ước tính:</span>
+<span class="text-text-muted font-bold">--</span>
+</div>
+<div class="flex justify-between items-center text-xs">
+<span class="text-text-muted font-sans">Sân đấu khuyến nghị:</span>
+<span class="text-text-main font-medium">4 Sân Pickleball</span>
+</div>
+<div class="flex justify-between items-center text-xs pt-2 border-t border-outline-variant">
+<span class="text-text-muted font-sans">Phân bổ bảng A/B:</span>
+<span class="text-text-muted font-bold">Chưa phân bổ</span>
+</div>
+</div>
+<div class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs">
+<div class="flex items-center gap-1.5 text-amber-800 font-bold mb-1">
+<span class="material-symbols-outlined text-sm font-bold">lock</span>
+<span>Chặn bước tiếp theo:</span>
+</div>
+<p class="text-slate-700 leading-relaxed">
+              Bạn cần tạo tối thiểu <strong>4 cặp đấu chính thức</strong> (khuyến nghị đủ 7 cặp từ 14 VĐV) để mở khóa Bước 4 bốc thăm chia bảng.
+            </p>
+</div>
+</div>
+<!-- Card Hỗ trợ nhanh cho Admin điều hành -->
+<div class="court-card rounded-2xl p-4 text-xs space-y-2">
+<div class="flex items-center gap-2 text-text-main font-bold">
+<span class="material-symbols-outlined text-base text-secondary">support_agent</span>
+<span>Hỗ trợ điều hành viên</span>
+</div>
+<p class="text-text-muted text-[11px] leading-relaxed">
+            Bạn có thể quay lại <em>Bước 2: Người tham gia</em> bất cứ lúc nào nếu cần bổ sung hoặc thay thế VĐV mà không bị mất cấu hình thể thức đã chọn.
+          </p>
+</div>
+</aside>
+</div>
+</main>
+<!-- FOOTER STICKY DƯỚI CÙNG (WIZARD ACTION BAR) -->
+<footer class="sticky bottom-0 z-40 bg-white/95 border-t border-surface-container-high backdrop-blur-md px-4 md:px-8 py-3.5 shadow-md">
+<div class="max-w-[1600px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+<div class="w-full sm:w-auto flex items-center justify-center gap-2">
+<button class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-surface-container-low hover:bg-surface-container text-xs font-mono font-medium text-text-main border border-outline-variant transition-colors">
+<span class="material-symbols-outlined text-sm text-text-muted">arrow_back</span>
+<span>Quay lại: Người tham gia</span>
+</button>
+</div>
+<div class="flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-amber-50 border border-amber-300 text-xs font-mono text-amber-800">
+<span class="material-symbols-outlined text-amber-600 text-base">warning</span>
+<span>⚠️ Còn 13 VĐV chưa ghép xong cặp</span>
+</div>
+<div class="w-full sm:w-auto flex items-center gap-2.5">
+<button class="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg bg-surface-container-low hover:bg-surface-container text-xs font-mono font-medium text-text-main border border-outline-variant transition-colors">
+<span class="material-symbols-outlined text-sm text-text-muted">save</span>
+<span>Lưu nháp</span>
+</button>
+<div class="relative flex flex-col items-center group">
+<button class="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-slate-200 text-slate-400 text-xs font-mono font-bold cursor-not-allowed border border-slate-300" disabled="">
+<span class="material-symbols-outlined text-sm">lock</span>
+<span>Tiếp tục (Bước 4: Bốc thăm)</span>
+<span class="material-symbols-outlined text-sm font-bold">arrow_forward</span>
+</button>
+<span class="text-[10px] font-mono text-text-muted mt-0.5">Cần ghép đủ 7 cặp để mở khóa</span>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

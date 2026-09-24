@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PickHub Pro - Bước 4: Bốc thăm, Xem trước lịch &amp; Chốt giải</title>
+<!-- Google Fonts: Plus Jakarta Sans, JetBrains Mono -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Target Tailwind Configuration verbatim -->
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "badge-emerald-bg": "#ecfdf5",
+          "badge-amber-bg": "#fffbeb",
+          "surface-container-high": "#dce9ff",
+          "brand-50": "#f5f3ff",
+          "on-tertiary-container": "#ffe1c0",
+          "secondary": "#4b41e1",
+          "badge-emerald-text": "#047857",
+          "surface-dim": "#cbdbf5",
+          "brand-700": "#6d28d9",
+          "brand-100": "#ede9fe",
+          "on-surface-variant": "#4a4455",
+          "surface-tint": "#732ee4",
+          "surface-bg": "#f8fafc",
+          "on-error-container": "#93000a",
+          "error-container": "#ffdad6",
+          "on-error": "#ffffff",
+          "tertiary-container": "#905b00",
+          "primary-container": "#7c3aed",
+          "tertiary": "#704500",
+          "border-subtle": "#e2e8f0",
+          "text-muted": "#64748b",
+          "on-secondary-fixed-variant": "#3323cc",
+          "on-tertiary": "#ffffff",
+          "on-background": "#0b1c30",
+          "primary": "#630ed4",
+          "on-surface": "#0b1c30",
+          "on-primary-fixed": "#25005a",
+          "surface-bright": "#f8f9ff",
+          "background": "#f8f9ff",
+          "surface-container": "#e5eeff",
+          "tertiary-fixed-dim": "#ffb95f",
+          "brand-900": "#4c1d95",
+          "brand-500": "#8b5cf6",
+          "surface-variant": "#d3e4fe",
+          "on-primary-fixed-variant": "#5a00c6",
+          "on-secondary-container": "#fffbff",
+          "brand-200": "#ddd6fe",
+          "on-primary": "#ffffff",
+          "surface-container-highest": "#d3e4fe",
+          "error": "#ba1a1a",
+          "outline-variant": "#ccc3d8",
+          "brand-600": "#7c3aed",
+          "badge-amber-text": "#b45309",
+          "tertiary-fixed": "#ffddb8",
+          "on-secondary": "#ffffff",
+          "inverse-surface": "#213145",
+          "on-primary-container": "#ede0ff",
+          "primary-fixed-dim": "#d2bbff",
+          "outline": "#7b7487",
+          "inverse-on-surface": "#eaf1ff",
+          "secondary-container": "#645efb",
+          "surface-container-lowest": "#ffffff",
+          "inverse-primary": "#d2bbff",
+          "surface": "#f8f9ff",
+          "on-tertiary-fixed": "#2a1700",
+          "on-secondary-fixed": "#0f0069",
+          "brand-800": "#5b21b6",
+          "secondary-fixed": "#e2dfff",
+          "surface-container-low": "#eff4ff",
+          "primary-fixed": "#eaddff",
+          "on-tertiary-fixed-variant": "#653e00",
+          "surface-card": "#ffffff",
+          "text-main": "#0f172a",
+          "secondary-fixed-dim": "#c3c0ff"
+        },
+        "borderRadius": {
+          "DEFAULT": "0.25rem",
+          "lg": "0.5rem",
+          "xl": "0.75rem",
+          "full": "9999px"
+        },
+        "spacing": {
+          "space-xs": "0.25rem",
+          "sidebar-width": "16rem",
+          "header-height": "4rem",
+          "space-base": "1rem",
+          "space-md": "0.75rem",
+          "space-lg": "1.5rem",
+          "space-xl": "2rem",
+          "space-sm": "0.5rem",
+          "container-max-w": "80rem"
+        },
+        "fontFamily": {
+          "sans": ["Plus Jakarta Sans", "sans-serif"],
+          "mono": ["JetBrains Mono", "monospace"],
+          "body-bold": ["Plus Jakarta Sans"],
+          "display-hero": ["Plus Jakarta Sans"],
+          "headline-lg": ["Plus Jakarta Sans"],
+          "body-base": ["Plus Jakarta Sans"],
+          "body-medium": ["Plus Jakarta Sans"],
+          "headline-md": ["Plus Jakarta Sans"],
+          "caption-bold": ["Plus Jakarta Sans"],
+          "label-micro": ["Plus Jakarta Sans"],
+          "label-uppercase": ["Plus Jakarta Sans"],
+          "caption": ["Plus Jakarta Sans"]
+        },
+        "fontSize": {
+          "body-bold": ["0.875rem", { "lineHeight": "1.25rem", "fontWeight": "700" }],
+          "display-hero": ["1.875rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.025em", "fontWeight": "800" }],
+          "headline-lg": ["1.5rem", { "lineHeight": "2rem", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+          "body-base": ["0.875rem", { "lineHeight": "1.25rem", "fontWeight": "400" }],
+          "body-medium": ["0.875rem", { "lineHeight": "1.25rem", "fontWeight": "500" }],
+          "headline-md": ["1.125rem", { "lineHeight": "1.75rem", "fontWeight": "700" }],
+          "caption-bold": ["0.75rem", { "lineHeight": "1rem", "fontWeight": "600" }],
+          "label-micro": ["10px", { "lineHeight": "0.875rem", "fontWeight": "700" }],
+          "label-uppercase": ["11px", { "lineHeight": "1rem", "letterSpacing": "0.05em", "fontWeight": "700" }],
+          "caption": ["0.75rem", { "lineHeight": "1rem", "fontWeight": "400" }]
+        }
+      },
+    },
+  }
+</script>
+<style>
+    /* Material icon helper */
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .material-symbols-fill {
+      font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+
+    /* Light Theme Glass & Card Utilities */
+    .glass-panel {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 20px -2px rgba(100, 116, 139, 0.08), 0 2px 6px -1px rgba(100, 116, 139, 0.04);
+    }
+    .glass-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+    }
+    .court-neon-glow {
+      box-shadow: 0 4px 20px -2px rgba(124, 58, 237, 0.22);
+    }
+    .court-neon-border {
+      border: 1px solid rgba(124, 58, 237, 0.5);
+    }
+
+    /* Smooth scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #7c3aed;
+    }
+</style>
+</head>
+<body class="bg-background text-text-main font-sans antialiased min-h-screen selection:bg-brand-100 selection:text-brand-700">
+<!-- ================= TOP BAR (DOCK HEADER / BRAND ANCHOR) ================= -->
+<header class="sticky top-0 z-40 w-full bg-surface-card/95 backdrop-blur-md border-b border-border-subtle px-4 md:px-8 h-16 flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-space-md">
+<!-- Back button out of wizard -->
+<a class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-text-muted hover:text-text-main hover:bg-surface-container-low transition-colors text-sm font-medium" href="#">
+<span class="material-symbols-outlined text-[18px]">arrow_back</span>
+<span class="hidden sm:inline">Thoát ra bàn điều hành</span>
+</a>
+<div class="h-4 w-px bg-border-subtle"></div>
+<!-- App & Tournament Title -->
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-brand-50 flex items-center justify-center border border-brand-200 text-brand-600">
+<span class="material-symbols-outlined text-[20px] material-symbols-fill">sports_tennis</span>
+</div>
+<div class="leading-none">
+<div class="flex items-center gap-2">
+<span class="text-base sm:text-lg font-bold tracking-tight text-text-main">Giải nội bộ tháng 10</span>
+<span class="inline-flex items-center px-2 py-0.5 rounded-md bg-badge-amber-bg text-badge-amber-text border border-amber-200 text-[11px] uppercase font-bold tracking-wider">
+              NHÁP
+            </span>
+</div>
+<span class="text-xs text-text-muted flex items-center gap-1.5 mt-0.5 font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            Đã lưu tự động lúc 09:48 • Mã giải: <span class="text-brand-600 font-semibold">PKH-OCT-24</span>
+</span>
+</div>
+</div>
+</div>
+<!-- Right Top Meta -->
+<div class="flex items-center gap-space-md">
+<div class="hidden lg:flex flex-col text-right">
+<span class="text-xs font-semibold text-text-main">PickHub 246 Club</span>
+<span class="text-xs text-text-muted">Quyền: Quản trị viên sân đấu</span>
+</div>
+<button class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white hover:bg-surface-container-low text-text-main text-xs font-semibold border border-border-subtle shadow-sm transition-all active:scale-95" type="button">
+<span class="material-symbols-outlined text-[18px] text-text-muted">gavel</span>
+<span>Quy chế giải</span>
+</button>
+<div class="w-8 h-8 rounded-full border border-brand-200 overflow-hidden ring-2 ring-brand-100">
+<img class="w-full h-full object-cover" data-alt="Close up professional portrait of Vietnamese pickleball club tournament coordinator wearing dark athletic tactical jersey with focused referee expression in futuristic stadium lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2rNYMhVsak-g-jUoD0dELHZtlJdtkr6FnR6DceROl53RTUtkLO5hgEb-8mBS17fm60eqWJFZdKvPQ5cs6D31aLebb-yiZmvilwArrIdxwnYt2a_qAlf0RQa_8pfshdpb_gP1gUMpj6YxEXBpRaXp-TadIbQsJgcUPhJzWgI184n0w7iSrzD5-a6KkzUuC3xCpS8NZMYtEw50QcDKKjtz92mxyoylhBBkl1attciTxtkP8hRPuVcalvpm6Nqa5Ffr2xGZzvRLf-ASf"/>
+</div>
+</div>
+</header>
+<!-- ================= 4-STEP WIZARD PROGRESS TRACKER ================= -->
+<nav aria-label="Tiến trình tạo giải" class="bg-white border-b border-border-subtle px-4 md:px-8 py-3 shadow-sm">
+<div class="max-w-7xl mx-auto flex items-center justify-between gap-2 overflow-x-auto no-scrollbar py-1">
+<!-- Step 1: Done -->
+<div class="flex items-center gap-2.5 hover:opacity-100 transition-opacity cursor-pointer flex-shrink-0">
+<div class="w-7 h-7 rounded-full bg-emerald-50 border border-emerald-500 text-emerald-600 flex items-center justify-center font-bold text-xs">
+<span class="material-symbols-outlined text-[16px]">check</span>
+</div>
+<div>
+<span class="text-[10px] text-text-muted uppercase font-bold tracking-wider block">Bước 1</span>
+<span class="text-xs sm:text-sm font-semibold text-text-main">Thông tin giải</span>
+</div>
+</div>
+<div class="h-0.5 flex-1 min-w-[20px] bg-emerald-300 mx-2"></div>
+<!-- Step 2: Done -->
+<div class="flex items-center gap-2.5 hover:opacity-100 transition-opacity cursor-pointer flex-shrink-0">
+<div class="w-7 h-7 rounded-full bg-emerald-50 border border-emerald-500 text-emerald-600 flex items-center justify-center font-bold text-xs">
+<span class="material-symbols-outlined text-[16px]">check</span>
+</div>
+<div>
+<span class="text-[10px] text-text-muted uppercase font-bold tracking-wider block">Bước 2</span>
+<span class="text-xs sm:text-sm font-semibold text-text-main">Người tham gia (7 cặp)</span>
+</div>
+</div>
+<div class="h-0.5 flex-1 min-w-[20px] bg-emerald-300 mx-2"></div>
+<!-- Step 3: Done -->
+<div class="flex items-center gap-2.5 hover:opacity-100 transition-opacity cursor-pointer flex-shrink-0">
+<div class="w-7 h-7 rounded-full bg-emerald-50 border border-emerald-500 text-emerald-600 flex items-center justify-center font-bold text-xs">
+<span class="material-symbols-outlined text-[16px]">check</span>
+</div>
+<div>
+<span class="text-[10px] text-text-muted uppercase font-bold tracking-wider block">Bước 3</span>
+<span class="text-xs sm:text-sm font-semibold text-text-main">Thể thức &amp; Ghép cặp</span>
+</div>
+</div>
+<div class="h-0.5 flex-1 min-w-[20px] bg-brand-500 mx-2"></div>
+<!-- Step 4: Active -->
+<div class="flex items-center gap-2.5 flex-shrink-0 bg-brand-50 px-3.5 py-1.5 rounded-xl border border-brand-500 shadow-sm">
+<div class="w-7 h-7 rounded-full bg-brand-600 text-white font-bold flex items-center justify-center text-xs shadow-sm">
+          4
+        </div>
+<div>
+<div class="flex items-center gap-1.5">
+<span class="text-[10px] text-brand-700 font-extrabold tracking-widest uppercase">BƯỚC HIỆN TẠI</span>
+<span class="w-1.5 h-1.5 rounded-full bg-brand-600 animate-ping"></span>
+</div>
+<span class="text-xs sm:text-sm font-bold text-text-main">Bốc thăm, Xem trước lịch &amp; Chốt</span>
+</div>
+</div>
+</div>
+</nav>
+<!-- ================= MAIN CONTENT CANVAS ================= -->
+<main class="max-w-7xl mx-auto px-4 md:px-8 py-6 pb-32">
+<!-- Top Banner Alert: Group Size Discrepancy (Accepted by format) -->
+<div class="mb-6 glass-panel rounded-xl p-4 border-l-4 border-l-amber-500 flex items-start gap-3 bg-white">
+<span class="material-symbols-outlined text-amber-500 text-[24px] mt-0.5 flex-shrink-0">warning</span>
+<div class="flex-1">
+<div class="flex items-center gap-2">
+<h2 class="text-sm font-bold text-amber-800">Thông báo cấu trúc bảng đấu: Lệch 1 cặp giữa 2 bảng</h2>
+<span class="px-2 py-0.5 rounded bg-badge-amber-bg text-badge-amber-text text-[11px] font-bold border border-amber-200">HỢP LỆ THỂ THỨC</span>
+</div>
+<p class="text-xs sm:text-sm text-text-muted mt-1 leading-relaxed">
+          Tổng số lượng là 7 cặp VĐV: <strong class="text-text-main">Bảng A (4 cặp)</strong> và <strong class="text-text-main">Bảng B (3 cặp)</strong>. Cấu hình này hoàn toàn hợp lệ, không gây nghẽn lịch và không chặn quyền chốt giải. Bảng A thi đấu 6 trận vòng tròn, Bảng B thi đấu 3 trận.
+        </p>
+</div>
+<button class="text-text-muted hover:text-text-main text-xs font-semibold self-center hidden sm:block">
+        Bỏ qua
+      </button>
+</div>
+<!-- 2 COLUMNS: 70% MAIN / 30% SIDE AUDIT & COMMIT -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+<!-- ================= LEFT COLUMN: 70% (8 COLS) ================= -->
+<div class="lg:col-span-8 space-y-6">
+<!-- ---------------- SECTION 1: XẾP BẢNG & BỐC THĂM ---------------- -->
+<section class="glass-panel rounded-xl p-4 md:p-6 relative overflow-hidden">
+<div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-brand-600 via-secondary to-brand-500"></div>
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-border-subtle">
+<div>
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-brand-600"></span>
+<h3 class="text-base sm:text-lg font-bold text-text-main tracking-tight">
+                  1. XẾP BẢNG &amp; BỐC THĂM VÒNG BẢNG
+                </h3>
+</div>
+<p class="text-xs sm:text-sm text-text-muted mt-0.5">
+                Xếp hạt giống tự động dựa theo điểm PickHub Rating (PHR) hoặc gán thủ công từng slot.
+              </p>
+</div>
+<!-- Segmented Control: Tự Động vs Thủ Công -->
+<div class="inline-flex p-1 rounded-lg bg-surface-container-low border border-border-subtle self-start sm:self-auto">
+<button class="px-3 py-1 rounded-md text-xs font-bold bg-white text-brand-700 shadow-sm transition-all" id="tab-auto">
+                Tự động (Active)
+              </button>
+<button class="px-3 py-1 rounded-md text-xs font-semibold text-text-muted hover:text-text-main transition-all" id="tab-manual">
+                Thủ công
+              </button>
+</div>
+</div>
+<!-- Actions Bar for Seed Generation & Cryptographic Hash info -->
+<div class="my-4 flex flex-col md:flex-row md:items-center justify-between gap-3 p-3 bg-surface-container-low rounded-lg border border-border-subtle text-xs">
+<div class="flex items-center gap-2 text-text-muted font-medium">
+<span class="material-symbols-outlined text-[18px] text-brand-600">verified_user</span>
+<span>Mã Hash hạt giống: <code class="text-brand-700 font-mono bg-white border border-border-subtle px-1.5 py-0.5 rounded font-semibold">0x8F9a...2B4c</code> (Minh bạch máy chủ)</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white hover:bg-surface-container-high text-text-main text-xs font-bold border border-border-subtle shadow-sm transition-colors active:scale-95" type="button">
+<span class="material-symbols-outlined text-[16px] text-brand-600">casino</span>
+<span>Bốc thăm lại / Sinh ngẫu nhiên</span>
+</button>
+<button class="p-1.5 rounded-lg bg-white hover:bg-surface-container-high text-text-muted hover:text-text-main border border-border-subtle shadow-sm" title="Cấu hình bốc thăm" type="button">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+</button>
+</div>
+</div>
+<!-- Groups Grid: Bang A (4 cap) & Bang B (3 cap) -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- BẢNG A -->
+<div class="glass-card rounded-xl p-4 border-t-2 border-t-brand-600">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-md bg-brand-50 text-brand-700 font-bold text-xs border border-brand-200">BẢNG A</span>
+<span class="text-xs text-text-muted font-medium">4 cặp đấu (Đủ slot)</span>
+</div>
+<span class="text-xs text-emerald-700 font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-emerald-600">check_circle</span>
+                  Sẵn sàng
+                </span>
+</div>
+<div class="space-y-2.5">
+<!-- Slot A1 (Hạt giống #1) -->
+<div class="p-2.5 rounded-lg bg-surface-container-low border border-border-subtle hover:border-brand-500 transition-colors flex items-center justify-between group">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-outline-variant cursor-grab group-hover:text-brand-600 text-[18px]">drag_indicator</span>
+<span class="w-6 h-6 rounded bg-brand-100 text-brand-700 font-bold flex items-center justify-center text-xs">A1</span>
+<div>
+<div class="text-xs sm:text-sm font-bold text-text-main">Minh Tuấn &amp; Hoàng Nam</div>
+<div class="text-[11px] text-text-muted flex items-center gap-2 font-medium">
+<span>Hạt giống #1</span>
+<span>•</span>
+<span class="text-brand-600 font-semibold">PHR: 4.85</span>
+</div>
+</div>
+</div>
+<button class="p-1 text-text-muted hover:text-brand-600 rounded hover:bg-white transition-colors" title="Đổi chỗ nhanh">
+<span class="material-symbols-outlined text-[18px]">swap_vert</span>
+</button>
+</div>
+<!-- Slot A2 (Đã điều chỉnh thủ công bởi BTC) -->
+<div class="p-2.5 rounded-lg bg-amber-50/40 border border-amber-300 hover:border-amber-400 transition-colors flex flex-col gap-1.5 relative">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-outline-variant cursor-grab group-hover:text-amber-600 text-[18px]">drag_indicator</span>
+<span class="w-6 h-6 rounded bg-amber-100 text-amber-800 font-bold flex items-center justify-center text-xs">A2</span>
+<div>
+<div class="text-xs sm:text-sm font-bold text-text-main">Quốc Khánh &amp; Bảo Long</div>
+<div class="text-[11px] text-text-muted flex items-center gap-2 font-medium">
+<span>Seed gốc #3</span>
+<span>•</span>
+<span class="text-brand-600 font-semibold">PHR: 4.60</span>
+</div>
+</div>
+</div>
+<button class="p-1 text-text-muted hover:text-amber-600 rounded hover:bg-white transition-colors" title="Đổi chỗ nhanh">
+<span class="material-symbols-outlined text-[18px]">swap_vert</span>
+</button>
+</div>
+<!-- Note Badge: Đã chỉnh sửa thủ công -->
+<div class="flex items-center justify-between pt-1 border-t border-amber-200 text-[11px] font-medium">
+<span class="inline-flex items-center gap-1 text-amber-800 font-semibold">
+<span class="material-symbols-outlined text-[14px] text-amber-600">edit_note</span>
+                      Đã điều chỉnh thủ công bởi BTC
+                    </span>
+<a class="text-brand-700 hover:underline font-semibold" href="#">Xem lịch sử (giữ seed #3)</a>
+</div>
+</div>
+<!-- Slot A3 -->
+<div class="p-2.5 rounded-lg bg-surface-container-low border border-border-subtle hover:border-brand-500 transition-colors flex items-center justify-between group">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-outline-variant cursor-grab group-hover:text-brand-600 text-[18px]">drag_indicator</span>
+<span class="w-6 h-6 rounded bg-white text-text-main font-bold flex items-center justify-center text-xs border border-border-subtle">A3</span>
+<div>
+<div class="text-xs sm:text-sm font-bold text-text-main">Đăng Khoa &amp; Trọng Hiếu</div>
+<div class="text-[11px] text-text-muted flex items-center gap-2 font-medium">
+<span>Hạt giống #5</span>
+<span>•</span>
+<span class="text-brand-600 font-semibold">PHR: 4.30</span>
+</div>
+</div>
+</div>
+<button class="p-1 text-text-muted hover:text-brand-600 rounded hover:bg-white transition-colors" title="Đổi chỗ nhanh">
+<span class="material-symbols-outlined text-[18px]">swap_vert</span>
+</button>
+</div>
+<!-- Slot A4 -->
+<div class="p-2.5 rounded-lg bg-surface-container-low border border-border-subtle hover:border-brand-500 transition-colors flex items-center justify-between group">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-outline-variant cursor-grab group-hover:text-brand-600 text-[18px]">drag_indicator</span>
+<span class="w-6 h-6 rounded bg-white text-text-main font-bold flex items-center justify-center text-xs border border-border-subtle">A4</span>
+<div>
+<div class="text-xs sm:text-sm font-bold text-text-main">Thành Luân &amp; Văn Hưng</div>
+<div class="text-[11px] text-text-muted flex items-center gap-2 font-medium">
+<span>Hạt giống #7</span>
+<span>•</span>
+<span class="text-brand-600 font-semibold">PHR: 4.10</span>
+</div>
+</div>
+</div>
+<button class="p-1 text-text-muted hover:text-brand-600 rounded hover:bg-white transition-colors" title="Đổi chỗ nhanh">
+<span class="material-symbols-outlined text-[18px]">swap_vert</span>
+</button>
+</div>
+</div>
+</div>
+<!-- BẢNG B -->
+<div class="glass-card rounded-xl p-4 border-t-2 border-t-secondary">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-md bg-indigo-50 text-indigo-700 font-bold text-xs border border-indigo-200">BẢNG B</span>
+<span class="text-xs text-text-muted font-medium">3 cặp đấu (3 trận)</span>
+</div>
+<span class="text-xs text-emerald-700 font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-emerald-600">check_circle</span>
+                  Sẵn sàng
+                </span>
+</div>
+<div class="space-y-2.5">
+<!-- Slot B1 (Hạt giống #2) -->
+<div class="p-2.5 rounded-lg bg-surface-container-low border border-border-subtle hover:border-secondary transition-colors flex items-center justify-between group">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-outline-variant cursor-grab group-hover:text-secondary text-[18px]">drag_indicator</span>
+<span class="w-6 h-6 rounded bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-xs">B1</span>
+<div>
+<div class="text-xs sm:text-sm font-bold text-text-main">Văn Sơn &amp; Đức Thịnh</div>
+<div class="text-[11px] text-text-muted flex items-center gap-2 font-medium">
+<span>Hạt giống #2</span>
+<span>•</span>
+<span class="text-indigo-600 font-semibold">PHR: 4.75</span>
+</div>
+</div>
+</div>
+<button class="p-1 text-text-muted hover:text-secondary rounded hover:bg-white transition-colors" title="Đổi chỗ nhanh">
+<span class="material-symbols-outlined text-[18px]">swap_vert</span>
+</button>
+</div>
+<!-- Slot B2 -->
+<div class="p-2.5 rounded-lg bg-surface-container-low border border-border-subtle hover:border-secondary transition-colors flex items-center justify-between group">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-outline-variant cursor-grab group-hover:text-secondary text-[18px]">drag_indicator</span>
+<span class="w-6 h-6 rounded bg-white text-text-main font-bold flex items-center justify-center text-xs border border-border-subtle">B2</span>
+<div>
+<div class="text-xs sm:text-sm font-bold text-text-main">Tiến Dũng &amp; Huy Hoàng</div>
+<div class="text-[11px] text-text-muted flex items-center gap-2 font-medium">
+<span>Hạt giống #4</span>
+<span>•</span>
+<span class="text-indigo-600 font-semibold">PHR: 4.45</span>
+</div>
+</div>
+</div>
+<button class="p-1 text-text-muted hover:text-secondary rounded hover:bg-white transition-colors" title="Đổi chỗ nhanh">
+<span class="material-symbols-outlined text-[18px]">swap_vert</span>
+</button>
+</div>
+<!-- Slot B3 -->
+<div class="p-2.5 rounded-lg bg-surface-container-low border border-border-subtle hover:border-secondary transition-colors flex items-center justify-between group">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-outline-variant cursor-grab group-hover:text-secondary text-[18px]">drag_indicator</span>
+<span class="w-6 h-6 rounded bg-white text-text-main font-bold flex items-center justify-center text-xs border border-border-subtle">B3</span>
+<div>
+<div class="text-xs sm:text-sm font-bold text-text-main">Hải Đăng &amp; Gia Huy</div>
+<div class="text-[11px] text-text-muted flex items-center gap-2 font-medium">
+<span>Hạt giống #6</span>
+<span>•</span>
+<span class="text-indigo-600 font-semibold">PHR: 4.20</span>
+</div>
+</div>
+</div>
+<button class="p-1 text-text-muted hover:text-secondary rounded hover:bg-white transition-colors" title="Đổi chỗ nhanh">
+<span class="material-symbols-outlined text-[18px]">swap_vert</span>
+</button>
+</div>
+<!-- Slot trống / Chế độ Manual helper note -->
+<div class="p-2 border border-dashed border-border-subtle rounded-lg text-center bg-surface-container-low">
+<span class="text-[11px] text-text-muted italic">
+                    Bảng B đã tối ưu hóa 3 cặp cho thể thức 7 VĐV. Không còn slot trống.
+                  </span>
+</div>
+</div>
+</div>
+</div>
+<!-- Explanatory system prompt for Manual Assignment Mode -->
+<div class="mt-3 p-3 rounded-lg bg-surface-container-low border border-border-subtle text-xs text-text-muted flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-brand-600">info</span>
+<span>Nếu chuyển sang <strong class="text-text-main">Thủ công</strong>, BTC gán trực tiếp từng cặp vào slot; nếu còn ô chưa gán sẽ xuất hiện mã chặn <code class="text-rose-600 font-mono bg-white border border-rose-200 px-1 rounded">GROUP_SLOT_UNASSIGNED</code> ngăn chốt lịch.</span>
+</div>
+</section>
+<!-- ---------------- SECTION 2: NHÁNH LOẠI TRỰC TIẾP (PLAYOFF BRACKET) ---------------- -->
+<section class="glass-panel rounded-xl p-4 md:p-6">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-border-subtle">
+<div>
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-brand-600"></span>
+<h3 class="text-base sm:text-lg font-bold text-text-main tracking-tight">
+                  2. NHÁNH LOẠI TRỰC TIẾP (PLAYOFF BRACKET)
+                </h3>
+</div>
+<p class="text-xs sm:text-sm text-text-muted mt-0.5">
+                Nhất &amp; Nhì mỗi bảng bước vào vòng Playoff. Nhất A gặp Nhì B, Nhất B gặp Nhì A.
+              </p>
+</div>
+<div class="flex items-center gap-2 self-start sm:self-auto">
+<span class="px-2.5 py-1 rounded-lg bg-surface-container-low border border-border-subtle text-text-muted text-xs font-semibold">
+                Trận tranh hạng ba: <strong class="text-text-main">TẮT</strong>
+</span>
+</div>
+</div>
+<!-- Playoff Bracket Visualizer with Crisp Connected Nodes -->
+<div class="mt-4 p-4 bg-surface-container-low rounded-xl border border-border-subtle overflow-x-auto">
+<div class="min-w-[620px] flex items-center justify-between gap-4 py-4 relative">
+<!-- COLUMN 1: BÁN KẾT (SEMIFINALS) -->
+<div class="w-64 space-y-8 flex flex-col justify-around">
+<div class="text-center text-xs font-bold text-brand-700 tracking-wider uppercase mb-2">
+                  Bán kết (BO1 - 15 Điểm)
+                </div>
+<!-- MATCH BK1 -->
+<div class="relative bg-white rounded-xl p-3 border border-border-subtle shadow-sm">
+<div class="flex items-center justify-between text-xs text-text-muted border-b border-border-subtle pb-1 mb-2 font-medium">
+<span class="font-bold text-brand-700">TRẬN BK1 (M10)</span>
+<span>Sân 1 • 09:15</span>
+</div>
+<!-- Dashed placeholder candidate 1 -->
+<div class="p-2 rounded-lg border border-dashed border-border-subtle bg-surface-container-low flex items-center justify-between mb-1.5">
+<span class="text-xs text-text-main font-bold flex items-center gap-1.5">
+<span class="w-4 h-4 rounded bg-brand-100 text-brand-700 text-[10px] flex items-center justify-center font-bold">1</span>
+                      Nhất Bảng A
+                    </span>
+<span class="text-[11px] text-text-muted">Chờ kết quả</span>
+</div>
+<!-- Dashed placeholder candidate 2 -->
+<div class="p-2 rounded-lg border border-dashed border-border-subtle bg-surface-container-low flex items-center justify-between">
+<span class="text-xs text-text-main font-bold flex items-center gap-1.5">
+<span class="w-4 h-4 rounded bg-indigo-100 text-indigo-700 text-[10px] flex items-center justify-center font-bold">2</span>
+                      Nhì Bảng B
+                    </span>
+<span class="text-[11px] text-text-muted">Chờ kết quả</span>
+</div>
+</div>
+<!-- MATCH BK2 -->
+<div class="relative bg-white rounded-xl p-3 border border-border-subtle shadow-sm">
+<div class="flex items-center justify-between text-xs text-text-muted border-b border-border-subtle pb-1 mb-2 font-medium">
+<span class="font-bold text-brand-700">TRẬN BK2 (M11)</span>
+<span>Sân 2 • 09:15</span>
+</div>
+<!-- Dashed placeholder candidate 1 -->
+<div class="p-2 rounded-lg border border-dashed border-border-subtle bg-surface-container-low flex items-center justify-between mb-1.5">
+<span class="text-xs text-text-main font-bold flex items-center gap-1.5">
+<span class="w-4 h-4 rounded bg-indigo-100 text-indigo-700 text-[10px] flex items-center justify-center font-bold">1</span>
+                      Nhất Bảng B
+                    </span>
+<span class="text-[11px] text-text-muted">Chờ kết quả</span>
+</div>
+<!-- Dashed placeholder candidate 2 -->
+<div class="p-2 rounded-lg border border-dashed border-border-subtle bg-surface-container-low flex items-center justify-between">
+<span class="text-xs text-text-main font-bold flex items-center gap-1.5">
+<span class="w-4 h-4 rounded bg-brand-100 text-brand-700 text-[10px] flex items-center justify-center font-bold">2</span>
+                      Nhì Bảng A
+                    </span>
+<span class="text-[11px] text-text-muted">Chờ kết quả</span>
+</div>
+</div>
+</div>
+<!-- CONNECTOR LINES SVG (Crisp tactical brackets) -->
+<div class="flex-1 flex items-center justify-center px-2">
+<div class="w-full h-48 relative">
+<!-- Upper connector from BK1 to Center -->
+<div class="absolute top-[28%] left-0 w-1/2 h-0.5 bg-slate-300"></div>
+<div class="absolute top-[28%] left-1/2 w-0.5 h-[22%] bg-slate-300"></div>
+<!-- Lower connector from BK2 to Center -->
+<div class="absolute bottom-[28%] left-0 w-1/2 h-0.5 bg-slate-300"></div>
+<div class="absolute bottom-[28%] left-1/2 w-0.5 h-[22%] bg-slate-300"></div>
+<!-- Path into Finals -->
+<div class="absolute top-1/2 left-1/2 w-1/2 h-0.5 bg-brand-500"></div>
+</div>
+</div>
+<!-- COLUMN 2: CHUNG KẾT (FINALS) -->
+<div class="w-72">
+<div class="text-center text-xs font-bold text-brand-700 tracking-wider uppercase mb-2 flex items-center justify-center gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-amber-500 material-symbols-fill">emoji_events</span>
+                  Chung Kết (BO3 - 11 Điểm)
+                </div>
+<div class="relative bg-white rounded-xl p-4 border-2 border-brand-500 court-neon-glow shadow-md">
+<div class="flex items-center justify-between text-xs text-text-muted border-b border-border-subtle pb-1.5 mb-2.5 font-medium">
+<span class="font-bold text-brand-700 flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-brand-600 animate-pulse"></span>
+                      TRẬN CK (M12)
+                    </span>
+<span class="text-amber-700 font-bold">Sân Trung Tâm • 09:45</span>
+</div>
+<!-- Dashed placeholder finalists -->
+<div class="p-2.5 rounded-lg border border-dashed border-brand-300 bg-brand-50/50 mb-2 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-brand-600">arrow_forward</span>
+<span class="text-xs font-bold text-text-main">Thắng BK1</span>
+</div>
+<span class="text-[11px] text-text-muted">Chờ BK1</span>
+</div>
+<div class="p-2.5 rounded-lg border border-dashed border-brand-300 bg-brand-50/50 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-brand-600">arrow_forward</span>
+<span class="text-xs font-bold text-text-main">Thắng BK2</span>
+</div>
+<span class="text-[11px] text-text-muted">Chờ BK2</span>
+</div>
+<div class="mt-3 text-center">
+<span class="text-[11px] text-text-muted uppercase tracking-wider font-semibold">
+                      Cúp vô địch + Huy chương Vàng PickHub
+                    </span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ---------------- SECTION 3: LỊCH THI ĐẤU DỰ KIẾN ---------------- -->
+<section class="glass-panel rounded-xl p-4 md:p-6">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-border-subtle">
+<div>
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-brand-600"></span>
+<h3 class="text-base sm:text-lg font-bold text-text-main tracking-tight">
+                  3. XEM TRƯỚC LỊCH THI ĐẤU DỰ KIẾN (12 TRẬN)
+                </h3>
+</div>
+<p class="text-xs sm:text-sm text-text-muted mt-0.5">
+                Thuật toán tự động giãn cách tránh 1 cặp đấu đánh 2 trận liên tiếp (nghỉ tối thiểu 15 phút).
+              </p>
+</div>
+<div class="flex items-center gap-2">
+<button class="px-3 py-1.5 text-xs font-bold rounded-lg bg-white hover:bg-surface-container-high text-text-main border border-border-subtle shadow-sm flex items-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-[16px] text-brand-600">file_download</span>
+                Xuất PDF Lịch
+              </button>
+</div>
+</div>
+<!-- Metric Cards: Glanceable stats -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 my-4">
+<div class="bg-surface-container-low rounded-xl p-3.5 border border-border-subtle">
+<div class="text-xs text-text-muted font-medium">Quy mô cặp đấu</div>
+<div class="text-lg font-extrabold text-brand-700 mt-0.5">7 Cặp</div>
+<div class="text-[11px] text-text-muted mt-0.5">14 Vận động viên</div>
+</div>
+<div class="bg-surface-container-low rounded-xl p-3.5 border border-border-subtle">
+<div class="text-xs text-text-muted font-medium">Tổng số trận</div>
+<div class="text-lg font-extrabold text-text-main mt-0.5">12 Trận</div>
+<div class="text-[11px] text-indigo-600 font-semibold mt-0.5">9 Bảng • 2 BK • 1 CK</div>
+</div>
+<div class="bg-surface-container-low rounded-xl p-3.5 border border-border-subtle">
+<div class="text-xs text-text-muted font-medium">Số sân khai thác</div>
+<div class="text-lg font-extrabold text-text-main mt-0.5">4 Sân</div>
+<div class="text-[11px] text-text-muted mt-0.5">Sân 1, 2, 3, Trung tâm</div>
+</div>
+<div class="bg-surface-container-low rounded-xl p-3.5 border border-border-subtle">
+<div class="text-xs text-text-muted font-medium">Khung giờ dự kiến</div>
+<div class="text-lg font-extrabold text-amber-700 mt-0.5">07:30 - 10:15</div>
+<div class="text-[11px] text-emerald-700 font-semibold flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[12px]">timer</span>
+                Tổng ~2h45p
+              </div>
+</div>
+</div>
+<!-- Schedule Table: Responsive with horizontal scroll -->
+<div class="overflow-x-auto rounded-xl border border-border-subtle bg-white">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-border-subtle text-text-main text-xs font-bold">
+<th class="py-3 px-3">MÃ TRẬN</th>
+<th class="py-3 px-3">VÒNG / BẢNG</th>
+<th class="py-3 px-3">CẶP ĐẤU TRANH TÀI</th>
+<th class="py-3 px-3 text-center">THỂ THỨC</th>
+<th class="py-3 px-3">SÂN ĐẤU</th>
+<th class="py-3 px-3 text-right">GIỜ DỰ KIẾN</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-subtle text-xs">
+<!-- M01 -->
+<tr class="hover:bg-brand-50/40 transition-colors">
+<td class="py-3 px-3 font-mono font-bold text-brand-700">M01</td>
+<td class="py-3 px-3"><span class="px-2 py-0.5 rounded bg-surface-container-low text-text-main font-semibold border border-border-subtle">Bảng A • Lượt 1</span></td>
+<td class="py-3 px-3 font-bold text-text-main">Minh Tuấn / Hoàng Nam vs Thành Luân / Văn Hưng</td>
+<td class="py-3 px-3 text-center"><span class="text-[11px] text-indigo-700 bg-indigo-50 font-bold px-1.5 py-0.5 rounded border border-indigo-100">BO1 (15p)</span></td>
+<td class="py-3 px-3 text-text-muted font-medium">Sân 1</td>
+<td class="py-3 px-3 text-right font-mono font-bold text-text-main">07:30</td>
+</tr>
+<!-- M02 -->
+<tr class="hover:bg-brand-50/40 transition-colors">
+<td class="py-3 px-3 font-mono font-bold text-brand-700">M02</td>
+<td class="py-3 px-3"><span class="px-2 py-0.5 rounded bg-surface-container-low text-text-main font-semibold border border-border-subtle">Bảng A • Lượt 1</span></td>
+<td class="py-3 px-3 font-bold text-text-main">Quốc Khánh / Bảo Long vs Đăng Khoa / Trọng Hiếu</td>
+<td class="py-3 px-3 text-center"><span class="text-[11px] text-indigo-700 bg-indigo-50 font-bold px-1.5 py-0.5 rounded border border-indigo-100">BO1 (15p)</span></td>
+<td class="py-3 px-3 text-text-muted font-medium">Sân 2</td>
+<td class="py-3 px-3 text-right font-mono font-bold text-text-main">07:30</td>
+</tr>
+<!-- M03 -->
+<tr class="hover:bg-brand-50/40 transition-colors">
+<td class="py-3 px-3 font-mono font-bold text-brand-700">M03</td>
+<td class="py-3 px-3"><span class="px-2 py-0.5 rounded bg-surface-container-low text-text-main font-semibold border border-border-subtle">Bảng B • Lượt 1</span></td>
+<td class="py-3 px-3 font-bold text-text-main">Văn Sơn / Đức Thịnh vs Hải Đăng / Gia Huy</td>
+<td class="py-3 px-3 text-center"><span class="text-[11px] text-indigo-700 bg-indigo-50 font-bold px-1.5 py-0.5 rounded border border-indigo-100">BO1 (15p)</span></td>
+<td class="py-3 px-3 text-text-muted font-medium">Sân 3</td>
+<td class="py-3 px-3 text-right font-mono font-bold text-text-main">07:30</td>
+</tr>
+<!-- M04 -->
+<tr class="hover:bg-brand-50/40 transition-colors">
+<td class="py-3 px-3 font-mono font-bold text-brand-700">M04</td>
+<td class="py-3 px-3"><span class="px-2 py-0.5 rounded bg-surface-container-low text-text-main font-semibold border border-border-subtle">Bảng A • Lượt 2</span></td>
+<td class="py-3 px-3 font-bold text-text-main">Minh Tuấn / Hoàng Nam vs Đăng Khoa / Trọng Hiếu</td>
+<td class="py-3 px-3 text-center"><span class="text-[11px] text-indigo-700 bg-indigo-50 font-bold px-1.5 py-0.5 rounded border border-indigo-100">BO1 (15p)</span></td>
+<td class="py-3 px-3 text-text-muted font-medium">Sân 1</td>
+<td class="py-3 px-3 text-right font-mono font-bold text-text-main">07:55</td>
+</tr>
+<!-- M05 -->
+<tr class="hover:bg-brand-50/40 transition-colors">
+<td class="py-3 px-3 font-mono font-bold text-brand-700">M05</td>
+<td class="py-3 px-3"><span class="px-2 py-0.5 rounded bg-surface-container-low text-text-main font-semibold border border-border-subtle">Bảng A • Lượt 2</span></td>
+<td class="py-3 px-3 font-bold text-text-main">Quốc Khánh / Bảo Long vs Thành Luân / Văn Hưng</td>
+<td class="py-3 px-3 text-center"><span class="text-[11px] text-indigo-700 bg-indigo-50 font-bold px-1.5 py-0.5 rounded border border-indigo-100">BO1 (15p)</span></td>
+<td class="py-3 px-3 text-text-muted font-medium">Sân 2</td>
+<td class="py-3 px-3 text-right font-mono font-bold text-text-main">07:55</td>
+</tr>
+<!-- M06 -->
+<tr class="hover:bg-brand-50/40 transition-colors">
+<td class="py-3 px-3 font-mono font-bold text-brand-700">M06</td>
+<td class="py-3 px-3"><span class="px-2 py-0.5 rounded bg-surface-container-low text-text-main font-semibold border border-border-subtle">Bảng B • Lượt 2</span></td>
+<td class="py-3 px-3 font-bold text-text-main">Tiến Dũng / Huy Hoàng vs Hải Đăng / Gia Huy</td>
+<td class="py-3 px-3 text-center"><span class="text-[11px] text-indigo-700 bg-indigo-50 font-bold px-1.5 py-0.5 rounded border border-indigo-100">BO1 (15p)</span></td>
+<td class="py-3 px-3 text-text-muted font-medium">Sân 3</td>
+<td class="py-3 px-3 text-right font-mono font-bold text-text-main">07:55</td>
+</tr>
+<!-- M07 -->
+<tr class="hover:bg-brand-50/40 transition-colors">
+<td class="py-3 px-3 font-mono font-bold text-brand-700">M07</td>
+<td class="py-3 px-3"><span class="px-2 py-0.5 rounded bg-surface-container-low text-text-main font-semibold border border-border-subtle">Bảng A • Lượt 3</span></td>
+<td class="py-3 px-3 font-bold text-text-main">Minh Tuấn / Hoàng Nam vs Quốc Khánh / Bảo Long</td>
+<td class="py-3 px-3 text-center"><span class="text-[11px] text-indigo-700 bg-indigo-50 font-bold px-1.5 py-0.5 rounded border border-indigo-100">BO1 (15p)</span></td>
+<td class="py-3 px-3 text-text-muted font-medium">Sân 1</td>
+<td class="py-3 px-3 text-right font-mono font-bold text-text-main">08:25</td>
+</tr>
+<!-- M08 -->
+<tr class="hover:bg-brand-50/40 transition-colors">
+<td class="py-3 px-3 font-mono font-bold text-brand-700">M08</td>
+<td class="py-3 px-3"><span class="px-2 py-0.5 rounded bg-surface-container-low text-text-main font-semibold border border-border-subtle">Bảng A • Lượt 3</span></td>
+<td class="py-3 px-3 font-bold text-text-main">Đăng Khoa / Trọng Hiếu vs Thành Luân / Văn Hưng</td>
+<td class="py-3 px-3 text-center"><span class="text-[11px] text-indigo-700 bg-indigo-50 font-bold px-1.5 py-0.5 rounded border border-indigo-100">BO1 (15p)</span></td>
+<td class="py-3 px-3 text-text-muted font-medium">Sân 2</td>
+<td class="py-3 px-3 text-right font-mono font-bold text-text-main">08:25</td>
+</tr>
+<!-- M09 -->
+<tr class="hover:bg-brand-50/40 transition-colors">
+<td class="py-3 px-3 font-mono font-bold text-brand-700">M09</td>
+<td class="py-3 px-3"><span class="px-2 py-0.5 rounded bg-surface-container-low text-text-main font-semibold border border-border-subtle">Bảng B • Lượt 3</span></td>
+<td class="py-3 px-3 font-bold text-text-main">Văn Sơn / Đức Thịnh vs Tiến Dũng / Huy Hoàng</td>
+<td class="py-3 px-3 text-center"><span class="text-[11px] text-indigo-700 bg-indigo-50 font-bold px-1.5 py-0.5 rounded border border-indigo-100">BO1 (15p)</span></td>
+<td class="py-3 px-3 text-text-muted font-medium">Sân 3</td>
+<td class="py-3 px-3 text-right font-mono font-bold text-text-main">08:25</td>
+</tr>
+<!-- M10 (Bán kết 1) -->
+<tr class="bg-brand-50/30 hover:bg-brand-50/60 border-t-2 border-brand-200 transition-colors">
+<td class="py-3 px-3 font-mono font-bold text-brand-700">M10</td>
+<td class="py-3 px-3"><span class="px-2 py-0.5 rounded bg-brand-100 text-brand-800 font-bold text-xs">BÁN KẾT 1</span></td>
+<td class="py-3 px-3 font-bold text-text-main italic">Nhất Bảng A vs Nhì Bảng B</td>
+<td class="py-3 px-3 text-center"><span class="text-[11px] text-indigo-700 bg-indigo-50 font-bold px-1.5 py-0.5 rounded border border-indigo-100">BO1 (20p)</span></td>
+<td class="py-3 px-3 text-text-muted font-medium">Sân 1</td>
+<td class="py-3 px-3 text-right font-mono font-bold text-text-main">09:15</td>
+</tr>
+<!-- M11 (Bán kết 2) -->
+<tr class="bg-brand-50/30 hover:bg-brand-50/60 transition-colors">
+<td class="py-3 px-3 font-mono font-bold text-brand-700">M11</td>
+<td class="py-3 px-3"><span class="px-2 py-0.5 rounded bg-brand-100 text-brand-800 font-bold text-xs">BÁN KẾT 2</span></td>
+<td class="py-3 px-3 font-bold text-text-main italic">Nhất Bảng B vs Nhì Bảng A</td>
+<td class="py-3 px-3 text-center"><span class="text-[11px] text-indigo-700 bg-indigo-50 font-bold px-1.5 py-0.5 rounded border border-indigo-100">BO1 (20p)</span></td>
+<td class="py-3 px-3 text-text-muted font-medium">Sân 2</td>
+<td class="py-3 px-3 text-right font-mono font-bold text-text-main">09:15</td>
+</tr>
+<!-- M12 (Chung kết) -->
+<tr class="bg-amber-50/60 hover:bg-amber-50 border-t-2 border-amber-400 transition-colors">
+<td class="py-3.5 px-3 font-mono font-extrabold text-amber-800">M12</td>
+<td class="py-3.5 px-3"><span class="px-2.5 py-0.5 rounded bg-amber-200/80 text-amber-900 font-extrabold text-xs uppercase">CHUNG KẾT</span></td>
+<td class="py-3.5 px-3 font-bold text-brand-800">Thắng Bán Kết 1 vs Thắng Bán Kết 2</td>
+<td class="py-3.5 px-3 text-center"><span class="text-xs text-amber-800 font-bold bg-amber-100 px-2 py-0.5 rounded border border-amber-300">BO3 (35p)</span></td>
+<td class="py-3.5 px-3 text-text-main font-bold">Sân Trung Tâm</td>
+<td class="py-3.5 px-3 text-right font-mono font-extrabold text-amber-800">09:45</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- ---------------- SECTION 4: QUY TẮC XẾP HẠNG (CHỈ ĐỌC) ---------------- -->
+<section class="glass-panel rounded-xl p-4 md:p-6">
+<div class="flex items-center justify-between pb-3 border-b border-border-subtle">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+<h3 class="text-base sm:text-lg font-bold text-text-main tracking-tight">
+                4. TIÊU CHÍ XẾP HẠNG VÒNG BẢNG (CHỈ ĐỌC)
+              </h3>
+</div>
+<span class="px-2 py-0.5 rounded bg-surface-container-low text-text-muted text-xs font-semibold border border-border-subtle">
+              ĐÃ KHÓA THEO ĐIỀU LỆ
+            </span>
+</div>
+<p class="text-xs sm:text-sm text-text-muted my-3">
+            Thứ tự ưu tiên phân định vị trí khi các cặp đấu có cùng thành tích tại vòng bảng theo chuẩn PickHub USA Pickleball:
+          </p>
+<div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+<div class="p-3 rounded-xl bg-surface-container-low border border-border-subtle flex items-start gap-2.5">
+<span class="w-6 h-6 rounded-full bg-brand-100 text-brand-700 font-bold flex items-center justify-center text-xs flex-shrink-0">1</span>
+<div>
+<div class="text-xs font-bold text-text-main">Số trận thắng</div>
+<div class="text-[11px] text-text-muted mt-0.5">Ưu tiên số trận toàn thắng vòng bảng</div>
+</div>
+</div>
+<div class="p-3 rounded-xl bg-surface-container-low border border-border-subtle flex items-start gap-2.5">
+<span class="w-6 h-6 rounded-full bg-slate-200 text-text-main font-bold flex items-center justify-center text-xs flex-shrink-0">2</span>
+<div>
+<div class="text-xs font-bold text-text-main">Đối đầu trực tiếp</div>
+<div class="text-[11px] text-text-muted mt-0.5">Head-to-head giữa 2 cặp bằng điểm</div>
+</div>
+</div>
+<div class="p-3 rounded-xl bg-surface-container-low border border-border-subtle flex items-start gap-2.5">
+<span class="w-6 h-6 rounded-full bg-slate-200 text-text-main font-bold flex items-center justify-center text-xs flex-shrink-0">3</span>
+<div>
+<div class="text-xs font-bold text-text-main">Hiệu số điểm</div>
+<div class="text-[11px] text-text-muted mt-0.5">Điểm ghi trừ điểm thua (Point Diff)</div>
+</div>
+</div>
+<div class="p-3 rounded-xl bg-surface-container-low border border-border-subtle flex items-start gap-2.5">
+<span class="w-6 h-6 rounded-full bg-slate-200 text-text-main font-bold flex items-center justify-center text-xs flex-shrink-0">4</span>
+<div>
+<div class="text-xs font-bold text-text-main">Bốc thăm điện tử</div>
+<div class="text-[11px] text-text-muted mt-0.5">Thuật toán ngẫu nhiên nếu hòa toàn diện</div>
+</div>
+</div>
+</div>
+<div class="mt-3 text-xs text-text-muted flex items-center justify-between">
+<span class="italic">Luật xếp hạng hiệu lực sẽ được khóa hoàn toàn khi chốt giải nhằm bảo đảm tính công bằng tuyệt đối.</span>
+<a class="text-brand-700 font-bold hover:underline" href="#">Xem chi tiết quy chế »</a>
+</div>
+</section>
+</div>
+<!-- ================= RIGHT COLUMN: 30% (4 COLS) AUDIT & COMMIT ================= -->
+<div class="lg:col-span-4 space-y-6">
+<!-- PANEL KIỂM TRA SẴN SÀNG (AUDIT CHECKLIST) -->
+<div class="glass-panel rounded-xl p-4 md:p-5 border-t-4 border-t-emerald-500 relative">
+<div class="flex items-center justify-between pb-3 border-b border-border-subtle">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-emerald-600 text-[22px] material-symbols-fill">task_alt</span>
+<h3 class="text-sm sm:text-base font-bold text-text-main">
+                KIỂM TRA TÍNH TOÀN VẸN
+              </h3>
+</div>
+<span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">
+              4/4 ĐẠT
+            </span>
+</div>
+<div class="mt-4 space-y-3">
+<!-- Item 1: Đủ số cặp -->
+<div class="p-3 rounded-xl bg-surface-container-low border border-border-subtle flex items-start gap-2.5">
+<span class="material-symbols-outlined text-emerald-600 text-[20px] material-symbols-fill flex-shrink-0">check_circle</span>
+<div class="flex-1">
+<div class="flex items-center justify-between">
+<span class="text-xs font-bold text-text-main">Đã xếp đủ 7 cặp đấu</span>
+<span class="text-xs text-emerald-700 font-bold">Đạt</span>
+</div>
+<p class="text-[11px] text-text-muted mt-0.5">
+                  100% VĐV đã được ghép cặp và định danh mã số hợp lệ.
+                </p>
+</div>
+</div>
+<!-- Item 2: Hash & Fingerprint -->
+<div class="p-3 rounded-xl bg-surface-container-low border border-border-subtle flex items-start gap-2.5">
+<span class="material-symbols-outlined text-emerald-600 text-[20px] material-symbols-fill flex-shrink-0">check_circle</span>
+<div class="flex-1">
+<div class="flex items-center justify-between">
+<span class="text-xs font-bold text-text-main">Lịch xem trước khớp nháp</span>
+<span class="text-xs text-emerald-700 font-bold">Đạt</span>
+</div>
+<p class="text-[11px] text-text-muted mt-0.5">
+                  Fingerprint xác nhận: <code class="text-brand-700 font-mono text-[10px] bg-white px-1 py-0.5 rounded border border-border-subtle">FP-948-246-OK</code>
+</p>
+</div>
+</div>
+<!-- Item 3: 0 Lỗi Chặn -->
+<div class="p-3 rounded-xl bg-surface-container-low border border-border-subtle flex items-start gap-2.5">
+<span class="material-symbols-outlined text-emerald-600 text-[20px] material-symbols-fill flex-shrink-0">check_circle</span>
+<div class="flex-1">
+<div class="flex items-center justify-between">
+<span class="text-xs font-bold text-text-main">Không có lỗi chặn (Blocker)</span>
+<span class="text-xs text-emerald-700 font-bold">0 Lỗi</span>
+</div>
+<p class="text-[11px] text-text-muted mt-0.5">
+                  Không còn slot trống hoặc xung đột sân đấu.
+                </p>
+</div>
+</div>
+<!-- Item 4: Cảnh báo chấp nhận -->
+<div class="p-3 rounded-xl bg-amber-50/50 border border-amber-200 flex items-start gap-2.5">
+<span class="material-symbols-outlined text-amber-600 text-[20px] flex-shrink-0">notification_important</span>
+<div class="flex-1">
+<div class="flex items-center justify-between">
+<span class="text-xs font-bold text-amber-800">1 Cảnh báo lệch bảng</span>
+<span class="text-xs text-amber-800 font-bold">Chấp nhận</span>
+</div>
+<p class="text-[11px] text-text-muted mt-0.5">
+                  Bảng A (4 cặp), Bảng B (3 cặp). Phù hợp điều lệ thi đấu nội bộ.
+                </p>
+</div>
+</div>
+</div>
+<!-- Notice on commit action -->
+<div class="mt-4 p-3 rounded-xl bg-surface-container-low border border-border-subtle text-xs text-text-muted leading-relaxed">
+<span class="font-bold text-text-main block mb-1">LƯU Ý QUAN TRỌNG:</span>
+            Sau khi bấm <strong class="text-text-main">Chốt giải</strong>: Danh sách VĐV, cặp đấu và kết quả bốc thăm sẽ bị <strong>khóa cố định</strong>. Hệ thống tự động chuyển trạng thái giải sang <strong class="text-text-main">ĐÃ LÊN LỊCH (Scheduled)</strong> tại Trung tâm Điều hành sân, chưa kích hoạt trạng thái LIVE.
+          </div>
+</div>
+<!-- MODAL MINI-CARD: XÁC NHẬN CHỐT GIẢI (COMMIT BOX) -->
+<div class="glass-panel rounded-xl p-4 md:p-5 border-2 border-brand-500 court-neon-glow relative bg-white">
+<div class="flex items-center gap-2.5 mb-3">
+<div class="w-9 h-9 rounded-lg bg-brand-100 text-brand-700 flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">lock_open</span>
+</div>
+<div>
+<h4 class="text-sm sm:text-base font-bold text-text-main">Chốt bốc thăm &amp; tạo lịch?</h4>
+<p class="text-xs text-text-muted">Thao tác cuối cùng để đưa giải vào vận hành</p>
+</div>
+</div>
+<div class="p-3 rounded-xl bg-surface-container-low border border-border-subtle space-y-2 my-3 text-xs">
+<div class="flex justify-between text-text-muted">
+<span>Quy mô VĐV:</span>
+<span class="text-text-main font-bold">7 Cặp đấu (14 VĐV)</span>
+</div>
+<div class="flex justify-between text-text-muted">
+<span>Khối lượng trận:</span>
+<span class="text-text-main font-bold">12 Trận (Bảng + Playoff)</span>
+</div>
+<div class="flex justify-between text-text-muted">
+<span>Sân phục vụ:</span>
+<span class="text-text-main font-bold">4 Sân Pickleball</span>
+</div>
+<div class="flex justify-between text-text-muted pt-1.5 border-t border-border-subtle">
+<span>Trạng thái sau chốt:</span>
+<span class="text-brand-700 font-bold">Scheduled (Sẵn sàng)</span>
+</div>
+</div>
+<div class="flex flex-col gap-2 pt-1">
+<button class="w-full py-2.5 px-4 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm tracking-wide flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all active:scale-98" id="btn-modal-commit" type="button">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+<span>CHỐT LỊCH &amp; VẬN HÀNH</span>
+</button>
+<button class="w-full py-2 px-4 rounded-xl bg-surface-container-low hover:bg-surface-container-high text-text-muted hover:text-text-main font-semibold text-xs border border-border-subtle transition-colors" type="button">
+              Hủy / Xem lại cấu hình
+            </button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- ================= STICKY BOTTOM ACTIONS FOOTER ================= -->
+<footer class="fixed bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-border-subtle px-4 md:px-8 py-3 shadow-lg">
+<div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+<!-- Left return action & sync state -->
+<div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
+<button class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-surface-container-low hover:bg-surface-container-high text-text-main text-xs font-bold border border-border-subtle transition-all active:scale-95" type="button">
+<span class="material-symbols-outlined text-[18px]">arrow_back</span>
+<span>Quay lại Bước 3</span>
+</button>
+<div class="flex items-center gap-1.5 text-xs text-text-muted font-medium">
+<span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+<span>Đã tự động lưu nháp lúc <strong class="text-text-main">09:48</strong></span>
+</div>
+</div>
+<!-- Right primary actions cluster -->
+<div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+<button class="px-4 py-2 rounded-xl bg-surface-container-low hover:bg-surface-container-high text-text-main text-xs font-bold border border-border-subtle transition-colors" type="button">
+          Lưu nháp &amp; Tạm dừng
+        </button>
+<!-- Final Primary Call To Action (Brand Violet) -->
+<button class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-sm tracking-wide shadow-md hover:shadow-lg transition-all duration-200 active:scale-95" id="btn-footer-commit" type="button">
+<span>Chốt bốc thăm &amp; tạo lịch</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</footer>
+<!-- ================= MICRO-INTERACTION SCRIPT ================= -->
+<script>
+    // Tab Segmented Control Switching demo
+    const btnAuto = document.getElementById('tab-auto');
+    const btnManual = document.getElementById('tab-manual');
+
+    btnAuto.addEventListener('click', () => {
+      btnAuto.className = 'px-3 py-1 rounded-md text-xs font-bold bg-white text-brand-700 shadow-sm transition-all';
+      btnManual.className = 'px-3 py-1 rounded-md text-xs font-semibold text-text-muted hover:text-text-main transition-all';
+    });
+
+    btnManual.addEventListener('click', () => {
+      btnManual.className = 'px-3 py-1 rounded-md text-xs font-bold bg-white text-brand-700 shadow-sm transition-all';
+      btnAuto.className = 'px-3 py-1 rounded-md text-xs font-semibold text-text-muted hover:text-text-main transition-all';
+    });
+
+    // Commit button feedback
+    const btnCommit = document.getElementById('btn-footer-commit');
+    const btnModalCommit = document.getElementById('btn-modal-commit');
+
+    const handleCommit = () => {
+      const originalText = btnCommit.innerHTML;
+      btnCommit.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">sync</span><span>Đang tạo 12 trận đấu...</span>';
+      setTimeout(() => {
+        alert('🎉 BỐC THĂM & CHỐT LỊCH THÀNH CÔNG!\n\nGiải đấu đã được chuyển sang trạng thái SCHEDULED (Đã lên lịch) tại Trung tâm Điều hành sân PickHub Pro.');
+        btnCommit.innerHTML = originalText;
+      }, 700);
+    };
+
+    btnCommit.addEventListener('click', handleCommit);
+    btnModalCommit.addEventListener('click', handleCommit);
+  </script>
+</body></html>

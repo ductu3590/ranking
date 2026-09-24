@@ -85,3 +85,10 @@ Số sân chuyển từ Bước 1 sang Bước 3 (sau khi ghép cặp mới gợ
 |---|---|---|
 | `tests/phase3/scoring-rules.test.js` | Ca `WIN_BY_NOT_MET` (11–10) và `SCORE_CAP_EXCEEDED` (16–14) đổi thành hợp lệ; thêm ca 17–15, 7–21, hoà, âm, lẻ | D34: bên nhiều điểm hơn thắng, không kiểm mốc tới / cách / trần |
 | `tests/stitch-setup/epic-2/board.test.js` | "Trận vừa chốt" `7–11` → `11–7` | Điểm cặp thắng đứng trước (đọc "X thắng 7–11" bị ngược nghĩa) |
+
+## Bổ sung — Epic 2 lát E2 (2026-09-25)
+
+| File | Xử lý | Lý do |
+|---|---|---|
+| `tests/stitch-setup/epic-2/ui-contract.test.js` | `readOnly` → `!isAdmin \|\| (finalized && !correcting)`; nút lưu/chốt khóa theo `!readOnly && !finalized` | Trận đã chốt có chế độ "Sửa kết quả" (corrections), vẫn không có nút lưu/chốt |
+| `tests/tournament/ui-draw-step.contract.test.js` | `DrawStep` chỉ còn trong Cài đặt của giải cũ (`step === 'settings' && !v4Schedule`) | Giải setup v4 dùng `SettingsView`; huỷ chốt lịch cho giải v4 chưa hỗ trợ (xem spec E2 §Lệch spec) |

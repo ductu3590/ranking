@@ -1,12 +1,13 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { listMatches, saveGames } from '@/lib/tournamentV2Client';
+import { listMatches, saveGames, previewCorrection, applyCorrection } from '@/lib/tournamentV2Client';
 import { validateGameScore } from '@/lib/tournament/rules/scoring';
 import { registerLeaveGuard } from '../leaveGuard';
 
 // Sheet nhập tỉ số một trận (spec Epic 2, Lát E1 §6.1, §6.5; thiết kế canonical/operations/03-score-entry).
-// Luật trận chỉ đọc (D8/D14). Chốt đủ ván thắng → server tiến cấp. Trận đã chốt: chỉ xem.
+// Luật trận chỉ đọc (D8/D14). Chốt đủ ván thắng → server tiến cấp. Trận đã chốt: chỉ xem, admin có
+// "Sửa kết quả" (spec E2 §1) → kiểm ảnh hưởng (preview) → lý do bắt buộc → POST /corrections (không bao giờ /games).
 
 const ERROR_TEXT = {
   INVALID_SCORE: 'hai bên không được bằng điểm',
@@ -56,7 +57,17 @@ function evaluate(rows, rule) {
 
 function nameOf(side) { return side?.name || side?.source || 'Chờ xác định'; }
 
-export default function ScoreSheet({ match, isAdmin, onClose, onSaved }) {
+function newKey() {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+  return `corr-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+// Thông báo chặn của server kèm mã trận "(#<id>)" — thay bằng tên trận, người dùng không thấy mã id.
+function describeBlock(message, titleById) {
+  return String(message || '').replace(/\s*\(#(\d+)\)/g, (_, id) => (titleById && titleById[id] ? ` “${titleById[id]}”` : ''));
+}
+
+export default function ScoreSheet({ match, isAdmin, onClose, onSaved, titleById }) {
   const [serverMatch, setServerMatch] = useState(null);
   const [initialRows, setInitialRows] = useState([emptyRow()]);
   const [rows, setRows] = useState([emptyRow()]);
@@ -67,13 +78,18 @@ export default function ScoreSheet({ match, isAdmin, onClose, onSaved }) {
   const [conflict, setConflict] = useState(null);
   const [overwriting, setOverwriting] = useState(false);
   const [leaveConfirm, setLeaveConfirm] = useState(null);
+  const [correcting, setCorrecting] = useState(false);
+  const [reason, setReason] = useState('');
+  const [impact, setImpact] = useState(null);
+  const correctionKey = useRef(null);
   const closingRef = useRef(false);
 
   const rule = match.rule;
   const status = serverMatch?.status || match.status;
-  const readOnly = !isAdmin || status === 'finalized';
+  const finalized = status === 'finalized';
+  const readOnly = !isAdmin || (finalized && !correcting);
   const evaluation = useMemo(() => evaluate(rows, rule), [rows, rule]);
-  const dirty = !readOnly && !sameRows(rows, initialRows);
+  const dirty = !readOnly && (!sameRows(rows, initialRows) || (correcting && reason.trim() !== ''));
 
   const fetchServer = useCallback(async () => {
     const data = await listMatches(match.stageId);
@@ -149,6 +165,7 @@ export default function ScoreSheet({ match, isAdmin, onClose, onSaved }) {
   }
 
   function setScore(index, side, value) {
+    setImpact(null);
     const clean = value.replace(/[^0-9]/g, '').slice(0, 2);
     setRows((current) => {
       const next = current.map((row, i) => (i === index ? { ...row, [side]: clean } : row));
@@ -157,6 +174,7 @@ export default function ScoreSheet({ match, isAdmin, onClose, onSaved }) {
   }
 
   function step(index, side, delta) {
+    setImpact(null);
     setRows((current) => current.map((row, i) => {
       if (i !== index) return row;
       const value = Math.max(0, (Number(row[side]) || 0) + delta);
@@ -208,6 +226,73 @@ export default function ScoreSheet({ match, isAdmin, onClose, onSaved }) {
     }
   }
 
+  function startCorrection() {
+    setCorrecting(true);
+    setImpact(null);
+    setError('');
+    correctionKey.current = newKey();
+  }
+
+  function cancelCorrection() {
+    setCorrecting(false);
+    setImpact(null);
+    setReason('');
+    setRows(initialRows);
+    setError('');
+  }
+
+  function correctionGames() {
+    return rows
+      .map((row, index) => ({ row, index }))
+      .filter(({ row }) => row.a !== '' || row.b !== '')
+      .map(({ row, index }) => ({ game_no: index + 1, kind: 'game', score_a: Number(row.a) || 0, score_b: Number(row.b) || 0 }));
+  }
+
+  // Bước 1: hỏi server ảnh hưởng (đổi người thắng? trận sau đã bắt đầu?) trước khi ghi.
+  async function checkCorrection() {
+    setBusy(true);
+    setError('');
+    try {
+      const result = await previewCorrection({ match_id: match.id, games: correctionGames() });
+      setImpact(result);
+    } catch (previewError) {
+      setError(describeBlock(previewError.message, titleById) || 'Không kiểm tra được thay đổi.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function applyFix() {
+    setBusy(true);
+    setError('');
+    try {
+      await applyCorrection({
+        match_id: match.id,
+        games: correctionGames(),
+        reason: reason.trim(),
+        expected_version: version,
+        idempotency_key: correctionKey.current || newKey(),
+      });
+      closingRef.current = true;
+      if (window.history.state && window.history.state.pcScoreSheet) window.history.back();
+      onSaved(`Đã sửa kết quả ${match.title}${impact && impact.winner_changed ? ' · người thắng đã đổi, trận sau được cập nhật' : ''}.`);
+    } catch (applyError) {
+      if (applyError.code === 'MATCH_VERSION_CONFLICT') {
+        try {
+          const { fresh, games: serverGames } = await fetchServer();
+          setConflict({ status: fresh?.status, version: fresh?.version, rows: rowsFromGames(serverGames) });
+          setServerMatch(fresh);
+        } catch (reloadError) {
+          setError(reloadError.message || 'Trận vừa được cập nhật ở máy khác. Tải lại để xem.');
+        }
+      } else {
+        setError(describeBlock(applyError.message, titleById) || 'Không sửa được kết quả.');
+      }
+    } finally {
+      setBusy(false);
+    }
+  }
+
   function takeServer() {
     setRows(conflict.rows);
     setInitialRows(conflict.rows);
@@ -223,8 +308,10 @@ export default function ScoreSheet({ match, isAdmin, onClose, onSaved }) {
   }
 
   const winnerName = evaluation.complete ? nameOf(evaluation.winsA > evaluation.winsB ? match.a : match.b) : null;
-  const canDraft = !readOnly && evaluation.hasValid && !evaluation.complete && (status === 'live' || status === 'paused');
-  const canFinalize = !readOnly && evaluation.complete;
+  const canDraft = !readOnly && !finalized && evaluation.hasValid && !evaluation.complete && (status === 'live' || status === 'paused');
+  const canFinalize = !readOnly && !finalized && evaluation.complete;
+  const canCheckFix = correcting && evaluation.complete && !sameRows(rows, initialRows);
+  const winnerLabel = (entryId) => (String(entryId) === String(match.a?.entryId) ? nameOf(match.a) : String(entryId) === String(match.b?.entryId) ? nameOf(match.b) : 'cặp khác');
   const serverFinalized = conflict && conflict.status === 'finalized';
 
   return <div className="ops-sheet-backdrop" role="presentation" onClick={(event) => { if (event.target === event.currentTarget) requestClose(); }}>
@@ -293,10 +380,32 @@ export default function ScoreSheet({ match, isAdmin, onClose, onSaved }) {
       </div>
 
       {error ? <p className="ops-banner is-error" role="alert">{error}</p> : null}
-      {status === 'finalized' && !conflict ? <p className="ops-muted">Trận đã chốt. Sửa kết quả dùng “Sửa kết quả” ở mục Trận đấu.</p> : null}
+      {finalized && !correcting && !conflict ? <p className="ops-muted">Trận đã chốt.{isAdmin ? ' Nhập sai thì bấm “Sửa kết quả”.' : ''}</p> : null}
       {!isAdmin ? <p className="ops-muted">Chỉ quản trị viên được nhập tỉ số.</p> : null}
 
-      {!readOnly ? <footer className="ops-sheet-foot">
+      {finalized && isAdmin && !correcting && !conflict ? <footer className="ops-sheet-foot">
+        <span className="ops-dirty">Sửa kết quả cần lý do và được ghi vào nhật ký.</span>
+        <button type="button" className="ops-btn is-primary" onClick={startCorrection}>Sửa kết quả</button>
+      </footer> : null}
+
+      {correcting ? <div className="ops-correction">
+        <label className="ops-field"><span>Lý do sửa (bắt buộc)</span><textarea rows={2} value={reason} placeholder="Vd: trọng tài ghi nhầm điểm ván 2" onChange={(event) => setReason(event.target.value)} /></label>
+        {impact ? (impact.blocked
+          ? <p className="ops-banner is-error" role="alert">{describeBlock(impact.block_reason, titleById)}</p>
+          : <p className={`ops-banner ${impact.winner_changed ? 'is-warn' : 'is-ok'}`} role="status">{impact.winner_changed
+            ? <>Người thắng đổi sang <b>{winnerLabel(impact.next_winner)}</b>{match.winnerTo ? ` — ${match.winnerTo} được cập nhật theo.` : '.'}</>
+            : 'Người thắng giữ nguyên, chỉ đổi tỉ số.'}</p>) : null}
+      </div> : null}
+
+      {correcting ? <footer className="ops-sheet-foot">
+        <span className={`ops-dirty ${dirty ? 'is-on' : ''}`}>{sameRows(rows, initialRows) ? 'Chưa đổi tỉ số' : 'Tỉ số đã đổi — chưa lưu'}</span>
+        <button type="button" className="ops-btn" disabled={busy} onClick={cancelCorrection}>Hủy sửa</button>
+        {impact && !impact.blocked
+          ? <button type="button" className="ops-btn is-primary" disabled={busy || !reason.trim() || (conflict && !conflict.kept)} onClick={applyFix}>{busy ? 'Đang lưu…' : 'Xác nhận sửa kết quả'}</button>
+          : <button type="button" className="ops-btn is-primary" disabled={busy || !canCheckFix} onClick={checkCorrection}>{busy ? 'Đang kiểm tra…' : 'Kiểm tra thay đổi'}</button>}
+      </footer> : null}
+
+      {!readOnly && !finalized ? <footer className="ops-sheet-foot">
         <span className={`ops-dirty ${dirty ? 'is-on' : ''}`}>{dirty ? 'Chưa lưu thay đổi' : 'Không có thay đổi'}</span>
         {overwriting ? <span className="ops-muted">Sẽ ghi đè tỉ số trên máy chủ</span> : null}
         <button type="button" className="ops-btn" disabled={busy || !canDraft || (conflict && !conflict.kept)} onClick={() => save(false)}>Lưu nháp</button>

@@ -61,8 +61,9 @@ suite('epic-2 · ui contract', {
   'sheet: không có ô chọn BO; luật chỉ đọc; trận đã chốt không có nút lưu': () => {
     assert.doesNotMatch(sheet, /BO1<|BO3<|BO5<|updateRoundRule/);
     assert.match(sheet, /ops-rule-chip/);
-    assert.match(sheet, /const readOnly = !isAdmin \|\| status === 'finalized'/);
-    assert.match(sheet, /\{!readOnly \? <footer/);
+    // E2: trận đã chốt chỉ sửa qua "Sửa kết quả" (corrections), không có nút lưu/chốt (ADR-006 mục E2).
+    assert.match(sheet, /const readOnly = !isAdmin \|\| \(finalized && !correcting\)/);
+    assert.match(sheet, /\{!readOnly && !finalized \? <footer/);
   },
   'xung đột phiên bản: không lưu một chạm, đã chốt thì không sửa đè': () => {
     const keepMine = sheet.slice(sheet.indexOf('function keepMine'), sheet.indexOf('function keepMine') + 260);

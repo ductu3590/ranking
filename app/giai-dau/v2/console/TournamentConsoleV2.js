@@ -5,6 +5,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { listTournaments, listStages, getCourtBoard, listDivisions, getDivisionSetup } from '@/lib/tournamentV2Client';
 import ConsoleShell from './ConsoleShell';
 import ControlCenter from './control/ControlCenter';
+import MatchesView from './matches/MatchesView';
+import BracketStandings from './bracket/BracketStandings';
+import SettingsView from './settings/SettingsView';
 import CourtsStep from './steps/CourtsStep';
 import LogStep from './steps/LogStep';
 import DrawStep from './steps/DrawStep';
@@ -76,6 +79,9 @@ export default function TournamentConsoleV2({ tournamentId }) {
   }, [load]);
 
   const scheduleReady = hasSchedule(stages);
+  // Giải setup v4 (mọi stage có luật cố định config.scoring, trận đơn): mục Trận đấu mới (E2 §1).
+  // Stage legacy / MLP giữ ResultsTab cũ.
+  const v4Schedule = stages.length > 0 && stages.every((stage) => stage.config && stage.config.scoring && (stage.match_format || 'simple') !== 'mlp');
   const activeStage = stages.find((stage) => String(stage.id) === String(activeStageId)) || null;
   const firstDivision = divisions[0] || null;
   const isCommunity = tournament?.organizer_mode === 'community';
@@ -118,9 +124,12 @@ export default function TournamentConsoleV2({ tournamentId }) {
   return <ConsoleShell tournament={tournament} tournamentId={tournamentId} progress={board?.progress} actor={session}>
     {(step) => <>
       {step === 'control' ? <ControlCenter tournamentId={tournamentId} isAdmin={isAdmin} onSettings={goSettings} onStandings={() => goStep('bracket')} onMatches={() => goStep('matches')} onChanged={load} /> : null}
-      {step === 'matches' ? <>{stagePicker}<ResultsTab {...stepProps} /></> : null}
-      {step === 'bracket' ? <>{stagePicker}<StandingsTab {...stepProps} /><BracketTab {...stepProps} /></> : null}
-      {step === 'settings' ? <div className="v2-console-settings">
+      {step === 'matches' ? (v4Schedule ? <MatchesView tournamentId={tournamentId} isAdmin={isAdmin} /> : <>{stagePicker}<ResultsTab {...stepProps} /></>) : null}
+      {step === 'bracket' ? (v4Schedule ? <BracketStandings tournamentId={tournamentId} isAdmin={isAdmin} onChanged={load} /> : <>{stagePicker}<StandingsTab {...stepProps} /><BracketTab {...stepProps} /></>) : null}
+      {step === 'settings' && v4Schedule ? <SettingsView tournament={tournament} tournamentId={tournamentId} isAdmin={isAdmin} reload={load}>
+        {isCommunity ? <div id="dang-ky-mo"><OpenRegTab {...stepProps} /></div> : null}
+      </SettingsView> : null}
+      {step === 'settings' && !v4Schedule ? <div className="v2-console-settings">
         <SettingsTab {...stepProps} />
         <CourtsStep {...stepProps} />
         <TeamsTab {...stepProps} isAdmin={firstDivision?.play_type === 'doubles' ? false : isAdmin} />

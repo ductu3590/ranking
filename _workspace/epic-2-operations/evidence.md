@@ -80,3 +80,18 @@ thắng trước; KPI sân đang dùng x/y; giao diện Điều hành sát Stitc
 | Trang xem trước tạm (fetch giả lập, đã xoá) | 1280/390 không tràn ngang; giữa giải: bộ lọc, tiêu đề sân, cặp canh giữa, vừa chốt "X thắng 11–9 trước Y"; vòng bảng xong: thẻ BXH tóm tắt + nút chốt → hộp xác nhận → "Quay lại"; lọc "Vòng loại trực tiếp" còn 3 trận chờ, 0 vừa chốt. Dev server không lỗi biên dịch |
 
 Người dùng nghiệm thu trên CLB 59: **PASS E1.1** (2026-09-24).
+
+## Lát E2 — code (2026-09-25)
+
+Không migration. Trận đấu (`MatchesView` + "Sửa kết quả" qua corrections), Sơ đồ & xếp hạng (`shared/BracketView`,
+`shared/StandingsView`, `BracketStandings`), Cài đặt (`SettingsView`, `operationLogText`). PATCH `tournaments` sinh
+`public_slug` khi bật link (giải 218/219/220 tạo bằng setup 4 bước đều `private`, chưa có slug).
+
+| Kiểm | Kết quả |
+|---|---|
+| `tests/stitch-setup/epic-2/*` | e2-contract 7/7, ui-contract 11/11, e1-1 7/7, board 7/7 và các file còn lại xanh |
+| `npm run test:stitch-setup` | xanh trừ `epic-1/ui-contract` (CRLF, có từ trước) |
+| `npm run test:tournament`, `test:open-registration`, `tests/phase3/share.test.js` | xanh (sửa 2 test khóa chuỗi — ADR-006 mục E2) |
+| Trang xem trước tạm (fetch giả lập, đã xoá) | 1280/390 không tràn ngang; dev server không lỗi biên dịch (gồm `TournamentConsoleV2`) |
+
+Lệch spec: không có "Huỷ chốt lịch" cho giải v4 (xem spec E2 §Lệch spec). Chưa làm — cần người dùng nghiệm thu trên CLB 59.

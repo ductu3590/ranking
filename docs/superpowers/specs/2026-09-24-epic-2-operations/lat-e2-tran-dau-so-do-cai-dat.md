@@ -95,3 +95,35 @@ khỏi console khi phần dùng lại đã chuyển; `RoundScoringPanel` chỉ c
 | `ui-contract.test.js` (bổ sung) | Trận đấu không render ô BO cho stage v4; Cài đặt không có "Sinh lại lịch"/"Số ván theo vòng"; vùng nguy hiểm bắt lý do, ẩn với member; thẻ "Đăng ký mở" chỉ với giải cộng đồng |
 
 Test cũ `ui-results`, `ui-round-scoring`, `ui-standings` sửa theo → ghi ADR-006.
+
+## Đã làm (2026-09-25)
+
+Chỉ áp cho giải setup v4 (mọi stage có `config.scoring`, trận đơn); giải cũ và MLP giữ component cũ.
+
+- **Trận đấu** — `console/matches/MatchesView.js`: dữ liệu `board.schedule` (GET /operations, nhóm theo `matchGroupKey`,
+  Tranh hạng ba riêng); lọc giai đoạn / lượt / sân / trạng thái / tên VĐV; không ô BO theo vòng. Chạm dòng → `ScoreSheet`;
+  trận đã chốt → "Sửa kết quả": kiểm tra (`preview`) → lý do bắt buộc → `POST /corrections`. Thông báo chặn thay
+  "(#id)" bằng tên trận; route corrections phân loại lỗi RPC bằng `classifyRpcConflict`; nhật ký sửa kết quả ghi thêm
+  tỉ số trước/sau.
+- **Sơ đồ & xếp hạng** — `shared/BracketView.js`, `shared/StandingsView.js` (không fetch; chỉ bấm được khi có
+  `onSelectMatch`) + `console/bracket/BracketStandings.js` (tab Sơ đồ nhánh / Xếp hạng, thẻ Kết thúc giải dùng
+  `stageAction`). Loại trực tiếp: cột theo vòng, Tranh hạng ba tách dưới Chung kết; loại kép: ba khung W/L/GF có cột
+  Chung kết nhánh thua; bục 1–2–3 chỉ khi `F`/`GF` đã chốt, chip Tạm tính / Chính thức.
+- **Cài đặt** — `console/settings/SettingsView.js`: Thông tin giải; Link công khai & chia sẻ (bật link → PATCH
+  `visibility: unlisted`, route sinh `public_slug` nếu thiếu — giải tạo bằng setup 4 bước chưa có slug; QR; ảnh/tin Zalo
+  qua `ShareActions`); Sân (công tắc, ngưng dùng cần lý do, thêm sân, thời lượng trận/khởi động); Nhật ký dạng câu
+  (`lib/tournament/operationLogText.js`, 5 dòng + Xem toàn bộ); Cặp thi đấu (chỉ xem); Đăng ký mở chỉ giải cộng đồng.
+
+### Lệch spec (cần người dùng quyết)
+
+- **Vùng nguy hiểm / Huỷ chốt lịch không đưa vào giải v4.** `unlock_tournament_draw` huỷ từng stage theo mô hình bốc
+  thăm cũ; với giải v4 nhiều giai đoạn (tuyến đi tiếp tường minh, bản nháp setup 4 bước) sẽ để lại dữ liệu lệch. Cần một
+  luồng "mở lại thiết lập" riêng (SQL mới, sửa tuần tự theo roadmap §1.2) — để lát sau nếu người dùng cần.
+- `OverviewTab.js` chưa gỡ: vẫn còn test `phase3/share` và `release-hardening` tham chiếu; không còn được mount.
+
+### Kiểm thử
+
+`tests/stitch-setup/epic-2/e2-contract.test.js` 7/7 (schedule/Tranh hạng ba, loại kép đủ W/L/GF/LF, nhật ký phủ mọi
+action đang ghi, sửa kết quả đi corrections, component chung không fetch, Cài đặt không sinh lịch/luật ván, PATCH sinh
+slug). Xem trước tạm (fetch giả lập, đã xoá) 1280/390: Trận đấu, luồng sửa kết quả (đổi người thắng, bị chặn), sơ đồ
+loại trực tiếp + loại kép, xếp hạng vòng bảng, Cài đặt (link bật/tắt).

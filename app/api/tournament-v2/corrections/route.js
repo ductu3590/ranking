@@ -8,6 +8,7 @@ import { resolveMatchScoring } from '@/lib/tournament/rules/roundScoring';
 import { validateGameScore } from '@/lib/tournament/rules/scoring';
 import { getMatchEngine } from '@/lib/tournament/engines';
 import { actorName } from '@/lib/tournament/actorName';
+import { classifyRpcConflict } from '@/lib/tournament/scoreEntry';
 
 // Xung dot nghiep vu nay ERRCODE 'PH409' (migration 078). Truoc day dung 40001,
 // nhung 40001 la serialization_failure nen tang tren tu dong retry va request treo.
@@ -241,6 +242,9 @@ export async function POST(request) {
             p_idempotency_key: idempotencyKey,
         });
         if (mutationError) {
+            // Spec E2 §1: xung đột nghiệp vụ (phiên bản, trận sau đã bắt đầu) → câu tiếng Việt theo message RPC.
+            const conflict = classifyRpcConflict(mutationError);
+            if (conflict) return NextResponse.json({ error: conflict.message, code: conflict.code }, { status: conflict.status });
             const busy = LOCK_BUSY_CODES.includes(mutationError.code);
             const status = busy || CONFLICT_CODES.includes(mutationError.code) ? 409 : mutationError.code === '22023' ? 400 : mutationError.code === 'P0002' ? 404 : 500;
             return NextResponse.json({
@@ -259,8 +263,8 @@ export async function POST(request) {
             action: 'result_corrected',
             targetType: 'match',
             targetId: Number(matchId),
-            before: { winner: previousWinner },
-            after: { winner: resolved.winner_entrant_id },
+            before: { winner: previousWinner, games: (oldGames || []).map(({ game_no, score_a, score_b }) => ({ game_no, score_a, score_b })) },
+            after: { winner: resolved.winner_entrant_id, games: normalized.map(({ game_no, score_a, score_b }) => ({ game_no, score_a, score_b })) },
             reason,
         });
         if (!logged.ok) console.error('Ghi nhật ký sửa kết quả lỗi:', logged.error);

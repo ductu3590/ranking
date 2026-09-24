@@ -10,6 +10,7 @@ Plan: `docs/superpowers/plans/2026-09-23-tournament-setup-stitch-recovery.md`
 Spec theo lát: `docs/superpowers/specs/2026-09-23-stitch-setup/` (README + lat-0/a/b/c)
 Quyết định sản phẩm: `_workspace/unified-setup-ux/ADR-005-stitch-product-overrides.md` (D1–D12)
 Contract: `_workspace/unified-setup-ux/00-contract.md` (đã cập nhật shape v3)
+**Sau đợt Stitch (Lát 0/A/B/C đã lên production):** roadmap `docs/superpowers/plans/2026-09-24-tournament-roadmap.md`, quyết định D13–D20 ở `_workspace/unified-setup-ux/ADR-007-roadmap-decisions.md`.
 
 Tài liệu đợt trước (chỉ để tra lịch sử): `docs/superpowers/plans/2026-09-19-unified-internal-tournament-setup-parallel.md`, `docs/superpowers/plans/plan-1.md`.
 

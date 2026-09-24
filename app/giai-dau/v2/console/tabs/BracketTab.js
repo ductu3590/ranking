@@ -2,10 +2,12 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { listMatches, listEntrants } from '@/lib/tournamentV2Client';
-import { BracketView } from '../bracketRender';
+import { BracketView, DoubleElimBracketView } from '../bracketRender';
 import '../bracket.css';
 
-// Tab Sơ đồ — chỉ áp dụng cho thể thức loại trực tiếp (knockout).
+// Tab Sơ đồ — áp dụng cho loại trực tiếp (knockout) và loại kép (double_elim, ba khung W/L/GF).
+const BRACKET_FORMATS = new Set(['knockout', 'double_elim']);
+
 export default function BracketTab({ tournamentId, stageId, stages }) {
     const [matches, setMatches] = useState([]);
     const [gamesByMatchId, setGamesByMatchId] = useState({});
@@ -14,7 +16,8 @@ export default function BracketTab({ tournamentId, stageId, stages }) {
     const [error, setError] = useState('');
 
     const stage = (stages || []).find((s) => String(s.id) === String(stageId)) || null;
-    const isKnockout = stage?.schedule_format === 'knockout';
+    const isKnockout = BRACKET_FORMATS.has(stage?.schedule_format);
+    const isDoubleElim = stage?.schedule_format === 'double_elim';
 
     const load = useCallback(async () => {
         if (!stageId || !isKnockout) {
@@ -46,6 +49,7 @@ export default function BracketTab({ tournamentId, stageId, stages }) {
 
     if (!isKnockout) {
         // Giải không có chặng loại trực tiếp nào (vd. vòng tròn một chặng): không hiện gì.
+        // Loại kép luôn là stage duy nhất của nội dung nên không rơi vào nhánh này.
         if (!(stages || []).some((s) => s.schedule_format === 'knockout')) return null;
         return (
             <div className="v2-state v2-empty">
@@ -72,7 +76,7 @@ export default function BracketTab({ tournamentId, stageId, stages }) {
         );
     }
 
-    return (
-        <BracketView matches={matches} gamesByMatchId={gamesByMatchId} entrantsById={entrantsById} />
-    );
+    return isDoubleElim
+        ? <DoubleElimBracketView matches={matches} gamesByMatchId={gamesByMatchId} entrantsById={entrantsById} />
+        : <BracketView matches={matches} gamesByMatchId={gamesByMatchId} entrantsById={entrantsById} />;
 }

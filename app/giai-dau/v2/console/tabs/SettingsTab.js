@@ -300,7 +300,7 @@ export default function SettingsTab({ tournament, stage, stageId, stages, isAdmi
                                     <div className="v2-team-info">
                                         <span className="v2-team-name">{s.name}</span>
                                         <span className="v2-item-sub">
-                                            {s.schedule_format === 'knockout' ? 'Loại trực tiếp' : 'Vòng tròn'}
+                                            {s.schedule_format === 'knockout' ? 'Loại trực tiếp' : s.schedule_format === 'double_elim' ? 'Loại kép' : 'Vòng tròn'}
                                             {' · '}
                                             {s.match_format === 'mlp' ? 'MLP' : 'Thường'}
                                         </span>

@@ -44,6 +44,7 @@ Tham khảo mã nguồn mở (chỉ học ý tưởng, không chép code): tài 
 - **Bước 0 (song song với Epic 1):** soạn brief thiết kế và làm màn điều hành trên Stitch; lưu vào `_workspace/stitch-internal-setup/canonical/` (cạnh bộ setup, DESIGN.md là chuẩn token).
 - **Lát gợi ý:** trung tâm điều hành theo sân/lượt; nhập tỉ số + BO theo **từng trận** (bỏ ô chọn BO theo vòng với stage v4 — trái D8); một component sơ đồ nhánh dùng chung (single / W-L-GF / tranh hạng ba tách khỏi "Chung kết"); BXH + trang công khai; chặn nút Back khi có thay đổi chưa lưu.
 - **Nợ đã biết:** ô chờ hiện "Đội A / Đội B"; BRONZE bị gộp vào nhóm "Chung kết"; `koLabel` fallback còn sai cho dữ liệu không có `label`.
+- **Nợ ghi nhận khi người dùng chạy thử Epic 1 (loại kép):** tab Kết quả của stage `double_elim` vẫn hiện ô chọn BO1/BO3/BO5 theo "Lượt" (trái D8/D14 — đúng mục "bỏ ô chọn BO theo vòng" ở trên); thẻ trận báo "Dữ liệu trận đã thay đổi, hãy tải lại." khi lưu tỉ số — nghi do 068 tăng `version` của trận đích lúc điền cặp tiến cấp trong khi thẻ còn giữ `version` cũ (cần xác minh, rồi tải lại trận sau mỗi lần định tuyến). Người dùng sẽ liệt kê thêm các lỗi nhỏ khác khi bắt đầu Epic 2.
 
 ### Epic 3 — Giải giao hữu liên CLB (~2 lát)
 

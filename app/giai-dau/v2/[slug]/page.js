@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { getPublic } from '@/lib/tournamentV2Client';
 import { nextPollingDelay } from '@/lib/pollingBackoff';
 import { StandingsView } from '../console/standingsRender';
-import { BracketView } from '../console/bracketRender';
+import { BracketView, DoubleElimBracketView } from '../console/bracketRender';
 import ShareActions from '../ShareActions';
 import '../console/bracket.css';
 import './public.css';
@@ -56,9 +56,10 @@ function ScheduleList({ matches, entrantsById }) {
     );
 }
 
-// 1 giai đoạn: lịch + BXH (+ sơ đồ nếu knockout).
+// 1 giai đoạn: lịch + BXH (+ sơ đồ nếu loại trực tiếp / loại kép).
 function StageSection({ stage, matches, gamesByMatchId, entrantsById, standings }) {
-    const isKnockout = stage.schedule_format === 'knockout';
+    const isDoubleElim = stage.schedule_format === 'double_elim';
+    const isKnockout = stage.schedule_format === 'knockout' || isDoubleElim;
     return (
         <section className="v2pub-stage">
             <h2 className="v2pub-stage-title">{stage.name}</h2>
@@ -66,7 +67,9 @@ function StageSection({ stage, matches, gamesByMatchId, entrantsById, standings 
             {isKnockout ? (
                 <div className="v2pub-block">
                     <h3 className="v2pub-block-title">Sơ đồ thi đấu</h3>
-                    <BracketView matches={matches} gamesByMatchId={gamesByMatchId} entrantsById={entrantsById} />
+                    {isDoubleElim
+                        ? <DoubleElimBracketView matches={matches} gamesByMatchId={gamesByMatchId} entrantsById={entrantsById} />
+                        : <BracketView matches={matches} gamesByMatchId={gamesByMatchId} entrantsById={entrantsById} />}
                 </div>
             ) : null}
 

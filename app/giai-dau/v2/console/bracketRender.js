@@ -1,5 +1,7 @@
 'use client';
 
+import { annotateDoubleElim, doubleElimRoundLabel, BRACKET_TITLES } from '@/lib/tournament/doubleElimKeys';
+
 // Render sơ đồ cây loại trực tiếp dùng chung cho console (BracketTab) và trang công khai.
 // Cột theo round, các match sắp theo bracket_slot. Cuộn ngang trên mobile.
 
@@ -67,24 +69,31 @@ export function BracketView({ matches, gamesByMatchId, entrantsById }) {
     }
     const roundNums = Object.keys(rounds).map(Number).sort((a, b) => a - b);
     const maxRound = roundNums.length ? roundNums[roundNums.length - 1] : 0;
+    const columns = roundNums.map((rn) => ({ key: rn, label: roundLabel(rn, maxRound), matches: rounds[rn] }));
 
+    return <BracketColumns columns={columns} gamesByMatchId={gamesByMatchId} entrantsById={entrantsById} />;
+}
+
+// Cột theo vòng, trận trong cột sắp theo bracket_slot. Dùng chung cho nhánh đơn và từng nhánh loại kép.
+// noByes: loại kép không có trận bye (mọi ô đều có nguồn), ô trống luôn là "chờ".
+function BracketColumns({ columns, gamesByMatchId, entrantsById, noByes = false }) {
     return (
         <div className="v2-bracket-scroll">
             <div className="v2-bracket">
-                {roundNums.map((rn) => {
-                    const col = [...rounds[rn]].sort(
+                {columns.map((column) => {
+                    const col = [...column.matches].sort(
                         (a, b) => (a.bracket_slot ?? 0) - (b.bracket_slot ?? 0),
                     );
                     return (
-                        <div key={rn} className="v2-br-col">
-                            <div className="v2-br-col-head">{roundLabel(rn, maxRound)}</div>
+                        <div key={column.key} className="v2-br-col">
+                            <div className="v2-br-col-head">{column.label}</div>
                             {col.map((m) => {
                                 const nameA = entrantName(entrantsById, m.entrant_a_id);
                                 const nameB = entrantName(entrantsById, m.entrant_b_id);
                                 const score = matchScore(gamesByMatchId ? gamesByMatchId[m.id] : null);
                                 // BYE: 1 bên có đội, bên kia null và match đã done (qua thẳng).
-                                const aBye = m.entrant_a_id == null && m.entrant_b_id != null;
-                                const bBye = m.entrant_b_id == null && m.entrant_a_id != null;
+                                const aBye = !noByes && m.entrant_a_id == null && m.entrant_b_id != null;
+                                const bBye = !noByes && m.entrant_b_id == null && m.entrant_a_id != null;
                                 const winA = String(m.winner_entrant_id) === String(m.entrant_a_id);
                                 const winB = String(m.winner_entrant_id) === String(m.entrant_b_id);
                                 return (
@@ -108,6 +117,40 @@ export function BracketView({ matches, gamesByMatchId, entrantsById }) {
                     );
                 })}
             </div>
+        </div>
+    );
+}
+
+// Loại kép (Epic 1 D2 §4): ba khung Nhánh thắng / Nhánh thua / Chung kết tổng. Nhánh và vòng trong
+// nhánh suy từ match_key (W1-2, WF, L3-1, LF, GF) — cột round là lượt thi đấu, không phải vòng nhánh.
+export function DoubleElimBracketView({ matches, gamesByMatchId, entrantsById }) {
+    const list = Array.isArray(matches) ? matches : [];
+    if (!list.length) {
+        return (
+            <div className="v2-state v2-empty">
+                <p>Chưa có sơ đồ.</p>
+            </div>
+        );
+    }
+    const annotated = annotateDoubleElim(list).filter((item) => item.bracket);
+    return (
+        <div className="v2-de-bracket">
+            {['W', 'L', 'GF'].map((bracket) => {
+                const inBracket = annotated.filter((item) => item.bracket === bracket);
+                if (!inBracket.length) return null;
+                const roundsInBracket = [...new Set(inBracket.map((item) => item.bracketRound))].sort((a, b) => a - b);
+                const columns = roundsInBracket.map((round) => ({
+                    key: `${bracket}-${round}`,
+                    label: doubleElimRoundLabel(bracket, round, inBracket[0].lastRound),
+                    matches: inBracket.filter((item) => item.bracketRound === round).map((item) => item.match),
+                }));
+                return (
+                    <section key={bracket} className="v2-de-section" data-bracket={bracket}>
+                        <h4 className="v2-de-section-title">{BRACKET_TITLES[bracket]}</h4>
+                        <BracketColumns columns={columns} gamesByMatchId={gamesByMatchId} entrantsById={entrantsById} noByes />
+                    </section>
+                );
+            })}
         </div>
     );
 }

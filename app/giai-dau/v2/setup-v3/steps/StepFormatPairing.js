@@ -8,11 +8,13 @@ import * as Pairing from '@/lib/tournament/pairingDraft';
 import { newIdempotencyKey } from '@/lib/tournamentV2Client';
 import GroupKnockoutConfig from './GroupKnockoutConfig';
 import KnockoutConfig from './KnockoutConfig';
+import DoubleElimConfig from './DoubleElimConfig';
 
 const FORMAT_BLURB = {
   group_knockout: 'Chia bảng đấu vòng tròn, các cặp dẫn đầu vào vòng loại trực tiếp.',
   round_robin: 'Mọi cặp gặp nhau một lần, xếp hạng theo bảng điểm.',
   knockout: 'Thua một trận là dừng, phù hợp giải đông cặp cần xong nhanh.',
+  double_elimination: 'Thua hai trận mới bị loại: nhánh thắng, nhánh thua và chung kết tổng.',
 };
 
 const makePairId = () => `pair_${newIdempotencyKey().replace(/[^A-Za-z0-9]/g, '').slice(0, 24)}`;
@@ -226,6 +228,7 @@ export default function StepFormatPairing({ draft, roster, readiness, showErrors
 
       {draft.format.formatKey === 'group_knockout' ? <GroupKnockoutConfig draft={draft} onChange={onChange} /> : null}
       {draft.format.formatKey === 'knockout' ? <KnockoutConfig draft={draft} onChange={onChange} /> : null}
+      {draft.format.formatKey === 'double_elimination' ? <DoubleElimConfig draft={draft} onChange={onChange} /> : null}
       {draft.format.formatKey === 'round_robin' ? (
         <div className="pc-notice pc-notice--info">
           <p><strong>Vòng tròn:</strong> mỗi cặp gặp mọi cặp khác một lần, mỗi trận 1 ván (BO1). Không có chung kết; xếp hạng theo bảng điểm sau lượt cuối.</p>

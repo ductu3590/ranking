@@ -60,3 +60,9 @@ Sinh bởi `node scripts/qa/epic-1-de-integration.js --applied --only=<kịch b�
 ### Chưa làm — cần người dùng (D24)
 
 Chạy thật trên browser trong CLB 59 (người dùng tự đăng nhập): hành trình 4 bước với 7 cặp (1 bye) và 5 cặp; 390px / tablet / desktop; chốt; nhập hết tỉ số tới chung kết tổng; BXH đúng D22; `Kết thúc giải & chốt xếp hạng`; trang công khai. Giữ lại giải test. Sau đó merge PR để Vercel deploy.
+
+## Nghiệm thu của người dùng (2026-09-24)
+
+Người dùng chạy thật trên browser: quy trình tạo giải loại kép và nhập tỉ số ra kết quả đúng. **Kết luận: nhánh PASS.** Một số lỗi nhỏ để lại cho Epic 2 (người dùng sẽ nêu khi bắt đầu Epic 2). Từ ảnh chụp người dùng gửi, đã ghi vào roadmap mục Epic 2 "Nợ ghi nhận": ô chọn BO theo "Lượt" vẫn hiện ở tab Kết quả; thông báo "Dữ liệu trận đã thay đổi, hãy tải lại." khi lưu tỉ số (nghi phiên bản trận cũ sau khi 068 điền cặp tiến cấp).
+
+Còn lại: người dùng merge PR để Vercel deploy production.

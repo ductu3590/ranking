@@ -17,3 +17,14 @@ Bối cảnh: Lát 0/A/B/C (vòng bảng → loại trực tiếp, vòng tròn, 
 | D20 | MLP bản đầu **không ràng buộc giới tính**: đội tự xếp cặp từng ván con, có dreambreaker | `club_members`/`athletes` chưa có cột giới tính; engine `match/mlp.js` đã hỗ trợ kiểu "vòng/cặp" |
 
 Các câu hỏi còn để ngỏ, chốt ở vòng brainstorm của từng việc: xem mục "Câu hỏi mở" của từng epic trong roadmap.
+
+## Bổ sung — Epic 1 (loại kép), brainstorm 2026-09-24
+
+Chốt bằng AskUserQuestion (người dùng chọn cả bốn phương án đề xuất). Spec: `docs/superpowers/specs/2026-09-24-epic-1-double-elim/`.
+
+| Mã | Quyết định | Lý do |
+|---|---|---|
+| D21 | Tên vòng: `Nhánh thắng · Vòng r` / `Bán kết nhánh thắng` / `Chung kết nhánh thắng`; `Nhánh thua · Vòng r` / `Chung kết nhánh thua`; `Chung kết tổng`. Mã nội bộ `W<r>-<ô>`, `WF`, `L<r>-<ô>`, `LF`, `GF` | Dễ hiểu với VĐV phong trào; mã ngắn chỉ dùng nội bộ |
+| D22 | Không trận tranh hạng ba. Hạng 3 = thua `LF`; hạng 4 = thua trận nhánh thua ngay trước `LF`; còn lại đồng hạng theo vòng bị loại ở nhánh thua (5–6, 7–8, 9–12…) | `LF` đã phân hạng 3 tự nhiên; không thêm trận/nhánh bất biến |
+| D23 | Chống gặp lại sớm: người thua nhánh thắng từ vòng 2 được thả sang nửa đối diện nhánh thua (bảng hoán vị cố định theo số trận vòng nhận) | Engine thả 1:1 nên có thể tái đấu ngay đối thủ vừa gặp |
+| D24 | Epic 1 deploy qua nhánh + PR nháp: agent apply migration (ROLLBACK trước, md5 sau) và kiểm thử tích hợp; người dùng chạy browser CLB 59 rồi merge | Người dùng giữ quyền quyết định lên production |

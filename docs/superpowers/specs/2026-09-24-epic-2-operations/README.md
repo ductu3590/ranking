@@ -39,7 +39,8 @@ hiện bắt buộc phải sửa SQL, dừng lại và bổ sung spec (quy tắc
    "Nhanhthangthua" (group 1) có trận `GF` (id 1469) ở trạng thái `live`, mới một bên, 0 ván. Route
    `POST /api/tournament-v2/games` nhận lưu **khi trận thiếu cặp và khi không có ván nào**, và mọi lần lưu chưa đủ
    ván đều đặt `status = 'live'`. Khi chốt `LF`, hàm 068 thấy trận đích không còn `pending|warmup` → ném
-   `PLAYOFF_TARGET_CONFLICT` (40001) → route gộp chung thông báo với lỗi phiên bản. Toàn database chỉ có đúng 1 trận
+   `PLAYOFF_TARGET_CONFLICT` (trên production là SQLSTATE `PH409` sau migration 078, không phải `40001` như file 068) →
+   route gộp chung thông báo với lỗi phiên bản (cũng `PH409`). Toàn database chỉ có đúng 1 trận
    rơi vào trạng thái này. Hàm 068 đúng; lỗi ở route + UI.
 2. Route `match-transition` cho phép chuyển trận sang `finalized` **không kèm tỉ số / người thắng / tiến cấp**
    (nút "Ghi điểm / Chốt" của ControlStep, W.O., bỏ cuộc). Trận loại trực tiếp chốt kiểu này không bao giờ điền cặp
@@ -58,13 +59,32 @@ hiện bắt buộc phải sửa SQL, dừng lại và bổ sung spec (quy tắc
 ```text
 lib/tournament/matchLabels.js      (mới, thuần)  match_key + stage + transitions → nhãn tiếng Việt, nhãn ô chờ
 lib/tournament/operationsBoard.js  (mới, thuần)  courts + matches + entries + assignments + transitions → view model bàn điều hành
-lib/tournament/scoreEntry.js       (mới, thuần)  kiểm điều kiện lưu tỉ số, suy trạng thái, tạo ván W.O./bỏ cuộc
-GET  /api/tournament-v2/operations?tournamentId=   (mới)  trả view model (E1)
-POST /api/tournament-v2/games                      (sửa)  chặn trận thiếu cặp / không ván; ghi mốc giờ; W.O./bỏ cuộc (E1)
-POST /api/tournament-v2/match-transition           (sửa)  chặn *→finalized; kiểm cặp sẵn sàng khi gọi sân (E1)
+lib/tournament/scoreEntry.js       (mới, thuần)  assertScoreSavable, classifyRpcConflict (theo message, không theo SQLSTATE)
+GET  /api/tournament-v2/operations?tournamentId=   (mới, need:read)  trả view model (E1)
+POST /api/tournament-v2/games                      (sửa)  chặn trận đã chốt / thiếu cặp / không ván / lưu dở khi chưa đấu; ended_at có điều kiện (E1)
+POST /api/tournament-v2/withdraw                   (sửa nhẹ) W.O. + bỏ cuộc qua RPC 096 (một transaction), kiểm trạng thái (E1)
+POST /api/tournament-v2/match-transition           (sửa)  chặn *→finalized; kiểm cặp/sân bận khi gọi sân (E1)
+POST /api/tournament-v2/corrections                (giữ)  "Sửa kết quả" trận đã chốt, RPC graph-aware 069/070 (E2)
 app/giai-dau/v2/console/*                          (viết lại shell + 4 mục; E1 Điều hành, E2 ba mục còn lại)
 components dùng chung console ↔ công khai: BracketView, StandingsView, MatchRow, ScoreSheet (chỉ console)
 ```
+
+## Review spec lần 1 (2026-09-24)
+
+Review độc lập (14 mục + 3 Low) đã được đối chiếu với code/DB. Tiếp thu: W.O./bỏ cuộc đi RPC 096 (một transaction,
+không UPDATE `result_type` ngoài RPC); sửa kết quả đi route `corrections` (action `result_corrected`); phân loại lỗi theo
+message vì production dùng `PH409`; `started_at` chỉ do transition ghi, `ended_at` bằng UPDATE có điều kiện; K4 không
+lưu một chạm; giữ `overview→control`, thêm `openreg`; nhãn loại kép không đi `knockoutPlacementLabels`; tab Sơ đồ theo
+stage; nhóm theo `match_key`; `onSelectMatch` tùy chọn; quyền ghi của Cài đặt; WHERE chặt cho sửa trận 1469; poll dùng
+`nextPollingDelay`; bổ sung test.
+Giải trình (không áp dụng nguyên văn):
+- *"Thêm `retired` bắt buộc sửa SQL"* — không đúng: BXH tính trong Node (`standingsService` → engine JS), hàm 103 chỉ
+  nhận thứ hạng Node truyền vào. Tuy vậy vẫn chọn phương án đơn giản hơn: bỏ cuộc ghi `walkover` qua RPC 096, phân biệt
+  bằng action nhật ký → không cần nhánh `retired`.
+- *"Cấm mọi lần lưu khi chưa `live|paused`"* — không áp dụng; xem E1 §6.7 (dữ liệu thật cho thấy người dùng nhập tỉ số
+  thẳng; hỏng dữ liệu đến từ thiếu cặp / lưu dở, đã chặn riêng).
+- *"Không UPDATE ngoài RPC"* cho `ended_at` — giữ một UPDATE có điều kiện, idempotent, không đụng `version` (E1 §6.3), vì
+  mục tiêu không migration; hậu quả khi lỗi chỉ là thiếu một mốc thống kê.
 
 ## Ca nghiệm thu xuyên suốt (chạy tay trên CLB 59, người dùng — D27)
 

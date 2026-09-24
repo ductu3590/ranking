@@ -28,3 +28,14 @@ Chốt bằng AskUserQuestion (người dùng chọn cả bốn phương án đ�
 | D22 | Không trận tranh hạng ba. Hạng 3 = thua `LF`; hạng 4 = thua trận nhánh thua ngay trước `LF`; còn lại đồng hạng theo vòng bị loại ở nhánh thua (5–6, 7–8, 9–12…) | `LF` đã phân hạng 3 tự nhiên; không thêm trận/nhánh bất biến |
 | D23 | Chống gặp lại sớm: người thua nhánh thắng từ vòng 2 được thả sang nửa đối diện nhánh thua (bảng hoán vị cố định theo số trận vòng nhận) | Engine thả 1:1 nên có thể tái đấu ngay đối thủ vừa gặp |
 | D24 | Epic 1 deploy qua nhánh + PR nháp: agent apply migration (ROLLBACK trước, md5 sau) và kiểm thử tích hợp; người dùng chạy browser CLB 59 rồi merge | Người dùng giữ quyền quyết định lên production |
+
+## Bổ sung — Epic 2 (tối ưu điều hành), brainstorm 2026-09-24
+
+Chốt bằng AskUserQuestion. Brief thiết kế: `_workspace/epic-2-operations/01_stitch_brief.md`.
+
+| Mã | Quyết định | Lý do |
+|---|---|---|
+| D25 | Giữ D16: người dùng làm màn điều hành trên **Stitch** theo brief; agent không tự dựng mockup thay Stitch, chỉ chia lát code sau khi màn được xuất về `canonical/operations/` | Nhất quán với bộ setup đã duyệt |
+| D26 | Lát đầu Epic 2 là **trung tâm điều hành theo sân/lượt**, gom luôn các nợ liên quan (ô chờ theo nguồn, bỏ ô BO theo lượt, lỗi phiên bản trận sau tiến cấp, chặn Back khi chưa lưu) | Người dùng ưu tiên màn chạy giải trong ngày |
+| D27 | Deploy Epic 2 như D24: nhánh + PR nháp, agent apply migration (nếu có) và kiểm thử tích hợp; người dùng chạy browser CLB 59 rồi merge | Người dùng giữ quyền lên production |
+| D28 | Phạm vi nợ = danh sách đã ghi trong roadmap mục Epic 2; không thêm lỗi mới ở vòng này | Người dùng xác nhận |

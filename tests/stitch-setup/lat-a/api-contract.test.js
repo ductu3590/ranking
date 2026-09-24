@@ -44,7 +44,8 @@ suite('lát A — hợp đồng API & migration', {
     assert.ok(recompute > 0 && compare > recompute && rpc > compare);
     assert.ok(finalize.includes('firstBlocker(draft, ctx, 4)'));
     assert.equal(/body\?\.plan|body\.plan/.test(finalize), false, 'không nhận plan từ client');
-    assert.ok(finalize.includes('redirect: `/dieu-hanh-giai/${tournamentId}?step=schedule`'));
+    // Chốt xong mở mục Điều hành (Epic 2, yêu cầu người dùng 2026-09-24 — ADR-006 mục "Bổ sung sau E1").
+    assert.ok(finalize.includes('redirect: `/dieu-hanh-giai/${tournamentId}?step=control`'));
     const code = finalize.replace(/^\s*\/\/.*$/gm, '');
     assert.equal(/LIVE|setLive/.test(code), false, 'không tự chuyển LIVE');
   },

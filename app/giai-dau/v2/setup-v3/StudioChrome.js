@@ -6,7 +6,7 @@ import { messageFor } from '@/lib/tournament/setupMessages';
 export const STUDIO_STEPS = [
   { id: 1, title: 'Thông tin giải' },
   { id: 2, title: 'Người tham gia' },
-  { id: 3, title: 'Thể thức & ghép cặp' },
+  { id: 3, title: 'Ghép cặp, thể thức & sân' },
   { id: 4, title: 'Bốc thăm & chốt' },
 ];
 

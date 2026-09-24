@@ -15,11 +15,13 @@ const db = supabaseAdmin || supabaseServer;
 
 // Xung đột nghiệp vụ trên production là 'PH409' (migration 078); phân loại theo thông điệp
 // exception vì lỗi phiên bản và lỗi trận đích (068) dùng chung mã (spec Epic 2 E1 §6.2).
+const CONFLICT_CODES = ['PH409', '40001'];
+
 function rpcErrorResponse(error) {
     const conflict = classifyRpcConflict(error);
     if (conflict) return NextResponse.json({ error: conflict.message, code: conflict.code }, { status: conflict.status });
     const code = error?.code;
-    const status = code === '22023' ? 400 : code === 'P0002' ? 404 : 500;
+    const status = CONFLICT_CODES.includes(code) ? 409 : code === '22023' ? 400 : code === 'P0002' ? 404 : 500;
     return NextResponse.json({ error: error?.message || 'Không lưu được tỉ số.', code: code || 'MUTATION_FAILED' }, { status });
 }
 

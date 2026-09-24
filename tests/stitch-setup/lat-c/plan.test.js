@@ -15,7 +15,8 @@ const incoming = (p, key, side) => p.progressions.filter((e) => e.targetMatchKey
 function pairedDraft(n, format) {
   const memberIds = Array.from({ length: n * 2 }, (_, i) => String(i + 1));
   const pairs = pairIds(n).map((pairId, i) => ({ pairId, participantRefs: [`member:${2 * i + 1}`, `member:${2 * i + 2}`] }));
-  return { draftVersion: 3, participants: { memberIds, guests: [] }, pairs, format };
+  // courtCount: số sân chuyển sang Bước 3 (ADR-006 mục "Bổ sung sau E1").
+  return { draftVersion: 3, tournament: { courtCount: 2 }, participants: { memberIds, guests: [] }, pairs, format };
 }
 
 suite('lát C — plan loại trực tiếp', {

@@ -11,7 +11,8 @@ function draftWith(pairCount, formatKey = 'double_elimination', config = {}) {
   const memberIds = Array.from({ length: pairCount * 2 }, (_, i) => String(i + 1));
   return {
     draftVersion: 3,
-    tournament: { name: 'IT', eventDate: '2026-10-12', organizerMode: 'internal' },
+    // courtCount: số sân chuyển sang Bước 3 (ADR-006 mục "Bổ sung sau E1").
+    tournament: { name: 'IT', eventDate: '2026-10-12', courtCount: 2, organizerMode: 'internal' },
     participants: { memberIds, guests: [] },
     format: { entrantType: 'doubles', formatKey, config },
     pairs: Array.from({ length: pairCount }, (_, i) => ({ pairId: `pair_${i}`, participantRefs: [`member:${2 * i + 1}`, `member:${2 * i + 2}`], locked: false })),

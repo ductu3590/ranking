@@ -171,7 +171,7 @@ async function checkTransitionGuards(guards, tournamentId, groupId) {
     }
     if (guards.includes('no_finalized_matches') && counts.finalized > 0) {
         return NextResponse.json({
-            error: `Giải đã có ${counts.finalized} trận chốt kết quả, không quay về Đã chốt lịch được.`,
+            error: `Giải đã có ${counts.finalized} trận chốt kết quả, không quay về Chờ diễn ra được.`,
             code: 'TOURNAMENT_HAS_FINALIZED_MATCHES',
         }, { status: 409 });
     }

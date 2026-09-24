@@ -49,6 +49,7 @@
 .v2-console-status i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 .v2-console-status.is-live { border-color: #a7f3d0; background: var(--pc-ok-bg); color: var(--pc-ok); }
 .v2-console-status.is-live i { animation: v2-console-blip 1.6s infinite; }
+.v2-console-status.is-scheduled { border-color: var(--pc-brand-200); background: var(--pc-brand-50); color: var(--pc-brand-700); }
 @keyframes v2-console-blip { 50% { opacity: .25; } }
 
 .v2-console-body { flex: 1; display: grid; grid-template-columns: 16rem minmax(0, 1fr); min-height: 0; }

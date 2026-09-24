@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useMemo, useState } from 'react';
 import { listFormats } from '@/lib/tournament/setupFormats';
+import { suggestCourts } from '@/lib/tournament/courtSuggestion';
 import { messageFor } from '@/lib/tournament/setupMessages';
 import { parseRef } from '@/lib/tournament/setupDraftV3';
 import * as Pairing from '@/lib/tournament/pairingDraft';
@@ -190,30 +191,89 @@ function PairingBoard({ draft, roster, onChange, onAddPerson, stepResult, showEr
   );
 }
 
+// Số sân (chuyển từ Bước 1 sang đây): biết số cặp + thể thức mới gợi ý được số sân.
+function CourtConfig({ draft, onChange, issue, showErrors, sectionKey }) {
+  const base = useId();
+  const courtCount = Number.isInteger(draft.tournament.courtCount) ? draft.tournament.courtCount : null;
+  const suggestion = suggestCourts({ formatKey: draft.format.formatKey, config: draft.format.config, pairCount: draft.pairs.length });
+  const setCourts = (value) => onChange((current) => ({
+    ...current,
+    tournament: { ...current.tournament, courtCount: value === '' || value == null ? null : Math.max(1, Math.min(20, Number(value) || 1)) },
+  }));
+  const surplus = suggestion && courtCount != null && courtCount > suggestion.maxUseful;
+  const showIssue = issue && (showErrors || courtCount != null);
+
+  return (
+    <section className="pc-card" aria-labelledby={`${base}-title`} data-section="courts">
+      <div className="pc-card__head">
+        <h3 id={`${base}-title`} className="pc-card__title"><span className="pc-section-key">{sectionKey}</span>Số sân thi đấu</h3>
+        <span className="pc-card__hint">1–20 sân · tự tạo Sân 01…N khi chốt giải</span>
+      </div>
+      <div className="pc-courts">
+        <div className="pc-field">
+          <label className="pc-field__label" htmlFor={`${base}-count`}><span>Số sân sử dụng<span className="pc-req" aria-hidden="true"> *</span></span></label>
+          <div className="pc-counter">
+            <button type="button" aria-label="Bớt một sân" disabled={!courtCount || courtCount <= 1} onClick={() => setCourts((courtCount || 1) - 1)}>−</button>
+            <input
+              id={`${base}-count`} inputMode="numeric" value={courtCount ?? ''} aria-invalid={Boolean(showIssue) || undefined}
+              aria-describedby={`${base}-suggest`}
+              onChange={(event) => setCourts(event.target.value.replace(/\D/g, ''))}
+            />
+            <button type="button" aria-label="Thêm một sân" disabled={courtCount >= 20} onClick={() => setCourts((courtCount || 0) + 1)}>+</button>
+          </div>
+          {showIssue ? <span className="pc-field__error" data-code={issue.code}>{messageFor(issue.code, issue.params).text}</span> : null}
+        </div>
+        <div id={`${base}-suggest`} className="pc-court-suggest" aria-live="polite">
+          {suggestion ? (
+            <>
+              <p><strong>Gợi ý: {suggestion.suggested} sân</strong> cho {draft.pairs.length} cặp. {suggestion.reason}</p>
+              {surplus ? <p className="pc-card__hint">Chỉ tối đa {suggestion.maxUseful} trận diễn ra cùng lúc — {courtCount - suggestion.maxUseful} sân sẽ để trống.</p> : null}
+              {courtCount !== suggestion.suggested ? (
+                <button type="button" className="pc-btn pc-btn--sm pc-btn--soft" onClick={() => setCourts(suggestion.suggested)}>Dùng {suggestion.suggested} sân</button>
+              ) : <span className="pc-badge pc-badge--ok">Đang dùng số sân gợi ý</span>}
+            </>
+          ) : <p className="pc-card__hint">Ghép cặp xong sẽ có gợi ý số sân.</p>}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function StepFormatPairing({ draft, roster, readiness, showErrors, onChange, onGoToStep }) {
   const base = useId();
   const stepResult = readiness.byStep[3];
   const formatIssue = stepResult.blockers.find((item) => item.field === 'format');
+  const courtIssue = stepResult.blockers.find((item) => item.code === 'COURT_COUNT_INVALID');
   const countIssue = stepResult.blockers.find((item) => item.code === 'PAIR_COUNT_BELOW_MINIMUM')
     || stepResult.warnings.find((item) => item.code === 'PAIR_COUNT_OUTSIDE_RECOMMENDED');
   const total = draft.participants.memberIds.length + draft.participants.guests.length;
 
+  // Thứ tự: ghép cặp trước → biết số cặp → chọn thể thức → số sân (yêu cầu người dùng 2026-09-24).
   return (
     <>
       <section className="pc-card pc-card--hero" aria-labelledby={`${base}-title`}>
         <div className="pc-card__head">
           <div>
             <p className="pc-eyebrow">Thiết lập thi đấu</p>
-            <h2 id={`${base}-title`} className="pc-hero-title">Thể thức &amp; ghép cặp</h2>
-            <p className="pc-lead">Chọn thể thức rồi ghép {total} VĐV thành các cặp đánh đôi.</p>
+            <h2 id={`${base}-title`} className="pc-hero-title">Ghép cặp, thể thức &amp; sân</h2>
+            <p className="pc-lead">Ghép {total} VĐV thành các cặp đánh đôi, rồi chọn thể thức và số sân phù hợp với số cặp.</p>
           </div>
           <span className="pc-badge pc-badge--brand">{draft.pairs.length * 2}/{total} VĐV đã vào cặp</span>
         </div>
       </section>
 
-      <section className="pc-card" aria-labelledby={`${base}-format`}>
+      <section className="pc-card" aria-labelledby={`${base}-pairs`} data-section="pairs">
         <div className="pc-card__head">
-          <h3 id={`${base}-format`} className="pc-card__title"><span className="pc-section-key">A</span>Chọn thể thức thi đấu</h3>
+          <h3 id={`${base}-pairs`} className="pc-card__title"><span className="pc-section-key">A</span>Bảng ghép cặp thi đấu</h3>
+          <span className="pc-card__hint">{draft.pairs.length} cặp · không có danh sách dự bị</span>
+        </div>
+        <PairingBoard draft={draft} roster={roster} onChange={onChange} stepResult={stepResult} showErrors={showErrors} onAddPerson={() => onGoToStep(2)} />
+      </section>
+
+      <section className="pc-card" aria-labelledby={`${base}-format`} data-section="format">
+        <div className="pc-card__head">
+          <h3 id={`${base}-format`} className="pc-card__title"><span className="pc-section-key">B</span>Chọn thể thức thi đấu</h3>
+          {draft.pairs.length ? <span className="pc-card__hint">Đang có {draft.pairs.length} cặp</span> : null}
         </div>
         <FormatCards draft={draft} onChange={onChange} />
         {formatIssue && showErrors ? (
@@ -235,13 +295,7 @@ export default function StepFormatPairing({ draft, roster, readiness, showErrors
         </div>
       ) : null}
 
-      <section className="pc-card" aria-labelledby={`${base}-pairs`}>
-        <div className="pc-card__head">
-          <h3 id={`${base}-pairs`} className="pc-card__title"><span className="pc-section-key">{draft.format.formatKey === 'round_robin' ? 'B' : 'D'}</span>Bảng ghép cặp thi đấu</h3>
-          <span className="pc-card__hint">Không có danh sách dự bị</span>
-        </div>
-        <PairingBoard draft={draft} roster={roster} onChange={onChange} stepResult={stepResult} showErrors={showErrors} onAddPerson={() => onGoToStep(2)} />
-      </section>
+      <CourtConfig draft={draft} onChange={onChange} issue={courtIssue} showErrors={showErrors} sectionKey={draft.format.formatKey && draft.format.formatKey !== 'round_robin' ? 'D' : 'C'} />
     </>
   );
 }

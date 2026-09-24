@@ -69,7 +69,8 @@ suite('lát B — plan vòng tròn tính điểm', {
     assert.throws(() => plan(2), (e) => e.code === 'PAIR_COUNT_BELOW_MINIMUM' && e.params.min === 3);
     const memberIds = Array.from({ length: 14 }, (_, i) => String(i + 1));
     const pairs = pairIds(7).map((pairId, i) => ({ pairId, participantRefs: [`member:${2 * i + 1}`, `member:${2 * i + 2}`] }));
-    const result = validateStep({ draftVersion: 3, participants: { memberIds, guests: [] }, pairs, format: { formatKey: 'round_robin', config: {} } }, 3);
+    // courtCount: số sân chuyển sang Bước 3 (ADR-006 mục "Bổ sung sau E1").
+    const result = validateStep({ draftVersion: 3, tournament: { courtCount: 3 }, participants: { memberIds, guests: [] }, pairs, format: { formatKey: 'round_robin', config: {} } }, 3);
     assert.equal(result.ok, true);
     assert.deepEqual(result.warnings.map((w) => w.code), ['PAIR_COUNT_OUTSIDE_RECOMMENDED']);
   },

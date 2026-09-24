@@ -35,3 +35,19 @@ console 4 mục (`ConsoleShell`, `TournamentConsoleV2`, `control/ControlCenter`,
 | Trang xem trước tạm (dựng từ `buildSetupPlan` + `buildOperationsBoard` thật, fetch giả lập; đã xoá, không commit) | 1280px: thẻ sân live/khởi động/trống/ngưng, gợi ý không trùng, "Cặp đang đấu ở Sân 01", ô chờ "Nhất bảng A"; sheet: 11–10 báo "phải thắng cách 2 điểm" + khóa nút chốt, 12–10 mở khóa; xung đột phiên bản hiện 2 cột, khóa lưu tới khi chọn; Back khi chưa lưu → hộp "Bạn có tỉ số chưa lưu", "Bỏ thay đổi" đóng sheet giữ trang; lịch sử: mở +1 mục, đóng gỡ đúng 1. 375px: không tràn ngang, thanh tab đáy, bottom sheet vừa khít, thẻ gọi sân đúng thiết kế. Không lỗi console |
 
 Chưa làm — cần người dùng (D27): chạy thật K1/K2/K3/K4 trên CLB 59 (đăng nhập admin), đặc biệt K2 chạy tới `GF`.
+
+## Bổ sung sau E1 — tạo giải & trạng thái (2026-09-24)
+
+Yêu cầu người dùng: (1) Bước 1 không gõ được dấu cách; (2) Bước 3 ghép cặp lên đầu; (3) số sân chuyển sang
+Bước 3 kèm gợi ý, tự tạo Sân 01…N; (4) chốt xong → "Chờ diễn ra", Nháp chỉ khi chưa xong 4 bước;
+(5) nút nổi bật vào trang điều hành.
+
+- Nguyên nhân (1): reducer `edit` chạy `normalizeDraft` → `trim()` mỗi phím, dấu cách cuối bị xoá ngay.
+  Sửa: `normalizeDraft(raw, { keepWhitespace: true })` khi đang gõ; lưu/kiểm luật vẫn cắt.
+- (3)(4): migration `109_prepare_tournament_after_finalize.sql` (hàm idempotent + bù dữ liệu cũ, trừ giải 204).
+  Route finalize gọi hàm sau RPC chốt; gọi trận đầu tiên (`warmup`/`live`) chuyển `scheduled → live`.
+- Test: `tests/stitch-setup/epic-2/setup-followup.test.js` 11/11; `test:stitch-setup` xanh trừ `epic-1/ui-contract`
+  (CRLF, có từ trước); `test:tournament`, `test:open-registration` xanh; `next build` OK.
+- Trang xem trước tạm (đã xoá): gõ "Giải nội bộ tháng 10", "Cụm sân CLB Mỹ Đình", "Thể lệ BO3 mỗi trận" giữ
+  nguyên dấu cách; Bước 3 thứ tự A ghép cặp → B thể thức → C cấu hình → D số sân; 6 cặp/3 bảng gợi ý 3 sân,
+  bấm "Dùng 3 sân" → courtCount 3; 375px không tràn ngang; không lỗi console.

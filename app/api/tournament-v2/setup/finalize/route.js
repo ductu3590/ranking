@@ -10,7 +10,8 @@ import { firstBlocker, setupContext } from '@/lib/tournament/setupServer';
 
 // Chốt giải luồng v3 (spec Lát A §10): route TÍNH LẠI plan từ bản nháp đã lưu (không tin
 // plan do client gửi), so fingerprint với bản đã xem trước, rồi gọi RPC v4 ghi nguyên tử.
-// Chốt xong chuyển tới lịch; không tự chuyển LIVE.
+// Chốt xong: giải chuyển "Chờ diễn ra" (scheduled) và có sẵn Sân 01…N theo số sân đã nhập
+// (migration 109). Không tự chuyển LIVE — trận đầu tiên được gọi vào sân mới chuyển.
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -104,13 +105,21 @@ export async function POST(request) {
             return fail(code || 'FINALIZE_NOT_ATOMIC', error.code === 'P0002' ? 404 : 409);
         }
 
+        // Bước phụ sau chốt: idempotent, lỗi ở đây KHÔNG làm hỏng giải đã chốt (lần mở sau vẫn gọi lại được).
+        const prepared = await db.rpc('prepare_tournament_after_finalize', {
+            p_group_id: Number(admin.groupId),
+            p_tournament_id: Number(tournamentId),
+        });
+        if (prepared.error) console.error('Prepare after finalize error:', prepared.error);
+
         return NextResponse.json({
             success: true,
             ...(data || {}),
+            prepared: prepared.error ? null : prepared.data,
             tournamentId: Number(tournamentId),
             divisionId: Number(divisionId),
             revision: Number(data?.setup_revision || expectedRevision + 1),
-            redirect: `/dieu-hanh-giai/${tournamentId}?step=schedule`,
+            redirect: `/dieu-hanh-giai/${tournamentId}?step=control`,
         });
     } catch (error) {
         console.error('Setup finalize error:', error);

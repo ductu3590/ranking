@@ -75,6 +75,12 @@ export async function POST(request) {
         division_id: stageResult.data.division_id, match_id: Number(matchId), court_id: body.court_id }, { onConflict: 'group_id,match_id' });
       if (courtResult.data) await db.from('tournament_matches').update({ court: courtResult.data.label }).eq('id', matchId).eq('group_id', access.groupId);
     }
+    // Trận đầu tiên được gọi vào sân → giải "Chờ diễn ra" chuyển "Đang diễn ra". Có điều kiện nên chạy lại vô hại.
+    if (to === 'warmup' || to === 'live') {
+      const started = await db.from('tournaments').update({ status: 'live', updated_at: new Date().toISOString() })
+        .eq('id', stageResult.data.tournament_id).eq('group_id', access.groupId).eq('status', 'scheduled');
+      if (started.error) console.error('Tournament go-live error:', started.error);
+    }
     await writeOperationLog(db, { groupId: access.groupId, tournamentId: stageResult.data.tournament_id, divisionId: stageResult.data.division_id,
       actor: access.actor?.kind || 'admin', action: verdict.action, targetType: 'match', targetId: matchId,
       before: { status: matchResult.data.status }, after: { status: to, result_type: nextResultType || matchResult.data.result_type }, reason: reason || null });

@@ -64,3 +64,17 @@ Console sau khi chốt giải còn 4 mục (ADR-007 D29): bước Cấu hình / 
 (route `stages`), `tests/phase3/wizard-redesign-contract.test.js` (nhãn wizard). Trên Windows,
 `tests/stitch-setup/epic-1/ui-contract.test.js` đỏ cục bộ vì `StepDraw.js` được checkout CRLF (`core.autocrlf=true`)
 trong khi test so chuỗi có `\n`; không đổi file.
+
+## Bổ sung sau E1 — tạo giải (2026-09-24, yêu cầu người dùng)
+
+Số sân chuyển từ Bước 1 sang Bước 3 (sau khi ghép cặp mới gợi ý được số sân); chốt giải mở mục "Điều hành".
+
+| File | Xử lý | Lý do |
+|---|---|---|
+| `tests/stitch-setup/lat-0/step-rules.test.js` | Bỏ `COURT_COUNT_INVALID` khỏi 2 ca bước 1; thêm ca bước 3 | Luật số sân nay thuộc bước 3 (`setupStepRules.step3`) |
+| `tests/stitch-setup/epic-1/registry.test.js`, `lat-b/plan.test.js`, `lat-c/plan.test.js` | Fixture bước 3 thêm `tournament.courtCount` | Bản nháp mẫu thiếu số sân nên bước 3 chặn thêm `COURT_COUNT_INVALID` |
+| `tests/stitch-setup/lat-a/api-contract.test.js` | Redirect sau chốt `?step=schedule` → `?step=control` | Chốt xong vào thẳng mục Điều hành |
+
+`tests/unified-setup/release-hardening.contract.test.js` từng đỏ sau E1 (route `games` bỏ khai báo
+`CONFLICT_CODES`): khai báo lại và dùng làm mã 409 dự phòng — không sửa test.
+`tests/unified-setup/legacy-wizard-retired.contract.test.js` (3 ca soi wizard v2 đã gỡ) đỏ từ trước, không đụng.

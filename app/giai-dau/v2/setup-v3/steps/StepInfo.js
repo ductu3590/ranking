@@ -41,9 +41,8 @@ export default function StepInfo({ draft, readiness, showErrors, onChange }) {
     return found.severity === 'blocker' && !showErrors ? null : found;
   };
   const set = (patch) => onChange((current) => ({ ...current, tournament: { ...current.tournament, ...patch } }));
-  const courtCount = Number.isInteger(t.courtCount) ? t.courtCount : null;
-  const setCourts = (value) => set({ courtCount: value === '' ? null : Math.max(1, Math.min(20, Number(value) || 1)) });
-  const requiredDone = [t.name, t.eventDate, t.startTime, courtCount].filter(Boolean).length;
+  // Số sân chọn ở Bước 3, sau khi ghép cặp (biết số cặp mới gợi ý được số sân).
+  const requiredDone = [t.name.trim(), t.eventDate, t.startTime].filter(Boolean).length;
   const posterOk = /^https:\/\/\S+$/i.test(t.posterUrl || '');
 
   return (
@@ -53,15 +52,15 @@ export default function StepInfo({ draft, readiness, showErrors, onChange }) {
           <div>
             <p className="pc-eyebrow">Thiết lập cốt lõi</p>
             <h2 id={`${base}-title`} className="pc-hero-title">Thông tin giải đấu</h2>
-            <p className="pc-lead">Thời gian và số sân dùng để ước tính lịch thi đấu ở Bước 4.</p>
+            <p className="pc-lead">Ngày giờ dùng để ước tính lịch thi đấu ở Bước 4. Số sân chọn ở Bước 3, sau khi ghép cặp.</p>
           </div>
-          <span className="pc-badge pc-badge--brand">{requiredDone}/4 mục bắt buộc</span>
+          <span className="pc-badge pc-badge--brand">{requiredDone}/3 mục bắt buộc</span>
         </div>
       </section>
 
       <section className="pc-card" aria-labelledby={`${base}-core`}>
         <div className="pc-card__head">
-          <h3 id={`${base}-core`} className="pc-card__title">1. Thời gian &amp; tài nguyên thi đấu</h3>
+          <h3 id={`${base}-core`} className="pc-card__title">1. Tên &amp; thời gian thi đấu</h3>
           <span className="pc-card__hint">Trường có * là bắt buộc</span>
         </div>
         <div className="pc-grid">
@@ -74,7 +73,7 @@ export default function StepInfo({ draft, readiness, showErrors, onChange }) {
               onChange={(event) => set({ name: event.target.value })}
             />
           </Field>
-          <div className="pc-grid pc-grid--3">
+          <div className="pc-grid pc-grid--2">
             <Field id={`${base}-date`} label="Ngày thi đấu" required issue={issueFor('eventDate')} hint={weekdayLabel(t.eventDate)}>
               <input
                 id={`${base}-date`} type="date" className="pc-input" value={t.eventDate}
@@ -90,16 +89,6 @@ export default function StepInfo({ draft, readiness, showErrors, onChange }) {
                 aria-describedby={issueFor('startTime') ? `${base}-time-issue` : undefined}
                 onChange={(event) => set({ startTime: event.target.value })}
               />
-            </Field>
-            <Field id={`${base}-courts`} label="Số sân sử dụng" required aside="1–20 sân" issue={issueFor('courtCount')}>
-              <div className="pc-counter">
-                <button type="button" aria-label="Bớt một sân" disabled={!courtCount || courtCount <= 1} onClick={() => setCourts((courtCount || 1) - 1)}>−</button>
-                <input
-                  id={`${base}-courts`} inputMode="numeric" value={courtCount ?? ''} aria-invalid={Boolean(issueFor('courtCount')) || undefined}
-                  onChange={(event) => setCourts(event.target.value.replace(/\D/g, ''))}
-                />
-                <button type="button" aria-label="Thêm một sân" disabled={courtCount >= 20} onClick={() => setCourts((courtCount || 0) + 1)}>+</button>
-              </div>
             </Field>
           </div>
         </div>

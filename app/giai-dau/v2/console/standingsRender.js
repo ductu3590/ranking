@@ -1,7 +1,7 @@
 'use client';
 
 // Render BXH dùng chung cho console (StandingsTab) và trang công khai.
-// Nhánh theo schedule_format: round_robin (bảng 13 field) vs knockout (placement list).
+// Nhánh theo schedule_format: round_robin (bảng 13 field) vs knockout / double_elim (placement list).
 
 function entrantName(entrantsById, id) {
     if (id == null) return 'Chưa xác định';
@@ -78,14 +78,15 @@ function koLabel(exitRound, maxExit) {
 
 function KnockoutStandings({ rows, entrantsById }) {
     const maxExit = rows.reduce((m, r) => Math.max(m, r.exit_round ?? 0), 0);
-    const sorted = [...rows].sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0));
+    // Loại kép: cặp đang thi đấu có rank null, engine đã xếp sẵn (đang thi đấu trên, đã loại dưới).
+    const sorted = rows.some((r) => r.rank == null) ? rows : [...rows].sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0));
 
     return (
         <div className="v2-standings">
             <ul className="v2-placement-list">
                 {sorted.map((r) => (
                     <li key={r.entrant_id} className="v2-placement-item">
-                        <span className="v2-placement-rank">{r.rank}</span>
+                        <span className="v2-placement-rank">{r.rank ?? '–'}</span>
                         <span className="v2-placement-name">{entrantName(entrantsById, r.entrant_id)}</span>
                         <span className="v2-placement-label">{r.label || koLabel(r.exit_round, maxExit)}</span>
                     </li>
@@ -103,7 +104,7 @@ export function StandingsView({ scheduleFormat, rows, entrantsById, outlook, tie
             </div>
         );
     }
-    if (scheduleFormat === 'knockout') {
+    if (scheduleFormat === 'knockout' || scheduleFormat === 'double_elim') {
         return <KnockoutStandings rows={rows} entrantsById={entrantsById} />;
     }
     return <>

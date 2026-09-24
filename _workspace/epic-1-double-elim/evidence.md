@@ -46,3 +46,17 @@ Sinh bởi `node scripts/qa/epic-1-de-integration.js --applied --only=<kịch b�
 ### Test JS
 
 `npm run test:stitch-setup` — toàn bộ lat-0/a/b/c + epic-1 (plan, simulate, standings, registry, api-contract) xanh; `tests/tournament/*.test.js` xanh (gồm `double-elim-schedule`, `double-elim-standings`).
+
+## Lát D2 — giao diện (2026-09-24)
+
+| Kiểm | Kết quả |
+|---|---|
+| `npx next build` | OK (không lỗi biên dịch) |
+| `tests/stitch-setup/epic-1/ui-contract.test.js` | 5/5 |
+| Test Lát B/C khóa chuỗi mã nguồn (BracketTab, StepDraw, StandingsTab) | giữ nguyên chuỗi cũ, không sửa test cũ → không cần mục ADR-006 |
+| Ảnh chụp (trang xem trước tạm dựng từ chính `buildSetupPlan` + mô phỏng nửa giải, đã xóa, không commit) | `evidence/epic-1/{390-7cap,390-5cap,1280-12cap}-{step3,step4,console}.png`; không tràn ngang ở 390px, không lỗi runtime |
+| Lỗi phát hiện qua ảnh và đã sửa | Ô chung kết tổng đang chờ hiện `BYE` (logic sơ đồ cũ coi ô trống là bye) → loại kép truyền `noByes`, hiện `chờ` |
+
+### Chưa làm — cần người dùng (D24)
+
+Chạy thật trên browser trong CLB 59 (người dùng tự đăng nhập): hành trình 4 bước với 7 cặp (1 bye) và 5 cặp; 390px / tablet / desktop; chốt; nhập hết tỉ số tới chung kết tổng; BXH đúng D22; `Kết thúc giải & chốt xếp hạng`; trang công khai. Giữ lại giải test. Sau đó merge PR để Vercel deploy.

@@ -42,3 +42,5 @@ Chốt bằng AskUserQuestion. Brief thiết kế: `_workspace/epic-2-operations
 | D29 | Bàn điều hành sau khi chốt còn **4 mục**: `Điều hành` (mặc định; gộp trung tâm điều hành + sân + nhập tỉ số) · `Trận đấu` · `Sơ đồ & xếp hạng` · `Cài đặt` (thông tin, link/chia sẻ, sân, vùng nguy hiểm, nhật ký). Bỏ bước Cấu hình / VĐV & cặp / Bốc thăm khỏi sidebar (đã có workspace setup 4 bước); mobile dùng thanh tab đáy | So sánh Sportix (`_workspace/epic-2-operations/02_sportix_benchmark.md`); BTC dùng chính mục Điều hành |
 | D30 | Trang công khai giữ **4 tab** như OPS-07: Trực tiếp · Lịch · Xếp hạng · Sơ đồ | Người dùng chọn |
 | D31 | Không làm "Nhánh Bạc" (nhánh an ủi). Sơ đồ nhánh thắng/thua theo OPS-05 | Người dùng chọn |
+| D32 | Epic 2 **không** làm link cho trọng tài nhập điểm bằng điện thoại (API `score-tokens` giữ nguyên, không giao diện) | Người dùng chọn |
+| D33 | Hàng chờ chỉ có nút **"Gọi vào sân…"** (chọn sân trống), không kéo-thả | Người dùng chọn |

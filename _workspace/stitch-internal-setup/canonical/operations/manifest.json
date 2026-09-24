@@ -122,6 +122,18 @@
       "stitchScreenId": "ae763f78319a48718b7deac5507b416b",
       "bytes": 105990,
       "sha256": "6324beee6440655bd8cbc92afedb14e3fab8794898a49e4302386c3d8bbd4b67"
+    },
+    {
+      "path": "operations/08-settings/reference.html",
+      "stitchScreenId": "246a2a7d008d49df88e4d7781d29ca03",
+      "bytes": 30638,
+      "sha256": "06cdf6d3003abf82c52d9930ad1ae892ca285c3d574068e67425266343a05301"
+    },
+    {
+      "path": "operations/08-settings/reference.png",
+      "stitchScreenId": "246a2a7d008d49df88e4d7781d29ca03",
+      "bytes": 131526,
+      "sha256": "a85ace6511aab8c69925a904796accd3013c657894d675ae6451ab712b23cc67"
     }
   ]
 }

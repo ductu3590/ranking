@@ -120,3 +120,6 @@ bỏ vỏ app CLB ở `/giai-dau/v2/<slug>` và `/noi-dung/<id>` (`AppShell` →
 loại trực tiếp), đường "vs", ô "n ván", chân "✓ Ván 1: 11–7 · Đang đánh Ván 2"; Sắp tới có **sân dự kiến**
 (`projectSchedule.courtByMatchId`, chỉ hiển thị) + dòng nguồn tô tím / Tranh hạng ba xám; Vừa xong tỉ số bên phải;
 footer tự động cập nhật. Kiểm 390px trên giải 219/220: khớp bố cục, không tràn ngang. `e3-public` 6/6, test cũ xanh.
+
+Người dùng nghiệm thu trang công khai (sau chỉnh khối mục tô màu, font Plus Jakarta Sans, tên cặp thắng/thua):
+**PASS E3** (2026-09-25). **Epic 2 hoàn tất** (E1 → E1.1 → E2 → E3 đều PASS).

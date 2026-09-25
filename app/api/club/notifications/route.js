@@ -3,6 +3,47 @@ import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { requireValidatedGroupAdmin } from '@/lib/groupSession';
 import { normalizeName } from '@/lib/fundLeaderboard';
 import { loadContributionInputs } from '@/lib/fundContributions';
+import {
+    isFriendlyNotificationKind,
+    projectClubNotification,
+    shouldResolveNotification,
+    FRIENDLY_NOTIFICATION_KINDS,
+} from '@/lib/tournament/friendlyNotifications';
+
+// Thông báo giải giao hữu (spec Epic 3 F1 §6.4): thông báo đang mở mà dòng tournament_clubs không còn (giải bị xoá)
+// hoặc trạng thái không còn đòi mở → đánh dấu resolved và bỏ khỏi kết quả. Dòng phải thuộc đúng CLB của phiên
+// (khách: club_id; chủ nhà: group_id) — không khớp coi như mồ côi. Kind khác không đụng.
+async function settleFriendlyNotifications(groupId, rows) {
+    const friendly = rows.filter((row) => isFriendlyNotificationKind(row.kind));
+    if (!friendly.length) return rows;
+    const subjectIds = [...new Set(friendly.map((row) => Number(row.subject_id)).filter((id) => Number.isSafeInteger(id) && id > 0))];
+    let subjects = new Map();
+    if (subjectIds.length) {
+        const { data, error } = await supabaseAdmin
+            .from('tournament_clubs')
+            .select('id, group_id, club_id, invitation_status')
+            .in('id', subjectIds);
+        if (error) throw error;
+        subjects = new Map((data || []).map((row) => [String(row.id), row]));
+    }
+    const stale = new Set();
+    for (const notification of friendly) {
+        const subject = subjects.get(String(notification.subject_id)) || null;
+        const owner = notification.kind === FRIENDLY_NOTIFICATION_KINDS.guest ? subject?.club_id : subject?.group_id;
+        const scoped = subject && String(owner) === String(groupId) ? subject : null;
+        if (shouldResolveNotification(notification, scoped)) stale.add(notification.id);
+    }
+    if (stale.size) {
+        const { error } = await supabaseAdmin
+            .from('club_notifications')
+            .update({ status: 'resolved', resolved_at: new Date().toISOString() })
+            .eq('group_id', groupId)
+            .eq('status', 'open')
+            .in('id', [...stale]);
+        if (error) throw error;
+    }
+    return rows.filter((row) => !stale.has(row.id));
+}
 
 export async function GET() {
     const adminCheck = await requireValidatedGroupAdmin();
@@ -67,7 +108,9 @@ export async function GET() {
             .eq('status', 'open')
             .order('created_at', { ascending: false });
         if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-        return NextResponse.json({ notifications: fresh || [], openCount: (fresh || []).length });
+        const open = await settleFriendlyNotifications(groupId, fresh || []);
+        const notifications = open.map(projectClubNotification);
+        return NextResponse.json({ notifications, openCount: notifications.length });
     } catch (error) {
         console.error('Không tải được thông báo CLB:', error);
         return NextResponse.json({ error: error.message }, { status: 500 });

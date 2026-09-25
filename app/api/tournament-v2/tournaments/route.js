@@ -11,6 +11,7 @@ import { writeOperationLog } from '@/lib/tournament/operationLog';
 import { finalStandingsFrom } from '@/lib/tournament/qualification';
 import { computeStageStandings } from '@/lib/tournament/standingsService';
 import { getClubReadScope } from '@/lib/clubReadContext';
+import { preserveServerOwnedSettings } from '@/lib/tournament/friendlyClubs';
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -572,6 +573,16 @@ export async function PATCH(request) {
         delete payload.group_id;
         if (payload.name === null) {
             return NextResponse.json({ error: 'Tournament name is required' }, { status: 400 });
+        }
+
+        // settings là cột jsonb chung: client chỉ sửa khoá của mình. organizer_mode và friendly (hạn chót / khoá
+        // đăng ký giao hữu) do server quản lý — giữ nguyên giá trị hiện có, client không đặt/xoá được (Epic 3 F1 §6.5).
+        if ('settings' in body) {
+            const { data: current, error: settingsErr } = await db.from('tournaments').select('settings')
+                .eq('id', id).eq('group_id', adminCheck.groupId).maybeSingle();
+            if (settingsErr) return NextResponse.json({ error: settingsErr.message }, { status: 500 });
+            if (!current) return NextResponse.json({ error: 'Không tìm thấy giải' }, { status: 404 });
+            payload.settings = preserveServerOwnedSettings(current.settings, body.settings);
         }
 
         // Giải tạo bằng setup 4 bước (hàm SQL) chưa có public_slug. Bật link (unlisted/public) thì sinh slug

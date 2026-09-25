@@ -251,6 +251,15 @@ export async function POST(request) {
         }
 
         if (action === 'replace_invited_clubs') {
+            // Luồng v3: lời mời CLB không còn nằm trong bản nháp (Epic 3 F1) — đi POST/PATCH /clubs (RPC friendly_*).
+            // RPC 090 chèn tournament_clubs không qua hạn mức D46 → khoá với mọi division đã có bản nháp v3.
+            const { data: draftDivision, error: draftDivisionError } = await db.from('tournament_divisions')
+                .select('id, draft_version:setup_draft->>draftVersion')
+                .eq('id', Number(divisionId)).eq('group_id', Number(groupId)).eq('tournament_id', Number(tournamentId)).maybeSingle();
+            if (draftDivisionError) return mutationError(draftDivisionError);
+            if (Number(draftDivision?.draft_version) >= 3) {
+                return NextResponse.json({ error: messageFor('SETUP_ACTION_RETIRED').text, code: 'SETUP_ACTION_RETIRED' }, { status: 410 });
+            }
             const invitedClubs = body?.invited_clubs ?? body?.invitedClubs;
             if (!Array.isArray(invitedClubs)) {
                 return NextResponse.json({ error: 'invited_clubs phải là mảng CLB được mời', code: 'SETUP_PAYLOAD_INVALID' }, { status: 400 });

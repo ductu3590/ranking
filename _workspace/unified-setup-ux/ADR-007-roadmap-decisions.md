@@ -56,3 +56,21 @@ Người dùng chạy thật một giải vòng bảng → loại trực tiếp 
 | D35 | Khi mọi trận của một chặng đã chốt, mục **Điều hành** hiện thẻ "việc tiếp theo": BXH tóm tắt (suất đi tiếp) + nút "Chốt … & vào …" / "Kết thúc giải & chốt xếp hạng", bấm hai lần để xác nhận. Nút cũ ở "Sơ đồ & xếp hạng" giữ nguyên, dùng chung `stageAction.js` | Phải sang mục khác để tiến vòng là không hợp lý; vẫn cần bước xem lại khi đồng điểm |
 | D36 | "Kết thúc giải" ở cả hai lối vào chuyển giải sang `completed` qua PATCH `tournaments` (vòng đời `live → completed`, ghi hạng chung cuộc). Giải đã chốt hết chặng nhưng còn `live` (vd 220) có nút "Kết thúc giải" riêng | Giải 220 xong 15/15 trận mà vẫn "Đang diễn ra" |
 | D37 | Giải setup v4 **không có "Huỷ chốt lịch"** trong Cài đặt (2026-09-25, người dùng chốt sau nghiệm thu E2). `unlock_tournament_draw` chỉ dùng cho giải cũ | Huỷ từng stage làm lệch tuyến đi tiếp và bản nháp setup 4 bước |
+
+## Bổ sung — Epic 3 (giao hữu liên CLB), brainstorm 2026-09-25
+
+Chốt bằng AskUserQuestion, 2 vòng (người dùng chọn cả tám phương án đề xuất). Worktree `ranking-epic3`, nhánh `epic-3-friendly` từ `origin/main` `ae59fc3`.
+Preflight DB (2026-09-25): `tournament_clubs` 22 dòng, **0** dòng liên CLB (`club_id <> group_id`); `tournament_registrations` 0; `tournament_external_clubs` 0 → không có dữ liệu cũ cần tương thích.
+
+| Mã | Quyết định | Lý do |
+|---|---|---|
+| D38 | Hạn mức CLB khách tính theo **số cặp**. Admin CLB khách chọn thành viên của mình, **tự ghép cặp** (chạm hai người như Bước 2), gửi danh sách; chủ nhà **duyệt** hoặc **yêu cầu sửa** (không sửa hộ). Chỉ thành viên CLB — **không khách mời** trong đội CLB khách | Đúng D17/D18; ranh giới dữ liệu rõ, CLB nào chịu trách nhiệm danh sách của CLB đó |
+| D39 | Bản đầu **chỉ mời CLB có trên PickHub**; CLB ngoài hệ thống (`tournament_external_clubs`) để epic sau | D18 cần admin CLB khách tự đăng ký |
+| D40 | BXH: giữ **BXH cặp** (gắn tên/màu CLB cạnh cặp) + thêm **bảng tổng hợp theo CLB** (trận thắng, hiệu số; tái dùng `aggregateClubStandings`) | Giải giao hữu cần thấy CLB nào mạnh hơn mà không đổi luật xếp hạng cặp |
+| D41 | Bốc thăm: **rải đều** cặp cùng CLB ra các bảng / nửa nhánh; không đủ chỗ thì **cảnh báo, không chặn** (tái dùng `distributeEntriesAcrossPools` policy `spread_if_possible`) | Tránh "nội chiến" sớm nhưng không làm kẹt giải ít CLB |
+| D42 | Hạn chót đăng ký **tùy chọn**; qua hạn hoặc khi chủ nhà bấm "Khoá đăng ký" thì CLB khách không sửa được. Chốt giải vẫn do chủ nhà bấm | Linh hoạt cho giải phong trào |
+| D43 | Kết quả giải giao hữu **không** tính vào xếp hạng nội bộ của CLB nào ở bản đầu | Không đụng hệ ranking từng CLB |
+| D44 | UI mới (mời CLB, hộp lời mời của CLB khách, đăng ký cặp, duyệt) làm **Stitch trước** rồi mới chia lát code UI (như D16/D25). Lát domain/API/migration làm song song | Nhất quán với bộ setup/điều hành đã duyệt |
+| D45 | Deploy như D24/D27: nhánh + PR nháp; agent apply migration (ROLLBACK trước, md5 sau) và kiểm thử tích hợp; người dùng chạy browser trên CLB 59 (chủ nhà) + một CLB test thứ hai (khách) rồi tự merge | Người dùng giữ quyền lên production |
+
+Phát hiện khi rà (đưa vào spec): `GET /api/tournament-v2/clubs?mode=available` trả tên **mọi** `groups` (kể cả CLB test/hệ thống) cho bất kỳ admin nào — lộ danh bạ CLB; chọn CLB để mời phải đổi sang tra theo mã CLB. Admin CLB khách hiện **không có đường nào** đọc giải của CLB khác (`access.js` chỉ biết chủ giải / cùng `group_id`).

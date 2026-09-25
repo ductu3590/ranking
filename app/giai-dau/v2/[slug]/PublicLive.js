@@ -1,10 +1,15 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { Plus_Jakarta_Sans, JetBrains_Mono } from 'next/font/google';
 import BracketView from '../shared/BracketView';
 import { GroupTables, FinalRanking } from '../shared/StandingsView';
 import ShareActions from '../ShareActions';
 import './public-live.css';
+
+// Font đúng thiết kế Stitch OPS-07; app gốc chỉ tải Montserrat nên các khối rơi về font hệ thống khác nhau.
+const jakarta = Plus_Jakarta_Sans({ subsets: ['latin', 'vietnamese'], weight: ['400', '500', '600', '700', '800'], variable: '--pl-font', display: 'swap' });
+const jetbrains = JetBrains_Mono({ subsets: ['latin', 'vietnamese'], weight: ['500', '600', '700'], variable: '--pl-mono-font', display: 'swap' });
 
 // Trang công khai cho VĐV + khán giả (spec Epic 2 E3; Stitch OPS-07, D30: 4 tab Trực tiếp · Lịch · Xếp hạng · Sơ đồ).
 // Chỉ đọc: dữ liệu `board` đã chiếu công khai từ GET /public, dùng chung nhãn trận + component sơ đồ/xếp hạng với
@@ -68,7 +73,7 @@ function LiveCourt({ court, now }) {
     <div className="pl-matchup">
       {['a', 'b'].map((slot, index) => <div key={slot} className="pl-side">
         <span className={`pl-badge ${knockout && leader === slot ? 'is-lead' : ''}`}>{knockout ? index + 1 : (index === 0 ? 'A' : 'B')}</span>
-        <span className="pl-side-name">{nameOf(match[slot])}</span>
+        <span className="pl-name">{nameOf(match[slot])}</span>
         {bestOf > 1 ? <span className={`pl-wins ${leader === slot ? 'is-lead' : ''}`}>{wins(slot)} ván</span> : null}
       </div>).reduce((acc, node, i) => (i === 0 ? [node] : [...acc, <div key="vs" className="pl-vs-line" aria-hidden="true"><i />vs<i /></div>, node]), [])}
     </div>
@@ -82,7 +87,7 @@ function LiveCourt({ court, now }) {
 }
 
 function SourceChip({ side, tone }) {
-  return side?.name ? <b className="pl-up-name">{side.name}</b> : <span className={`pl-source ${tone}`}>{nameOf(side)}</span>;
+  return side?.name ? <span className="pl-name">{side.name}</span> : <span className={`pl-source ${tone}`}>{nameOf(side)}</span>;
 }
 
 // Dòng "Sắp tới": sân + giờ dự kiến; trận chờ nguồn (Thắng/Thua …) tô tím, Tranh hạng ba xám (Stitch OPS-07).
@@ -99,38 +104,38 @@ function UpcomingRow({ item }) {
       <span>{court ? <><b>{court}</b>{knockout ? <span className="pl-up-title"> · {item.title}</span> : null}</> : <b>{item.title}</b>}</span>
       {item.projectedStart ? <em className={`pl-eta ${bronze ? 'is-slate' : ''}`}>dự kiến {hhmm(item.projectedStart)}</em> : null}
     </header>
-    <p><SourceChip side={item.a} tone={tone} /><small>vs</small><SourceChip side={item.b} tone={tone} /></p>
+    <p className="pl-pair"><SourceChip side={item.a} tone={tone} /><small>vs</small><SourceChip side={item.b} tone={tone} /></p>
     {sub ? <small className="pl-up-sub">{sub}</small> : null}
   </div>;
 }
 
-function SectionHead({ icon, title, count, tone, aside }) {
-  return <div className="pl-sec-head">
-    <p>{icon}<b>{title}</b><span className={`pl-count is-${tone}`}>{count}</span></p>
-    {aside}
-  </div>;
+function Block({ tone, icon, title, count, aside, children }) {
+  return <section className={`pl-block is-${tone}`}>
+    <div className="pl-block-head">
+      <p><span className="pl-block-icon" aria-hidden="true">{icon}</span><b>{title}</b><span className="pl-block-count">{count}</span></p>
+      {aside}
+    </div>
+    <div className="pl-block-body">{children}</div>
+  </section>;
 }
 
 function LiveTab({ courts, upcoming, recent, finalizedCount, now, onSeeAll }) {
   return <div className="pl-tab">
-    <section className="pl-section">
-      <SectionHead icon={<i className="pl-pulse" aria-hidden="true" />} title="Đang đấu" count={`${courts.length} sân`} tone="ok" aside={<span className="pl-aside">Cập nhật tự động</span>} />
+    <Block tone="live" icon="▶" title="Đang đấu" count={`${courts.length} sân đang thi đấu`} aside={<span className="pl-aside">Cập nhật tự động</span>}>
       {courts.length ? courts.map((court) => <LiveCourt key={court.label} court={court} now={now} />) : <p className="pl-empty">Chưa có trận nào đang đấu.</p>}
-    </section>
-    <section className="pl-section">
-      <SectionHead icon={<span className="pl-icon is-amber" aria-hidden="true">◷</span>} title="Sắp tới" count={`${upcoming.length} trận`} tone="warn" aside={<span className="pl-aside">Theo lịch gọi sân</span>} />
-      {upcoming.length ? <div className="pl-card-list">{upcoming.map((item) => <UpcomingRow key={item.id} item={item} />)}</div> : <p className="pl-empty">Không còn trận nào chờ.</p>}
-    </section>
-    <section className="pl-section">
-      <SectionHead icon={<span className="pl-icon is-brand" aria-hidden="true">✓</span>} title="Vừa xong" count={`${finalizedCount} trận`} tone="brand" aside={finalizedCount ? <button type="button" className="pl-see-all" onClick={onSeeAll}>Xem tất cả</button> : null} />
-      {recent.length ? <div className="pl-card-list">{recent.map((item) => <div key={item.id} className="pl-done">
+    </Block>
+    <Block tone="next" icon="◷" title="Sắp tới" count={`${upcoming.length} trận`} aside={<span className="pl-aside">Theo lịch gọi sân</span>}>
+      {upcoming.length ? upcoming.map((item) => <UpcomingRow key={item.id} item={item} />) : <p className="pl-empty">Không còn trận nào chờ.</p>}
+    </Block>
+    <Block tone="done" icon="✓" title="Vừa xong" count={`${finalizedCount} trận`} aside={finalizedCount ? <button type="button" className="pl-see-all" onClick={onSeeAll}>Xem tất cả</button> : null}>
+      {recent.length ? recent.map((item) => <div key={item.id} className="pl-done">
         <header><span>{item.title}</span><span>{[hhmm(item.endedAt), item.court].filter(Boolean).join(' · ')}</span></header>
         <div className="pl-done-body">
-          <p><strong>{item.winnerName || '—'}</strong> <small>{item.resultType === 'walkover' ? 'thắng W.O.' : 'thắng'}</small> {item.loserName ? <span>{item.loserName}</span> : null}</p>
+          <p className="pl-pair"><span className="pl-name is-win">{item.winnerName || '—'}</span><small>{item.resultType === 'walkover' ? 'thắng W.O.' : 'thắng'}</small>{item.loserName ? <span className="pl-name is-lose">{item.loserName}</span> : null}</p>
           {item.resultType !== 'walkover' && item.scoreText ? <em className="pl-score">{item.scoreText}</em> : null}
         </div>
-      </div>)}</div> : <p className="pl-empty">Chưa có trận nào kết thúc.</p>}
-    </section>
+      </div>) : <p className="pl-empty">Chưa có trận nào kết thúc.</p>}
+    </Block>
     <p className="pl-note"><span aria-hidden="true">ⓘ</span><span><b>Lưu ý cho khán giả:</b> Lịch và kết quả do BTC cập nhật tại sân. Chạm các tab phía trên để xem xếp hạng và sơ đồ.</span></p>
   </div>;
 }
@@ -146,9 +151,9 @@ function ScheduleTab({ groups, stages }) {
       <h2><i className={`pl-dot ${group.counts.running ? 'is-live' : group.counts.finalized === group.counts.total ? 'is-done' : ''}`} />{group.title}<span className="pl-count">{group.counts.finalized}/{group.counts.total} xong</span></h2>
       <div className="pl-list">{group.matches.map((item) => {
         const done = item.status === 'finalized';
-        const cls = (slot) => (item[slot]?.name ? (done && item.winnerSide ? (item.winnerSide === slot ? 'is-win' : 'is-lose') : '') : 'is-source');
+        const cls = (slot) => (item[slot]?.name ? `pl-name ${done && item.winnerSide ? (item.winnerSide === slot ? 'is-win' : 'is-lose') : ''}` : 'pl-source is-brand');
         return <div key={item.id} className="pl-row">
-          <p><b className={cls('a')}>{nameOf(item.a)}</b><i>vs</i><b className={cls('b')}>{nameOf(item.b)}</b></p>
+          <p className="pl-pair"><span className={cls('a')}>{nameOf(item.a)}</span><small>vs</small><span className={cls('b')}>{nameOf(item.b)}</span></p>
           <span className="pl-row-score">{done ? (item.resultType === 'walkover' ? 'W.O.' : item.games.map((game) => `${game.a}–${game.b}`).join(', ')) : ['live', 'warmup', 'paused'].includes(item.status) ? <em className="pl-chip is-live">Đang đấu</em> : '–'}</span>
           <small>{item.court || ''}{done ? ` ${hhmm(item.endedAt)}` : item.projectedStart ? ` dự kiến ${hhmm(item.projectedStart)}` : ''}</small>
         </div>;
@@ -236,7 +241,7 @@ export default function PublicLive({ data, initialDivisionId = null }) {
   const clubName = data.club?.name || 'PickHub';
   const live = tournament.status === 'live';
 
-  return <div className="pl-page">
+  return <div className={`pl-page ${jakarta.variable} ${jetbrains.variable}`}>
     <header className="pl-topbar">
       <span className="pl-brand"><b>P</b><span><small>Cổng thông tin giải</small>{clubName}</span></span>
       <button type="button" className="pl-share-btn" aria-expanded={sharing} onClick={() => setSharing((value) => !value)}><span aria-hidden="true">⤴</span>Chia sẻ</button>

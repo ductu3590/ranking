@@ -119,6 +119,7 @@ Chỉ áp cho giải setup v4 (mọi stage có `config.scoring`, trận đơn); 
 - **Vùng nguy hiểm / Huỷ chốt lịch không đưa vào giải v4.** `unlock_tournament_draw` huỷ từng stage theo mô hình bốc
   thăm cũ; với giải v4 nhiều giai đoạn (tuyến đi tiếp tường minh, bản nháp setup 4 bước) sẽ để lại dữ liệu lệch. Cần một
   luồng "mở lại thiết lập" riêng (SQL mới, sửa tuần tự theo roadmap §1.2) — để lát sau nếu người dùng cần.
+  → Người dùng chốt (D37): không làm.
 - `OverviewTab.js` chưa gỡ: vẫn còn test `phase3/share` và `release-hardening` tham chiếu; không còn được mount.
 
 ### Kiểm thử

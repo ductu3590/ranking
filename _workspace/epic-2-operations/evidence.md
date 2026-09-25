@@ -94,4 +94,5 @@ Không migration. Trận đấu (`MatchesView` + "Sửa kết quả" qua correct
 | `npm run test:tournament`, `test:open-registration`, `tests/phase3/share.test.js` | xanh (sửa 2 test khóa chuỗi — ADR-006 mục E2) |
 | Trang xem trước tạm (fetch giả lập, đã xoá) | 1280/390 không tràn ngang; dev server không lỗi biên dịch (gồm `TournamentConsoleV2`) |
 
-Lệch spec: không có "Huỷ chốt lịch" cho giải v4 (xem spec E2 §Lệch spec). Chưa làm — cần người dùng nghiệm thu trên CLB 59.
+Lệch spec: không có "Huỷ chốt lịch" cho giải v4 — người dùng chốt giữ nguyên (ADR-007 D37).
+Người dùng nghiệm thu trên CLB 59: **PASS E2** (2026-09-25).

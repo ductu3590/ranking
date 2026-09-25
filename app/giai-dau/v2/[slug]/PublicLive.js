@@ -155,7 +155,7 @@ function ScheduleTab({ groups, stages }) {
         return <div key={item.id} className="pl-row">
           <p className="pl-pair"><span className={cls('a')}>{nameOf(item.a)}</span><small>vs</small><span className={cls('b')}>{nameOf(item.b)}</span></p>
           <span className="pl-row-score">{done ? (item.resultType === 'walkover' ? 'W.O.' : item.games.map((game) => `${game.a}–${game.b}`).join(', ')) : ['live', 'warmup', 'paused'].includes(item.status) ? <em className="pl-chip is-live">Đang đấu</em> : '–'}</span>
-          <small>{item.court || ''}{done ? ` ${hhmm(item.endedAt)}` : item.projectedStart ? ` dự kiến ${hhmm(item.projectedStart)}` : ''}</small>
+          <small>{[item.court || (!done ? item.projectedCourt : null), done ? hhmm(item.endedAt) : item.projectedStart ? `dự kiến ${hhmm(item.projectedStart)}` : null].filter(Boolean).join(' · ')}</small>
         </div>;
       })}</div>
     </section>)}

@@ -73,4 +73,11 @@ Preflight DB (2026-09-25): `tournament_clubs` 22 dòng, **0** dòng liên CLB (`
 | D44 | UI mới (mời CLB, hộp lời mời của CLB khách, đăng ký cặp, duyệt) làm **Stitch trước** rồi mới chia lát code UI (như D16/D25). Lát domain/API/migration làm song song | Nhất quán với bộ setup/điều hành đã duyệt |
 | D45 | Deploy như D24/D27: nhánh + PR nháp; agent apply migration (ROLLBACK trước, md5 sau) và kiểm thử tích hợp; người dùng chạy browser trên CLB 59 (chủ nhà) + một CLB test thứ hai (khách) rồi tự merge | Người dùng giữ quyền lên production |
 
-Phát hiện khi rà (đưa vào spec): `GET /api/tournament-v2/clubs?mode=available` trả tên **mọi** `groups` (kể cả CLB test/hệ thống) cho bất kỳ admin nào — lộ danh bạ CLB; chọn CLB để mời phải đổi sang tra theo mã CLB. Admin CLB khách hiện **không có đường nào** đọc giải của CLB khác (`access.js` chỉ biết chủ giải / cùng `group_id`).
+Phát hiện khi rà: `GET /api/tournament-v2/clubs?mode=available` trả tên mọi `groups`; admin CLB khách chưa có đường nào đọc giải của CLB khác (`access.js` chỉ biết chủ giải / cùng `group_id`). Người dùng trả lời (2026-09-25) → D46, D47.
+
+| Mã | Quyết định | Lý do |
+|---|---|---|
+| D46 | CLB tổ chức **được thấy danh sách mọi CLB** trên PickHub để chọn mời (giữ `mode=available`, chỉ lọc bỏ chính mình). **Core hỗ trợ mời không giới hạn**, nhưng tài khoản **admin CLB thường chỉ mời tối đa 1 CLB khác mỗi giải**; mời nhiều hơn là quyền lợi của **gói trả phí** (làm sau). Giới hạn kiểm ở **server** qua một điểm quyết định quyền lợi (mặc định 1), không chỉ ẩn nút ở UI; mã lỗi ổn định khi vượt | Mô hình kinh doanh: giao lưu 1–1 miễn phí, mở rộng theo gói |
+| D47 | Admin CLB khách nhận lời mời qua **thông báo trong app** (tái dùng `club_notifications`, `kind` mới cho lời mời giải) **và/hoặc link mời**. Mở link **bắt buộc đăng nhập**; server đối chiếu `group_id` của phiên với `club_id` được mời — khớp mới cho xem/đáp lời mời, không khớp thì từ chối (không lộ thông tin giải) | Ranh giới đa CLB: chỉ đúng CLB được mời mới vào được |
+
+Hệ quả: với tài khoản thường, giải giao hữu mặc định là **2 CLB (chủ nhà + 1 khách)** → BXH tổng CLB (D40) là đối đầu hai CLB; rải cặp (D41) vẫn áp dụng. Diễn giải "tối đa 1 CLB mỗi giải" (không phải "1 CLB đang mời cùng lúc trên mọi giải") — xác nhận lại nếu khác.

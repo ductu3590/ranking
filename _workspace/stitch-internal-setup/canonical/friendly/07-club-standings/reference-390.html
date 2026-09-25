@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sơ đồ &amp; xếp hạng · Giao hữu Thu 2026 | PickHub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              purple: '#7c3aed',
+              'purple-dark': '#6d28d9',
+              'purple-light': '#f5f3ff',
+            },
+            tealclub: {
+              DEFAULT: '#0e7490',
+              light: '#ecfeff',
+            }
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-[#f8fafc] text-slate-800 font-sans antialiased min-h-screen flex flex-col items-center py-6 px-2">
+
+  <!-- Mobile 390px Column Container -->
+  <div class="w-full max-w-[390px] bg-[#f8fafc] flex flex-col gap-4">
+
+    <!-- Top Bar -->
+    <header class="bg-white rounded-xl border border-slate-200 px-4 py-3.5 flex items-center justify-between shadow-sm">
+      <button class="p-1 text-slate-700 hover:text-slate-900 transition-colors" aria-label="Menu">
+        <!-- Inline SVG Hamburger -->
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+
+      <div class="flex flex-col items-center">
+        <h1 class="text-base font-bold text-slate-900">Sơ đồ &amp; xếp hạng</h1>
+        <span class="text-[11px] font-medium text-slate-500">Giao hữu Thu 2026</span>
+      </div>
+
+      <button class="p-1 text-slate-700 hover:text-slate-900 relative transition-colors" aria-label="Thông báo">
+        <!-- Inline SVG Bell -->
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+      </button>
+    </header>
+
+    <!-- Head-to-Head Card: Đối đầu CLB -->
+    <section class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col gap-3">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+        <div class="flex items-center gap-1.5">
+          <!-- Inline SVG Swords / Target icon -->
+          <svg class="w-4 h-4 text-[#7c3aed]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-700">Đối đầu CLB</span>
+        </div>
+        <span class="text-[11px] font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">Liên CLB</span>
+      </div>
+
+      <!-- Two Teams & Big Score -->
+      <div class="grid grid-cols-5 items-center gap-2 pt-1">
+        <!-- Left Team -->
+        <div class="col-span-2 flex flex-col items-center text-center">
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-slate-200 shadow-xs mb-1.5 max-w-full">
+            <span class="w-2 h-2 rounded-full bg-[#7c3aed] flex-shrink-0"></span>
+            <span class="text-[11px] font-semibold text-slate-800 truncate">CLB Test 23.9…</span>
+          </div>
+          <span class="text-[10px] text-slate-400 font-medium">Chủ nhà</span>
+        </div>
+
+        <!-- Middle Big Score -->
+        <div class="col-span-1 flex flex-col items-center justify-center">
+          <div class="flex items-baseline font-extrabold text-[36px] tracking-tight leading-none">
+            <span class="text-[#7c3aed]">5</span>
+            <span class="text-slate-300 mx-1 font-semibold text-2xl">–</span>
+            <span class="text-[#0e7490]">4</span>
+          </div>
+        </div>
+
+        <!-- Right Team -->
+        <div class="col-span-2 flex flex-col items-center text-center">
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-slate-200 shadow-xs mb-1.5 max-w-full">
+            <span class="w-2 h-2 rounded-full bg-[#0e7490] flex-shrink-0"></span>
+            <span class="text-[11px] font-semibold text-slate-800 truncate">CLB Test Resp…</span>
+          </div>
+          <span class="text-[10px] text-slate-400 font-medium">Khách mời</span>
+        </div>
+      </div>
+
+      <!-- Subline summary badge -->
+      <div class="mt-1 bg-slate-50 rounded-lg p-2 flex items-center justify-center text-center">
+        <span class="text-[12px] font-semibold text-slate-700">Hiệu số điểm +12 · 9/9 trận liên CLB đã đấu</span>
+      </div>
+
+      <!-- Footnote -->
+      <p class="text-[12px] text-slate-500 leading-relaxed text-center pt-1 border-t border-slate-100">
+        Chỉ tính trận giữa hai CLB khác nhau. Không tính vào xếp hạng CLB.
+      </p>
+    </section>
+
+    <!-- Segmented Control: Bảng A | Bảng B -->
+    <div class="bg-slate-200/80 p-1 rounded-xl flex items-center gap-1">
+      <button class="flex-1 py-2 text-xs font-bold text-slate-900 bg-white rounded-lg shadow-sm text-center transition-all">
+        Bảng A
+      </button>
+      <button class="flex-1 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 rounded-lg text-center transition-all">
+        Bảng B
+      </button>
+    </div>
+
+    <!-- Pair Standings Table Card: Bảng A -->
+    <section class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col gap-3">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+        <div class="flex items-center gap-2">
+          <span class="flex items-center justify-center w-5 h-5 rounded-md bg-[#f5f3ff] text-[#7c3aed] text-xs font-bold">A</span>
+          <h2 class="text-sm font-bold text-slate-900">Bảng xếp hạng cặp đấu · Bảng A</h2>
+        </div>
+        <span class="text-[11px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Top 2 đi tiếp</span>
+      </div>
+
+      <!-- Table Structure -->
+      <div class="overflow-hidden">
+        <!-- Table Header -->
+        <div class="grid grid-cols-12 text-[11px] font-bold text-slate-400 uppercase tracking-wider pb-2 border-b border-slate-100 px-1">
+          <div class="col-span-2 text-center">Hạng</div>
+          <div class="col-span-6">Cặp</div>
+          <div class="col-span-2 text-center">T–B</div>
+          <div class="col-span-2 text-center">HS</div>
+        </div>
+
+        <!-- Table Rows -->
+        <div class="divide-y divide-slate-100 text-xs">
+
+          <!-- Row 1: Nguyễn Minh + Trần Tuấn -->
+          <div class="grid grid-cols-12 items-center py-2.5 px-1 bg-emerald-50/40 rounded-lg my-0.5">
+            <div class="col-span-2 flex flex-col items-center justify-center">
+              <span class="w-6 h-6 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shadow-xs">1</span>
+              <span class="mt-1 text-[9px] font-bold uppercase text-emerald-700 bg-emerald-100/90 px-1 py-0.2 rounded">Đi tiếp</span>
+            </div>
+            <div class="col-span-6 pr-2">
+              <div class="font-bold text-slate-900 leading-tight text-[13px]">Nguyễn Minh + Trần Tuấn</div>
+              <div class="mt-1 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-white border border-slate-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#7c3aed]"></span>
+                <span class="text-[10px] font-semibold text-slate-700">CLB Test 23.9…</span>
+              </div>
+            </div>
+            <div class="col-span-2 text-center font-bold text-slate-800 text-[13px]">3–0</div>
+            <div class="col-span-2 text-center font-bold text-emerald-600 text-[13px]">+14</div>
+          </div>
+
+          <!-- Row 2: Hoàng Nam + Quốc Khánh -->
+          <div class="grid grid-cols-12 items-center py-2.5 px-1 bg-emerald-50/40 rounded-lg my-0.5">
+            <div class="col-span-2 flex flex-col items-center justify-center">
+              <span class="w-6 h-6 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shadow-xs">2</span>
+              <span class="mt-1 text-[9px] font-bold uppercase text-emerald-700 bg-emerald-100/90 px-1 py-0.2 rounded">Đi tiếp</span>
+            </div>
+            <div class="col-span-6 pr-2">
+              <div class="font-bold text-slate-900 leading-tight text-[13px]">Hoàng Nam + Quốc Khánh</div>
+              <div class="mt-1 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-white border border-slate-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#0e7490]"></span>
+                <span class="text-[10px] font-semibold text-slate-700">CLB Test Resp…</span>
+              </div>
+            </div>
+            <div class="col-span-2 text-center font-bold text-slate-800 text-[13px]">2–1</div>
+            <div class="col-span-2 text-center font-bold text-emerald-600 text-[13px]">+5</div>
+          </div>
+
+          <!-- Row 3: Lê Hoàng + Phạm Quang -->
+          <div class="grid grid-cols-12 items-center py-2.5 px-1">
+            <div class="col-span-2 flex items-center justify-center">
+              <span class="w-5 h-5 rounded-full bg-slate-100 text-slate-600 font-bold text-xs flex items-center justify-center">3</span>
+            </div>
+            <div class="col-span-6 pr-2">
+              <div class="font-medium text-slate-800 leading-tight">Lê Hoàng + Phạm Quang</div>
+              <div class="mt-1 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-white border border-slate-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#7c3aed]"></span>
+                <span class="text-[10px] font-semibold text-slate-700">CLB Test 23.9…</span>
+              </div>
+            </div>
+            <div class="col-span-2 text-center font-medium text-slate-700">1–2</div>
+            <div class="col-span-2 text-center font-medium text-rose-500">−6</div>
+          </div>
+
+          <!-- Row 4: Văn Sơn + Đức Thịnh -->
+          <div class="grid grid-cols-12 items-center py-2.5 px-1">
+            <div class="col-span-2 flex items-center justify-center">
+              <span class="w-5 h-5 rounded-full bg-slate-100 text-slate-600 font-bold text-xs flex items-center justify-center">4</span>
+            </div>
+            <div class="col-span-6 pr-2">
+              <div class="font-medium text-slate-800 leading-tight">Văn Sơn + Đức Thịnh</div>
+              <div class="mt-1 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-white border border-slate-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#0e7490]"></span>
+                <span class="text-[10px] font-semibold text-slate-700">CLB Test Resp…</span>
+              </div>
+            </div>
+            <div class="col-span-2 text-center font-medium text-slate-700">0–3</div>
+            <div class="col-span-2 text-center font-medium text-rose-500">−13</div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Card: Trận gần nhất -->
+    <section class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col gap-3">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+        <div class="flex items-center gap-1.5">
+          <!-- Inline SVG Clock / History icon -->
+          <svg class="w-4 h-4 text-[#7c3aed]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700">Trận gần nhất</h2>
+        </div>
+        <span class="text-[11px] text-slate-400 font-medium">Bảng A</span>
+      </div>
+
+      <div class="flex flex-col gap-2.5">
+        <!-- Match 1: Completed -->
+        <div class="p-3 rounded-lg border border-slate-100 bg-slate-50/70 flex flex-col gap-2">
+          <div class="flex items-center justify-between text-[11px] text-slate-500">
+            <span>Lượt 3 · Sân 01</span>
+            <span class="font-semibold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">Đã kết thúc</span>
+          </div>
+
+          <div class="flex items-center justify-between gap-2">
+            <!-- Winner -->
+            <div class="flex-1 flex flex-col">
+              <span class="text-xs font-bold text-emerald-700 leading-tight flex items-center gap-1">
+                <span>Nguyễn Minh + Trần Tuấn</span>
+                <!-- Inline SVG checkmark -->
+                <svg class="w-3.5 h-3.5 text-emerald-600 inline" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              </span>
+              <span class="text-[10px] text-slate-500 mt-0.5">CLB Test 23.9…</span>
+            </div>
+
+            <!-- Score -->
+            <div class="px-2.5 py-1 rounded bg-white border border-slate-200 shadow-2xs font-extrabold text-sm text-slate-900 tracking-wider">
+              11 – 7
+            </div>
+
+            <!-- Loser -->
+            <div class="flex-1 flex flex-col text-right">
+              <span class="text-xs font-normal text-slate-700 leading-tight">Văn Sơn + Đức Thịnh</span>
+              <span class="text-[10px] text-slate-500 mt-0.5">CLB Test Resp…</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Match 2: Not yet played -->
+        <div class="p-3 rounded-lg border border-slate-100 bg-white flex flex-col gap-2">
+          <div class="flex items-center justify-between text-[11px] text-slate-500">
+            <span>Lượt 3 · Sân 02</span>
+            <span class="font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full">Chưa đấu</span>
+          </div>
+
+          <div class="flex items-center justify-between text-xs text-slate-700 font-normal py-0.5">
+            <span class="leading-relaxed">Lê Hoàng + Phạm Quang gặp Hoàng Nam + Quốc Khánh</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mobile Bottom Tab Bar (at the page end) -->
+    <nav class="bg-white rounded-xl border border-slate-200 p-2 shadow-sm grid grid-cols-4 gap-1 mt-2">
+      <!-- Tab 1: Điều hành -->
+      <button class="flex flex-col items-center justify-center py-2 px-1 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-colors">
+        <!-- Inline SVG Dashboard -->
+        <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <rect x="3" y="3" width="7" height="9"/>
+          <rect x="14" y="3" width="7" height="5"/>
+          <rect x="14" y="12" width="7" height="9"/>
+          <rect x="3" y="16" width="7" height="5"/>
+        </svg>
+        <span class="text-[11px] font-medium leading-none">Điều hành</span>
+      </button>
+
+      <!-- Tab 2: Trận đấu -->
+      <button class="flex flex-col items-center justify-center py-2 px-1 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-colors">
+        <!-- Inline SVG Calendar / Fixtures -->
+        <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        <span class="text-[11px] font-medium leading-none">Trận đấu</span>
+      </button>
+
+      <!-- Tab 3: Sơ đồ (ACTIVE PURPLE) -->
+      <button class="flex flex-col items-center justify-center py-2 px-1 rounded-lg text-[#7c3aed] bg-[#f5f3ff] transition-colors">
+        <!-- Inline SVG Bracket / Tree -->
+        <svg class="w-5 h-5 mb-1 text-[#7c3aed]" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16 4h2a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-2"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8 8H4v8h4"/>
+          <line x1="4" y1="12" x2="16" y2="12"/>
+        </svg>
+        <span class="text-[11px] font-bold leading-none">Sơ đồ</span>
+      </button>
+
+      <!-- Tab 4: Cài đặt -->
+      <button class="flex flex-col items-center justify-center py-2 px-1 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-colors">
+        <!-- Inline SVG Settings / Gear -->
+        <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="3"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+        <span class="text-[11px] font-medium leading-none">Cài đặt</span>
+      </button>
+    </nav>
+
+    <!-- Sub footer branding -->
+    <div class="text-center py-2">
+      <span class="text-[11px] font-medium text-slate-400">PickHub · Hệ thống quản lý &amp; thi đấu Pickleball</span>
+    </div>
+
+  </div>
+
+</body>
+</html>

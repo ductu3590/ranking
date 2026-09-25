@@ -21,6 +21,25 @@ This folder contains the approved visual-reference bundle for the Unified Intern
 
 See `operations/README.md` (10 screens, generated 2026-09-24 via the Stitch connector, same project and light design system).
 
+## Friendly Screens (Epic 3)
+
+See `friendly/README.md` (27 mobile 390px screens for FRD-01…08, generated 2026-09-25 via the Stitch connector, same project
+and light design system `ca3eeb22ca9e4f738817511ae0f13aae`). Hashes in `friendly/manifest.json`; deviations from the brief and
+Stitch-added text to drop when coding: `_workspace/epic-3-friendly/02_stitch_notes.md`.
+
+| Key (folder) | FRD | Screens |
+| --- | --- | --- |
+| `friendly/01-host-invite` | FRD-01 | `reference-390`, `-type`, `-sheet`, `-link`, `-states` |
+| `friendly/02-host-review` | FRD-02 | `reference-390`, `-request`, `-approved` |
+| `friendly/03-host-pairs-draw` | FRD-03 | `reference-390-step3`, `-step3-blocked`, `-step4` |
+| `friendly/04-notifications-inbox` | FRD-04 | `reference-390-bell`, `-inbox` |
+| `friendly/05-invite-link` | FRD-05 | `reference-390-login`, `-wrong-club`, `-states` |
+| `friendly/06-guest-registration` | FRD-06 | `reference-390`, `-invited`, `-changes-requested`, `-submitted-approved`, `-closed-finalized`, `-conflict` |
+| `friendly/07-club-standings` | FRD-07 | `reference-390`, `-3clubs`, `-bracket` |
+| `friendly/08-public-friendly` | FRD-08 | `reference-390`, `-standings` |
+
+Desktop 1280px versions were not generated in this pass.
+
 `DESIGN.md` is the visual token authority. The `shell-references/` files provide broader club-shell inspiration only; they do not define tournament setup behavior. `unclassified/image.png` has no known functional role.
 
 ## Usage Rules

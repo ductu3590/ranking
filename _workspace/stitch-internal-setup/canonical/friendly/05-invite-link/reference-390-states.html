@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mở link mời giải - 3 trạng thái xử lý | PickHub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f5f3ff',
+              100: '#ede9fe',
+              200: '#ddd6fe',
+              500: '#8b5cf6',
+              600: '#7c3aed',
+              700: '#6d28d9',
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen py-6 md:py-10 px-4 flex flex-col items-center justify-start text-slate-900">
+
+  <!-- Mobile 390px Column (Natural height, no scroll container, no phone frame) -->
+  <div class="w-full max-w-[390px] flex flex-col gap-6">
+
+    <!-- Top Navigation Bar -->
+    <header class="w-full bg-white rounded-2xl border border-slate-200 px-4 py-3.5 flex items-center justify-between shadow-sm">
+      <!-- Hamburger Menu -->
+      <button type="button" aria-label="Menu" class="size-10 rounded-xl flex items-center justify-center text-slate-700 hover:bg-slate-100 transition-colors focus:outline-none">
+        <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      <!-- Brand Logo / Wordmark -->
+      <div class="flex items-center gap-2">
+        <div class="size-8 rounded-xl bg-brand-600 flex items-center justify-center text-white shadow-sm shadow-brand-500/30">
+          <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <circle cx="12" cy="8" r="1.5" fill="currentColor"></circle>
+            <circle cx="8" cy="13" r="1.5" fill="currentColor"></circle>
+            <circle cx="16" cy="13" r="1.5" fill="currentColor"></circle>
+            <circle cx="12" cy="16" r="1.5" fill="currentColor"></circle>
+          </svg>
+        </div>
+        <span class="text-xl font-extrabold tracking-tight text-brand-600">PickHub</span>
+      </div>
+
+      <!-- Notification Bell -->
+      <button type="button" aria-label="Thông báo" class="size-10 rounded-xl flex items-center justify-center text-slate-700 hover:bg-slate-100 transition-colors focus:outline-none relative">
+        <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+        </svg>
+      </button>
+    </header>
+
+    <!-- TRẠNG THÁI 1: CẦN QUYỀN QUẢN TRỊ -->
+    <section class="flex flex-col gap-2">
+      <div class="flex items-center gap-1.5 px-1">
+        <span class="text-[11px] font-bold tracking-wider uppercase text-slate-500">
+          CẦN QUYỀN QUẢN TRỊ
+        </span>
+      </div>
+
+      <div class="bg-white rounded-xl border border-slate-200 p-6 flex flex-col items-center text-center shadow-sm">
+        <!-- 56px circle brand-50 with shield-person icon purple -->
+        <div class="size-14 rounded-full bg-brand-50 border border-brand-100 flex items-center justify-center text-brand-600 mb-4 shrink-0 shadow-sm shadow-brand-500/10">
+          <svg class="size-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+            <path d="M7 18a5 5 0 0 1 10 0"></path>
+          </svg>
+        </div>
+
+        <h2 class="text-base font-bold text-slate-900 leading-snug mb-2">
+          Cần tài khoản quản trị CLB để trả lời lời mời
+        </h2>
+
+        <p class="text-sm font-normal text-slate-600 leading-relaxed mb-6">
+          Bạn đang đăng nhập bằng tài khoản thành viên.
+        </p>
+
+        <!-- Primary purple button (full width, >= 44px) -->
+        <button type="button" class="w-full min-h-[46px] px-4 py-2.5 bg-brand-600 hover:bg-brand-700 active:scale-[0.99] text-white font-semibold text-sm rounded-xl transition-all shadow-sm shadow-brand-600/25 flex items-center justify-center gap-2">
+          <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+            <polyline points="10 17 15 12 10 7"></polyline>
+            <line x1="15" y1="12" x2="3" y2="12"></line>
+          </svg>
+          <span>Đăng nhập bằng quyền quản trị</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- TRẠNG THÁI 2: LINK KHÔNG HỢP LỆ -->
+    <section class="flex flex-col gap-2">
+      <div class="flex items-center gap-1.5 px-1">
+        <span class="text-[11px] font-bold tracking-wider uppercase text-slate-500">
+          LINK KHÔNG HỢP LỆ
+        </span>
+      </div>
+
+      <div class="bg-white rounded-xl border border-slate-200 p-6 flex flex-col items-center text-center shadow-sm">
+        <!-- 56px circle slate-100 with broken-link icon slate-500 -->
+        <div class="size-14 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 mb-4 shrink-0">
+          <svg class="size-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m18.84 12.25 1.72-1.71a4.5 4.5 0 0 0-6.36-6.36l-1.72 1.71"></path>
+            <path d="m5.16 11.75-1.72 1.71a4.5 4.5 0 0 0 6.36 6.36l1.72-1.71"></path>
+            <line x1="2" y1="2" x2="22" y2="22"></line>
+          </svg>
+        </div>
+
+        <h2 class="text-base font-bold text-slate-900 leading-snug mb-2">
+          Link mời không hợp lệ hoặc đã bị thu hồi
+        </h2>
+
+        <p class="text-sm font-normal text-slate-600 leading-relaxed mb-6">
+          Chủ nhà có thể đã tạo link mới. Lời mời vẫn có trong hộp lời mời của CLB bạn.
+        </p>
+
+        <!-- Outlined button (full width, >= 44px) -->
+        <button type="button" class="w-full min-h-[46px] px-4 py-2.5 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-800 font-semibold text-sm rounded-xl border border-slate-300 transition-colors flex items-center justify-center gap-2">
+          <svg class="size-4 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
+            <path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+          </svg>
+          <span>Mở hộp lời mời</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- TRẠNG THÁI 3: ĐĂNG KÝ ĐÃ ĐÓNG -->
+    <section class="flex flex-col gap-2">
+      <div class="flex items-center gap-1.5 px-1">
+        <span class="text-[11px] font-bold tracking-wider uppercase text-slate-500">
+          ĐĂNG KÝ ĐÃ ĐÓNG
+        </span>
+      </div>
+
+      <div class="bg-white rounded-xl border border-slate-200 p-6 flex flex-col items-center text-center shadow-sm">
+        <!-- 56px circle amber-50 with clock icon amber-700 -->
+        <div class="size-14 rounded-full bg-amber-50 border border-amber-200/70 flex items-center justify-center text-amber-700 mb-4 shrink-0">
+          <svg class="size-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+        </div>
+
+        <h2 class="text-base font-bold text-slate-900 leading-snug mb-2">
+          Đăng ký của giải này đã đóng
+        </h2>
+
+        <p class="text-sm font-normal text-slate-600 leading-relaxed mb-6">
+          Chủ nhà đã khoá đăng ký hoặc đã qua hạn chót.
+        </p>
+
+        <!-- Outlined button (full width, >= 44px) -->
+        <button type="button" class="w-full min-h-[46px] px-4 py-2.5 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-800 font-semibold text-sm rounded-xl border border-slate-300 transition-colors flex items-center justify-center gap-2">
+          <svg class="size-4 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+          <span>Xem lời mời</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Sub-footer Note / Guidance -->
+    <footer class="text-center py-2">
+      <p class="text-xs text-slate-400 font-medium">Nền tảng quản lý & kết nối CLB Pickleball • PickHub</p>
+    </footer>
+
+  </div>
+
+</body>
+</html>

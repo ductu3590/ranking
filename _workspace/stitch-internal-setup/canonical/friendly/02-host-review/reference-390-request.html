@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Yêu cầu sửa cặp đấu & Xung đột phiên bản | PickHub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f5f3ff',
+              100: '#ede9fe',
+              500: '#8b5cf6',
+              600: '#7c3aed',
+              700: '#6d28d9',
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 20;
+      line-height: 1;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen py-10 flex flex-col items-center justify-start font-sans antialiased text-slate-800">
+
+  <!-- Mobile 390px Column Container -->
+  <div class="w-[390px] mx-auto flex flex-col gap-6">
+
+    <!-- MAIN BOTTOM SHEET OVER DIMMED PAGE WRAPPER -->
+    <div class="relative w-full rounded-2xl overflow-hidden shadow-xl border border-slate-200 bg-white">
+      
+      <!-- DIMMED BACKGROUND PAGE (Step 2 Setup Page under Scrim) -->
+      <div class="relative w-full bg-slate-50 p-4 pb-20 select-none pointer-events-none filter blur-[1px]">
+        
+        <!-- Header background -->
+        <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center text-white font-bold text-sm">P</div>
+            <div>
+              <div class="text-xs font-bold text-slate-900 leading-tight">PickHub</div>
+              <div class="text-[10px] text-slate-500">Giao hữu Thu 2026</div>
+            </div>
+          </div>
+          <div class="px-2 py-0.5 rounded text-[10px] font-semibold bg-brand-50 text-brand-600 border border-brand-100">
+            Bước 2/4
+          </div>
+        </div>
+
+        <!-- Dimmed content cards -->
+        <div class="mt-3.5 space-y-3 opacity-60">
+          <div class="p-3 bg-white rounded-xl border border-slate-200">
+            <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Thành viên CLB của bạn</div>
+            <div class="mt-2 space-y-1.5">
+              <div class="flex items-center gap-2 text-xs text-slate-700">
+                <span class="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center font-bold text-[10px] text-slate-600">M</span>
+                <span>Nguyễn Minh</span>
+              </div>
+              <div class="flex items-center gap-2 text-xs text-slate-700">
+                <span class="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center font-bold text-[10px] text-slate-600">T</span>
+                <span>Trần Tuấn</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-3 bg-white rounded-xl border border-slate-200">
+            <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">CLB tham dự</div>
+            <div class="mt-2 flex items-center justify-between text-xs">
+              <span class="font-medium text-slate-800">CLB Test Responsive UI</span>
+              <span class="text-amber-600 font-semibold text-[11px]">Chờ duyệt</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Scrim Overlay inside 390px Column -->
+      <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px]"></div>
+
+      <!-- BOTTOM SHEET CONTENT CONTAINER -->
+      <div class="relative w-full bg-white rounded-t-3xl pt-3 pb-6 px-4 shadow-2xl mt-[-80px] border-t border-slate-200">
+        
+        <!-- Sheet Drag Handle -->
+        <div class="w-10 h-1 bg-slate-300 rounded-full mx-auto mb-3.5"></div>
+
+        <!-- Sheet Header Bar -->
+        <div class="flex items-start justify-between gap-2">
+          <!-- Left: Club pill & Title/Subtitle -->
+          <div class="flex-1">
+            <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-[11px] font-medium text-slate-700 mb-2">
+              <span class="w-2 h-2 rounded-full bg-[#0e7490]"></span>
+              <span class="truncate max-w-[140px]">CLB Test Resp…</span>
+            </div>
+            
+            <h2 class="text-base font-bold text-slate-900 tracking-tight leading-snug">
+              CLB Test Responsive UI
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">
+              Gửi lúc 21:04 · 24/09
+            </p>
+          </div>
+
+          <!-- Right: Status Badge & Close Button -->
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200/80">
+              Chờ duyệt
+            </span>
+            <button class="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors" title="Đóng">
+              <span class="material-symbols-outlined text-base">close</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Collapsed Pair List Summary -->
+        <div class="mt-4 p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-start gap-2.5">
+          <span class="material-symbols-outlined text-slate-400 text-lg mt-0.5">group</span>
+          <div class="flex-1 min-w-0">
+            <div class="text-xs text-slate-700 leading-relaxed font-normal">
+              <span class="font-semibold text-slate-900">3 cặp</span> · Nguyễn Minh + Trần Tuấn, Lê Hoàng + Phạm Quang, Đỗ Khánh + Vũ Long
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Yêu cầu sửa (Expanded with Amber-tinted Border) -->
+        <div class="mt-4 p-3.5 bg-white rounded-xl border-2 border-amber-300/80 shadow-sm">
+          <div class="flex items-center justify-between mb-2">
+            <label for="change-reason" class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+              <span>Lý do</span>
+              <span class="text-rose-500 font-semibold">(bắt buộc)</span>
+            </label>
+            <span class="text-[11px] font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+              Yêu cầu sửa
+            </span>
+          </div>
+
+          <!-- Textarea -->
+          <div class="relative">
+            <textarea
+              id="change-reason"
+              rows="3"
+              class="w-full text-xs text-slate-900 bg-amber-50/20 border border-slate-300 rounded-lg p-2.5 pb-6 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none resize-none leading-relaxed transition-all"
+              placeholder="Nhập lý do gửi yêu cầu sửa đổi..."
+            >Đổi cặp 2 cho cân trình</textarea>
+            
+            <!-- Character Counter Bottom-Right inside textarea container -->
+            <div class="absolute bottom-2 right-2 text-[10px] font-semibold text-slate-400 pointer-events-none bg-white/80 px-1 rounded">
+              23/300
+            </div>
+          </div>
+
+          <!-- Inline Hint in Slate-500 -->
+          <p class="text-[11px] text-slate-500 mt-2 flex items-center gap-1 leading-normal">
+            <span class="material-symbols-outlined text-xs text-slate-400">info</span>
+            <span>Từ 2 đến 300 ký tự. CLB khách sẽ thấy lý do này.</span>
+          </p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="mt-5 flex flex-col gap-2">
+          <!-- Primary Purple Full-width -->
+          <button class="w-full py-2.5 px-4 bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white text-xs font-bold rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5">
+            <span class="material-symbols-outlined text-sm">send</span>
+            <span>Gửi yêu cầu</span>
+          </button>
+          
+          <!-- Text Button Huỷ -->
+          <button class="w-full py-2 px-4 text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors">
+            Huỷ
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- SECOND PANEL: XUNG ĐỘT PHIÊN BẢN -->
+    <div class="w-full flex flex-col gap-2">
+      <!-- Section Caption -->
+      <div class="text-[11px] font-bold uppercase tracking-wider text-slate-500 px-1">
+        XUNG ĐỘT PHIÊN BẢN
+      </div>
+
+      <!-- White Sheet Fragment -->
+      <div class="w-full bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+        
+        <!-- Sheet Handle -->
+        <div class="w-8 h-1 bg-slate-200 rounded-full mx-auto mb-3"></div>
+
+        <!-- Amber Banner -->
+        <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-2.5 text-amber-800">
+          <span class="material-symbols-outlined text-amber-600 text-lg mt-0.5 shrink-0">sync</span>
+          <div class="flex-1">
+            <p class="text-xs font-medium leading-relaxed">
+              CLB vừa cập nhật danh sách. Tải lại để xem bản mới nhất trước khi duyệt.
+            </p>
+            <div class="mt-2.5 flex items-center">
+              <button class="px-3 py-1.5 bg-white hover:bg-amber-100/60 border border-amber-300 text-amber-800 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1 shadow-2xs">
+                <span class="material-symbols-outlined text-sm text-amber-700">refresh</span>
+                <span>Tải lại</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Button Duyệt (Disabled Grey) -->
+        <div class="mt-3.5">
+          <button disabled class="w-full py-2.5 px-4 bg-slate-100 border border-slate-200 text-slate-400 text-xs font-semibold rounded-xl cursor-not-allowed flex items-center justify-center gap-1.5">
+            <span class="material-symbols-outlined text-sm text-slate-400">check</span>
+            <span>Duyệt</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

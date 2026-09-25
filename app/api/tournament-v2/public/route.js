@@ -3,6 +3,8 @@ import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { computeStageStandings } from '@/lib/tournament/standingsService';
 import { buildPublicSnapshot, normalizePublicSlug } from '@/lib/tournament/publicSnapshot';
+import { buildOperationsBoard } from '@/lib/tournament/operationsBoard';
+import { projectPublicBoard } from '@/lib/tournament/publicBoard';
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -23,6 +25,8 @@ const PUBLIC_MATCH_SELECT = [
     'id', 'division_id', 'stage_id', 'round', 'bracket_slot', 'group_label',
     'court', 'match_order', 'entrant_a_id', 'entrant_b_id', 'status',
     'winner_entrant_id', 'entry_a_id', 'entry_b_id', 'winner_entry_id', 'result_type', 'parent_match_id',
+    // Chỉ để dựng board (E3); buildPublicSnapshot không chiếu các cột này ra ngoài.
+    'match_key', 'warmup_started_at', 'started_at', 'ended_at',
 ].join(', ');
 const PUBLIC_GAME_SELECT = [
     'match_id', 'game_no', 'kind', 'score_a', 'score_b',
@@ -127,7 +131,39 @@ export async function GET(request) {
             return tiebreak ? { ...stage, config: { ...(stage.config || {}), tiebreak } } : stage;
         });
 
-        return NextResponse.json(buildPublicSnapshot({
+        // Trang công khai mới (spec Epic 2 E3): view model như bàn điều hành, chỉ cho giải setup v4
+        // (mọi stage có luật cố định, trận đơn). Giải cũ giữ snapshot cũ, trang tự rơi về giao diện cũ.
+        const isV4 = stages.length > 0 && stages.every((stage) => stage.config && stage.config.scoring && (stage.match_format || 'simple') !== 'mlp');
+        let board = null;
+        if (isV4) {
+            const [rules, transitions, courts, assignments] = await Promise.all([
+                readRows('tournaments', 'id, status, settings, default_scoring', [['eq', 'id', tournament.id]]),
+                readRows('tournament_stage_transitions', 'source_kind, source_match_id, source_outcome, source_group_label, source_rank, source_pool_position, target_match_id, target_slot', [['eq', 'tournament_id', tournament.id]]),
+                readRows('tournament_courts', 'id, label, active', [['eq', 'tournament_id', tournament.id]]),
+                readRows('tournament_match_assignments', 'match_id, court_id, scheduled_start, locked', [['eq', 'tournament_id', tournament.id]]),
+            ]);
+            const divisionRules = await readRows('tournament_divisions', 'id, scoring_override', [['eq', 'tournament_id', tournament.id]]);
+            const operations = (rules[0]?.settings || {}).operations || {};
+            const gamesByMatchId = {};
+            for (const game of games) (gamesByMatchId[String(game.match_id)] ||= []).push(game);
+            board = projectPublicBoard(buildOperationsBoard({
+                tournament: rules[0] || tournament,
+                divisions: divisionRules,
+                stages,
+                matches,
+                courts,
+                assignments,
+                entries: entrants.map((entry) => ({ id: entry.id, name: entry.name })),
+                transitions,
+                gamesByMatchId,
+                settings: {
+                    matchMinutes: Number(operations.estimated_match_minutes || 22),
+                    warmupMinutes: Number(operations.warmup_minutes || 4),
+                },
+            }, { now: Date.now() }));
+        }
+
+        const snapshot = buildPublicSnapshot({
             tournament,
             divisions,
             stages: stagesWithPolicy,
@@ -135,7 +171,8 @@ export async function GET(request) {
             matches,
             games,
             standingsByStage,
-        }));
+        });
+        return NextResponse.json(board ? { ...snapshot, board } : snapshot);
     } catch (err) {
         console.error('Public v2 GET error:', err);
         return NextResponse.json({ error: err.message }, { status: err.status || 500 });

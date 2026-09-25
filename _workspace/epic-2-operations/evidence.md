@@ -96,3 +96,17 @@ Không migration. Trận đấu (`MatchesView` + "Sửa kết quả" qua correct
 
 Lệch spec: không có "Huỷ chốt lịch" cho giải v4 — người dùng chốt giữ nguyên (ADR-007 D37).
 Người dùng nghiệm thu trên CLB 59: **PASS E2** (2026-09-25).
+
+## Lát E3 — code (2026-09-25)
+
+Không migration. Trang công khai 4 tab (`PublicLive`) dùng `board` công khai (`publicBoard.js`) từ GET /public cho giải
+v4; giải cũ giữ trang cũ.
+
+| Kiểm | Kết quả |
+|---|---|
+| `tests/stitch-setup/epic-2/e3-public.test.js` | 5/5 |
+| `npm run test:stitch-setup` | xanh trừ `epic-1/ui-contract` (CRLF, có từ trước) |
+| `test:tournament`, `test:open-registration`, `test:phase1` | xanh |
+| Chạy thật trên dữ liệu CLB 59 (localhost:3100, không đăng nhập) | Giải 219 (đang diễn ra): tab Trực tiếp mặc định, Đang đấu Sân 02, Sắp tới có "Nhất bảng A / Suất bù hạng 2 · thứ 1 / Thắng Bán kết 1", Vừa xong "X thắng Y 15–9"; Sơ đồ Bán kết + Chung kết. Giải 220 (đã kết thúc): tab Xếp hạng mặc định, bục Vô địch / Á quân / Đồng hạng ba, bảng A/B/C. 390px không tràn ngang |
+
+Chưa làm — cần người dùng nghiệm thu trên điện thoại.

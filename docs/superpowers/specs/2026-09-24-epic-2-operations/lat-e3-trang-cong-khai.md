@@ -51,3 +51,22 @@ Giữ cache/polling hiện có (`nextPollingDelay`, làm mới khi focus).
 | `public-ui.test.js` | Đúng 4 tab + mặc định theo trạng thái; không nút quản trị, không import `saveGames`/`transitionMatch`/`withdraw`/`corrections`, `BracketView` không nhận `onSelectMatch`; `Sơ đồ` hiện với vòng bảng có playoff, ẩn với vòng tròn thuần và vòng bảng không playoff; nhóm Tranh hạng ba theo `match_key`; header không có ảnh poster; division lạ → không tồn tại |
 
 Test `tests/tournament/ui-public.contract.test.js` / `api-public.contract.test.js` sửa theo → ghi ADR-006.
+
+## Đã làm (2026-09-25)
+
+- **API** `GET /public`: với giải setup v4 (mọi stage có `config.scoring`, trận đơn) trả thêm `board` =
+  `projectPublicBoard(buildOperationsBoard(...))` (`lib/tournament/publicBoard.js`, whitelist: tên cặp / nguồn ô chờ,
+  nhãn trận, sân, mốc giờ, tỉ số, giờ dự kiến; không `version`, `busyCourt`, `stageAction`, settings). Thay cho việc
+  bổ sung `sources`/`schedule` rời trong §4 — cùng một view model với bàn điều hành nên nhãn và ô chờ khớp tuyệt đối.
+  Cột mới (`match_key`, mốc giờ) chỉ dùng dựng board, không lọt vào snapshot cũ.
+- **Trang** `app/giai-dau/v2/[slug]/PublicLive.js`: hero gọn + tiến độ, chọn nội dung (> 1), 4 tab dính
+  (Sơ đồ chỉ khi nội dung có stage `knockout`/`double_elim`), tab mặc định theo trạng thái, `?tab=`. Trực tiếp:
+  Đang đấu theo sân (phút từ `started_at`, ván đã lưu), Sắp tới (giờ dự kiến + trận chờ nguồn), Vừa xong. Lịch theo
+  lượt/vòng. Xếp hạng: bục khi trận cuối đã chốt + bảng vòng bảng + tiêu chí. Sơ đồ: `BracketView` chỉ đọc.
+  Chia sẻ: `ShareActions` trong nút "Chia sẻ".
+- Giải cũ (không có `board`) giữ giao diện công khai cũ; `noi-dung/[division]` render cùng trang với nội dung chọn sẵn,
+  division lạ vẫn báo không tồn tại.
+- Để backlog: chip "Đi tiếp" trên BXH công khai (snapshot công khai chưa có `outlook`).
+
+Test: `tests/stitch-setup/epic-2/e3-public.test.js` 5/5; `ui-public`, `api-public`, `phase1/public-*`,
+`phase3/interclub-public`, `phase3/share` xanh không phải sửa.

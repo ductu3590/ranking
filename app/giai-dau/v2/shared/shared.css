@@ -99,4 +99,6 @@ button.bv-match:hover { border-color: var(--bv-brand-200); box-shadow: 0 4px 10p
   .sv-podium-card { min-height: 0 !important; }
   .sv-podium-card.is-1 { order: -1; }
   .sv-group-grid { grid-template-columns: minmax(0, 1fr); }
+  .sv-table th, .sv-table td { padding: 8px 6px; }
+  .sv-table { font-size: .78rem; }
 }

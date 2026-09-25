@@ -6,6 +6,7 @@ import { nextPollingDelay } from '@/lib/pollingBackoff';
 import { StandingsView } from '../console/standingsRender';
 import { BracketView, DoubleElimBracketView } from '../console/bracketRender';
 import ShareActions from '../ShareActions';
+import PublicLive from './PublicLive';
 import '../console/bracket.css';
 import './public.css';
 
@@ -200,6 +201,9 @@ export default function PublicTournamentPage({ params }) {
             </div>
         );
     }
+
+    // Giải setup v4: trang 4 tab (spec Epic 2 E3). Giải cũ giữ giao diện bên dưới.
+    if (data.board) return <PublicLive data={data} />;
 
     const {
         tournament, stages = [], entrants = [], matches = [], gamesByMatchId = {},

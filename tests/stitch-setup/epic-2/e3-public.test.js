@@ -59,6 +59,15 @@ suite('epic-2 · E3 trang công khai', {
     assert.ok(!/onSelectMatch/.test(PAGE));
     assert.ok(!/<img/.test(PAGE), 'header không poster');
   },
+  'trang công khai không có vỏ app CLB (Stitch OPS-07), trang CLB vẫn có': () => {
+    const shell = read('components/pickhub/AppShell.js');
+    assert.ok(shell.includes('if (isBarePublicPath(pathname)) return <main className="ph-shell-bare">{children}</main>;'));
+    const re = /^\/giai-dau\/v2\/[^/]+(\/noi-dung\/[^/]+)?\/?$/;
+    for (const path of ['/giai-dau/v2/giai-abc', '/giai-dau/v2/giai-abc/noi-dung/12']) assert.ok(re.test(path), path);
+    for (const path of ['/giai-dau/v2', '/giai-dau', '/giai-dau/admin', '/dieu-hanh-giai/220']) assert.ok(!re.test(path), path);
+    assert.ok(PAGE.includes("data.club?.name"), 'tên CLB trên thanh trên');
+    assert.ok(read('lib/tournament/publicBoard.js').includes("'projectedCourt'"), 'sân dự kiến ở Sắp tới');
+  },
   'trang cũ vẫn chạy cho giải không có board; division lạ vẫn báo không tồn tại': () => {
     const page = read('app/giai-dau/v2/[slug]/page.js');
     assert.ok(page.includes('if (data.board) return <PublicLive data={data} />;'));

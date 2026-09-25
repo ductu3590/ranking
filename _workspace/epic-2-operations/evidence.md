@@ -110,3 +110,13 @@ v4; giải cũ giữ trang cũ.
 | Chạy thật trên dữ liệu CLB 59 (localhost:3100, không đăng nhập) | Giải 219 (đang diễn ra): tab Trực tiếp mặc định, Đang đấu Sân 02, Sắp tới có "Nhất bảng A / Suất bù hạng 2 · thứ 1 / Thắng Bán kết 1", Vừa xong "X thắng Y 15–9"; Sơ đồ Bán kết + Chung kết. Giải 220 (đã kết thúc): tab Xếp hạng mặc định, bục Vô địch / Á quân / Đồng hạng ba, bảng A/B/C. 390px không tràn ngang |
 
 Chưa làm — cần người dùng nghiệm thu trên điện thoại.
+
+## E3 — chỉnh theo thiết kế chốt (2026-09-25, phản hồi người dùng)
+
+Người dùng: tab Trực tiếp trên mobile chưa giống Stitch "Theo dõi trực tiếp giải đấu - Mobile 390px"
+(screen `ae763f78319a48718b7deac5507b416b`). Đã so với `07-public-live/reference-390.html` và sửa:
+bỏ vỏ app CLB ở `/giai-dau/v2/<slug>` và `/noi-dung/<id>` (`AppShell` → `ph-shell-bare`); thanh trên dính có tên CLB
+(API trả `club.name`); hero có dòng CLB + chip trạng thái; tab dính full-width; thẻ sân vạch xanh, huy hiệu A/B (1/2 ở
+loại trực tiếp), đường "vs", ô "n ván", chân "✓ Ván 1: 11–7 · Đang đánh Ván 2"; Sắp tới có **sân dự kiến**
+(`projectSchedule.courtByMatchId`, chỉ hiển thị) + dòng nguồn tô tím / Tranh hạng ba xám; Vừa xong tỉ số bên phải;
+footer tự động cập nhật. Kiểm 390px trên giải 219/220: khớp bố cục, không tràn ngang. `e3-public` 6/6, test cũ xanh.

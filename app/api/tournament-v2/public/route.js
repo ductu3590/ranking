@@ -9,7 +9,7 @@ import { projectPublicBoard } from '@/lib/tournament/publicBoard';
 const db = supabaseAdmin || supabaseServer;
 
 const PUBLIC_TOURNAMENT_SELECT = [
-    'id', 'public_slug', 'name', 'description', 'event_date',
+    'id', 'group_id', 'public_slug', 'name', 'description', 'event_date',
     'status', 'location', 'entrant_type', 'visibility', 'share_settings',
 ].join(', ');
 const PUBLIC_STAGE_SELECT = [
@@ -172,7 +172,10 @@ export async function GET(request) {
             games,
             standingsByStage,
         });
-        return NextResponse.json(board ? { ...snapshot, board } : snapshot);
+        if (!board) return NextResponse.json(snapshot);
+        // Tên CLB tổ chức hiện ở thanh trên của trang công khai (Stitch OPS-07). Chỉ tên, không mã/liên hệ.
+        const clubRows = tournament.group_id ? await readRows('groups', 'name', [['eq', 'id', tournament.group_id]]) : [];
+        return NextResponse.json({ ...snapshot, board, club: { name: clubRows[0]?.name || null } });
     } catch (err) {
         console.error('Public v2 GET error:', err);
         return NextResponse.json({ error: err.message }, { status: err.status || 500 });

@@ -37,47 +37,101 @@ function minutesSince(value, now) {
   return Number.isFinite(start) ? Math.max(0, Math.floor((now - start) / 60000)) : null;
 }
 
+function formatText(bestOf) {
+  return bestOf > 1 ? `BO${bestOf} (thắng ${Math.floor(bestOf / 2) + 1} ván)` : '1 ván';
+}
+
+function isKnockoutCode(code) {
+  return Boolean(code) && !/^(GROUP|RR)-/.test(code);
+}
+
+// Thẻ sân đang đấu (Stitch OPS-07 · "Đang đấu"): vạch xanh trái, huy hiệu A/B (vòng bảng) hoặc 1/2 (loại trực tiếp),
+// số ván thắng mỗi bên khi BO > 1, chân thẻ = ván đã lưu + "Đang đánh Ván n".
 function LiveCourt({ court, now }) {
   const match = court.match;
   const minutes = minutesSince(match.startedAt || match.warmupStartedAt, now);
   const warm = court.state === 'warmup';
+  const paused = court.state === 'paused';
   const bestOf = match.rule?.bestOf || 1;
-  const wins = (slot) => match.games.filter((game) => (slot === 'a' ? game.a > game.b : game.b > game.a)).length;
-  return <article className={`pl-live ${warm ? 'is-warm' : ''}`}>
-    <header><b>{court.label}</b><span>· {match.title}</span><em className={`pl-chip ${warm ? 'is-warm' : 'is-live'}`}>{warm ? 'Khởi động' : court.state === 'paused' ? 'Tạm dừng' : `Đang đấu${minutes != null ? ` · ${minutes} phút` : ''}`}</em></header>
-    <div className="pl-live-sides">
-      {['a', 'b'].map((slot, index) => <div key={slot} className="pl-live-side">
-        <span className="pl-slot">{index === 0 ? 'A' : 'B'}</span>
-        <span className="pl-live-name">{nameOf(match[slot])}</span>
-        {bestOf > 1 && match.games.length ? <span className="pl-wins">{wins(slot)} ván</span> : null}
-      </div>).reduce((acc, node, i) => (i === 0 ? [node] : [...acc, <i key="vs" className="pl-vs">vs</i>, node]), [])}
+  const games = match.games || [];
+  const wins = (slot) => games.filter((game) => (slot === 'a' ? game.a > game.b : game.b > game.a)).length;
+  const knockout = isKnockoutCode(match.code);
+  const leader = wins('a') === wins('b') ? null : wins('a') > wins('b') ? 'a' : 'b';
+  const needed = Math.floor(bestOf / 2) + 1;
+  const decided = wins('a') >= needed || wins('b') >= needed;
+  const chip = warm ? 'Khởi động' : paused ? 'Tạm dừng' : `Đang đấu${minutes != null ? ` · ${minutes} phút` : ''}`;
+  return <article className={`pl-court ${warm || paused ? 'is-warm' : ''}`}>
+    <header className="pl-court-head">
+      <p><b>{court.label}</b><span className="pl-sep">·</span><span>{match.title}</span></p>
+      <em className={`pl-live-chip ${warm || paused ? 'is-warm' : ''}`}><i />{chip}</em>
+    </header>
+    <div className="pl-matchup">
+      {['a', 'b'].map((slot, index) => <div key={slot} className="pl-side">
+        <span className={`pl-badge ${knockout && leader === slot ? 'is-lead' : ''}`}>{knockout ? index + 1 : (index === 0 ? 'A' : 'B')}</span>
+        <span className="pl-side-name">{nameOf(match[slot])}</span>
+        {bestOf > 1 ? <span className={`pl-wins ${leader === slot ? 'is-lead' : ''}`}>{wins(slot)} ván</span> : null}
+      </div>).reduce((acc, node, i) => (i === 0 ? [node] : [...acc, <div key="vs" className="pl-vs-line" aria-hidden="true"><i />vs<i /></div>, node]), [])}
     </div>
-    <footer>{match.games.length ? <span className="pl-game-chip">✓ {match.games.map((game, i) => `Ván ${i + 1}: ${game.a}–${game.b}`).join(' · ')}</span> : <span>Thể thức: BO{bestOf}</span>}</footer>
+    <footer className="pl-court-foot">
+      {games.length
+        ? <><span className="pl-saved">✓ {games.map((game, i) => <span key={i}>Ván {i + 1}: <strong>{game.a}–{game.b}</strong></span>).reduce((acc, node, i) => (i === 0 ? [node] : [...acc, ' · ', node]), [])}</span>
+          {!decided && !warm ? <span>Đang đánh Ván {games.length + 1}</span> : null}</>
+        : <span>Thể thức: {formatText(bestOf)}</span>}
+    </footer>
   </article>;
 }
 
-function LiveTab({ courts, upcoming, recent, now }) {
+function SourceChip({ side, tone }) {
+  return side?.name ? <b className="pl-up-name">{side.name}</b> : <span className={`pl-source ${tone}`}>{nameOf(side)}</span>;
+}
+
+// Dòng "Sắp tới": sân + giờ dự kiến; trận chờ nguồn (Thắng/Thua …) tô tím, Tranh hạng ba xám (Stitch OPS-07).
+function UpcomingRow({ item }) {
+  const bronze = item.code === 'BRONZE';
+  const waiting = !item.a?.name || !item.b?.name;
+  const knockout = isKnockoutCode(item.code);
+  const tone = bronze ? 'is-slate' : 'is-brand';
+  const bestOf = item.rule?.bestOf || 1;
+  const court = item.court || item.projectedCourt;
+  const sub = [!knockout && court ? item.title : null, bestOf > 1 ? formatText(bestOf) : null].filter(Boolean).join(' · ');
+  return <div className={`pl-up ${waiting && !bronze ? 'is-source' : ''}`}>
+    <header>
+      <span>{court ? <><b>{court}</b>{knockout ? <span className="pl-up-title"> · {item.title}</span> : null}</> : <b>{item.title}</b>}</span>
+      {item.projectedStart ? <em className={`pl-eta ${bronze ? 'is-slate' : ''}`}>dự kiến {hhmm(item.projectedStart)}</em> : null}
+    </header>
+    <p><SourceChip side={item.a} tone={tone} /><small>vs</small><SourceChip side={item.b} tone={tone} /></p>
+    {sub ? <small className="pl-up-sub">{sub}</small> : null}
+  </div>;
+}
+
+function SectionHead({ icon, title, count, tone, aside }) {
+  return <div className="pl-sec-head">
+    <p>{icon}<b>{title}</b><span className={`pl-count is-${tone}`}>{count}</span></p>
+    {aside}
+  </div>;
+}
+
+function LiveTab({ courts, upcoming, recent, finalizedCount, now, onSeeAll }) {
   return <div className="pl-tab">
     <section className="pl-section">
-      <h2><i className="pl-dot is-live" />Đang đấu <span className="pl-count is-live">{courts.length} sân</span></h2>
+      <SectionHead icon={<i className="pl-pulse" aria-hidden="true" />} title="Đang đấu" count={`${courts.length} sân`} tone="ok" aside={<span className="pl-aside">Cập nhật tự động</span>} />
       {courts.length ? courts.map((court) => <LiveCourt key={court.label} court={court} now={now} />) : <p className="pl-empty">Chưa có trận nào đang đấu.</p>}
     </section>
     <section className="pl-section">
-      <h2><i className="pl-dot is-warn" />Sắp tới <span className="pl-count is-warn">{upcoming.length} trận</span><small>Theo lịch gọi sân</small></h2>
-      {upcoming.length ? <div className="pl-list">{upcoming.map((item) => <div key={item.id} className="pl-next">
-        <header><span>{item.court ? `${item.court} · ` : ''}{item.title}</span>{item.projectedStart ? <em className="pl-eta">dự kiến {hhmm(item.projectedStart)}</em> : null}</header>
-        <p><b className={item.a?.name ? '' : 'is-source'}>{nameOf(item.a)}</b><i>vs</i><b className={item.b?.name ? '' : 'is-source'}>{nameOf(item.b)}</b></p>
-        <small>{item.stageName}{(item.rule?.bestOf || 1) > 1 ? ` · BO${item.rule.bestOf}` : ''}</small>
-      </div>)}</div> : <p className="pl-empty">Không còn trận nào chờ.</p>}
+      <SectionHead icon={<span className="pl-icon is-amber" aria-hidden="true">◷</span>} title="Sắp tới" count={`${upcoming.length} trận`} tone="warn" aside={<span className="pl-aside">Theo lịch gọi sân</span>} />
+      {upcoming.length ? <div className="pl-card-list">{upcoming.map((item) => <UpcomingRow key={item.id} item={item} />)}</div> : <p className="pl-empty">Không còn trận nào chờ.</p>}
     </section>
     <section className="pl-section">
-      <h2><i className="pl-dot is-done" />Vừa xong <span className="pl-count">{recent.length} trận</span></h2>
-      {recent.length ? <div className="pl-list">{recent.map((item) => <div key={item.id} className="pl-done">
-        <header><span>{item.title}</span><small>{hhmm(item.endedAt)}{item.court ? ` · ${item.court}` : ''}</small></header>
-        <p><b>{item.winnerName || '—'}</b> {item.resultType === 'walkover' ? 'thắng W.O.' : 'thắng'} {item.loserName ? <span>{item.loserName}</span> : null}{item.resultType !== 'walkover' && item.scoreText ? <em className="pl-score">{item.scoreText}</em> : null}</p>
+      <SectionHead icon={<span className="pl-icon is-brand" aria-hidden="true">✓</span>} title="Vừa xong" count={`${finalizedCount} trận`} tone="brand" aside={finalizedCount ? <button type="button" className="pl-see-all" onClick={onSeeAll}>Xem tất cả</button> : null} />
+      {recent.length ? <div className="pl-card-list">{recent.map((item) => <div key={item.id} className="pl-done">
+        <header><span>{item.title}</span><span>{[hhmm(item.endedAt), item.court].filter(Boolean).join(' · ')}</span></header>
+        <div className="pl-done-body">
+          <p><strong>{item.winnerName || '—'}</strong> <small>{item.resultType === 'walkover' ? 'thắng W.O.' : 'thắng'}</small> {item.loserName ? <span>{item.loserName}</span> : null}</p>
+          {item.resultType !== 'walkover' && item.scoreText ? <em className="pl-score">{item.scoreText}</em> : null}
+        </div>
       </div>)}</div> : <p className="pl-empty">Chưa có trận nào kết thúc.</p>}
     </section>
-    <p className="pl-note">ⓘ <b>Lưu ý cho khán giả:</b> lịch và kết quả do BTC cập nhật tại sân. Chạm các tab phía trên để xem xếp hạng và sơ đồ.</p>
+    <p className="pl-note"><span aria-hidden="true">ⓘ</span><span><b>Lưu ý cho khán giả:</b> Lịch và kết quả do BTC cập nhật tại sân. Chạm các tab phía trên để xem xếp hạng và sơ đồ.</span></p>
   </div>;
 }
 
@@ -179,34 +233,43 @@ export default function PublicLive({ data, initialDivisionId = null }) {
   const done = tournament.status === 'completed' || tournament.status === 'archived';
   const tabs = [['live', 'Trực tiếp'], ['schedule', 'Lịch'], ['standings', 'Xếp hạng'], ...(hasBracket ? [['bracket', 'Sơ đồ']] : [])];
 
+  const clubName = data.club?.name || 'PickHub';
+  const live = tournament.status === 'live';
+
   return <div className="pl-page">
-    <div className="pl-topbar">
-      <span className="pl-brand"><b>P</b><span><small>Cổng thông tin giải</small>PickHub</span></span>
-      <button type="button" className="pl-share-btn" aria-expanded={sharing} onClick={() => setSharing((value) => !value)}>↗ Chia sẻ</button>
-    </div>
+    <header className="pl-topbar">
+      <span className="pl-brand"><b>P</b><span><small>Cổng thông tin giải</small>{clubName}</span></span>
+      <button type="button" className="pl-share-btn" aria-expanded={sharing} onClick={() => setSharing((value) => !value)}><span aria-hidden="true">⤴</span>Chia sẻ</button>
+    </header>
     {sharing ? <div className="pl-share"><ShareActions snapshot={data} divisionId={divisionId} /></div> : null}
 
-    <header className="pl-hero">
-      <span className={`pl-status is-${tournament.status}`}>● {STATUS[tournament.status] || 'Sắp diễn ra'}</span>
-      <h1>{tournament.name}</h1>
-      {tournament.event_date || tournament.location ? <p>📍 {[formatDate(tournament.event_date), tournament.location].filter(Boolean).join(' · ')}</p> : null}
-      <div className="pl-progress"><span>Tiến độ thi đấu</span><b>{view.progress.finalized}/{view.progress.total} trận đã xong</b></div>
-      <div className="pl-bar" aria-hidden="true"><i style={{ width: `${percent}%` }} /></div>
-    </header>
+    <div className="pl-hero-wrap">
+      <section className="pl-hero">
+        <div className="pl-hero-top"><span className="pl-club">{clubName}</span><span className={`pl-status is-${tournament.status}`}><i />{STATUS[tournament.status] || 'Sắp diễn ra'}</span></div>
+        <h1>{tournament.name}</h1>
+        {tournament.event_date || tournament.location ? <p className="pl-where"><span aria-hidden="true">⌖</span><span>{[formatDate(tournament.event_date), tournament.location].filter(Boolean).join(' · ')}</span></p> : null}
+        <div className="pl-progress">
+          <div><span>Tiến độ thi đấu</span><b>{view.progress.finalized}/{view.progress.total} trận đã xong</b></div>
+          <div className="pl-bar" aria-hidden="true"><i style={{ width: `${percent}%` }} /></div>
+        </div>
+      </section>
+    </div>
 
-    {divisions.length > 1 ? <div className="pl-seg is-division" role="tablist" aria-label="Nội dung thi đấu">
+    {divisions.length > 1 ? <div className="pl-division" role="tablist" aria-label="Nội dung thi đấu">
       {divisions.map((division) => <button key={division.id} type="button" role="tab" aria-selected={String(divisionId) === String(division.id)} onClick={() => setDivisionId(division.id)}>{division.name}</button>)}
     </div> : null}
 
-    <nav className="pl-tabs" role="tablist" aria-label="Xem">
-      {tabs.map(([key, label]) => <button key={key} type="button" role="tab" aria-selected={activeTab === key} onClick={() => selectTab(key)}>{key === 'live' && tournament.status === 'live' ? '● ' : ''}{label}</button>)}
+    <nav className="pl-tabs" role="tablist" aria-label="Xem" style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}>
+      {tabs.map(([key, label]) => <button key={key} type="button" role="tab" aria-selected={activeTab === key} onClick={() => selectTab(key)}>{key === 'live' && live ? <i className="pl-ping" aria-hidden="true" /> : null}{label}</button>)}
     </nav>
 
-    {activeTab === 'live' ? <LiveTab courts={view.courts} upcoming={view.upcoming} recent={view.recent} now={now} /> : null}
-    {activeTab === 'schedule' ? <ScheduleTab groups={view.groups} stages={view.stages} /> : null}
-    {activeTab === 'standings' ? <StandingsTab stages={view.stages} standingsByStage={data.standingsByStage || {}} names={view.names} groups={view.groups} done={done} /> : null}
-    {activeTab === 'bracket' ? <div className="pl-tab"><BracketView groups={view.bracketGroups} /></div> : null}
+    <div className="pl-main">
+      {activeTab === 'live' ? <LiveTab courts={view.courts} upcoming={view.upcoming} recent={view.recent} finalizedCount={view.progress.finalized} now={now} onSeeAll={() => selectTab('schedule')} /> : null}
+      {activeTab === 'schedule' ? <ScheduleTab groups={view.groups} stages={view.stages} /> : null}
+      {activeTab === 'standings' ? <StandingsTab stages={view.stages} standingsByStage={data.standingsByStage || {}} names={view.names} groups={view.groups} done={done} /> : null}
+      {activeTab === 'bracket' ? <div className="pl-tab"><BracketView groups={view.bracketGroups} /></div> : null}
+    </div>
 
-    <footer className="pl-foot"><span>● Tự động cập nhật</span><span>PickHub</span></footer>
+    <footer className="pl-foot"><span><i className="pl-pulse" aria-hidden="true" />Tự động cập nhật</span><span>{clubName}</span></footer>
   </div>;
 }

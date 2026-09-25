@@ -46,9 +46,10 @@ assert(con.includes('OpenRegTab'), 'console render OpenRegTab');
 // Console đã đổi từ 7 tab ngang sang shell theo lộ trình 8 bước. OpenRegTab giờ
 // nằm trong bước "VĐV & cặp đấu"; khoá tab cũ `openreg` được ánh xạ sang đúng
 // bước đó nên link đã chia sẻ không vỡ.
-assert(/step === 'athletes'/.test(con), 'OpenRegTab nằm trong bước VĐV & cặp đấu');
+// Epic 2 D29: OpenRegTab là thẻ "Đăng ký mở" trong mục Cài đặt.
+assert(/step === 'settings'/.test(con) && /dang-ky-mo/.test(con), 'OpenRegTab nằm trong mục Cài đặt');
 const shell = read('app/giai-dau/v2/console/ConsoleShell.js');
-assert(/openreg:\s*'athletes'/.test(shell), 'link cũ ?tab=openreg vẫn mở đúng bước');
+assert(/openreg:\s*'settings'/.test(shell), 'link cũ ?tab=openreg vẫn mở đúng mục');
 assert(con.includes("organizer_mode") && con.includes("community"), 'chỉ hiện với giải community');
 
 console.log('open-registration ui contract: OK');

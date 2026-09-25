@@ -69,12 +69,24 @@ function rowPresentation(tournament) {
             secondaryAction: 'Chỉnh sửa giải',
         };
     }
+    // Đã chốt xong 4 bước tạo giải: lối vào chính là trang điều hành (nút nổi bật).
+    if (tournament.status === 'scheduled') {
+        return {
+            tone: 'scheduled',
+            badge: STATUS_LABELS.scheduled,
+            visualLabel: 'Sẵn sàng',
+            primaryAction: 'Vào trang điều hành',
+            ops: true,
+            secondaryAction: 'Chỉnh sửa giải',
+        };
+    }
     if (group === 'running') {
         return {
             tone: 'live',
-            badge: 'Đang diễn ra',
+            badge: STATUS_LABELS.live,
             visualLabel: 'Sân chính',
-            primaryAction: 'Điều hành giải đấu',
+            primaryAction: 'Vào trang điều hành',
+            ops: true,
             secondaryAction: 'Nhập điểm trực tiếp',
         };
     }
@@ -147,9 +159,17 @@ function TournamentListRow({ tournament, isAdmin, onOpen, onEdit, onDelete }) {
             </div>
             {isAdmin && (
                 <div className="v2-tournament-actions">
-                    <button type="button" className="v2-tournament-primary" onClick={onOpen}>
-                        {display.primaryAction} <span aria-hidden="true">›</span>
-                    </button>
+                    {display.ops ? (
+                        <button type="button" className={`v2-tournament-primary v2-tournament-ops${display.tone === 'live' ? ' is-live' : ''}`} onClick={onOpen}>
+                            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z" /></svg>
+                            <span>{display.primaryAction}</span>
+                            {display.tone === 'live' ? <i className="v2-tournament-ops-dot" aria-hidden="true" /> : <span aria-hidden="true">›</span>}
+                        </button>
+                    ) : (
+                        <button type="button" className="v2-tournament-primary" onClick={onOpen}>
+                            {display.primaryAction} <span aria-hidden="true">›</span>
+                        </button>
+                    )}
                     <button type="button" className="v2-tournament-secondary" onClick={display.tone === 'live' ? onOpen : onEdit}>
                         {display.secondaryAction}
                     </button>

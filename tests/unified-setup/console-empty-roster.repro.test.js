@@ -82,10 +82,10 @@ check.match(
     'TournamentConsoleV2 can select a division from the tournament (panel reachable before any stage exists), not only from activeStage.division_id',
 );
 
-// The athletes step runs from its own guard up to the next step guard; stopping at the
-// first ": null}" would truncate the block and hide TeamsTab from this check.
-const athletesStep = /step === 'athletes' \?([\s\S]*?)(?:step === '|<\/ConsoleShell>)/.exec(console_);
-check.ok(Boolean(athletesStep), 'TournamentConsoleV2 still has an "athletes" console step to inspect');
+// The roster now lives in the "settings" section (Epic 2 D29); the block runs from its guard up to the
+// next step guard; stopping at the first ": null}" would truncate the block and hide TeamsTab.
+const athletesStep = /step === 'settings' \?([\s\S]*?)(?:step === '|<\/ConsoleShell>)/.exec(console_);
+check.ok(Boolean(athletesStep), 'TournamentConsoleV2 still has a roster (settings) console section to inspect');
 if (athletesStep) {
     const block = athletesStep[1];
     check.ok(

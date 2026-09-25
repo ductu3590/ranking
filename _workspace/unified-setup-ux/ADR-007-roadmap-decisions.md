@@ -28,3 +28,31 @@ Chốt bằng AskUserQuestion (người dùng chọn cả bốn phương án đ�
 | D22 | Không trận tranh hạng ba. Hạng 3 = thua `LF`; hạng 4 = thua trận nhánh thua ngay trước `LF`; còn lại đồng hạng theo vòng bị loại ở nhánh thua (5–6, 7–8, 9–12…) | `LF` đã phân hạng 3 tự nhiên; không thêm trận/nhánh bất biến |
 | D23 | Chống gặp lại sớm: người thua nhánh thắng từ vòng 2 được thả sang nửa đối diện nhánh thua (bảng hoán vị cố định theo số trận vòng nhận) | Engine thả 1:1 nên có thể tái đấu ngay đối thủ vừa gặp |
 | D24 | Epic 1 deploy qua nhánh + PR nháp: agent apply migration (ROLLBACK trước, md5 sau) và kiểm thử tích hợp; người dùng chạy browser CLB 59 rồi merge | Người dùng giữ quyền quyết định lên production |
+
+## Bổ sung — Epic 2 (tối ưu điều hành), brainstorm 2026-09-24
+
+Chốt bằng AskUserQuestion. Brief thiết kế: `_workspace/epic-2-operations/01_stitch_brief.md`.
+
+| Mã | Quyết định | Lý do |
+|---|---|---|
+| D25 | Giữ D16: màn điều hành làm trên **Stitch** theo brief (không mockup HTML tự dựng); chỉ chia lát code sau khi màn có ở `canonical/operations/`. Cập nhật cùng ngày: người dùng kết nối Stitch connector và yêu cầu agent tương tác trực tiếp → agent sinh OPS-01…07 | Nhất quán với bộ setup đã duyệt |
+| D26 | Lát đầu Epic 2 là **trung tâm điều hành theo sân/lượt**, gom luôn các nợ liên quan (ô chờ theo nguồn, bỏ ô BO theo lượt, lỗi phiên bản trận sau tiến cấp, chặn Back khi chưa lưu) | Người dùng ưu tiên màn chạy giải trong ngày |
+| D27 | Deploy Epic 2 như D24: nhánh + PR nháp, agent apply migration (nếu có) và kiểm thử tích hợp; người dùng chạy browser CLB 59 rồi merge | Người dùng giữ quyền lên production |
+| D28 | Phạm vi nợ = danh sách đã ghi trong roadmap mục Epic 2; không thêm lỗi mới ở vòng này | Người dùng xác nhận |
+| D29 | Bàn điều hành sau khi chốt còn **4 mục**: `Điều hành` (mặc định; gộp trung tâm điều hành + sân + nhập tỉ số) · `Trận đấu` · `Sơ đồ & xếp hạng` · `Cài đặt` (thông tin, link/chia sẻ, sân, vùng nguy hiểm, nhật ký). Bỏ bước Cấu hình / VĐV & cặp / Bốc thăm khỏi sidebar (đã có workspace setup 4 bước); mobile dùng thanh tab đáy | So sánh Sportix (`_workspace/epic-2-operations/02_sportix_benchmark.md`); BTC dùng chính mục Điều hành |
+| D30 | Trang công khai giữ **4 tab** như OPS-07: Trực tiếp · Lịch · Xếp hạng · Sơ đồ | Người dùng chọn |
+| D31 | Không làm "Nhánh Bạc" (nhánh an ủi). Sơ đồ nhánh thắng/thua theo OPS-05 | Người dùng chọn |
+| D32 | Epic 2 **không** làm link cho trọng tài nhập điểm bằng điện thoại (API `score-tokens` giữ nguyên, không giao diện) | Người dùng chọn |
+| D33 | Hàng chờ chỉ có nút **"Gọi vào sân…"** (chọn sân trống), không kéo-thả | Người dùng chọn |
+
+## Bổ sung — nghiệm thu Epic 2 lát E1 (2026-09-24)
+
+Người dùng chạy thật một giải vòng bảng → loại trực tiếp trên CLB 59 (giải 220) tới hết: luồng nghiệp vụ hoàn tất
+100%, giao diện chưa đạt. Chốt bằng AskUserQuestion. Spec: `docs/superpowers/specs/2026-09-24-epic-2-operations/lat-e1-1-sua-sau-nghiem-thu.md`.
+
+| Mã | Quyết định | Lý do |
+|---|---|---|
+| D34 | Luật tỉ số một ván: **bên nhiều điểm hơn thắng**. Chỉ chặn hoà, số âm, số lẻ; bỏ kiểm mốc tới / cách / trần ở server (`games`, `corrections`) và sheet nhập tỉ số. `points_to` còn dùng cho tỉ số W.O. (096) | Nhiều giải đánh 15 thắng cách 2 nên có 17–15; giải phong trào không cố định 11/15/21 |
+| D35 | Khi mọi trận của một chặng đã chốt, mục **Điều hành** hiện thẻ "việc tiếp theo": BXH tóm tắt (suất đi tiếp) + nút "Chốt … & vào …" / "Kết thúc giải & chốt xếp hạng", bấm hai lần để xác nhận. Nút cũ ở "Sơ đồ & xếp hạng" giữ nguyên, dùng chung `stageAction.js` | Phải sang mục khác để tiến vòng là không hợp lý; vẫn cần bước xem lại khi đồng điểm |
+| D36 | "Kết thúc giải" ở cả hai lối vào chuyển giải sang `completed` qua PATCH `tournaments` (vòng đời `live → completed`, ghi hạng chung cuộc). Giải đã chốt hết chặng nhưng còn `live` (vd 220) có nút "Kết thúc giải" riêng | Giải 220 xong 15/15 trận mà vẫn "Đang diễn ra" |
+| D37 | Giải setup v4 **không có "Huỷ chốt lịch"** trong Cài đặt (2026-09-25, người dùng chốt sau nghiệm thu E2). `unlock_tournament_draw` chỉ dùng cho giải cũ | Huỷ từng stage làm lệch tuyến đi tiếp và bản nháp setup 4 bước |

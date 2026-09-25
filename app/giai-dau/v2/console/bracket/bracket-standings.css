@@ -1,0 +1,43 @@
+/* Mục Sơ đồ & xếp hạng (spec Epic 2 E2 §2; Stitch OPS-05/06). */
+
+.bs-page { display: grid; gap: 16px; }
+.bs-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 10px 16px; }
+.bs-head h1 { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 0; font-size: 1.6rem; font-weight: 800; letter-spacing: -.02em; }
+.bs-head p { margin: 4px 0 0; }
+.bs-format { padding: 2px 10px; border: 1px solid var(--pc-brand-200); border-radius: 8px; background: var(--pc-brand-50); color: var(--pc-brand-700); font-size: .75rem; font-weight: 700; letter-spacing: 0; }
+.bs-card { display: grid; gap: 14px; padding: 16px; border: 1px solid var(--pc-border); border-radius: var(--pc-radius-xl); background: var(--pc-card); box-shadow: var(--pc-shadow); }
+.bs-card-title { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin: 0; font-size: 1.05rem; font-weight: 800; }
+.bs-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--pc-brand-600); }
+.bs-dot.is-gold { background: #f59e0b; }
+.bs-pill { margin-left: auto; padding: 2px 10px; border: 1px solid var(--pc-border); border-radius: 8px; font-size: .72rem; font-weight: 700; }
+.bs-pill.is-ok { border-color: #a7f3d0; background: var(--pc-ok-bg); color: var(--pc-ok); }
+.bs-pill.is-warn { border-color: #fde68a; background: var(--pc-warn-bg); color: var(--pc-warn); }
+.bs-foot { padding-top: 10px; border-top: 1px solid var(--pc-border); }
+
+.bs-standings { display: grid; grid-template-columns: minmax(0, 1fr) 19rem; align-items: start; gap: 16px; }
+.bs-main { display: grid; min-width: 0; gap: 16px; }
+.bs-finish { position: sticky; top: 12px; display: grid; gap: 12px; padding: 16px; border: 1px solid var(--pc-border); border-radius: var(--pc-radius-xl); background: var(--pc-card); box-shadow: var(--pc-shadow); }
+.bs-finish h2 { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 1.05rem; }
+.bs-finish h2 span { color: var(--pc-brand-600); }
+.bs-state { margin: 0; padding: 12px; border: 1px solid var(--pc-border); border-radius: var(--pc-radius-lg); background: var(--pc-bg); color: #475569; font-size: .82rem; line-height: 1.5; }
+.bs-state b { display: block; color: var(--pc-text); }
+.bs-state.is-ok { border-color: #a7f3d0; background: var(--pc-ok-bg); color: var(--pc-ok); }
+.bs-state.is-ok b { color: var(--pc-ok); }
+.bs-state.is-warn { border-color: #fde68a; background: var(--pc-warn-bg); color: #92400e; }
+.bs-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0; }
+.bs-stats div { padding: 10px; border: 1px solid var(--pc-border); border-radius: var(--pc-radius-lg); }
+.bs-stats dt { color: var(--pc-muted); font-size: .72rem; }
+.bs-stats dd { margin: 2px 0 0; font-weight: 800; }
+.bs-finish > .ops-btn { width: 100%; }
+
+@media (max-width: 1100px) {
+  .bs-standings { grid-template-columns: minmax(0, 1fr); }
+  .bs-finish { position: static; }
+}
+
+@media (max-width: 767px) {
+  .bs-head h1 { font-size: 1.3rem; }
+  .bs-head .ops-filter { width: 100%; }
+  .bs-head .ops-filter button { flex: 1; }
+  .bs-card { padding: 12px; }
+}

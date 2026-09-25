@@ -26,14 +26,26 @@ function pairedDraft(pairCount, format = { formatKey: 'round_robin', config: {} 
 }
 
 suite('step rules', {
-  'bước 1: thiếu tên/ngày/giờ/số sân đều chặn'() {
+  // Số sân chuyển sang Bước 3 (yêu cầu người dùng 2026-09-24 — ADR-006 mục "Bổ sung sau E1").
+  'bước 1: thiếu tên/ngày/giờ đều chặn; số sân không còn ở bước 1'() {
     const result = validateStep({ tournament: { name: '', eventDate: '', startTime: '', courtCount: null } }, 1);
-    assert.deepEqual(codes(result).sort(), ['COURT_COUNT_INVALID', 'EVENT_DATE_REQUIRED', 'START_TIME_REQUIRED', 'TOURNAMENT_NAME_REQUIRED']);
+    assert.deepEqual(codes(result).sort(), ['EVENT_DATE_REQUIRED', 'START_TIME_REQUIRED', 'TOURNAMENT_NAME_REQUIRED']);
   },
 
-  'bước 1: ngày không tồn tại, số sân 21, áp phích http đều chặn'() {
+  'bước 1: ngày không tồn tại, áp phích http đều chặn'() {
     const result = validateStep({ tournament: info({ eventDate: '2026-02-30', courtCount: 21, posterUrl: 'http://x.vn/a.jpg' }) }, 1);
-    assert.deepEqual(codes(result).sort(), ['COURT_COUNT_INVALID', 'EVENT_DATE_REQUIRED', 'POSTER_URL_INVALID']);
+    assert.deepEqual(codes(result).sort(), ['EVENT_DATE_REQUIRED', 'POSTER_URL_INVALID']);
+  },
+
+  'bước 3: chưa chọn số sân hoặc quá 20 sân → COURT_COUNT_INVALID'() {
+    const missing = pairedDraft(4);
+    missing.tournament = info({ courtCount: null });
+    assert.ok(codes(validateStep(missing, 3, enabledAll)).includes('COURT_COUNT_INVALID'));
+    const tooMany = pairedDraft(4);
+    tooMany.tournament = info({ courtCount: 21 });
+    assert.ok(codes(validateStep(tooMany, 3, enabledAll)).includes('COURT_COUNT_INVALID'));
+    assert.equal(codes(validateStep(pairedDraft(4), 3, enabledAll)).includes('COURT_COUNT_INVALID'), false);
+    assert.equal(messageFor('COURT_COUNT_INVALID').step, 3);
   },
 
   'bước 1: ngày đã qua chỉ cảnh báo'() {

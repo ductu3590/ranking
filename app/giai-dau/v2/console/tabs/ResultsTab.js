@@ -136,8 +136,8 @@ function MatchCard({ match, savedGames, isMlp, entrantsById, isAdmin, onSaved, p
     const [dbPickA, setDbPickA] = useState([]);
     const [dbPickB, setDbPickB] = useState([]);
 
-    const nameA = entrantName(entrantsById, match.entrant_a_id, 'Đội A');
-    const nameB = entrantName(entrantsById, match.entrant_b_id, 'Đội B');
+    const nameA = entrantName(entrantsById, match.entrant_a_id ?? match.entry_a_id, 'Chờ xác định');
+    const nameB = entrantName(entrantsById, match.entrant_b_id ?? match.entry_b_id, 'Chờ xác định');
     const isWalkover = match.result_type === 'walkover';
 
     const entrantA = entrantsById[String(match.entrant_a_id)];
@@ -539,7 +539,7 @@ function groupMatchesByRound(matches, stage) {
     }));
 }
 
-function RoundGroupHead({ group, rule, stageId, isAdmin, onSaved }) {
+function RoundGroupHead({ group, rule, stageId, isAdmin, onSaved, fixedRules }) {
     const [busy, setBusy] = useState(false);
     async function pick(value) {
         setBusy(true);
@@ -554,7 +554,7 @@ function RoundGroupHead({ group, rule, stageId, isAdmin, onSaved }) {
         <div className="v2-round-group-head">
             <b>{group.label}</b>
             <small>{group.matches.length} trận</small>
-            {group.locked || !isAdmin ? (
+            {fixedRules || group.locked || !isAdmin ? (
                 <span className="v2-round-readonly">
                     {bestOf ? `BO${bestOf}` : ''} {group.locked ? '🔒' : ''}
                 </span>
@@ -752,6 +752,7 @@ export default function ResultsTab({ tournamentId, stageId, stage, isAdmin }) {
                         rule={(roundRules?.rounds || []).find((r) => r.round_key === group.key)}
                         stageId={stageId}
                         isAdmin={isAdmin}
+                        fixedRules={Boolean(stage?.config?.scoring)}
                         onSaved={() => getRoundRules(stageId).then(setRoundRules).catch(() => {})}
                     />
                     {group.matches.map((match) => renderMatchRow(match))}

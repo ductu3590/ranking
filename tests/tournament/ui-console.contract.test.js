@@ -8,8 +8,8 @@ const assert = (condition, message) => { if (!condition) { console.error(`FAIL: 
 assert(/ConsoleShell/.test(source), 'console dùng shell sidebar');
 assert(!/v2-tabbar/.test(source), 'không còn thanh 7 tab ngang');
 for (const tab of ['SettingsTab', 'TeamsTab', 'ResultsTab', 'StandingsTab', 'BracketTab', 'OpenRegTab']) assert(new RegExp(tab).test(source), `${tab} được dùng lại`);
-assert(/CourtsStep|ControlStep|LogStep/.test(source), 'mount ba màn mới');
-assert(/readiness/.test(source), 'có readiness');
+assert(/ControlCenter/.test(source) && /CourtsStep/.test(source) && /LogStep/.test(source), 'mount mục Điều hành + sân + nhật ký');
+assert(!/ControlStep/.test(source), 'ControlStep (chốt trận không tỉ số) đã gỡ — Epic 2 E1');
 assert(fs.existsSync(fullPage), 'có route điều hành toàn màn hình độc lập AppShell');
 const fullSource = fs.readFileSync(fullPage, 'utf8');
 assert(/TournamentConsoleV2/.test(fullSource), 'route toàn màn hình tái dùng console thật');

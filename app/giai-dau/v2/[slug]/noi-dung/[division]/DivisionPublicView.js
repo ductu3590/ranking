@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { getPublic } from '@/lib/tournamentV2Client';
 import { StandingsView } from '../../../console/standingsRender';
 import ShareActions from '../../../ShareActions';
+import PublicLive from '../../PublicLive';
 import '../../public.css';
 import '../../../share.css';
 
@@ -62,6 +63,9 @@ export default function DivisionPublicView({ slug, divisionId }) {
             </div>
         );
     }
+
+    // Giải setup v4: cùng trang 4 tab với nội dung được chọn sẵn (spec Epic 2 E3 §2).
+    if (data.board) return <PublicLive data={data} initialDivisionId={division.id} />;
 
     const stages = (data.stages || []).filter((stage) => String(stage.division_id) === String(division.id));
     const entrantsById = {};

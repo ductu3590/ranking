@@ -9,6 +9,14 @@ import AppTopBar from './AppTopBar';
 import PhNotificationBell from './PhNotificationBell';
 import './AppShell.css';
 
+// Trang công khai của giải (khán giả / VĐV quét QR tại sân) là trang độc lập, không có vỏ app CLB
+// (spec Epic 2 E3, Stitch OPS-07): /giai-dau/v2/<slug> và /giai-dau/v2/<slug>/noi-dung/<id>.
+const PUBLIC_TOURNAMENT_PATH = /^\/giai-dau\/v2\/[^/]+(\/noi-dung\/[^/]+)?\/?$/;
+
+export function isBarePublicPath(pathname) {
+    return PUBLIC_TOURNAMENT_PATH.test(String(pathname || ''));
+}
+
 export default function AppShell({ children, layout = '' }) {
     const pathname = usePathname();
     const [role, setRole] = useState('member');
@@ -107,6 +115,8 @@ export default function AppShell({ children, layout = '' }) {
             burger?.focus();
         };
     }, [drawerOpen]);
+
+    if (isBarePublicPath(pathname)) return <main className="ph-shell-bare">{children}</main>;
 
     return (
         <div className={`ph-shell${layout ? ` ph-shell--${layout}` : ''}${drawerOpen ? ' is-drawer-open' : ''}`}>

@@ -17,6 +17,10 @@ This folder contains the approved visual-reference bundle for the Unified Intern
 | `setup/03-format-pairing/tap-to-pair.*` | `3ebeb2f0f3f949eab3b318dd30f8c77d` | Step-3 tap-to-pair interaction state, not an extra wizard step |
 | `setup/04-draw-preview-finalize` | `f96d2e8bf77943e2a8511acce797b022` | Step 4: draw, preview, and finalization |
 
+## Operations Screens (Epic 2)
+
+See `operations/README.md` (10 screens, generated 2026-09-24 via the Stitch connector, same project and light design system).
+
 `DESIGN.md` is the visual token authority. The `shell-references/` files provide broader club-shell inspiration only; they do not define tournament setup behavior. `unclassified/image.png` has no known functional role.
 
 ## Usage Rules

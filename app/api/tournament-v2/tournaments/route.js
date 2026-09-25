@@ -171,7 +171,7 @@ async function checkTransitionGuards(guards, tournamentId, groupId) {
     }
     if (guards.includes('no_finalized_matches') && counts.finalized > 0) {
         return NextResponse.json({
-            error: `Giải đã có ${counts.finalized} trận chốt kết quả, không quay về Đã chốt lịch được.`,
+            error: `Giải đã có ${counts.finalized} trận chốt kết quả, không quay về Chờ diễn ra được.`,
             code: 'TOURNAMENT_HAS_FINALIZED_MATCHES',
         }, { status: 409 });
     }
@@ -572,6 +572,15 @@ export async function PATCH(request) {
         delete payload.group_id;
         if (payload.name === null) {
             return NextResponse.json({ error: 'Tournament name is required' }, { status: 400 });
+        }
+
+        // Giải tạo bằng setup 4 bước (hàm SQL) chưa có public_slug. Bật link (unlisted/public) thì sinh slug
+        // một lần — slug là danh tính công khai, không đổi lại khi đã có (spec Epic 2 E2 §3.2).
+        if (payload.visibility === 'unlisted' || payload.visibility === 'public') {
+            const { data: current, error: slugErr } = await db.from('tournaments').select('name, public_slug')
+                .eq('id', id).eq('group_id', adminCheck.groupId).maybeSingle();
+            if (slugErr) return NextResponse.json({ error: slugErr.message }, { status: 500 });
+            if (current && !current.public_slug) payload.public_slug = generateSlug(payload.name || current.name);
         }
 
         const { data, error } = await db

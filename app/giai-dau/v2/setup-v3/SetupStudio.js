@@ -17,7 +17,7 @@ const jakarta = Plus_Jakarta_Sans({ subsets: ['latin', 'vietnamese'], weight: ['
 
 const NEXT_HINT = {
   1: 'Chọn thành viên CLB và khách mời tham gia.',
-  2: 'Chọn thể thức và ghép cặp đánh đôi.',
+  2: 'Ghép cặp đánh đôi, chọn thể thức và số sân.',
   3: 'Bốc thăm, xem trước lịch và chốt giải.',
   4: null,
 };
@@ -39,9 +39,9 @@ export default function SetupStudio({ tournamentId, divisionId, step: requestedS
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   }, [pathname, router, save.tournamentId, save.divisionId, step]);
 
-  // Giải đã chốt không mở lại màn thiết lập (spec Lát 0 §10): chuyển tới lịch.
+  // Giải đã chốt không mở lại màn thiết lập (spec Lát 0 §10): chuyển tới mục Điều hành.
   useEffect(() => {
-    if (save.draft.state === 'finalized' && save.tournamentId) router.replace(`/dieu-hanh-giai/${save.tournamentId}?step=schedule`);
+    if (save.draft.state === 'finalized' && save.tournamentId) router.replace(`/dieu-hanh-giai/${save.tournamentId}?step=control`);
   }, [router, save.draft.state, save.tournamentId]);
 
   useEffect(() => {
@@ -120,7 +120,7 @@ export default function SetupStudio({ tournamentId, divisionId, step: requestedS
   const summaries = {
     1: draft.tournament.eventDate ? draft.tournament.eventDate.split('-').reverse().join('/') : '',
     2: participants ? `${participants} VĐV` : '',
-    3: draft.pairs.length ? `${draft.pairs.length} cặp` : '',
+    3: draft.pairs.length ? `${draft.pairs.length} cặp${draft.tournament.courtCount ? ` · ${draft.tournament.courtCount} sân` : ''}` : '',
   };
   const stepProps = { draft, readiness, showErrors: Boolean(showErrors[step]), onChange: edit };
 

@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Trung tâm Điều hành Giải đấu | PickHub 246 Club</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#f5f3ff',
+              100: '#ede9fe',
+              200: '#ddd6fe',
+              500: '#8b5cf6',
+              600: '#7c3aed',
+              700: '#6d28d9',
+              800: '#5b21b6',
+            }
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 450, 'GRAD' 0, 'opsz' 20;
+      line-height: 1;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .hatched-pattern {
+      background-color: #f8fafc;
+      background-image: repeating-linear-gradient(45deg, #f1f5f9, #f1f5f9 10px, #f8fafc 10px, #f8fafc 20px);
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+<!-- TOP BAR -->
+<header class="h-14 bg-white border-b border-slate-200 px-6 sticky top-0 z-30 flex items-center justify-between shadow-xs">
+<div class="flex items-center gap-4">
+<a class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-brand-600 transition-colors py-1 px-2 -ml-2 rounded hover:bg-slate-100" href="#">
+<span class="material-symbols-outlined text-sm">arrow_back</span>
+<span>Danh sách giải</span>
+</a>
+<div class="h-4 w-px bg-slate-200"></div>
+<div class="flex items-center gap-2.5">
+<span class="font-bold text-slate-900 text-sm tracking-tight">Giải nội bộ tháng 10</span>
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+</span>
+<span>Đang diễn ra</span>
+</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 text-xs font-semibold text-slate-700">
+<span class="w-6 h-6 rounded bg-brand-100 text-brand-700 flex items-center justify-center font-bold text-xs">P</span>
+<span>PickHub 246 Club</span>
+</div>
+</div>
+</header>
+<!-- BODY WORKSPACE -->
+<div class="flex flex-1 max-w-[1280px] w-full mx-auto">
+<!-- LEFT SIDEBAR (16rem / 256px) -->
+<aside class="w-64 border-r border-slate-200 bg-white p-4 flex flex-col justify-between shrink-0">
+<div class="space-y-6">
+<!-- Group: Chuẩn bị -->
+<div>
+<div class="text-[11px] font-bold text-slate-400 tracking-wider uppercase px-2 mb-2">Chuẩn bị</div>
+<nav class="space-y-1">
+<div class="flex items-center gap-2 px-2.5 py-1.5 rounded text-xs font-medium text-slate-500 hover:bg-slate-50 transition-colors">
+<span class="material-symbols-outlined text-sm text-emerald-600">check</span>
+<span>Cấu hình giải</span>
+</div>
+<div class="flex items-center gap-2 px-2.5 py-1.5 rounded text-xs font-medium text-slate-500 hover:bg-slate-50 transition-colors">
+<span class="material-symbols-outlined text-sm text-emerald-600">check</span>
+<span>Sân &amp; sơ đồ sân</span>
+</div>
+<div class="flex items-center gap-2 px-2.5 py-1.5 rounded text-xs font-medium text-slate-500 hover:bg-slate-50 transition-colors">
+<span class="material-symbols-outlined text-sm text-emerald-600">check</span>
+<span>VĐV &amp; cặp đấu</span>
+</div>
+<div class="flex items-center gap-2 px-2.5 py-1.5 rounded text-xs font-medium text-slate-500 hover:bg-slate-50 transition-colors">
+<span class="material-symbols-outlined text-sm text-emerald-600">check</span>
+<span>Bốc thăm &amp; chốt lịch</span>
+</div>
+</nav>
+</div>
+<!-- Highlighted Active Tab -->
+<div>
+<div class="flex items-center justify-between px-3 py-2.5 rounded-lg bg-brand-50 border border-brand-200 text-brand-700 shadow-xs">
+<div class="flex items-center gap-2.5">
+<span class="w-5 h-5 rounded-full bg-brand-600 text-white font-mono text-[11px] font-bold flex items-center justify-center">5</span>
+<span class="text-xs font-bold">Trung tâm điều hành</span>
+</div>
+<span class="w-2 h-2 rounded-full bg-brand-600"></span>
+</div>
+</div>
+<!-- Group: Trong & sau giải -->
+<div>
+<div class="text-[11px] font-bold text-slate-400 tracking-wider uppercase px-2 mb-2">Trong &amp; sau giải</div>
+<nav class="space-y-1">
+<a class="flex items-center gap-2 px-2.5 py-1.5 rounded text-xs font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors" href="#">
+<span class="material-symbols-outlined text-sm text-slate-400">calendar_month</span>
+<span>Lịch thi đấu &amp; kết quả</span>
+</a>
+<a class="flex items-center gap-2 px-2.5 py-1.5 rounded text-xs font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors" href="#">
+<span class="material-symbols-outlined text-sm text-slate-400">trophy</span>
+<span>Bảng đấu &amp; xếp hạng</span>
+</a>
+<a class="flex items-center gap-2 px-2.5 py-1.5 rounded text-xs font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors" href="#">
+<span class="material-symbols-outlined text-sm text-slate-400">history</span>
+<span>Nhật ký thao tác</span>
+</a>
+</nav>
+</div>
+</div>
+<!-- Footer Quick Status -->
+</aside>
+<!-- MAIN DASHBOARD CONTENT -->
+<main class="flex-1 p-6 flex flex-col gap-6 overflow-y-auto">
+<!-- PROGRESS STRIP CARD -->
+<section class="bg-white rounded-xl border border-slate-200 p-4 shadow-xs">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<!-- Left: Metrics & Progress Bar -->
+<div class="flex-1 max-w-2xl space-y-2">
+<div class="flex items-baseline justify-between text-xs">
+<div class="flex items-baseline gap-2">
+<span class="text-xl font-extrabold text-slate-900 tracking-tight">18/31</span>
+<span class="font-semibold text-slate-600">trận đã chốt</span>
+<span class="text-slate-400 font-mono text-[11px]">(58%)</span>
+</div>
+<div class="flex items-center gap-3 text-slate-500 font-medium">
+<span class="inline-flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-slate-400">alarm</span>
+<span>Dự kiến xong <strong class="text-slate-700 font-mono">16:40</strong></span>
+</span>
+<span>•</span>
+<span>TB <strong class="text-slate-700 font-mono">21</strong> phút/trận</span>
+<span>•</span>
+<span class="inline-flex items-center gap-1 text-brand-700 font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-brand-600"></span>
+<span>4 sân đang dùng</span>
+</span>
+</div>
+</div>
+<!-- Violet Progress Bar -->
+<div class="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden p-0.5">
+<div class="h-full bg-brand-600 rounded-full transition-all duration-500" style="width: 58%"></div>
+</div>
+</div>
+<!-- Right: Segmented Filter -->
+<div class="flex items-center bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs shrink-0 self-start md:self-auto">
+<button class="px-3 py-1.5 rounded-md font-bold text-slate-900 bg-white shadow-xs">Tất cả nội dung</button>
+<button class="px-3 py-1.5 rounded-md font-medium text-slate-600 hover:text-slate-900 transition-colors">Vòng bảng</button>
+<button class="px-3 py-1.5 rounded-md font-medium text-slate-600 hover:text-slate-900 transition-colors">Loại trực tiếp</button>
+</div>
+</div>
+</section>
+<!-- 2-COLUMN MAIN OPERATIONAL AREA: 8 cols courts + 4 cols queue -->
+<div class="grid grid-cols-12 gap-6 items-start">
+<!-- 8 COLS: 4 COURT CARDS (2x2 GRID) -->
+<div class="col-span-12 lg:col-span-8 flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="text-xs font-bold uppercase tracking-wider text-slate-400">Sân thi đấu trực tiếp</span>
+<span class="text-[11px] font-semibold text-slate-500 bg-slate-200/60 px-2 py-0.5 rounded">4 sân</span>
+</div>
+<div class="text-xs text-slate-500">
+              Nhấp nút để cập nhật trạng thái sân ngay
+            </div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- SÂN 01 — ĐANG ĐẤU -->
+<div class="bg-white rounded-xl border border-slate-200 shadow-xs flex flex-col overflow-hidden relative">
+<!-- Top colored 3px bar -->
+<div class="h-[3px] bg-emerald-500 w-full"></div>
+<div class="p-4 flex-1 flex flex-col justify-between space-y-4">
+<!-- Header -->
+<div><div class="flex items-start justify-between gap-2 mb-2"><div><span class="text-xl font-extrabold text-slate-900 tracking-tight block">Sân 01</span><span class="text-xs font-semibold text-slate-500 block mt-0.5">Bảng A · Lượt 3</span></div><span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0 whitespace-nowrap"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span><span>Đang đấu · </span><span class="font-mono font-bold">12:48</span></span></div><div class="inline-flex items-center gap-1 text-[11px] font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded"><span>BO1 · 11 điểm</span></div></div>
+<!-- Matchup pairs stacked with 'vs' -->
+<div class="space-y-1.5 bg-slate-50/80 p-3 rounded-lg border border-slate-100"><div class="text-center py-1"><div class="text-xs font-bold text-slate-900">Minh Tuấn + Hoàng Nam</div><div class="flex items-center justify-center my-1"><span class="text-[10px] uppercase font-bold text-slate-400 bg-white px-2 py-0.2 rounded-full border border-slate-200">vs</span></div><div class="text-xs font-bold text-slate-900">Quốc Khánh + Bảo Long</div></div></div>
+<!-- Actions -->
+<div class="flex items-center gap-2 pt-1">
+<button class="flex-1 py-2 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors shadow-xs flex items-center justify-center gap-1.5">
+<span class="material-symbols-outlined text-sm">edit_note</span>
+<span>Nhập tỉ số</span>
+</button>
+<button class="w-9 h-9 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600 flex items-center justify-center transition-colors text-xs font-bold" title="Tùy chọn khác">
+                    ⋯
+                  </button>
+</div>
+</div>
+</div>
+<!-- SÂN 02 — KHỞI ĐỘNG -->
+<div class="bg-white rounded-xl border border-slate-200 shadow-xs flex flex-col overflow-hidden relative">
+<!-- Top colored 3px bar -->
+<div class="h-[3px] bg-amber-500 w-full"></div>
+<div class="p-4 flex-1 flex flex-col justify-between space-y-4">
+<!-- Header -->
+<div><div class="flex items-start justify-between gap-2 mb-2"><div><span class="text-xl font-extrabold text-slate-900 tracking-tight block">Sân 02</span><span class="text-xs font-semibold text-slate-500 block mt-0.5">Bán kết nhánh thắng</span></div><span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200 shrink-0 whitespace-nowrap"><span class="material-symbols-outlined text-xs">timer</span><span>Khởi động · còn </span><span class="font-mono font-bold">02:15</span></span></div><div class="inline-flex items-center gap-1 text-[11px] font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded"><span>BO1 · 11 điểm</span></div></div>
+<!-- Matchup pairs stacked with 'vs' -->
+<div class="space-y-1.5 bg-slate-50/80 p-3 rounded-lg border border-slate-100">
+<div class="flex items-center justify-between">
+<span class="text-xs font-bold text-slate-900">Văn Sơn + Đức Thịnh</span>
+<span class="text-[11px] text-slate-400">Đã vào sân</span>
+</div>
+<div class="flex items-center justify-center my-0.5">
+<span class="text-[10px] uppercase font-bold text-slate-400 bg-white px-2 py-0.2 rounded-full border border-slate-200">vs</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs font-bold text-slate-900">Hải Đăng + Gia Huy</span>
+<span class="text-[11px] text-slate-400">Đã vào sân</span>
+</div>
+</div>
+<!-- Actions -->
+<div class="flex items-center gap-2 pt-1">
+<button class="flex-1 py-2 px-3 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition-colors shadow-xs flex items-center justify-center gap-1.5">
+<span class="material-symbols-outlined text-sm">play_arrow</span>
+<span>Bắt đầu đấu</span>
+</button>
+<button class="w-9 h-9 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600 flex items-center justify-center transition-colors text-xs font-bold" title="Tùy chọn khác">
+                    ⋯
+                  </button>
+</div>
+</div>
+</div>
+<!-- SÂN 03 — TRỐNG · CHỜ GỌI -->
+<div class="bg-white rounded-xl border border-brand-200/80 shadow-xs flex flex-col overflow-hidden relative bg-gradient-to-b from-brand-50/30 to-white">
+<!-- Top colored 3px bar -->
+<div class="h-[3px] bg-brand-500 w-full"></div>
+<div class="p-4 flex-1 flex flex-col justify-between space-y-4">
+<!-- Header -->
+<div><div class="flex items-start justify-between gap-2 mb-2"><div><span class="text-xl font-extrabold text-slate-900 tracking-tight block">Sân 03</span><span class="text-xs font-semibold text-slate-500 block mt-0.5">Chờ ghép trận</span></div><span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-brand-50 text-brand-700 border border-brand-200 shrink-0 whitespace-nowrap"><span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span><span>Trống · chờ gọi</span></span></div><div class="inline-flex items-center gap-1 text-[11px] font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded"><span>BO1 · 11 điểm</span></div></div>
+<!-- Suggested next match -->
+<div class="bg-brand-50/60 p-3 rounded-lg border border-brand-100 space-y-1.5">
+<div class="text-[11px] font-bold text-brand-700 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">recommend</span>
+<span>Gợi ý tiếp theo: Bảng B · Lượt 3</span>
+</div>
+<div class="text-xs font-bold text-slate-900 leading-snug">
+                    Tiến Dũng + Huy Hoàng
+                    <span class="text-slate-400 font-normal"> vs </span>
+                    Đăng Khoa + Trọng Hiếu
+                  </div>
+<div class="text-[11px] text-slate-500">Hai cặp đều đang rảnh</div>
+</div>
+<!-- Actions -->
+<div class="flex items-center gap-2 pt-1">
+<button class="flex-1 py-2 px-3 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold transition-colors shadow-xs flex items-center justify-center gap-1.5">
+<span class="material-symbols-outlined text-sm">campaign</span>
+<span>Gọi vào sân</span>
+</button>
+<button class="w-9 h-9 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600 flex items-center justify-center transition-colors text-xs font-bold" title="Tùy chọn khác">
+                    ⋯
+                  </button>
+</div>
+</div>
+</div>
+<!-- SÂN 04 — NGƯNG DÙNG -->
+<div class="rounded-xl border border-slate-200 shadow-xs flex flex-col overflow-hidden relative hatched-pattern opacity-85">
+<!-- Top colored 3px bar -->
+<div class="h-[3px] bg-slate-400 w-full"></div>
+<div class="p-4 flex-1 flex flex-col justify-between space-y-4">
+<!-- Header -->
+<div><div class="flex items-start justify-between gap-2 mb-2"><div><span class="text-xl font-extrabold text-slate-500 tracking-tight block">Sân 04</span><span class="text-xs font-medium text-slate-400 block mt-0.5">Tạm thời khóa</span></div><span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-200 text-slate-700 border border-slate-300 shrink-0 whitespace-nowrap"><span class="material-symbols-outlined text-xs">block</span><span>Ngưng dùng</span></span></div><div class="inline-flex items-center gap-1 text-[11px] font-medium text-slate-400 bg-white/80 px-2 py-0.5 rounded border border-slate-200"><span>Sân trong nhà</span></div></div>
+<!-- Reason Card -->
+<div class="bg-white/90 p-3 rounded-lg border border-slate-200 space-y-1"><div class="flex items-center gap-1.5 text-xs font-bold text-slate-700"><span class="material-symbols-outlined text-sm text-amber-600">build</span><span>Lý do ngưng: Lưới hỏng</span></div></div>
+<!-- Actions -->
+<div class="flex items-center gap-2 pt-1">
+<button class="flex-1 py-2 px-3 rounded-lg bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-bold transition-colors shadow-xs flex items-center justify-center gap-1.5">
+<span class="material-symbols-outlined text-sm">lock_open</span>
+<span>Bật lại sân</span>
+</button>
+<button class="w-9 h-9 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600 flex items-center justify-center transition-colors text-xs font-bold" title="Tùy chọn khác">
+                    ⋯
+                  </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- 4 COLS: CARD HÀNG CHỜ THEO LƯỢT -->
+<div class="col-span-12 lg:col-span-4">
+<div class="bg-white rounded-xl border border-slate-200 p-4 shadow-xs flex flex-col gap-4">
+<!-- Queue Header -->
+<div class="flex items-center justify-between border-b border-slate-100 pb-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-500 text-base">format_list_bulleted</span>
+<h3 class="text-sm font-bold text-slate-900 tracking-tight">Hàng chờ theo lượt</h3>
+</div>
+<span class="text-[11px] font-semibold text-brand-700 bg-brand-50 px-2 py-0.5 rounded border border-brand-200 font-mono">7 trận chờ</span>
+</div>
+<!-- QUEUE GROUPS -->
+<div class="space-y-4 text-xs">
+<!-- Group: Lượt 3 (3 trận) -->
+<div class="space-y-2">
+<div class="flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+<span>Lượt 3 · 3 trận</span>
+<span class="text-slate-400 font-normal lowercase">vòng bảng</span>
+</div>
+<!-- Row 1: Ready -->
+<div class="p-2.5 rounded-lg border border-slate-200 hover:border-slate-300 transition-colors bg-slate-50/50 space-y-1.5">
+<div class="flex items-center justify-between">
+<span class="font-bold text-slate-800">Bảng B · Lượt 3</span>
+<span class="font-mono text-[11px] text-slate-400">dự kiến 15:05</span>
+</div>
+<div class="text-slate-700 font-medium truncate">
+                    Tiến Dũng + Huy Hoàng <span class="text-slate-400">vs</span> Đăng Khoa + Trọng Hiếu
+                  </div>
+<div class="flex items-center justify-between pt-1">
+<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+<span>Sẵn sàng</span>
+</span>
+<button class="py-1 px-2.5 rounded bg-brand-600 hover:bg-brand-700 text-white text-[11px] font-bold transition-colors">
+                      Gọi vào sân…
+                    </button>
+</div>
+</div>
+<!-- Row 2: In-match blocker -->
+<div class="p-2.5 rounded-lg border border-amber-200/80 bg-amber-50/30 space-y-1.5">
+<div class="flex items-center justify-between">
+<span class="font-bold text-slate-800">Bảng A · Lượt 3</span>
+<span class="font-mono text-[11px] text-slate-400">dự kiến 15:20</span>
+</div>
+<div class="text-slate-700 font-medium truncate">
+                    Thành Luân + Văn Hưng <span class="text-slate-400">vs</span> Quốc Khánh + Bảo Long
+                  </div>
+<div class="flex items-center justify-between pt-1">
+<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 bg-amber-100/70 border border-amber-200 px-2 py-0.5 rounded">
+<span class="material-symbols-outlined text-xs">hourglass_top</span>
+<span>Cặp đang đấu ở Sân 01</span>
+</span>
+<span class="text-[11px] text-slate-400 italic">Chưa thể gọi</span>
+</div>
+</div>
+<!-- Row 3: Ready -->
+<div class="p-2.5 rounded-lg border border-slate-200 hover:border-slate-300 transition-colors bg-slate-50/50 space-y-1.5">
+<div class="flex items-center justify-between">
+<span class="font-bold text-slate-800">Bảng B · Lượt 3</span>
+<span class="font-mono text-[11px] text-slate-400">dự kiến 15:25</span>
+</div>
+<div class="text-slate-700 font-medium truncate">
+                    Văn Thành + Tất Hảo <span class="text-slate-400">vs</span> Mạnh Thắng + Ngọc Hưng
+                  </div>
+<div class="flex items-center justify-between pt-1">
+<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+<span>Sẵn sàng</span>
+</span>
+<button class="py-1 px-2.5 rounded bg-brand-600 hover:bg-brand-700 text-white text-[11px] font-bold transition-colors">
+                      Gọi vào sân…
+                    </button>
+</div>
+</div>
+</div>
+<!-- Group: Lượt 4 (4 trận) -->
+<div class="space-y-2 pt-2 border-t border-slate-100">
+<div class="flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+<span>Lượt 4 · 4 trận</span>
+<span class="text-slate-400 font-normal lowercase">vòng playoff</span>
+</div>
+<!-- Row: Pending source slot -->
+<div class="p-2.5 rounded-lg border border-slate-200 bg-slate-50/30 space-y-1.5"><div class="flex items-center justify-between"><span class="font-bold text-slate-800">Chung kết</span><span class="font-mono text-[11px] text-slate-400">dự kiến 16:15</span></div><div class="text-slate-600 font-medium truncate">Thắng Bán kết 1 <span class="text-slate-400">vs</span> Thắng Bán kết 2</div><div class="flex items-center justify-between pt-1"><span class="inline-flex items-center gap-1 text-[11px] font-medium text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded whitespace-nowrap"><span class="material-symbols-outlined text-xs text-slate-400">schedule</span><span>Chờ đối thủ · Thắng Bán kết 1</span></span></div></div>
+<!-- Row: Another playoff waiting -->
+<div class="p-2.5 rounded-lg border border-slate-200 bg-slate-50/30 space-y-1.5">
+<div class="flex items-center justify-between">
+<span class="font-bold text-slate-800">Tranh hạng ba</span>
+<span class="font-mono text-[11px] text-slate-400">dự kiến 16:00</span>
+</div>
+<div class="text-slate-600 font-medium truncate">
+                    Thua Bán kết 1 <span class="text-slate-400">vs</span> Thua Bán kết 2
+                  </div>
+<div class="flex items-center justify-between pt-1"><span class="inline-flex items-center gap-1 text-[11px] font-medium text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded whitespace-nowrap"><span class="material-symbols-outlined text-xs text-slate-400">schedule</span><span>Chờ kết thúc Sân 02</span></span></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- BOTTOM CARD: TRẬN VỪA CHỐT -->
+<section class="bg-white rounded-xl border border-slate-200 p-4 shadow-xs">
+<div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-emerald-600 text-base">task_alt</span>
+<h3 class="text-sm font-bold text-slate-900 tracking-tight">Trận vừa chốt</h3>
+<span class="text-[11px] text-slate-400 font-medium">(Gần nhất)</span>
+</div>
+<a class="text-xs font-semibold text-brand-600 hover:text-brand-700" href="#">Xem toàn bộ 18 trận →</a>
+</div>
+<div class="divide-y divide-slate-100 text-xs">
+<!-- Row 1 -->
+<div class="py-2.5 flex items-center justify-between gap-4">
+<div class="flex items-center gap-3">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+<span class="font-bold text-slate-800 min-w-[120px]">Bảng A · Lượt 2</span>
+<span class="text-slate-900 font-medium">
+<strong class="font-bold text-slate-900">Minh Tuấn + Hoàng Nam</strong> thắng <span class="font-mono font-bold text-emerald-700 bg-emerald-50 px-1 rounded">11–7</span> trước Quang Huy + Nhật Minh
+              </span>
+</div>
+<div class="flex items-center gap-4 text-slate-400 font-mono text-[11px]">
+<span class="text-slate-600 font-sans font-medium">Sân 01</span>
+<span>14:32</span>
+<button class="font-sans font-bold text-brand-600 hover:text-brand-700 hover:underline">Sửa</button>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="py-2.5 flex items-center justify-between gap-4">
+<div class="flex items-center gap-3">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+<span class="font-bold text-slate-800 min-w-[120px]">Bảng B · Lượt 2</span>
+<span class="text-slate-900 font-medium">
+<strong class="font-bold text-slate-900">Đồng Linh + Hoàng Long</strong> thắng <span class="font-mono font-bold text-emerald-700 bg-emerald-50 px-1 rounded">11–9</span> trước Thanh Hải + Minh Trí
+              </span>
+</div>
+<div class="flex items-center gap-4 text-slate-400 font-mono text-[11px]">
+<span class="text-slate-600 font-sans font-medium">Sân 03</span>
+<span>14:15</span>
+<button class="font-sans font-bold text-brand-600 hover:text-brand-700 hover:underline">Sửa</button>
+</div>
+</div>
+<!-- Row 3 -->
+<div class="py-2.5 flex items-center justify-between gap-4">
+<div class="flex items-center gap-3">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+<span class="font-bold text-slate-800 min-w-[120px]">Bảng A · Lượt 2</span>
+<span class="text-slate-900 font-medium">
+<strong class="font-bold text-slate-900">Đặng Dương + Đức Tú</strong> thắng <span class="font-mono font-bold text-emerald-700 bg-emerald-50 px-1 rounded">11–5</span> trước Bùi Sơn + Chương Long
+              </span>
+</div>
+<div class="flex items-center gap-4 text-slate-400 font-mono text-[11px]">
+<span class="text-slate-600 font-sans font-medium">Sân 02</span>
+<span>13:58</span>
+<button class="font-sans font-bold text-brand-600 hover:text-brand-700 hover:underline">Sửa</button>
+</div>
+</div>
+</div>
+</section>
+</main>
+</div>
+</body>
+</html>

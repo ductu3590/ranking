@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import TournamentConsoleV2 from '@/app/giai-dau/v2/console/TournamentConsoleV2';
 import { requireTournamentAccess } from '@/lib/tournament/accessRuntime';
@@ -9,14 +8,8 @@ export default async function TournamentOperationsPage({ params }) {
     if (!access.ok) redirect('/giai-dau/v2');
 
     return (
-        <main className="ops-full-page">
-            <Link
-                className="ops-full-page-back"
-                href="/giai-dau/v2"
-            >
-                ← Danh sách giải
-            </Link>
+        <div className="ops-full-page">
             <TournamentConsoleV2 tournamentId={params.tournamentId} />
-        </main>
+        </div>
     );
 }

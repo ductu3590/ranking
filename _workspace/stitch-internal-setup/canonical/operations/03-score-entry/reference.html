@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="vi" class="light">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nhập tỉ số - Tứ kết 2 · Sân 02 | Pro Court OS Sáng</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              DEFAULT: '#7c3aed',
+              dark: '#6d28d9',
+              light: '#f5f3ff',
+              border: '#ddd6fe'
+            },
+            court: {
+              bg: '#f8fafc',
+              sidebar: '#ffffff',
+              card: '#ffffff',
+              border: '#e2e8f0'
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+      line-height: 1;
+      display: inline-block;
+    }
+    .material-symbols-outlined.fill {
+      font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20;
+    }
+  </style>
+</head>
+<body class="bg-[#f8fafc] text-slate-800 font-sans min-h-screen relative antialiased selection:bg-purple-100 selection:text-purple-700 overflow-x-hidden">
+
+  <!-- ==================== BACKGROUND: LIGHT OPERATIONS CONSOLE ==================== -->
+  <div class="min-h-screen w-full flex flex-col pointer-events-none select-none filter blur-[2px] opacity-75">
+    
+    <!-- Top Bar -->
+    <header class="h-14 bg-white border-b border-slate-200 px-6 flex items-center justify-between shrink-0">
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2 text-sm text-slate-600 font-medium">
+          <span class="material-symbols-outlined text-lg">arrow_back</span>
+          <span>Danh sách giải</span>
+        </div>
+        <span class="text-slate-300">·</span>
+        <div class="flex items-center gap-2.5">
+          <span class="font-bold text-slate-900 text-base">Giải nội bộ tháng 10</span>
+          <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            Đang diễn ra
+          </span>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="w-7 h-7 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-xs">P</div>
+        <span class="text-sm font-semibold text-slate-700">PickHub 246 Club</span>
+      </div>
+    </header>
+
+    <div class="flex-1 flex w-full">
+      <!-- Left Sidebar -->
+      <aside class="w-64 bg-white border-r border-slate-200 p-4 shrink-0 flex flex-col gap-6">
+        <div>
+          <div class="text-[11px] font-bold tracking-wider text-slate-400 uppercase mb-2 px-3">CHUẨN BỊ</div>
+          <div class="space-y-1">
+            <div class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-slate-600">
+              <span class="material-symbols-outlined fill text-emerald-600 text-base">check_circle</span>
+              <span>1 · Cấu hình giải</span>
+            </div>
+            <div class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-slate-600">
+              <span class="material-symbols-outlined fill text-emerald-600 text-base">check_circle</span>
+              <span>2 · Sân &amp; sơ đồ sân</span>
+            </div>
+            <div class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-slate-600">
+              <span class="material-symbols-outlined fill text-emerald-600 text-base">check_circle</span>
+              <span>3 · VĐV &amp; cặp đấu</span>
+            </div>
+            <div class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-slate-600">
+              <span class="material-symbols-outlined fill text-emerald-600 text-base">check_circle</span>
+              <span>4 · Bốc thăm &amp; chốt lịch</span>
+            </div>
+            <div class="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-bold text-purple-700 bg-purple-50 border border-purple-200">
+              <div class="flex items-center gap-2.5">
+                <span class="w-5 h-5 rounded-full bg-purple-600 text-white flex items-center justify-center text-[11px]">5</span>
+                <span>Trung tâm điều hành</span>
+              </div>
+              <span class="w-2 h-2 rounded-full bg-purple-600"></span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="text-[11px] font-bold tracking-wider text-slate-400 uppercase mb-2 px-3">TRONG &amp; SAU GIẢI</div>
+          <div class="space-y-1">
+            <div class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-slate-600">
+              <span class="material-symbols-outlined text-base text-slate-400">calendar_month</span>
+              <span>Lịch thi đấu &amp; kết quả</span>
+            </div>
+            <div class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-slate-600">
+              <span class="material-symbols-outlined text-base text-slate-400">trophy</span>
+              <span>Bảng đấu &amp; xếp hạng</span>
+            </div>
+            <div class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-slate-600">
+              <span class="material-symbols-outlined text-base text-slate-400">history</span>
+              <span>Nhật ký thao tác</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Operations Grid -->
+      <main class="flex-1 p-6 flex flex-col gap-6 max-w-[1280px]">
+        <!-- Progress Strip -->
+        <div class="bg-white rounded-xl border border-slate-200 p-4 flex items-center justify-between shadow-sm">
+          <div class="flex items-center gap-6">
+            <div class="flex items-baseline gap-2">
+              <span class="text-2xl font-black text-slate-900 font-mono">18/31</span>
+              <span class="text-xs text-slate-500 font-semibold">trận đã chốt (58%)</span>
+            </div>
+            <div class="h-4 w-px bg-slate-200"></div>
+            <div class="text-xs text-slate-600">
+              <span class="text-slate-400">Dự kiến xong:</span> <span class="font-bold text-slate-800 font-mono">16:40</span>
+            </div>
+            <div class="h-4 w-px bg-slate-200"></div>
+            <div class="text-xs text-slate-600">
+              <span class="text-slate-400">TB:</span> <span class="font-bold text-slate-800 font-mono">21 phút/trận</span>
+            </div>
+            <div class="h-4 w-px bg-slate-200"></div>
+            <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-purple-700">
+              <span class="w-2 h-2 rounded-full bg-purple-600"></span>
+              4 sân đang dùng
+            </span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700">Tất cả nội dung</span>
+            <span class="px-3 py-1 rounded-lg text-xs font-medium text-slate-500">Vòng bảng</span>
+            <span class="px-3 py-1 rounded-lg text-xs font-medium text-slate-500">Loại trực tiếp</span>
+          </div>
+        </div>
+
+        <!-- 4 Court Cards -->
+        <div class="grid grid-cols-2 gap-4">
+          <!-- Sân 01 -->
+          <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+              <div>
+                <h4 class="font-bold text-slate-900">Sân 01</h4>
+                <p class="text-xs text-slate-500">Bảng A · Lượt 3 · BO1 · 11 điểm</p>
+              </div>
+              <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">● Đang đấu · 12:48</span>
+            </div>
+            <div class="py-3 text-sm font-semibold text-slate-800">Minh Tuấn + Hoàng Nam <span class="text-slate-400 font-normal">vs</span> Quốc Khánh + Bảo Long</div>
+          </div>
+          <!-- Sân 02 -->
+          <div class="bg-white rounded-xl border-2 border-purple-400 p-4 shadow-sm relative">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+              <div>
+                <h4 class="font-bold text-purple-900">Sân 02</h4>
+                <p class="text-xs text-slate-500">Tứ kết 2 · BO1 · 11 điểm</p>
+              </div>
+              <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">● Đang nhập tỉ số</span>
+            </div>
+            <div class="py-3 text-sm font-semibold text-slate-800">Văn Sơn + Đức Thịnh <span class="text-slate-400 font-normal">vs</span> Hải Đăng + Gia Huy</div>
+          </div>
+          <!-- Sân 03 -->
+          <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+              <div>
+                <h4 class="font-bold text-slate-900">Sân 03</h4>
+                <p class="text-xs text-slate-500">Sẵn sàng tiếp nhận trận</p>
+              </div>
+              <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200">● Trống · chờ gọi</span>
+            </div>
+            <div class="py-3 text-xs text-slate-600">Gợi ý: Tiến Dũng + Huy Hoàng vs Đăng Khoa + Trọng Hiếu</div>
+          </div>
+          <!-- Sân 04 -->
+          <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm opacity-60">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+              <div>
+                <h4 class="font-bold text-slate-900">Sân 04</h4>
+                <p class="text-xs text-slate-500">Tạm dừng vận hành</p>
+              </div>
+              <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600">⊘ Ngưng dùng</span>
+            </div>
+            <div class="py-3 text-xs text-slate-600">Lý do ngưng: Lưới hỏng</div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- ==================== BACKDROP OVERLAY ==================== -->
+  <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 flex items-center justify-center p-6 overflow-y-auto">
+
+    <!-- Container for Dialog + Floating Confirm to the Right (1280px layout) -->
+    <div class="w-full max-w-[1080px] flex items-start justify-center gap-6 relative">
+
+      <!-- ==================== MAIN DIALOG: NHẬP TỈ SỐ (600px) ==================== -->
+      <div class="w-[600px] shrink-0 bg-white rounded-2xl border border-slate-200/80 shadow-2xl overflow-hidden flex flex-col z-50">
+        
+        <!-- Header -->
+        <div class="px-6 py-4.5 border-b border-slate-100 flex items-start justify-between bg-white shrink-0">
+          <div>
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-700 flex items-center justify-center">
+                <span class="material-symbols-outlined text-lg">edit_note</span>
+              </div>
+              <div>
+                <h2 class="text-lg font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+                  Tứ kết 2 · Sân 02
+                </h2>
+                <div class="flex items-center gap-2 mt-1">
+                  <!-- Read-only rule chip -->
+                  <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                    <span class="material-symbols-outlined text-[13px] text-slate-500">lock</span>
+                    BO1 · tới 11 · cách 2
+                  </span>
+                  <span class="text-slate-300">·</span>
+                  <span class="text-[11px] text-slate-500 font-medium">Luật trận cố định từ lúc chốt giải</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Close button -->
+          <button type="button" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors" title="Đóng">
+            <span class="material-symbols-outlined text-xl">close</span>
+          </button>
+        </div>
+
+        <!-- Dialog Body -->
+        <div class="p-6 flex flex-col gap-5 overflow-y-auto max-h-[calc(88vh-130px)]">
+
+          <!-- AMBER CONFLICT BANNER -->
+          <div class="rounded-xl bg-amber-50/80 border border-amber-200 p-4 text-amber-900 flex flex-col gap-3 shadow-sm">
+            <div class="flex items-start gap-3">
+              <span class="material-symbols-outlined text-amber-600 text-xl shrink-0 mt-0.5 fill">warning</span>
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <h3 class="text-sm font-bold text-amber-900 tracking-tight">Trận vừa được cập nhật ở máy khác</h3>
+                  <span class="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-200/70 text-amber-800">
+                    Cảnh báo đồng bộ
+                  </span>
+                </div>
+                <p class="text-xs text-amber-800 mt-1 leading-relaxed">
+                  Cặp thắng của trận trước vừa được điền vào trận này. Kiểm tra lại trước khi lưu.
+                </p>
+              </div>
+            </div>
+
+            <!-- Comparison Table -->
+            <div class="grid grid-cols-2 gap-2.5 pt-2 border-t border-amber-200/70">
+              <div class="bg-white/90 rounded-lg p-2.5 border border-amber-200/80 flex flex-col gap-0.5">
+                <span class="text-[11px] font-semibold text-slate-500">Tỉ số của bạn:</span>
+                <span class="text-base font-extrabold text-purple-700 font-mono tracking-tight">11 – 8</span>
+                <span class="text-[10px] text-slate-400 font-medium">Vừa nhập trên máy này</span>
+              </div>
+              <div class="bg-amber-100/50 rounded-lg p-2.5 border border-amber-300/60 flex flex-col gap-0.5">
+                <span class="text-[11px] font-semibold text-amber-800">Trên máy chủ:</span>
+                <span class="text-sm font-bold text-amber-900 font-mono tracking-tight mt-0.5">chưa có tỉ số</span>
+                <span class="text-[10px] text-amber-700 font-medium">Cập nhật lúc 14:31</span>
+              </div>
+            </div>
+
+            <!-- Conflict Action Buttons -->
+            <div class="flex items-center justify-end gap-2 pt-1">
+              <button type="button" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 transition-colors shadow-2xs">
+                Tải bản mới nhất
+              </button>
+              <button type="button" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-purple-600 hover:bg-purple-700 text-white transition-colors shadow-sm">
+                Giữ tỉ số của tôi và lưu
+              </button>
+            </div>
+          </div>
+
+          <!-- Pairs Facing Box -->
+          <div class="rounded-xl bg-slate-50 border border-slate-200/80 p-3.5 flex items-center justify-between">
+            <!-- Pair A -->
+            <div class="flex-1 text-center pr-3">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-purple-700 bg-purple-100 px-2 py-0.5 rounded-full inline-block mb-1">Cặp A</span>
+              <div class="text-sm font-bold text-slate-900 leading-tight">Văn Sơn + Đức Thịnh</div>
+            </div>
+
+            <!-- VS Badge -->
+            <div class="w-8 h-8 rounded-full bg-white border border-slate-200 text-slate-400 font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs">
+              VS
+            </div>
+
+            <!-- Pair B -->
+            <div class="flex-1 text-center pl-3">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-200 px-2 py-0.5 rounded-full inline-block mb-1">Cặp B</span>
+              <div class="text-sm font-bold text-slate-700 leading-tight">Hải Đăng + Gia Huy</div>
+            </div>
+          </div>
+
+          <!-- Game Row: Ván 1 -->
+          <div class="rounded-xl border-2 border-emerald-200 bg-emerald-50/20 p-4 flex flex-col gap-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-extrabold text-slate-900 uppercase tracking-wide">Ván 1</span>
+                <span class="text-[11px] text-slate-400 font-medium">· Tới 11 điểm cách 2</span>
+              </div>
+              <span class="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-100/90 px-2.5 py-0.5 rounded-full border border-emerald-300">
+                <span class="material-symbols-outlined text-sm font-bold">check</span>
+                Văn Sơn + Đức Thịnh thắng ván
+              </span>
+            </div>
+
+            <!-- Numeric Inputs & Steppers -->
+            <div class="flex items-center justify-center gap-4 py-1">
+              <!-- Pair A Score Input -->
+              <div class="flex flex-col items-center gap-1.5">
+                <div class="flex items-center gap-1.5">
+                  <button type="button" class="w-9 h-9 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 flex items-center justify-center font-bold text-lg transition-colors active:scale-95 shadow-2xs" title="Giảm 1 điểm">
+                    −
+                  </button>
+                  <input type="text" value="11" readonly class="w-24 h-16 rounded-xl bg-white border-2 border-emerald-500 text-emerald-700 font-mono font-extrabold text-3xl text-center shadow-sm focus:outline-none cursor-default selection:bg-emerald-100"/>
+                  <button type="button" class="w-9 h-9 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 flex items-center justify-center font-bold text-lg transition-colors active:scale-95 shadow-2xs" title="Tăng 1 điểm">
+                    +
+                  </button>
+                </div>
+                <span class="text-[11px] font-semibold text-emerald-800">Văn Sơn + Đức Thịnh</span>
+              </div>
+
+              <!-- Dash Separator -->
+              <div class="text-2xl font-bold text-slate-300 font-mono pb-4">–</div>
+
+              <!-- Pair B Score Input -->
+              <div class="flex flex-col items-center gap-1.5">
+                <div class="flex items-center gap-1.5">
+                  <button type="button" class="w-9 h-9 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 flex items-center justify-center font-bold text-lg transition-colors active:scale-95 shadow-2xs" title="Giảm 1 điểm">
+                    −
+                  </button>
+                  <input type="text" value="8" readonly class="w-24 h-16 rounded-xl bg-white border border-slate-300 text-slate-700 font-mono font-extrabold text-3xl text-center shadow-2xs focus:outline-none cursor-default selection:bg-slate-200"/>
+                  <button type="button" class="w-9 h-9 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 flex items-center justify-center font-bold text-lg transition-colors active:scale-95 shadow-2xs" title="Tăng 1 điểm">
+                    +
+                  </button>
+                </div>
+                <span class="text-[11px] font-semibold text-slate-500">Hải Đăng + Gia Huy</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Result Card Emerald -->
+          <div class="rounded-xl bg-emerald-50 border border-emerald-200 p-3.5 flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-2xs">
+              <span class="material-symbols-outlined text-lg">emoji_events</span>
+            </div>
+            <div class="flex-1">
+              <div class="text-xs font-semibold text-emerald-800 uppercase tracking-wider">Kết quả chung cuộc</div>
+              <div class="text-sm font-extrabold text-emerald-950">
+                Văn Sơn + Đức Thịnh thắng 1–0 · sẽ vào Bán kết 1
+              </div>
+            </div>
+            <span class="material-symbols-outlined text-emerald-600">arrow_forward</span>
+          </div>
+
+          <!-- Secondary Links Row -->
+          <div class="flex items-center justify-center gap-6 pt-1">
+            <button type="button" class="text-xs font-semibold text-slate-500 hover:text-purple-700 hover:underline flex items-center gap-1 transition-colors">
+              <span class="material-symbols-outlined text-sm">flag</span>
+              <span>Xử thắng W.O. (cần nêu lý do)</span>
+            </button>
+            <span class="text-slate-200">|</span>
+            <button type="button" class="text-xs font-semibold text-slate-500 hover:text-rose-600 hover:underline flex items-center gap-1 transition-colors">
+              <span class="material-symbols-outlined text-sm">cancel</span>
+              <span>Bỏ cuộc (cần nêu lý do)</span>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Dialog Footer -->
+        <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between shrink-0">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+            <span class="text-xs font-semibold text-slate-600">Chưa lưu thay đổi</span>
+          </div>
+          <div class="flex items-center gap-2.5">
+            <button type="button" class="px-4 py-2 rounded-lg text-xs font-semibold bg-white text-slate-700 border border-slate-200 hover:bg-slate-100 transition-colors shadow-2xs">
+              Lưu nháp
+            </button>
+            <button type="button" class="px-5 py-2 rounded-lg text-xs font-bold bg-purple-600 hover:bg-purple-700 text-white transition-colors shadow-md shadow-purple-500/20 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-sm">check_circle</span>
+              <span>Lưu &amp; chốt trận</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ==================== FLOATING CONFIRM: BẠN CÓ TỈ SỐ CHƯA LƯU (380px) ==================== -->
+      <div class="w-[380px] shrink-0 bg-white rounded-2xl border border-slate-200 shadow-2xl p-5 flex flex-col gap-4 z-50 animate-in fade-in slide-in-from-right-4 duration-200">
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-2xl fill">warning</span>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-base font-extrabold text-slate-900 tracking-tight">
+              Bạn có tỉ số chưa lưu
+            </h3>
+            <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+              Rời đi sẽ mất tỉ số vừa nhập ở Tứ kết 2.
+            </p>
+          </div>
+        </div>
+
+        <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs text-slate-500 flex items-center justify-between">
+          <span>Trận đang sửa:</span>
+          <span class="font-bold text-slate-800">Tứ kết 2 · Sân 02 (11–8)</span>
+        </div>
+
+        <div class="flex items-center justify-end gap-2.5 pt-1">
+          <button type="button" class="px-3.5 py-2 rounded-lg text-xs font-semibold text-rose-600 border border-rose-200 bg-rose-50/50 hover:bg-rose-100/70 hover:border-rose-300 transition-colors">
+            Bỏ thay đổi
+          </button>
+          <button type="button" class="px-4 py-2 rounded-lg text-xs font-bold bg-purple-600 hover:bg-purple-700 text-white transition-colors shadow-sm">
+            Ở lại
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

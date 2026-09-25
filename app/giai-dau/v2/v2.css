@@ -1226,6 +1226,38 @@
 
 .v2-tournament-primary:hover { filter: brightness(.92); }
 
+/* Lối vào trang điều hành cho giải Chờ diễn ra / Đang diễn ra: nút lớn, nổi bật. */
+.v2-tournament-row-scheduled::before { background: #7c3aed; }
+.v2-tournament-row-scheduled .v2-tournament-status { background: #f5f3ff; color: #6d28d9; }
+.v2-tournament-row-scheduled .v2-progress-track i { background: #7c3aed; }
+.v2-tournament-actions .v2-tournament-ops {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 48px;
+    border-color: #6d28d9;
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    box-shadow: 0 6px 16px rgba(124, 58, 237, .28);
+    font-size: .88rem;
+    font-weight: 800;
+}
+.v2-tournament-ops svg { width: 18px; height: 18px; flex: 0 0 auto; }
+.v2-tournament-actions .v2-tournament-ops.is-live {
+    border-color: #047857;
+    background: linear-gradient(135deg, #059669, #047857);
+    box-shadow: 0 6px 16px rgba(5, 150, 105, .28);
+}
+.v2-tournament-ops-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #fff;
+    animation: v2-ops-blip 1.6s infinite;
+}
+@keyframes v2-ops-blip { 50% { opacity: .25; } }
+@media (prefers-reduced-motion: reduce) { .v2-tournament-ops-dot { animation: none; } }
+
 .v2-tournament-secondary,
 .v2-tournament-delete {
     border: 1px solid var(--border-color);

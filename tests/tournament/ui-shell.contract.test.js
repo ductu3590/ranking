@@ -12,8 +12,10 @@ assert(!/--ops-/.test(css), 'không còn token ops-* (GAP-THEME)');
 assert(/prefers-reduced-motion/.test(css), 'tôn trọng reduced motion');
 const shell = read('app/giai-dau/v2/console/ConsoleShell.js');
 assert(/'use client'|"use client"/.test(shell), 'client component');
-for (const label of ['Cấu hình giải', 'Sân & sơ đồ', 'VĐV & cặp đấu', 'Bốc thăm', 'Trung tâm điều hành', 'Lịch thi đấu', 'Bảng đấu', 'Nhật ký']) assert(shell.includes(label), `sidebar có ${label}`);
-assert(/LIVE/.test(shell) && /step=/.test(shell) && /LEGACY_TAB_TO_STEP|tabParam/.test(shell) && /drawer/.test(shell), 'điều hướng và drawer');
+// Epic 2 D29: sau khi chốt giải console còn 4 mục; mobile dùng thanh tab đáy thay drawer (ADR-006 mục Epic 2).
+for (const label of ['Điều hành', 'Trận đấu', 'Sơ đồ & xếp hạng', 'Cài đặt']) assert(shell.includes(label), `sidebar có ${label}`);
+for (const old of ['Trung tâm điều hành', 'Bốc thăm & chốt lịch', 'VĐV & cặp đấu']) assert(!shell.includes(`label: '${old}'`), `không còn mục ${old}`);
+assert(/LEGACY_TAB_TO_STEP|tabParam/.test(shell) && /v2-console-tabbar/.test(shell), 'điều hướng link cũ và thanh tab đáy');
 const logStep = read('app/giai-dau/v2/console/steps/LogStep.js');
 assert(/listOperationLogs/.test(logStep), 'LogStep đọc nhật ký qua client wrapper');
 assert(/Trước → Sau|Trước|Sau/.test(logStep), 'LogStep có cột trước/sau');

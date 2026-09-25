@@ -81,3 +81,11 @@ Phát hiện khi rà: `GET /api/tournament-v2/clubs?mode=available` trả tên m
 | D47 | Admin CLB khách nhận lời mời qua **thông báo trong app** (tái dùng `club_notifications`, `kind` mới cho lời mời giải) **và/hoặc link mời**. Mở link **bắt buộc đăng nhập**; server đối chiếu `group_id` của phiên với `club_id` được mời — khớp mới cho xem/đáp lời mời, không khớp thì từ chối (không lộ thông tin giải) | Ranh giới đa CLB: chỉ đúng CLB được mời mới vào được |
 
 Hệ quả: với tài khoản thường, giải giao hữu mặc định là **2 CLB (chủ nhà + 1 khách)** → BXH tổng CLB (D40) là đối đầu hai CLB; rải cặp (D41) vẫn áp dụng. Diễn giải "tối đa 1 CLB mỗi giải" (không phải "1 CLB đang mời cùng lúc trên mọi giải") — xác nhận lại nếu khác.
+
+Chốt câu hỏi mở của spec (`docs/superpowers/specs/2026-09-25-epic-3-friendly/README.md` §11), AskUserQuestion 2026-09-25:
+
+| Mã | Quyết định | Lý do |
+|---|---|---|
+| D48 | CLB khách nghiệm thu browser: **group 19** "CLB Test Responsive UI" (chủ nhà vẫn là 59). Không đụng group 1 | Người dùng có tài khoản admin; đủ thành viên cho 3 cặp |
+| D49 | Giải giao hữu **cấm khách mời ở cả phía chủ nhà** (không chỉ CLB khách như D38): blocker Bước 2 `FRIENDLY_HOST_GUEST_NOT_ALLOWED` + finalize nhánh giao hữu chặn `guests` khác rỗng | Công bằng hai bên; mỗi cặp đại diện đúng CLB |
+| D50 | Chốt giải giao hữu đang `private` → **tự chuyển `unlisted`** và sinh `public_slug`; Bước 4 báo trước | Thành viên CLB khách không vào được bàn điều hành CLB khác, cần link xem |

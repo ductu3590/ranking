@@ -372,14 +372,10 @@ chỉ tổ chức mà không có cặp (Bước 2 vẫn đòi ≥ 2 người c�
 `group_rank` cố định 1A–2B); nhật ký thao tác cho hành động mời/duyệt (bản đầu không ghi); đổi chế độ nội bộ ↔ giao hữu
 sau khi tạo.
 
-## 11. Câu hỏi còn mở
+## 11. Câu hỏi còn mở — đã chốt (ADR-007 D48–D50, 2026-09-25)
 
-1. **CLB khách để nghiệm thu:** dùng group **19** "CLB Test Responsive UI" (cần người dùng có mật khẩu admin CLB này và
-   bổ sung hồ sơ thi đấu cho 6 thành viên nếu thiếu)? Nếu không, người dùng chỉ định CLB test khác (không phải group 1).
-2. **Khách mời của CLB chủ nhà trong giải giao hữu:** D38 chỉ cấm khách mời ở đội CLB khách. Spec mặc định **cho phép**
-   chủ nhà giữ khách mời như Bước 2 hiện nay, và khách mời tính vào CLB chủ nhà trong BXH CLB. Nếu người dùng muốn cấm cả
-   phía chủ nhà thì chỉ thêm một blocker Bước 2 (`FRIENDLY_HOST_GUEST_NOT_ALLOWED`), không đổi mô hình.
-3. **Tự bật link công khai khi chốt giải giao hữu:** thành viên CLB khách không vào được bàn điều hành của CLB khác, nên
-   spec mặc định: chốt giải giao hữu mà `visibility = 'private'` → chuyển `unlisted` và sinh `public_slug` (Bước 4 báo
-   trước "Giải giao hữu sẽ có link xem không liệt kê để CLB khách theo dõi"). Nếu người dùng muốn giữ riêng tư thì bỏ
-   bước này và hộp lời mời chỉ hiện "Chủ nhà chưa bật link xem giải".
+1. **CLB khách nghiệm thu:** group **19** "CLB Test Responsive UI" (D48). Bổ sung hồ sơ thi đấu cho 6 thành viên nếu thiếu — kiểm ở preflight F2.
+2. **Khách mời phía chủ nhà:** **cấm** (D49). Bước 2 của giải `organizer_mode = 'friendly'` ẩn nút thêm khách mời và báo
+   blocker `FRIENDLY_HOST_GUEST_NOT_ALLOWED` nếu bản nháp còn `participants.guests` (vd đổi chế độ từ nội bộ sang giao hữu);
+   finalize nhánh giao hữu (migration 111) chặn lại cùng mã. Không đổi mô hình dữ liệu. BXH CLB không còn trường hợp "khách mời tính vào CLB chủ nhà".
+3. **Tự bật link xem khi chốt:** **có** (D50) — giữ nguyên thiết kế mặc định ở trên.

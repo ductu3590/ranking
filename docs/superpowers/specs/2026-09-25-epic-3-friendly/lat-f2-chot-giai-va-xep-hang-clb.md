@@ -307,3 +307,11 @@ Apply (D45): ROLLBACK xanh → apply 111 → so `md5(prosrc)` → evidence.
 
 UI (F3); rải CLB cho vòng loại trực tiếp sau vòng bảng; chủ nhà không có cặp; xếp hạng CLB tính theo điểm tùy biến (chỉ
 dùng `aggregateClubStandings`); ghi kết quả giao hữu vào ranking (D43).
+
+
+## Bổ sung D49 (2026-09-25) — cấm khách mời phía chủ nhà
+
+- Domain (`friendlyReadiness` / blocker Bước 2): giải `friendly` có `participants.guests.length > 0` → blocker `FRIENDLY_HOST_GUEST_NOT_ALLOWED` (không lưu được sang Bước 3, nháp vẫn lưu được).
+- Migration 111, trong khối `-- friendly:` của `finalize_internal_setup_v4`: `jsonb_array_length(draft->participants->guests) > 0` → `RAISE` `FRIENDLY_HOST_GUEST_NOT_ALLOWED`; test khoá "chỉ khác 109/110 ở các điểm X" phải liệt kê điểm này.
+- Test node: bản nháp friendly có 1 khách mời → blocker; SQL ROLLBACK: finalize friendly có khách → mã lỗi trên; giải `internal` có khách vẫn chốt được (không hồi quy).
+- UI F3: Bước 2 ở chế độ giao hữu ẩn "Thêm khách mời".

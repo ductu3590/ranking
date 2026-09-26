@@ -10,7 +10,9 @@ assert(s.includes('requireValidatedGroupAdmin'), 'có database-backed admin guar
 assert(/export async function POST/.test(s) && /export async function PATCH/.test(s) && /export async function DELETE/.test(s) && /export async function GET/.test(s), 'đủ 4 method');
 assert(s.includes('entrant_type') && s.includes('public_slug'), 'hỗ trợ entrant_type + server slug');
 assert(s.includes('visibility') && s.includes('Invalid tournament visibility'), 'validate visibility');
-assert(s.includes('randomBytes') && !s.includes('body.public_slug'), 'slug do server tạo, không nhận tùy ý từ client');
+// Epic 3 F2: generateSlug tách sang lib/tournament/publicSlug.js (finalize giải giao hữu dùng chung, D50).
+const slugLib = exists('lib/tournament/publicSlug.js') ? read('lib/tournament/publicSlug.js') : '';
+assert((s.includes('randomBytes') || (s.includes("from '@/lib/tournament/publicSlug'") && slugLib.includes('randomBytes'))) && !s.includes('body.public_slug'), 'slug do server tạo, không nhận tùy ý từ client');
 assert(s.includes(".eq('group_id'"), 'scope group_id');
 assert(!/\.eq\('id',\s*1\)/.test(s) && !s.includes('tournament_id = 1'), 'không hardcode id');
 assert(s.includes('tournaments'), 'thao tác bảng tournaments');

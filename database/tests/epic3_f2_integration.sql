@@ -555,6 +555,7 @@ GRANT EXECUTE ON FUNCTION public.finalize_internal_setup_v4(bigint,bigint,bigint
 COMMENT ON FUNCTION public.finalize_internal_setup_v4(bigint,bigint,bigint,bigint,text,text,jsonb) IS 'Chốt giải v3: kiểm plan khớp bản nháp đã lưu, ghi VĐV (kể cả khách), cặp, entry, stage, trận, tuyến đi tiếp nguyên tử.';
 
 CREATE TEMP TABLE it_result(k text, v text) ON COMMIT DROP;
+CREATE TEMP SEQUENCE it_member_seq;
 CREATE FUNCTION pg_temp.it_ok(p_key text, p_cond boolean, p_detail text DEFAULT NULL) RETURNS void LANGUAGE plpgsql AS $f$
 BEGIN
   IF p_cond IS NOT TRUE THEN RAISE EXCEPTION 'IT_FAIL %: điều kiện sai (%)', p_key, COALESCE(p_detail, 'null'); END IF;
@@ -562,11 +563,13 @@ BEGIN
 END $f$;
 -- Thành viên + hồ sơ thi đấu tạm của group g.
 CREATE FUNCTION pg_temp.f2_members(g bigint, n integer) RETURNS bigint[] LANGUAGE plpgsql AS $f$
-DECLARE ids bigint[] := ARRAY[]::bigint[]; mid bigint;
+DECLARE ids bigint[] := ARRAY[]::bigint[]; mid bigint; sfx text;
 BEGIN
   FOR k IN 1..n LOOP
-    INSERT INTO public.club_members(group_id, full_name, is_active) VALUES (g, 'ZZF2 VĐV ' || g || '-' || k, true) RETURNING id INTO mid;
-    INSERT INTO public.athletes(display_name, normalized_name, legacy_club_member_id) VALUES ('ZZF2 VĐV ' || g || '-' || k, 'zzf2 vdv ' || g || '-' || k, mid)
+    -- Hậu tố duy nhất trong cả transaction: production có unique index tên thành viên theo group.
+    sfx := g || '-' || nextval('pg_temp.it_member_seq');
+    INSERT INTO public.club_members(group_id, full_name, is_active) VALUES (g, 'ZZF2 VĐV ' || sfx, true) RETURNING id INTO mid;
+    INSERT INTO public.athletes(display_name, normalized_name, legacy_club_member_id) VALUES ('ZZF2 VĐV ' || sfx, 'zzf2 vdv ' || sfx, mid)
     ON CONFLICT (legacy_club_member_id) DO NOTHING;
     ids := ids || mid;
   END LOOP;

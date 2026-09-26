@@ -46,3 +46,73 @@ Client: `getFriendlyStandings({ tournamentId })` (chủ nhà) / `getFriendlyStan
 **Quyết định supervisor (ghi lại):**
 1. `FRIENDLY_MODE_REQUIRED`: route **đọc** mà người gọi không phải chủ nhà (BXH phía khách, trang công khai) → 404 không lộ giải (phía khách trả `TOURNAMENT_NOT_FOUND`; trang công khai chỉ không có khối `friendly`); route **ghi/chốt** của chủ nhà → 409 như bảng F1. BXH phía chủ nhà (đọc) → 404 `FRIENDLY_MODE_REQUIRED`.
 2. `FRIENDLY_QUOTA_EXCEEDED`, `FRIENDLY_GUEST_NOT_ALLOWED`, `EXTERNAL_CLUB_NOT_SUPPORTED` trong luồng chốt → **409**; luồng lưu roster F1 giữ 400.
+
+## 3. Migration 111 — khác 108 ở đâu
+
+Chữ ký, `LANGUAGE plpgsql SECURITY DEFINER SET search_path = public`, REVOKE/GRANT/COMMENT **y hệt 108**; một
+`CREATE OR REPLACE`, không DROP/ALTER/TRUNCATE/DELETE. Mọi thay đổi nằm trong 4 khối `-- friendly:begin … -- friendly:end`
++ 7 dòng khai báo `-- friendly:decl` + 2 phép đảo; test khoá: xoá khối, bỏ dòng decl, `NOT IN ('internal', 'friendly')` →
+`<> 'internal'`, `v_pairs` → `v_draft->'pairs'` ⇒ **bằng đúng từng byte** thân 108 (11 điểm của `FRIENDLY_FINALIZE_SQL_CONTRACT.differencesFrom108`).
+
+1. `organizerMode ∈ {internal, friendly}`; friendly mà `settings.organizer_mode ≠ friendly` → `FINALIZE_DRAFT_INVALID`.
+2. D49: friendly + `participants.guests` không rỗng → `FRIENDLY_HOST_GUEST_NOT_ALLOWED` (PH409, DETAIL `{count}`).
+3. `p_plan->'friendly'->>'maxGuestClubs'` phải là **số JSON** nguyên 1–31 (chuỗi `"1"`, thiếu, 0, 32 → `FINALIZE_PLAN_INVALID`).
+4. `PERFORM … FROM tournament_clubs … ORDER BY id FOR UPDATE` sau khoá division → tournament.
+5. `FRIENDLY_CLUB_NOT_READY` (DETAIL `{clubs:[tên]}`), `EXTERNAL_CLUB_NOT_SUPPORTED`, `FRIENDLY_CLUB_LIMIT_REACHED` (DETAIL `{max, used}`).
+6. `v_guest_pairs` từ `roster_submitted->'pairs'` (theo id, ordinal), khóa `'c'||id||'.'||roster_approved_version||'.'||pairId`; tập khóa khách của plan (regex `^c([0-9]+)\.([0-9]+)\.([A-Za-z0-9_-]{1,64})$`) ≠ → `FRIENDLY_ROSTER_CHANGED`.
+7. Ref khách: `member:<id>` (`FRIENDLY_GUEST_NOT_ALLOWED`), ∈ `roster_submitted->'memberIds'` của chính dòng (`PAIRING_INVALID`), `club_members.group_id = club_id` đang hoạt động (`MEMBER_NOT_ACTIVE_IN_GROUP`), có `athletes` (`ATHLETE_IDENTITY_MISSING`), số cặp ≤ `quota` (`FRIENDLY_QUOTA_EXCEEDED`, DETAIL `{quota, count, club}`).
+8. `FRIENDLY_ATHLETE_DUPLICATE` (DETAIL `{name, athleteId}`), `FRIENDLY_CLUBS_TOO_FEW`; thêm: khóa cặp trùng trong `v_pairs` → `PAIRING_INVALID`.
+9. `v_pairs := v_draft->'pairs' || v_guest_pairs`; khối kiểm cặp 108 dùng `v_pairs` trừ mệnh đề "ref ∈ người tham gia bản nháp"; `v_participant_count += 2 × số cặp khách`.
+10. Khối ghi sau "Cặp → entry": `tournament_athletes(group_id = 59, tournament_club_id = dòng khách, club_name_snapshot = groups.name, source club_member)` → roster members → `tournament_pairs` → `tournament_entries(tournament_club_id = dòng khách)` → pair/entry members (`club_name_snapshot`); `v_pair_entries[khóa khách]`.
+11. `result.friendly_clubs` (chỉ friendly), trước khi lưu idempotency.
+
+Sau chốt: division `locked` → mọi RPC 110 của CLB khách trả `FRIENDLY_REGISTRATION_CLOSED`; chốt đòi mọi dòng khách ở
+approved/declined/withdrawn nên `friendly_sync_notifications` đã đóng thông báo — không cần code thêm (SQL tích hợp kiểm).
+
+## 4. Supervisor chạy kiểm thử + apply
+
+1. Số: `git ls-tree --name-only origin/main database/migrations/ | grep '^database/migrations/111_'` → rỗng (đã kiểm lúc làm).
+2. Preflight (§7).
+3. SQL tích hợp (111 **chưa** apply): nội dung `database/tests/epic3_f2_integration.sql` (779 dòng, ~98 KB; sinh lại:
+   `node scripts/qa/epic3-f2-integration.js > database/tests/epic3_f2_integration.sql`) qua MCP `execute_sql`.
+   **Kỳ vọng:** không lỗi; `it_result` **42 dòng**, dòng cuối `zz.ALL = ok`; `setup.guest_a = 19`; `g1.finalize.match_count = 12`,
+   `g1b… = 13`, `core3… = 12`, `ko… = 6`, `internal14.match_count = 12`, `internal.round_robin = 6`, `internal.knockout = 4`,
+   `internal.double_elimination = 6`; các ca âm ghi đúng mã (`limit.over = FRIENDLY_CLUB_LIMIT_REACHED`, `not_ready`,
+   `roster_changed`, `inactive`, `athlete_duplicate`, `d49.host_guest`, `too_few`, `external`, `quota`, `guest_ref`, `max.*`…).
+   Ca sai → `IT_FAIL <ca>: …` (không ghi gì). Dữ liệu tạm: thành viên `ZZF2 VĐV …` ở 59 và 19, group tạm `zzf2-b-…`, giải `ZZF2 IT …`.
+4. Sau ROLLBACK: `node scripts/qa/epic3-f2-integration.js --post-check` → chạy câu in ra; mọi cột = 0.
+5. Apply 111 (nội dung file).
+6. `node scripts/qa/epic3-f2-integration.js --md5`:
+   ```text
+   finalize_internal_setup_v4  c1ab7d4d96db9353185fc15ec8377bde
+   ```
+   ```sql
+   SELECT proname, md5(prosrc) FROM pg_proc WHERE pronamespace = 'public'::regnamespace AND proname = 'finalize_internal_setup_v4';
+   SELECT proname, proacl::text, prosecdef, proconfig FROM pg_proc WHERE pronamespace = 'public'::regnamespace AND proname = 'finalize_internal_setup_v4';
+   ```
+   Kỳ vọng quyền: `{postgres=X/postgres,service_role=X/postgres}`, `prosecdef = true`, `proconfig = {search_path=public}`.
+7. Tuỳ chọn: `node scripts/qa/epic3-f2-integration.js --applied` → chạy lại (không nạp thân hàm), kỳ vọng như bước 3.
+
+Đã chạy trước trên PGlite (Postgres WASM, schema giả lập: DDL cột dùng tới + `_v1` 108 + wrapper 100 + migration 110 + finalize 108):
+42/42 ở chế độ đầy đủ và `--applied` (sau khi apply 111 hai lần — idempotent); post-check 0; sau ROLLBACK hàm vẫn là 108;
+md5 trên PGlite = `c1ab7d4d…`; đối chứng âm: `--applied` khi hàm còn là 108 → `FINALIZE_DRAFT_INVALID`. Không thay cho production
+(PGlite không có trigger 059/064, RLS thật, dữ liệu thật).
+
+## 5. Test
+
+```text
+$ node tests/stitch-setup/run-all.js      → 46 file: 45 PASS, 1 RED
+ok   f2 api contract — migration 111: 9/9
+ok   f2 api contract — routes: 8/8
+ok   f2 api contract — SQL tích hợp: 1/1
+ok   f2 friendlyServer: 8/8
+RED  exit=1  epic-1\ui-contract.test.js    (CRLF StepDraw.js, có từ trước)
+```
+
+Hồi quy xanh: `tests/phase3/*` (trừ `wizard-redesign-contract`), `tests/tournament/*`, `tests/unified-setup-v2/api/*`, `tests/phase1/*`,
+`tests/unified-setup/{setup-route-actions,release-hardening,tiebreak-policy-end-to-end}`. Đỏ có từ trước, không do F2:
+`phase3/wizard-redesign-contract` (đỏ ở `ecbaa16`), `phase2/validated-mutation-guard` (route `stages`),
+`unified-setup/legacy-wizard-retired`, `unified-setup/console-empty-roster.repro` (UI console), `wizard-journey.browser` (cần browser).
+`f2-api-contract` viết đỏ trước (0/18) rồi mới có 111/route; `f2-server` viết sau khi có helper (không đỏ trước).
+Route ESM qua `node --check`; worktree không có `node_modules` nên chưa `next build`.
+

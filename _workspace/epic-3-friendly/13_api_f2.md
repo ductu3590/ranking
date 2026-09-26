@@ -116,3 +116,56 @@ Hồi quy xanh: `tests/phase3/*` (trừ `wizard-redesign-contract`), `tests/tour
 `f2-api-contract` viết đỏ trước (0/18) rồi mới có 111/route; `f2-server` viết sau khi có helper (không đỏ trước).
 Route ESM qua `node --check`; worktree không có `node_modules` nên chưa `next build`.
 
+## 6. Lệch spec (đã chọn phương án an toàn hơn)
+
+1. **Tên file tích hợp** theo yêu cầu supervisor: `scripts/qa/epic3-f2-integration.js` → `database/tests/epic3_f2_integration.sql`
+   (spec §2/§10: `epic-3-f2-integration.js` → `epic_3_f2_friendly_finalize.sql`). Không nạp thân 110 (đã apply production).
+2. **Plan trong SQL tích hợp** dựng bằng node với khóa khách giữ chỗ `c99900<i>.1.p<n>`, SQL thay bằng khóa thật sau khi duyệt;
+   bỏ `clubSpread`/`inputSignature` khỏi plan nhúng cho gọn (111 không đọc; fingerprint giữ của plan đầy đủ).
+3. **D50 nằm ở route**, không ở SQL: `UPDATE … SET visibility='unlisted', public_slug=COALESCE(slug, generateSlug(name)) WHERE
+   id AND group_id AND visibility='private'`. SQL tích hợp chỉ chạy đúng câu UPDATE đó để kiểm ràng buộc (ca `d50.after`).
+4. **BXH CLB cho CLB khách** (spec §7.2 chỉ nêu chủ nhà): thêm `?tournamentClubId=` qua `requireParticipantClubAccess`, chỉ khi dòng
+   `approved` và giải đã chốt (trước chốt không lộ CLB khác, README §6).
+5. **Khối `friendly` công khai chỉ khi đã chốt** (division `roster_lock_status ≠ open`): trước chốt danh sách CLB khách chưa công khai.
+   Route công khai đọc chế độ bằng cột ảo PostgREST `organizer_mode:settings->>organizer_mode` (không chiếu ra ngoài — `buildPublicSnapshot`
+   allowlist). **Chưa chạy trên PostgREST thật** → F3 kiểm bằng browser.
+6. **`ORGANIZER_MODE_LOCKED` cả ở preview/finalize** (spec chỉ nêu route lưu): bản nháp lệch `settings.organizer_mode` → 409 trước khi dựng plan.
+7. **111 chặt hơn contract**: `maxGuestClubs` phải là số JSON (chuỗi → `FINALIZE_PLAN_INVALID`); khóa cặp trùng trong `v_pairs` →
+   `PAIRING_INVALID`; `participantRefs` khách không phải mảng → `PAIRING_INVALID`; `roster_submitted.pairs` không phải mảng → coi như rỗng
+   (rồi `FRIENDLY_ROSTER_CHANGED`). Mã giao hữu dùng SQLSTATE `PH409`; params qua `DETAIL` JSON.
+8. **`FRIENDLY_ATHLETE_DUPLICATE` chỉ xảy ra khi thành viên đổi CLB** (`athletes.legacy_club_member_id` unique ⇒ hai thành viên khác nhau
+   luôn là hai athlete). SQL tích hợp dựng ca này bằng cách chuyển một thành viên 59 sang CLB A trong transaction.
+9. **Tên VĐV khách** trong `tournament_athletes/entry_members` lấy `club_members.full_name` hiện tại của CLB khách (như chủ nhà 108),
+   không lấy ảnh chụp `memberNames` của roster.
+10. **Đóng thông báo / khoá roster sau chốt**: không thêm code — division `locked` chặn mọi RPC 110; chốt đòi mọi dòng khách ở
+    approved/declined/withdrawn nên thông báo đã đóng (kiểm `g1.after.*`).
+11. **D43**: không có đường ghi ranking nào đọc `tournament_*` (`ranking_snapshots` chỉ ở `save-snapshot`); không thêm code, test quét của
+    `f2-standings` giữ nguyên.
+12. **Sửa test cũ có chủ đích**: `lat-0/api-contract` (cho phép `, { friendly }`), `tournament/api-tournaments.contract` (`randomBytes` ở `publicSlug.js`).
+
+## 7. Preflight cho supervisor (trước khi chạy SQL tích hợp)
+
+```sql
+-- 1. Hàm đang chạy là 108 (md5 thân 108 tính trên file LF)
+SELECT md5(prosrc) = '73d5ad132226394e9bdac0c0d755dd9a' AS is_108, proacl::text, proconfig FROM pg_proc
+WHERE pronamespace = 'public'::regnamespace AND proname = 'finalize_internal_setup_v4';
+-- 2. Cột 110 + cột snapshot mà 111 ghi
+SELECT table_name, column_name, data_type FROM information_schema.columns WHERE table_schema = 'public' AND (
+  (table_name = 'tournament_clubs' AND column_name IN ('roster_submitted', 'roster_approved_version', 'quota', 'external_club_id'))
+  OR (table_name IN ('tournament_athletes', 'tournament_entry_members') AND column_name = 'club_name_snapshot')
+  OR (table_name = 'tournaments' AND column_name IN ('visibility', 'public_slug', 'settings')));
+-- 3. RPC F1 có mặt (SQL tích hợp dùng)
+SELECT proname FROM pg_proc WHERE pronamespace = 'public'::regnamespace
+  AND proname IN ('friendly_invite_club', 'friendly_club_action', 'save_unified_setup_aggregate_draft', 'save_unified_setup_aggregate_draft_v1');
+-- 4. Group 59 / 19 (D48) và CHECK visibility (D50)
+SELECT id, name FROM public.groups WHERE id IN (19, 59);
+SELECT conname FROM pg_constraint WHERE conname = 'tournaments_visibility_check';
+-- 5. Giải friendly đang có (111 đổi hành vi chốt của chúng; kỳ vọng chỉ giải test)
+SELECT t.id, t.group_id, t.name, d.roster_lock_status FROM public.tournaments t
+JOIN public.tournament_divisions d ON d.tournament_id = t.id AND d.competition_template = 'unified_setup_draft_v2'
+WHERE t.settings->>'organizer_mode' = 'friendly' ORDER BY t.id;
+```
+
+Kỳ vọng: (1) `is_108 = true`; (2) đủ 9 dòng; (3) đủ 4 hàm; (4) có 19 và 59, có constraint. Nếu (1) sai: có người đã sửa
+hàm sau 108 → dừng, báo lại (111 dựng từ 108).
+

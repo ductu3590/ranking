@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { randomBytes } from 'crypto';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { requireValidatedGroupAdmin } from '@/lib/groupSession';
@@ -12,6 +11,7 @@ import { finalStandingsFrom } from '@/lib/tournament/qualification';
 import { computeStageStandings } from '@/lib/tournament/standingsService';
 import { getClubReadScope } from '@/lib/clubReadContext';
 import { preserveServerOwnedSettings } from '@/lib/tournament/friendlyClubs';
+import { generateSlug } from '@/lib/tournament/publicSlug';
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -54,24 +54,6 @@ function buildTournamentPayload(body, groupId) {
     }
     payload.updated_at = new Date().toISOString();
     return payload;
-}
-
-function slugify(name) {
-    return String(name || '')
-        .normalize('NFD')
-        .replace(/[̀-ͯ]/g, '')
-        .replace(/đ/g, 'd')
-        .replace(/Đ/g, 'D')
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/-+/g, '-')
-        .replace(/^-|-$/g, '');
-}
-
-function generateSlug(name) {
-    const base = slugify(name) || 'giai';
-    const suffix = randomBytes(9).toString('hex');
-    return `${base}-${suffix}`;
 }
 
 // Giải cộng đồng là phạm vi toàn hệ thống. group_id vẫn NOT NULL trong giai

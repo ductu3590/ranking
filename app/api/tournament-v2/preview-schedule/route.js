@@ -10,12 +10,15 @@ import { computeSetupReadiness } from '@/lib/tournament/setupReadiness';
 import { messageFor } from '@/lib/tournament/setupMessages';
 import { buildSetupPlan } from '@/lib/tournament/setupPlans';
 import { firstBlocker, setupContext } from '@/lib/tournament/setupServer';
+import { effectivePairs, entryClubs } from '@/lib/tournament/friendlySetup';
+import { loadFriendlyContext, organizerModeMismatch } from '@/lib/tournament/friendlyServer';
 
 // Bốc thăm / cập nhật xem trước cho luồng tạo giải v3 (spec Lát A §3, §12).
 // - action 'draw'    : server sinh seed mới rồi dựng plan (bốc thăm hoặc bốc lại).
 // - action 'preview' : dùng lại seed đã lưu (vd chỉ đổi tranh hạng ba / BO chung kết).
 // Plan + fingerprint được LƯU vào bản nháp qua RPC lưu (CAS theo revision), để finalize
 // có đúng một bản để so. Seed không bao giờ hiển thị trên UI.
+// Giải giao hữu (Epic 3 F2 §5): cặp hiệu lực = chủ nhà + CLB khách đã duyệt, rải CLB qua entryClubs (D41).
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -56,20 +59,25 @@ export async function POST(request) {
 
         const draft = normalizeDraft(division.setup_draft);
         if (!isFormatEnabled(draft.format.formatKey)) return fail('FORMAT_NOT_AVAILABLE', 409);
-        const ctx = await setupContext(db, admin.groupId, draft);
+        // null với giải nội bộ → mọi bước dưới đây y như trước Epic 3.
+        const friendly = await loadFriendlyContext(db, { groupId: admin.groupId, tournamentId: Number(tournamentId), draft });
+        if (organizerModeMismatch(draft, friendly)) return fail('ORGANIZER_MODE_LOCKED', 409);
+        const ctx = await setupContext(db, admin.groupId, draft, { friendly });
         const blocker = firstBlocker(draft, ctx, 3);
         if (blocker) return fail(blocker.code, 409, blocker.params);
 
         const seed = action === 'draw' ? randomUUID() : draft.draw.seed;
         if (!seed) return fail('DRAW_REQUIRED', 409);
+        const pairs = effectivePairs(draft, friendly);
         let plan;
         try {
             plan = buildSetupPlan({
                 formatKey: draft.format.formatKey,
                 config: draft.format.config,
-                pairIds: draft.pairs.map((pair) => pair.pairId),
+                pairIds: pairs.map((pair) => pair.pairId),
                 seed,
                 divisionId: String(division.id),
+                ...(friendly ? { entryClubs: entryClubs(pairs) } : {}),
             });
         } catch (planError) {
             return fail(planError.code || 'FORMAT_CONFIG_INVALID', 409, planError.params);

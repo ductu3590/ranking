@@ -7,11 +7,16 @@ import { normalizeDraft } from '@/lib/tournament/setupDraftV3';
 import { messageFor } from '@/lib/tournament/setupMessages';
 import { buildSetupPlan } from '@/lib/tournament/setupPlans';
 import { firstBlocker, setupContext } from '@/lib/tournament/setupServer';
+import { effectivePairs, entryClubs, finalizePlanPayload } from '@/lib/tournament/friendlySetup';
+import { loadFriendlyContext, organizerModeMismatch, publishFriendlyTournament } from '@/lib/tournament/friendlyServer';
 
 // Chốt giải luồng v3 (spec Lát A §10): route TÍNH LẠI plan từ bản nháp đã lưu (không tin
 // plan do client gửi), so fingerprint với bản đã xem trước, rồi gọi RPC v4 ghi nguyên tử.
 // Chốt xong: giải chuyển "Chờ diễn ra" (scheduled) và có sẵn Sân 01…N theo số sân đã nhập
 // (migration 109). Không tự chuyển LIVE — trận đầu tiên được gọi vào sân mới chuyển.
+// Giải giao hữu liên CLB (Epic 3 F2 §5): plan dựng trên cặp hiệu lực (chủ nhà + CLB khách đã duyệt, rải CLB);
+// hạn mức CLB khách lấy từ friendlyEntitlements trên server (p_plan.friendly), không bao giờ từ body; migration 111
+// kiểm lại mọi thứ dưới khoá. Chốt xong giải friendly đang riêng tư → tự bật link xem (D50, publicSlug dùng chung).
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -19,7 +24,11 @@ function validId(value) {
     return /^\d+$/.test(String(value || '')) && Number(value) > 0;
 }
 
+// Mã lấy từ message RAISE (khớp includes, mã đầu tiên thắng). Mã giao hữu (111) đều 409 — xung đột trạng thái.
 const RPC_CODES = [
+    'FRIENDLY_HOST_GUEST_NOT_ALLOWED', 'FRIENDLY_GUEST_NOT_ALLOWED', 'FRIENDLY_CLUB_NOT_READY', 'EXTERNAL_CLUB_NOT_SUPPORTED',
+    'FRIENDLY_CLUB_LIMIT_REACHED', 'FRIENDLY_ROSTER_CHANGED', 'FRIENDLY_QUOTA_EXCEEDED', 'FRIENDLY_ATHLETE_DUPLICATE',
+    'FRIENDLY_CLUBS_TOO_FEW',
     'SETUP_REVISION_CONFLICT', 'ROSTER_LOCKED', 'DRAW_FINGERPRINT_MISMATCH', 'FINALIZE_DRAFT_INVALID',
     'FINALIZE_PLAN_INVALID', 'FINALIZE_STRUCTURE_ALREADY_EXISTS', 'IDEMPOTENCY_KEY_REUSED', 'PAIRING_INVALID',
     'MEMBER_NOT_ACTIVE_IN_GROUP', 'ATHLETE_IDENTITY_MISSING', 'GUEST_INVALID', 'FORMAT_NOT_AVAILABLE',
@@ -40,6 +49,18 @@ function fail(code, status = 409, params) {
     const known = messageFor(code, params);
     const text = FRIENDLY[code] || (known.step !== null || known.text !== 'Có lỗi xảy ra. Thử lại sau.' ? known.text : 'Không thể chốt giải. Không có dữ liệu nào bị ghi dở; thử lại sau.');
     return NextResponse.json({ error: text, code, step: known.step, ...(params ? { params } : {}) }, { status });
+}
+
+// DETAIL JSON của RAISE (111: tên CLB chưa sẵn sàng, hạn mức, quota, VĐV trùng) → params của câu lỗi.
+function rpcParams(error) {
+    const details = error?.details;
+    if (typeof details !== 'string' || !details.trim().startsWith('{')) return undefined;
+    try {
+        const value = JSON.parse(details);
+        return value && typeof value === 'object' && !Array.isArray(value) ? value : undefined;
+    } catch {
+        return undefined;
+    }
 }
 
 export async function POST(request) {
@@ -67,18 +88,23 @@ export async function POST(request) {
 
         const draft = normalizeDraft(division.setup_draft);
         if (!isFormatEnabled(draft.format.formatKey)) return fail('FORMAT_NOT_AVAILABLE', 409);
-        const ctx = await setupContext(db, admin.groupId, draft);
+        // null với giải nội bộ → mọi bước dưới đây y như trước Epic 3.
+        const friendly = await loadFriendlyContext(db, { groupId: admin.groupId, tournamentId: Number(tournamentId), draft });
+        if (organizerModeMismatch(draft, friendly)) return fail('ORGANIZER_MODE_LOCKED', 409);
+        const ctx = await setupContext(db, admin.groupId, draft, { friendly });
         const blocker = firstBlocker(draft, ctx, 4);
         if (blocker) return fail(blocker.code, 409, blocker.params);
 
+        const pairs = effectivePairs(draft, friendly);
         let plan;
         try {
             plan = buildSetupPlan({
                 formatKey: draft.format.formatKey,
                 config: draft.format.config,
-                pairIds: draft.pairs.map((pair) => pair.pairId),
+                pairIds: pairs.map((pair) => pair.pairId),
                 seed: draft.draw.seed,
                 divisionId: String(division.id),
+                ...(friendly ? { entryClubs: entryClubs(pairs) } : {}),
             });
         } catch (planError) {
             return fail(planError.code || 'DRAW_STALE', 409, planError.params);
@@ -94,15 +120,12 @@ export async function POST(request) {
             p_expected_setup_revision: expectedRevision,
             p_idempotency_key: idempotencyKey,
             p_preview_fingerprint: previewFingerprint,
-            p_plan: {
-                ...plan,
-                pairs: draft.pairs.map((pair) => ({ pairId: pair.pairId, refs: pair.participantRefs })),
-            },
+            p_plan: finalizePlanPayload({ plan, pairs, friendly }),
         });
         if (error) {
             const code = RPC_CODES.find((candidate) => String(error.message || '').includes(candidate));
             console.error('Setup finalize RPC error:', error);
-            return fail(code || 'FINALIZE_NOT_ATOMIC', error.code === 'P0002' ? 404 : 409);
+            return fail(code || 'FINALIZE_NOT_ATOMIC', error.code === 'P0002' ? 404 : 409, code ? rpcParams(error) : undefined);
         }
 
         // Bước phụ sau chốt: idempotent, lỗi ở đây KHÔNG làm hỏng giải đã chốt (lần mở sau vẫn gọi lại được).
@@ -112,6 +135,16 @@ export async function POST(request) {
         });
         if (prepared.error) console.error('Prepare after finalize error:', prepared.error);
 
+        // D50: giải giao hữu đang riêng tư → "chỉ ai có link" + slug. Lỗi chỉ log (giải đã chốt; bật tay ở Cài đặt).
+        let publicUrl = null;
+        if (friendly) {
+            try {
+                publicUrl = await publishFriendlyTournament(db, { groupId: admin.groupId, tournamentId: Number(tournamentId) });
+            } catch (publishError) {
+                console.error('Publish friendly tournament error:', publishError);
+            }
+        }
+
         return NextResponse.json({
             success: true,
             ...(data || {}),
@@ -119,6 +152,7 @@ export async function POST(request) {
             tournamentId: Number(tournamentId),
             divisionId: Number(divisionId),
             revision: Number(data?.setup_revision || expectedRevision + 1),
+            ...(friendly ? { publicUrl } : {}),
             redirect: `/dieu-hanh-giai/${tournamentId}?step=control`,
         });
     } catch (error) {

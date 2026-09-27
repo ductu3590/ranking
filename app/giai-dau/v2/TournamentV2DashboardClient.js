@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
+import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { listTournaments, updateTournament, deleteTournament } from '@/lib/tournamentV2Client';
+import { listTournaments, updateTournament, deleteTournament, listFriendlyClubs, listFriendlyInvitations } from '@/lib/tournamentV2Client';
+import { needActionCount } from '../loi-moi/invitationGroups';
 import { STATUS_LABELS, groupOf, sortForGroup } from '@/lib/tournament/lifecycle';
 import TournamentWizard from './TournamentWizard';
 import './v2.css';
@@ -58,13 +60,33 @@ function formatTags(tournament) {
     return Array.from(new Set(tags));
 }
 
+// Thẻ giải nháp giao hữu (D52): một dòng trạng thái lời mời theo CLB khách đang còn hiệu lực.
+const FRIENDLY_DRAFT_LINES = {
+    invited: { tone: 'wait', text: (name) => `Chờ ${name} phản hồi` },
+    accepted: { tone: 'wait', text: (name) => `${name} đang đăng ký cặp` },
+    roster_submitted: { tone: 'action', text: (name) => `Cần bạn duyệt danh sách ${name}` },
+    changes_requested: { tone: 'wait', text: (name) => `Chờ ${name} sửa danh sách` },
+    approved: { tone: 'ok', text: (name, club) => `${name} đã được duyệt · ${club.submitted?.pairCount ?? 0} cặp` },
+    declined: { tone: 'warn', text: (name) => `${name} đã từ chối lời mời` },
+    withdrawn: { tone: 'warn', text: (name) => `${name} đã rút khỏi giải` },
+};
+
+function friendlyDraftLine(clubs) {
+    const guests = (clubs || []).filter((club) => !club.isHost);
+    if (!guests.length) return { tone: 'wait', text: 'Chưa mời CLB khách' };
+    const club = guests.find((item) => !['declined', 'withdrawn'].includes(item.status)) || guests[guests.length - 1];
+    const line = FRIENDLY_DRAFT_LINES[club.status];
+    return line ? { tone: line.tone, text: line.text(club.name || 'CLB khách', club) } : null;
+}
+
 function rowPresentation(tournament) {
     const group = groupOf(tournament.status || 'draft');
+    const kindLabel = tournament.organizer_mode === 'friendly' ? 'Giao hữu' : 'Nội bộ CLB';
     if (tournament.status === 'draft') {
         return {
             tone: 'upcoming',
             badge: STATUS_LABELS.draft || 'Bản nháp',
-            visualLabel: 'Nội bộ CLB',
+            visualLabel: kindLabel,
             primaryAction: 'Tiếp tục thiết lập',
             secondaryAction: 'Chỉnh sửa giải',
         };
@@ -102,13 +124,13 @@ function rowPresentation(tournament) {
     return {
         tone: 'upcoming',
         badge: STATUS_LABELS[tournament.status] || 'Sắp tổ chức',
-        visualLabel: 'Nội bộ CLB',
+        visualLabel: kindLabel,
         primaryAction: tournament.status === 'registration_open' ? 'Quản lý đăng ký' : 'Xếp cặp & bốc thăm',
         secondaryAction: 'Chỉnh sửa giải',
     };
 }
 
-function TournamentListRow({ tournament, isAdmin, onOpen, onEdit, onDelete }) {
+function TournamentListRow({ tournament, isAdmin, onOpen, onEdit, onDelete, friendlyLine }) {
     const display = rowPresentation(tournament);
     const progress = tournament.match_progress;
     const registration = tournament.registration_summary;
@@ -137,6 +159,11 @@ function TournamentListRow({ tournament, isAdmin, onOpen, onEdit, onDelete }) {
                 <button type="button" className="v2-tournament-title" onClick={onOpen}>
                     {tournament.name}
                 </button>
+                {friendlyLine ? (
+                    <p className="v2-friendly-line" data-tone={friendlyLine.tone}>
+                        <i aria-hidden="true" />{friendlyLine.text}
+                    </p>
+                ) : null}
                 <div className="v2-tournament-meta">
                     <span>◷ {formatDate(tournament.event_date)}</span>
                     <span>⌖ {tournament.location || 'Chưa cập nhật địa điểm'}</span>
@@ -270,7 +297,7 @@ function TournamentV2DashboardClientInner() {
     const router = useRouter();
     const activeId = searchParams.get('t');
     const createMode = searchParams.get('create');
-    const creating = createMode === 'internal';
+    const creating = createMode === 'internal' || createMode === 'friendly';
 
     const [tournaments, setTournaments] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -281,6 +308,8 @@ function TournamentV2DashboardClientInner() {
     const [deleteBusy, setDeleteBusy] = useState(false);
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
+    const [friendlyLines, setFriendlyLines] = useState({});
+    const [invitations, setInvitations] = useState([]);
 
     async function load() {
         setLoading(true);
@@ -309,13 +338,31 @@ function TournamentV2DashboardClientInner() {
         if (activeId) router.replace(`/dieu-hanh-giai/${activeId}`);
     }, [activeId, router]);
 
+    // Giải nháp giao hữu (D52): mỗi thẻ hiện trạng thái lời mời CLB khách. Chỉ admin (API chủ nhà cần quyền ghi).
+    useEffect(() => {
+        if (!isAdmin) return undefined;
+        let alive = true;
+        const drafts = tournaments.filter((t) => t.status === 'draft' && t.organizer_mode === 'friendly');
+        Promise.all(drafts.map((t) => listFriendlyClubs(t.id).then((data) => [t.id, friendlyDraftLine(data?.clubs)]).catch(() => [t.id, null])))
+            .then((pairs) => { if (alive) setFriendlyLines(Object.fromEntries(pairs)); });
+        return () => { alive = false; };
+    }, [tournaments, isAdmin]);
+
+    // Lối vào hộp lời mời của CLB khách (FRD-04).
+    useEffect(() => {
+        if (!isAdmin) return undefined;
+        let alive = true;
+        listFriendlyInvitations().then((items) => { if (alive) setInvitations(items); }).catch(() => {});
+        return () => { alive = false; };
+    }, [isAdmin]);
+
     function openTournament(id) {
         router.push(`/dieu-hanh-giai/${id}`);
     }
 
-    function setCreateMode(enabled) {
+    function setCreateMode(mode) {
         const params = new URLSearchParams(searchParams.toString());
-        if (enabled) params.set('create', 'internal');
+        if (mode) params.set('create', mode === 'friendly' ? 'friendly' : 'internal');
         else params.delete('create');
         const query = params.toString();
         router.push(query ? `/giai-dau/v2?${query}` : '/giai-dau/v2');
@@ -325,7 +372,8 @@ function TournamentV2DashboardClientInner() {
         const divisionId = tournament?.formats?.[0]?.division_id || tournament?.division_id;
         const params = new URLSearchParams({ tournamentId: String(tournament.id) });
         if (divisionId) params.set('divisionId', String(divisionId));
-        router.push(`/giai-dau/v2?create=internal&${params.toString()}`);
+        const mode = tournament?.organizer_mode === 'friendly' ? 'friendly' : 'internal';
+        router.push(`/giai-dau/v2?create=${mode}&${params.toString()}`);
     }
 
     function handleWizardDone(id) {
@@ -440,11 +488,25 @@ function TournamentV2DashboardClientInner() {
                     <p>Quản trị, tổ chức và điều hành các giải đấu pickleball của câu lạc bộ.</p>
                 </div>
                 {isAdmin && (
-                    <button type="button" className="v2-btn-primary v2-create-tournament" onClick={() => setCreateMode(true)}>
-                        <span aria-hidden="true">＋</span> Tạo giải nội bộ
-                    </button>
+                    <div className="v2-create-actions">
+                        <button type="button" className="v2-btn-primary v2-create-tournament" onClick={() => setCreateMode('internal')}>
+                            <span aria-hidden="true">＋</span> Tạo giải nội bộ
+                        </button>
+                        <button type="button" className="v2-btn-secondary v2-create-tournament" onClick={() => setCreateMode('friendly')}>
+                            <span aria-hidden="true">＋</span> Tạo giải giao hữu
+                        </button>
+                    </div>
                 )}
             </section>
+
+            {isAdmin && invitations.length > 0 ? (
+                <Link href="/giai-dau/loi-moi" className="v2-invite-entry">
+                    <span className="v2-invite-entry__icon" aria-hidden="true">🏆</span>
+                    <span className="v2-invite-entry__text">Lời mời giải giao hữu</span>
+                    {needActionCount(invitations) ? <span className="v2-invite-entry__count">{needActionCount(invitations)}</span> : null}
+                    <span aria-hidden="true">›</span>
+                </Link>
+            ) : null}
 
             <section className="v2-stat-grid" aria-label="Tổng quan giải đấu">
                 <article className="v2-stat-card v2-stat-card-total">
@@ -508,7 +570,7 @@ function TournamentV2DashboardClientInner() {
                 <div className="v2-state v2-empty">
                     <p>Chưa tìm thấy giải đấu phù hợp.</p>
                     {isAdmin && (
-                        <button type="button" className="v2-btn-primary" onClick={() => setCreateMode(true)}>
+                        <button type="button" className="v2-btn-primary" onClick={() => setCreateMode('internal')}>
                             + Tạo giải đầu tiên
                         </button>
                     )}
@@ -523,6 +585,7 @@ function TournamentV2DashboardClientInner() {
                             onOpen={() => (t.status === 'draft' ? openSetup(t) : openTournament(t.id))}
                             onEdit={() => (t.status === 'draft' ? openSetup(t) : setEditing(t))}
                             onDelete={() => setDeletingId(t.id)}
+                            friendlyLine={friendlyLines[t.id] || null}
                         />
                     ))}
                 </section>

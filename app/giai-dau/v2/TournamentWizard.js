@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import SetupStudio from './setup-v3/SetupStudio';
 
-// Điểm vào luồng tạo giải nội bộ (đợt Stitch, spec Lát 0). Toàn bộ nghiệp vụ nằm
+// Điểm vào luồng tạo giải nội bộ / giao hữu liên CLB (đợt Stitch, spec Lát 0; Epic 3 F3). Toàn bộ nghiệp vụ nằm
 // trong setup-v3/; file này chỉ đọc tham số URL.
 export default function TournamentWizard({ onDone }) {
     const router = useRouter();
@@ -11,12 +11,15 @@ export default function TournamentWizard({ onDone }) {
     const tournamentId = searchParams.get('tournamentId') || searchParams.get('t');
     const divisionId = searchParams.get('divisionId') || searchParams.get('division') || searchParams.get('d');
     const step = Number(searchParams.get('step')) || null;
+    // Loại giải chỉ chọn trước lần lưu đầu (Epic 3 F3 §3.1): ?create=friendly mở sẵn "Giao hữu liên CLB".
+    const organizerMode = searchParams.get('create') === 'friendly' ? 'friendly' : 'internal';
 
     return (
         <SetupStudio
             tournamentId={tournamentId}
             divisionId={divisionId}
             step={step}
+            organizerMode={organizerMode}
             onExit={() => {
                 if (typeof onDone === 'function') onDone(null);
                 else router.push('/giai-dau/v2');

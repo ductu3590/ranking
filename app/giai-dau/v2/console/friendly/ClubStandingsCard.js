@@ -30,7 +30,7 @@ function HeadToHead({ headToHead, rows }) {
           <span aria-hidden="true">–</span>
           <b style={{ color: headToHead.right?.color || undefined }}>{rightWins}</b>
         </div>
-        <div className="fr-h2h__side is-right">
+        <div className="fr-h2h__side fr-h2h__side--right">
           <ClubChip name={headToHead.right?.name} color={headToHead.right?.color} />
           <small>{right.isHost ? 'Chủ nhà' : 'CLB khách'}</small>
         </div>
@@ -54,7 +54,7 @@ function StandingsTable({ rows }) {
               <td><ClubChip name={row.name} color={row.color} /></td>
               <td>{row.played}</td>
               <td>{row.won}–{row.lost}</td>
-              <td className={Number(row.diff) > 0 ? 'is-up' : Number(row.diff) < 0 ? 'is-down' : undefined}>{signed(row.diff)}</td>
+              <td className={Number(row.diff) > 0 ? 'fr-up' : Number(row.diff) < 0 ? 'fr-down' : undefined}>{signed(row.diff)}</td>
             </tr>
           ))}
         </tbody>

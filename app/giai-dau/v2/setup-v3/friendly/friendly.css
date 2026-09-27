@@ -30,7 +30,7 @@
 }
 .fr-status[data-tone='reg'] { background: var(--pc-brand-50); border-color: var(--pc-brand-200); color: var(--pc-brand-700); }
 .fr-status[data-tone='review'] { background: var(--pc-warn-bg); border-color: var(--pc-warn-border); color: var(--pc-warn); }
-.fr-status[data-tone='fix'] { background: #fef3c7; border-color: var(--pc-warn-border); color: #92400e; }
+.fr-status[data-tone='fix'] { background: #fef3c7; border-color: var(--pc-warn-border); color: #78350f; }
 .fr-status[data-tone='ok'] { background: var(--pc-ok-bg); border-color: #a7f3d0; color: var(--pc-ok); }
 .fr-status[data-tone='off'] { color: var(--pc-subtle); text-decoration: line-through; }
 

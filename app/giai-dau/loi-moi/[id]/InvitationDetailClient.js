@@ -257,7 +257,7 @@ export default function InvitationDetailClient({ id }) {
           onConfirm={async () => { await act('decline'); setConfirm(null); }} />
       ) : null}
       {confirm === 'withdraw' ? (
-        <ConfirmDialog title="Rút khỏi giải?" body="Các cặp của CLB bạn sẽ bị bỏ khỏi giải. Chủ nhà sẽ nhận thông báo."
+        <ConfirmDialog title="Rút khỏi giải?" body="Các cặp của CLB bạn sẽ bị bỏ khỏi giải. Chủ nhà sẽ thấy CLB bạn đã rút."
           confirmLabel="Rút khỏi giải" busy={busy} onCancel={() => setConfirm(null)}
           onConfirm={async () => { await act('withdraw'); setConfirm(null); }} />
       ) : null}

@@ -2,6 +2,58 @@
 
 import { useId } from 'react';
 import { messageFor } from '@/lib/tournament/setupMessages';
+import '../friendly/friendly.css';
+
+// Ô "Loại giải" (Epic 3 F3 §3.1, Stitch FRD-01 type): chọn trước lần lưu đầu; sau đó chỉ đọc (ORGANIZER_MODE_LOCKED).
+const ORGANIZER_MODES = [
+  { key: 'internal', title: 'Nội bộ CLB', desc: 'Thành viên CLB mình', icon: '👥' },
+  { key: 'friendly', title: 'Giao hữu liên CLB', desc: 'Mời CLB khác gửi cặp', icon: '🤝' },
+];
+
+function OrganizerModeCard({ mode, locked, onSelect, base }) {
+  const current = ORGANIZER_MODES.find((item) => item.key === mode) || ORGANIZER_MODES[0];
+  if (locked) {
+    return (
+      <section className="pc-card" aria-labelledby={`${base}-mode`}>
+        <div className="pc-card__head">
+          <h3 id={`${base}-mode`} className="pc-card__title">Loại giải đấu</h3>
+          <span className="pc-badge pc-badge--muted">Đã cố định</span>
+        </div>
+        <div className="fr-mode fr-mode--locked" data-code="ORGANIZER_MODE_LOCKED">
+          <span className="fr-mode__icon" aria-hidden="true">🔒</span>
+          <span className="fr-mode__text">
+            <strong>{current.title}</strong>
+            <small>{messageFor('ORGANIZER_MODE_LOCKED').text}</small>
+          </span>
+        </div>
+      </section>
+    );
+  }
+  return (
+    <section className="pc-card" aria-labelledby={`${base}-mode`}>
+      <div className="pc-card__head">
+        <h3 id={`${base}-mode`} className="pc-card__title">Loại giải</h3>
+        <span className="pc-badge pc-badge--ok">Bắt buộc</span>
+      </div>
+      <div className="fr-mode-list" role="radiogroup" aria-labelledby={`${base}-mode`}>
+        {ORGANIZER_MODES.map((item) => (
+          <button
+            key={item.key} type="button" role="radio" className="fr-mode" aria-checked={mode === item.key}
+            onClick={() => onSelect(item.key)}
+          >
+            <span className="fr-mode__icon" aria-hidden="true">{item.icon}</span>
+            <span className="fr-mode__text">
+              <strong>{item.title}{mode === item.key ? <span className="fr-mode__tag">Đang chọn</span> : null}</strong>
+              <small>{item.desc}</small>
+            </span>
+            <span className="fr-mode__radio" aria-hidden="true" />
+          </button>
+        ))}
+      </div>
+      <p className="pc-field__help" style={{ marginTop: '0.5rem' }}>Chọn trước lần lưu đầu. Sau đó không đổi được.</p>
+    </section>
+  );
+}
 
 function fieldIssue(stepResult, field) {
   return stepResult.blockers.find((item) => item.field === field) || stepResult.warnings.find((item) => item.field === field) || null;
@@ -31,7 +83,7 @@ function weekdayLabel(value) {
   return date.toLocaleDateString('vi-VN', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
-export default function StepInfo({ draft, readiness, showErrors, onChange }) {
+export default function StepInfo({ draft, readiness, showErrors, onChange, modeLocked = false }) {
   const base = useId();
   const t = draft.tournament;
   const stepResult = readiness.byStep[1];
@@ -44,6 +96,7 @@ export default function StepInfo({ draft, readiness, showErrors, onChange }) {
   // Số sân chọn ở Bước 3, sau khi ghép cặp (biết số cặp mới gợi ý được số sân).
   const requiredDone = [t.name.trim(), t.eventDate, t.startTime].filter(Boolean).length;
   const posterOk = /^https:\/\/\S+$/i.test(t.posterUrl || '');
+  const friendly = t.organizerMode === 'friendly';
 
   return (
     <>
@@ -58,6 +111,8 @@ export default function StepInfo({ draft, readiness, showErrors, onChange }) {
         </div>
       </section>
 
+      <OrganizerModeCard base={base} mode={t.organizerMode} locked={modeLocked} onSelect={(organizerMode) => set({ organizerMode })} />
+
       <section className="pc-card" aria-labelledby={`${base}-core`}>
         <div className="pc-card__head">
           <h3 id={`${base}-core`} className="pc-card__title">1. Tên &amp; thời gian thi đấu</h3>
@@ -67,7 +122,7 @@ export default function StepInfo({ draft, readiness, showErrors, onChange }) {
           <Field id={`${base}-name`} label="Tên giải đấu" required issue={issueFor('name')}>
             <input
               id={`${base}-name`} className="pc-input" value={t.name} maxLength={120}
-              placeholder="Ví dụ: Giải nội bộ tháng 10"
+              placeholder={friendly ? 'Ví dụ: Giao hữu tháng 10' : 'Ví dụ: Giải nội bộ tháng 10'}
               aria-invalid={Boolean(issueFor('name')) || undefined}
               aria-describedby={issueFor('name') ? `${base}-name-issue` : undefined}
               onChange={(event) => set({ name: event.target.value })}

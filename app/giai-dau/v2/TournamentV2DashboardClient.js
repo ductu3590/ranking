@@ -372,8 +372,9 @@ function TournamentV2DashboardClientInner() {
         const divisionId = tournament?.formats?.[0]?.division_id || tournament?.division_id;
         const params = new URLSearchParams({ tournamentId: String(tournament.id) });
         if (divisionId) params.set('divisionId', String(divisionId));
-        const mode = tournament?.organizer_mode === 'friendly' ? 'friendly' : 'internal';
-        router.push(`/giai-dau/v2?create=${mode}&${params.toString()}`);
+        router.push(tournament?.organizer_mode === 'friendly'
+            ? `/giai-dau/v2?create=friendly&${params.toString()}`
+            : `/giai-dau/v2?create=internal&${params.toString()}`);
     }
 
     function handleWizardDone(id) {

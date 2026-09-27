@@ -5,7 +5,8 @@ import { drawSetup, finalizeSetup, listClubRoster, loadSetupDraft, newIdempotenc
 import { initialSaveState, isDirty, keyForNextSave, saveReducer } from '@/lib/tournament/setupSaveState';
 import { computeSetupReadiness } from '@/lib/tournament/setupReadiness';
 import { allowedStep } from '@/lib/tournament/setupStepRules';
-import { emptyDraft } from '@/lib/tournament/setupDraftV3';
+import { emptyDraft, normalizeDraft } from '@/lib/tournament/setupDraftV3';
+import { clientFriendlyContext } from './friendly/friendlyContext';
 
 const SAVE_TIMEOUT_MS = 20000;
 
@@ -32,9 +33,19 @@ function hydratePayload(setup, tournamentId, divisionId) {
   };
 }
 
+// Bản nháp trống theo loại giải chọn từ dashboard (?create=friendly). Loại giải ghi vào bản nháp ở lần lưu đầu,
+// sau đó server khoá (ORGANIZER_MODE_LOCKED).
+function blankDraft(organizerMode) {
+  if (organizerMode !== 'friendly') return emptyDraft();
+  const draft = emptyDraft();
+  return normalizeDraft({ ...draft, tournament: { ...draft.tournament, organizerMode: 'friendly' } });
+}
+
 // Trạng thái + I/O của luồng tạo giải v3. Logic lưu nằm ở setupSaveState (thuần).
-export function useSetupStudio({ tournamentId: initialTournamentId, divisionId: initialDivisionId, step: requestedStep }) {
-  const [save, dispatch] = useReducer(saveReducer, undefined, () => initialSaveState({ draft: emptyDraft() }));
+export function useSetupStudio({ tournamentId: initialTournamentId, divisionId: initialDivisionId, step: requestedStep, organizerMode = 'internal' }) {
+  const [save, dispatch] = useReducer(saveReducer, undefined, () => initialSaveState({ draft: blankDraft(organizerMode) }));
+  // Khối `friendly` của GET /setup (chỉ giải giao hữu): CLB tham dự, hạn mức, cặp CLB khách đã duyệt.
+  const [friendly, setFriendly] = useState(null);
   const [step, setStep] = useState(1);
   const [roster, setRoster] = useState([]);
   const [loading, setLoading] = useState(Boolean(initialTournamentId && initialDivisionId));
@@ -62,6 +73,7 @@ export function useSetupStudio({ tournamentId: initialTournamentId, divisionId: 
         const payload = hydratePayload(setup, initialTournamentId, initialDivisionId);
         if (payload.draft.clientDraftKey) clientDraftKeyRef.current = payload.draft.clientDraftKey;
         dispatch({ type: 'hydrate', payload });
+        setFriendly(setup?.friendly || null);
         // URL chỉ là yêu cầu; server quyết định bước được mở (không bypass bằng ?step=).
         setStep(allowedStep(requestedStep || setup?.resumeStep || 1, payload.completedThrough));
       })
@@ -72,7 +84,31 @@ export function useSetupStudio({ tournamentId: initialTournamentId, divisionId: 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialTournamentId, initialDivisionId]);
 
-  const ctx = useMemo(() => ({ members: roster.length ? memberContext(roster) : undefined, today: todayInVietnam() }), [roster]);
+  const friendlyCtx = useMemo(() => clientFriendlyContext(friendly), [friendly]);
+  const ctx = useMemo(() => ({
+    members: roster.length ? memberContext(roster) : undefined,
+    today: todayInVietnam(),
+    ...(friendlyCtx ? { friendly: friendlyCtx } : {}),
+  }), [roster, friendlyCtx]);
+
+  // Tải lại riêng khối `friendly` (sau khi mời/duyệt/khoá… hoặc khi quay lại Bước 2–4); không đụng bản nháp đang sửa.
+  const reloadFriendly = useCallback(async () => {
+    const current = saveRef.current;
+    if (!current.tournamentId || !current.divisionId) return null;
+    try {
+      const setup = await loadSetupDraft(current.tournamentId, current.divisionId);
+      setFriendly(setup?.friendly || null);
+      return setup?.friendly || null;
+    } catch {
+      return null;
+    }
+  }, []);
+
+  // Giải giao hữu vừa tạo ở lần lưu đầu: nạp khối `friendly` để Bước 2 có khu "CLB tham dự".
+  const isFriendly = save.draft.tournament.organizerMode === 'friendly';
+  useEffect(() => {
+    if (isFriendly && save.tournamentId && save.divisionId && !friendly) reloadFriendly();
+  }, [friendly, isFriendly, reloadFriendly, save.divisionId, save.tournamentId]);
   const readiness = useMemo(() => computeSetupReadiness(save.draft, ctx), [save.draft, ctx]);
 
   const edit = useCallback((update) => dispatch({ type: 'edit', update }), []);
@@ -154,6 +190,7 @@ export function useSetupStudio({ tournamentId: initialTournamentId, divisionId: 
     if (!current.tournamentId) return;
     const setup = await loadSetupDraft(current.tournamentId, current.divisionId);
     const payload = hydratePayload(setup, current.tournamentId, current.divisionId);
+    setFriendly(setup?.friendly || null);
     if (mode === 'keep') dispatch({ type: 'conflictKeepMine', revision: payload.revision });
     else {
       dispatch({ type: 'conflictReload', payload });
@@ -180,5 +217,8 @@ export function useSetupStudio({ tournamentId: initialTournamentId, divisionId: 
     finalizeError,
     discard,
     reloadFromServer,
+    friendly,
+    reloadFriendly,
+    isFriendly,
   };
 }

@@ -28,12 +28,13 @@ export function saveStatusText(save) {
   }
 }
 
-export function StudioHeader({ title, save, onBack }) {
+export function StudioHeader({ title, save, onBack, friendly = false }) {
   return (
     <header className="pc-header">
       <button type="button" className="pc-header__back" onClick={onBack} aria-label="Quay về danh sách giải">‹</button>
       <div className="pc-header__title">
-        <h1>{title || 'Tạo giải nội bộ'}</h1>
+        <h1>{title || (friendly ? 'Tạo giải giao hữu' : 'Tạo giải nội bộ')}</h1>
+        {friendly ? <span className="pc-badge pc-badge--brand">Giao hữu liên CLB</span> : null}
         <span className="pc-badge pc-badge--draft">Nháp</span>
         <span className="pc-save-status" data-status={save.status} role="status" aria-live="polite">{saveStatusText(save)}</span>
       </div>
@@ -41,7 +42,8 @@ export function StudioHeader({ title, save, onBack }) {
   );
 }
 
-export function StudioStepper({ step, completedThrough, summaries, onSelect }) {
+// extraOpenStep: bước mở thêm ngoài completedThrough + 1 — giải giao hữu mở Bước 4 ở trạng thái "chờ CLB khách" (D52).
+export function StudioStepper({ step, completedThrough, summaries, onSelect, extraOpenStep = null }) {
   const currentRef = useRef(null);
   useEffect(() => { currentRef.current?.scrollIntoView?.({ block: 'nearest', inline: 'center' }); }, [step]);
   return (
@@ -49,7 +51,7 @@ export function StudioStepper({ step, completedThrough, summaries, onSelect }) {
       <ol>
         {STUDIO_STEPS.map((item) => {
           const done = item.id <= completedThrough;
-          const open = item.id <= completedThrough + 1;
+          const open = item.id <= completedThrough + 1 || item.id === extraOpenStep;
           const current = item.id === step;
           return (
             <li key={item.id}>

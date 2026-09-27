@@ -1,0 +1,161 @@
+/* Giải giao hữu liên CLB — màn thiết lập của chủ nhà (Epic 3 F3; Stitch FRD-01…03, FRD-09).
+   Tiền tố fr-; token từ canonical/DESIGN.md (biến --pc-* của .pc-studio). Mobile-first 390px. */
+
+/* ---------- Loại giải (Bước 1) ---------- */
+.fr-mode-list { display: grid; gap: 0.5rem; }
+.fr-mode {
+  display: flex; align-items: center; gap: 0.75rem; width: 100%; min-height: 56px; padding: 0.75rem;
+  border: 1px solid var(--pc-border); border-radius: var(--pc-radius-lg); background: #fff; text-align: left; cursor: pointer;
+}
+.fr-mode[aria-checked='true'] { border: 2px solid var(--pc-brand-600); background: var(--pc-brand-50); }
+.fr-mode--locked { cursor: default; background: var(--pc-bg); }
+.fr-mode__icon {
+  flex: none; display: grid; place-items: center; width: 2.25rem; height: 2.25rem;
+  border-radius: var(--pc-radius); background: var(--pc-brand-50); font-size: 1rem;
+}
+.fr-mode__text { display: grid; gap: 0.125rem; flex: 1; min-width: 0; }
+.fr-mode__text strong { display: flex; flex-wrap: wrap; align-items: center; gap: 0.375rem; font-weight: 700; }
+.fr-mode__text small { color: var(--pc-muted); font-size: 0.75rem; }
+.fr-mode__tag {
+  padding: 0 0.375rem; border-radius: 999px; background: var(--pc-brand-100); color: var(--pc-brand-700);
+  font-size: 0.6875rem; font-weight: 700;
+}
+.fr-mode__radio { flex: none; width: 1.25rem; height: 1.25rem; border: 2px solid var(--pc-subtle); border-radius: 50%; }
+.fr-mode[aria-checked='true'] .fr-mode__radio { border-color: var(--pc-brand-600); box-shadow: inset 0 0 0 4px #fff; background: var(--pc-brand-600); }
+
+/* ---------- Chip trạng thái lời mời ---------- */
+.fr-status {
+  display: inline-flex; align-items: center; padding: 0.0625rem 0.5rem; border: 1px solid var(--pc-border);
+  border-radius: 999px; background: #f1f5f9; color: var(--pc-muted); font-size: 0.6875rem; font-weight: 700; white-space: nowrap;
+}
+.fr-status[data-tone='reg'] { background: var(--pc-brand-50); border-color: var(--pc-brand-200); color: var(--pc-brand-700); }
+.fr-status[data-tone='review'] { background: var(--pc-warn-bg); border-color: var(--pc-warn-border); color: var(--pc-warn); }
+.fr-status[data-tone='fix'] { background: #fef3c7; border-color: var(--pc-warn-border); color: #92400e; }
+.fr-status[data-tone='ok'] { background: var(--pc-ok-bg); border-color: #a7f3d0; color: var(--pc-ok); }
+.fr-status[data-tone='off'] { color: var(--pc-subtle); text-decoration: line-through; }
+
+/* ---------- Khu CLB tham dự (Bước 2) ---------- */
+.fr-panel { display: grid; gap: 0.75rem; }
+.fr-panel > .pc-card__head { margin-bottom: 0; }
+.fr-host {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; padding: 0.625rem 0.75rem;
+  border: 1px solid var(--pc-border); border-radius: var(--pc-radius-lg); background: var(--pc-bg);
+}
+.fr-host__meta { flex: 1; min-width: 8rem; color: var(--pc-muted); font-size: 0.75rem; }
+.fr-empty {
+  display: grid; justify-items: center; gap: 0.5rem; padding: 1.25rem 1rem; border: 1px dashed var(--pc-border);
+  border-radius: var(--pc-radius-lg); color: var(--pc-muted); text-align: center;
+}
+.fr-empty p { margin: 0; }
+.fr-empty span { font-size: 1.25rem; }
+.fr-club-list { display: grid; gap: 0.5rem; margin: 0; padding: 0; list-style: none; }
+.fr-club { position: relative; display: grid; gap: 0.5rem; padding: 0.75rem; border: 1px solid var(--pc-border); border-radius: var(--pc-radius-lg); background: #fff; }
+.fr-club[data-status='declined'], .fr-club[data-status='withdrawn'] { background: var(--pc-bg); }
+.fr-club__row { display: flex; align-items: flex-start; gap: 0.625rem; }
+.fr-club__main { display: grid; gap: 0.25rem; flex: 1; min-width: 0; }
+.fr-club__name { overflow-wrap: anywhere; }
+.fr-club__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.375rem; color: var(--pc-muted); font-size: 0.75rem; }
+.fr-club__hint { color: var(--pc-muted); font-size: 0.75rem; }
+.fr-club__actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.fr-avatar {
+  --fr-club: #0e7490;
+  position: relative; flex: none; display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 50%;
+  background: var(--pc-brand-50); color: var(--pc-brand-700); font-weight: 800;
+}
+.fr-avatar i { position: absolute; right: -1px; bottom: -1px; width: 0.625rem; height: 0.625rem; border: 2px solid #fff; border-radius: 50%; background: var(--fr-club); }
+.fr-icon-btn {
+  flex: none; display: grid; place-items: center; width: 44px; height: 44px; padding: 0;
+  border: 1px solid var(--pc-border); border-radius: var(--pc-radius); background: #fff; cursor: pointer; font-size: 1.125rem;
+}
+.fr-menu {
+  display: grid; margin: 0; padding: 0.25rem; list-style: none; border: 1px solid var(--pc-border);
+  border-radius: var(--pc-radius-lg); background: #fff; box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+}
+.fr-menu button { width: 100%; min-height: 44px; padding: 0 0.75rem; border: 0; border-radius: var(--pc-radius); background: none; text-align: left; cursor: pointer; }
+.fr-menu button:hover { background: var(--pc-bg); }
+.fr-danger-text { color: var(--pc-err) !important; }
+.fr-invite-btn { width: 100%; }
+.fr-limit-hint { margin: 0; color: var(--pc-muted); font-size: 0.8125rem; }
+.fr-window__inputs { gap: 0.5rem; }
+.fr-window__toggle { width: 100%; margin-top: 0.5rem; }
+.fr-window .pc-card__head { align-items: center; }
+.fr-confirm { flex-direction: column; margin-top: 0.5rem; }
+.fr-confirm p { margin: 0; }
+
+/* ---------- Sheet (mời CLB, duyệt danh sách) ---------- */
+.fr-layer { z-index: 60; }
+.fr-sheet-backdrop {
+  position: fixed; inset: 0; display: flex; align-items: flex-end; justify-content: center;
+  background: rgba(15, 23, 42, 0.45);
+}
+.fr-sheet {
+  display: flex; flex-direction: column; width: 100%; max-width: 32rem; max-height: min(92dvh, 46rem);
+  border-radius: var(--pc-radius-xl) var(--pc-radius-xl) 0 0; background: #fff; box-shadow: 0 -12px 32px rgba(15, 23, 42, 0.2);
+}
+.fr-sheet__grip { align-self: center; width: 2.5rem; height: 0.25rem; margin: 0.5rem 0 0; border-radius: 999px; background: var(--pc-border); }
+.fr-sheet__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.75rem; padding: 0.75rem 1rem 0.5rem; }
+.fr-sheet__head h2 { margin: 0.25rem 0 0; font-size: 1.125rem; font-weight: 800; }
+.fr-sheet__head p { margin: 0.125rem 0 0; color: var(--pc-muted); font-size: 0.8125rem; }
+.fr-sheet__head-side { display: flex; align-items: center; gap: 0.5rem; }
+.fr-sheet__body { display: grid; gap: 0.75rem; padding: 0.5rem 1rem 1rem; overflow-y: auto; overscroll-behavior: contain; }
+.fr-sheet__meta { display: flex; justify-content: space-between; color: var(--pc-muted); font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+.fr-sheet__label { margin: 0; color: var(--pc-muted); font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+.fr-sheet__foot { display: grid; gap: 0.5rem; padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom)); border-top: 1px solid var(--pc-border); }
+.fr-sheet__pair-actions { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.5rem; }
+.fr-sheet__hint { margin: 0; color: var(--pc-muted); font-size: 0.75rem; text-align: center; }
+@media (min-width: 640px) {
+  .fr-sheet-backdrop { align-items: center; padding: 1rem; }
+  .fr-sheet { border-radius: var(--pc-radius-xl); }
+}
+
+.fr-club-pick { display: grid; gap: 0.5rem; margin: 0; padding: 0; list-style: none; }
+.fr-club-pick > li { border: 1px solid var(--pc-border); border-radius: var(--pc-radius-lg); background: #fff; overflow: hidden; }
+.fr-club-pick > li[data-selected] { border: 2px solid var(--pc-brand-600); }
+.fr-club-pick__row { display: flex; align-items: center; gap: 0.625rem; width: 100%; min-height: 52px; padding: 0.5rem 0.75rem; border: 0; background: none; text-align: left; cursor: pointer; }
+li[data-selected] .fr-club-pick__row { background: var(--pc-brand-50); }
+.fr-club-pick__name { display: grid; flex: 1; min-width: 0; font-weight: 600; }
+.fr-club-pick__name small { color: var(--pc-brand-700); font-size: 0.75rem; font-weight: 500; }
+.fr-club-pick__form { display: grid; gap: 0.75rem; padding: 0.75rem; border-top: 1px solid var(--pc-brand-200); }
+.fr-radio { flex: none; width: 1.25rem; height: 1.25rem; border: 2px solid var(--pc-subtle); border-radius: 50%; }
+li[data-selected] .fr-radio { border-color: var(--pc-brand-600); background: var(--pc-brand-600); box-shadow: inset 0 0 0 3px #fff; }
+
+/* ---------- Duyệt danh sách ---------- */
+.fr-count {
+  padding: 0.5rem 0.75rem; border: 1px solid #a7f3d0; border-radius: var(--pc-radius-lg);
+  background: var(--pc-ok-bg); color: var(--pc-ok); font-weight: 700;
+}
+.fr-count[data-tone='err'] { border-color: #fecaca; background: var(--pc-err-bg); color: var(--pc-err); }
+.fr-pair-list { display: grid; gap: 0.5rem; margin: 0; padding: 0; list-style: none; }
+.fr-pair {
+  --fr-club: #0e7490;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.75rem; min-height: 44px; padding: 0.5rem 0.75rem;
+  border: 1px solid var(--pc-border); border-left: 3px solid var(--fr-club); border-radius: var(--pc-radius-lg); background: var(--pc-bg);
+}
+.fr-pair__no { color: var(--fr-club); font-weight: 800; font-size: 0.8125rem; }
+.fr-pair__names { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.fr-pair__lock { color: var(--pc-subtle); font-size: 0.75rem; }
+.fr-request { display: grid; gap: 0.375rem; padding: 0.75rem; border: 1px solid var(--pc-warn-border); border-radius: var(--pc-radius-lg); background: #fff; }
+
+/* ---------- Link mời ---------- */
+.fr-link-dialog { display: grid; gap: 0.75rem; text-align: center; }
+.fr-link-dialog h2, .fr-link-dialog p { margin: 0; }
+.fr-link-dialog__ok { justify-self: center; display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 50%; background: var(--pc-ok-bg); color: var(--pc-ok); font-size: 1.25rem; font-weight: 800; }
+.fr-link-box { display: flex; gap: 0.5rem; text-align: left; }
+.fr-link-box .pc-input { flex: 1; min-width: 0; }
+.fr-link-note { text-align: left; }
+.fr-link-note p { margin: 0; color: inherit; font-size: 0.8125rem; }
+.fr-link-actions { justify-content: stretch; }
+.fr-link-actions .pc-btn { flex: 1 1 8rem; }
+
+/* ---------- Bước 4 bị chặn (FRD-09) ---------- */
+.fr-gate__list, .fr-gate__group ul { display: grid; gap: 0.5rem; margin: 0.75rem 0 0; padding: 0; list-style: none; }
+.fr-gate__group ul { margin: 0; }
+.fr-gate__item {
+  display: flex; align-items: center; gap: 0.625rem; min-height: 44px; padding: 0.5rem 0.75rem;
+  border: 1px solid var(--pc-warn-border); border-radius: var(--pc-radius-lg); background: var(--pc-warn-bg);
+}
+.fr-gate__item[data-done] { border-color: #a7f3d0; background: var(--pc-ok-bg); }
+.fr-gate__item > span:nth-child(2) { display: grid; gap: 0.125rem; min-width: 0; }
+.fr-gate__item small { color: var(--pc-muted); font-size: 0.75rem; }
+.fr-gate__icon { flex: none; display: grid; place-items: center; width: 1.5rem; height: 1.5rem; border-radius: 50%; background: #fff; font-size: 0.75rem; font-weight: 800; color: var(--pc-ok); }
+.fr-gate .pc-notice { margin-top: 0.75rem; }

@@ -99,6 +99,9 @@ export default function InvitationDetailClient({ id }) {
 
   const invitation = data?.invitation || null;
   const has = (action) => Boolean(invitation?.actions?.includes(action));
+  // Hết quyền sửa (đã gửi, bị khoá, đã chốt) → trình soạn biến mất, không còn gì để hỏi khi rời trang.
+  const canEdit = Boolean(invitation?.canEdit);
+  useEffect(() => { if (!canEdit) setDirty(false); }, [canEdit]);
 
   async function act(action, { roster, version } = {}) {
     setBusy(true);

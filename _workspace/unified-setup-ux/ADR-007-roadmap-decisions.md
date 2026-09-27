@@ -89,3 +89,5 @@ Chốt câu hỏi mở của spec (`docs/superpowers/specs/2026-09-25-epic-3-fri
 | D48 | CLB khách nghiệm thu browser: **group 19** "CLB Test Responsive UI" (chủ nhà vẫn là 59). Không đụng group 1 | Người dùng có tài khoản admin; đủ thành viên cho 3 cặp |
 | D49 | Giải giao hữu **cấm khách mời ở cả phía chủ nhà** (không chỉ CLB khách như D38): blocker Bước 2 `FRIENDLY_HOST_GUEST_NOT_ALLOWED` + finalize nhánh giao hữu chặn `guests` khác rỗng | Công bằng hai bên; mỗi cặp đại diện đúng CLB |
 | D50 | Chốt giải giao hữu đang `private` → **tự chuyển `unlisted`** và sinh `public_slug`; Bước 4 báo trước | Thành viên CLB khách không vào được bàn điều hành CLB khác, cần link xem |
+
+| D51 | Hạn mức CLB khách là **mức tối đa**, không phải số bắt buộc: gửi từ 1 cặp tới `quota` cặp đều hợp lệ (vd hạn mức 10, gửi 6 hay 8 đều được); chỉ vượt mới chặn (`FRIENDLY_QUOTA_EXCEEDED`), 0 cặp chặn (`FRIENDLY_ROSTER_EMPTY`). Luật nằm ở hệ thống (domain + SQL 110 đã đúng), UI không cần giải thích — bộ đếm "x/y cặp" không được ngụ ý phải đủ y (người dùng chốt 2026-09-27) | Giải giao lưu phong trào, CLB khách thường ít người hơn chủ nhà |

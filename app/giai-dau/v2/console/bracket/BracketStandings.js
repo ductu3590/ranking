@@ -73,7 +73,7 @@ function FinishCard({ board, tournamentId, isAdmin, onDone }) {
   </aside>;
 }
 
-export default function BracketStandings({ tournamentId, isAdmin, onChanged, friendly = false }) {
+export default function BracketStandings({ tournamentId, isAdmin, onChanged, onBoard, friendly = false }) {
   const [board, setBoard] = useState(null);
   const [standings, setStandings] = useState({});
   const [error, setError] = useState('');
@@ -89,6 +89,8 @@ export default function BracketStandings({ tournamentId, isAdmin, onChanged, fri
       const next = await getOperationsBoard(tournamentId);
       const entries = await Promise.all((next.stages || []).map((stage) => getStandings(stage.id).then((data) => [stage.id, data]).catch(() => [stage.id, null])));
       setBoard(next);
+      // Shell (Tiến độ giải, nhãn trạng thái) dùng cùng board — không gọi thêm API.
+      if (onBoard) onBoard(next);
       setStandings(Object.fromEntries(entries));
       setError('');
       if (friendly) {
@@ -99,7 +101,7 @@ export default function BracketStandings({ tournamentId, isAdmin, onChanged, fri
     } catch (loadError) {
       setError(loadError.message || 'Không tải được sơ đồ và xếp hạng.');
     }
-  }, [tournamentId, friendly]);
+  }, [tournamentId, friendly, onBoard]);
 
   useEffect(() => { load(); }, [load]);
 

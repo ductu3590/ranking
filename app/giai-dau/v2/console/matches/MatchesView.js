@@ -72,7 +72,7 @@ function MatchRow({ item, onOpen }) {
   </button>;
 }
 
-export default function MatchesView({ tournamentId, isAdmin }) {
+export default function MatchesView({ tournamentId, isAdmin, onBoard }) {
   const [board, setBoard] = useState(null);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -85,12 +85,15 @@ export default function MatchesView({ tournamentId, isAdmin }) {
 
   const load = useCallback(async () => {
     try {
-      setBoard(await getOperationsBoard(tournamentId));
+      const next = await getOperationsBoard(tournamentId);
+      setBoard(next);
+      // Shell (Tiến độ giải, nhãn trạng thái) dùng cùng board — không gọi thêm API.
+      if (onBoard) onBoard(next);
       setError('');
     } catch (loadError) {
       setError(loadError.message || 'Không tải được danh sách trận.');
     }
-  }, [tournamentId]);
+  }, [onBoard, tournamentId]);
 
   useEffect(() => {
     load();

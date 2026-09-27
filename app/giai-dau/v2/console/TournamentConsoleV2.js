@@ -125,7 +125,7 @@ export default function TournamentConsoleV2({ tournamentId }) {
     {(step) => <>
       {step === 'control' ? <ControlCenter tournamentId={tournamentId} isAdmin={isAdmin} onSettings={goSettings} onStandings={() => goStep('bracket')} onMatches={() => goStep('matches')} onChanged={load} /> : null}
       {step === 'matches' ? (v4Schedule ? <MatchesView tournamentId={tournamentId} isAdmin={isAdmin} /> : <>{stagePicker}<ResultsTab {...stepProps} /></>) : null}
-      {step === 'bracket' ? (v4Schedule ? <BracketStandings tournamentId={tournamentId} isAdmin={isAdmin} onChanged={load} /> : <>{stagePicker}<StandingsTab {...stepProps} /><BracketTab {...stepProps} /></>) : null}
+      {step === 'bracket' ? (v4Schedule ? <BracketStandings tournamentId={tournamentId} isAdmin={isAdmin} onChanged={load} friendly={tournament?.organizer_mode === 'friendly'} /> : <>{stagePicker}<StandingsTab {...stepProps} /><BracketTab {...stepProps} /></>) : null}
       {step === 'settings' && v4Schedule ? <SettingsView tournament={tournament} tournamentId={tournamentId} isAdmin={isAdmin} reload={load}>
         {isCommunity ? <div id="dang-ky-mo"><OpenRegTab {...stepProps} /></div> : null}
       </SettingsView> : null}

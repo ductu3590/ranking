@@ -737,12 +737,10 @@ BEGIN
   UPDATE public.tournament_clubs SET roster_submitted = rs, quota = 1 WHERE id = (s->'clubs'->>0)::bigint;
   PERFORM pg_temp.f2_err('quota', s, 1, 'FRIENDLY_QUOTA_EXCEEDED');
   UPDATE public.tournament_clubs SET quota = NULL WHERE id = (s->'clubs'->>0)::bigint;
-  hm1 := (s->'hm'->>0)::bigint;
-  UPDATE public.club_members SET group_id = ga WHERE id = hm1;
-  UPDATE public.tournament_clubs SET roster_submitted = jsonb_set(jsonb_set(rs, '{pairs,0,participantRefs,0}', to_jsonb('member:' || hm1)),
-    '{memberIds}', ((rs->'memberIds') - (m::text)) || to_jsonb(hm1::text)) WHERE id = (s->'clubs'->>0)::bigint;
-  PERFORM pg_temp.f2_err('athlete_duplicate', s, 1, 'FRIENDLY_ATHLETE_DUPLICATE');
-  UPDATE public.club_members SET group_id = 59 WHERE id = hm1;
+  -- FRIENDLY_ATHLETE_DUPLICATE không dựng được trên production: athletes.legacy_club_member_id UNIQUE (một VĐV ↔ một
+  -- thành viên ↔ một CLB) và FK club_member_athlete_map_legacy_fk (id, group_id) cấm chuyển CLB. Khẳng định chính các
+  -- ràng buộc đó; nhánh RAISE trong 111 là lớp phòng thủ (đã kiểm trên PGlite).
+  PERFORM pg_temp.it_ok('neg.athlete_duplicate.unreachable', EXISTS (SELECT 1 FROM pg_indexes WHERE schemaname = 'public' AND indexname = 'athletes_legacy_club_member_id_key') AND EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'club_member_athlete_map_legacy_fk'));
   UPDATE public.tournament_clubs SET roster_submitted = rs WHERE id = (s->'clubs'->>0)::bigint;
   -- Duyệt lại sau bốc thăm (version đổi) → plan cũ lệch khóa.
   PERFORM public.friendly_club_action(59, 'host', (s->'clubs'->>0)::bigint, 'request_changes', (SELECT version FROM public.tournament_clubs WHERE id = (s->'clubs'->>0)::bigint), '{"note": "Đổi cặp"}'::jsonb);

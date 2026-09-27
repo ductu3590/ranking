@@ -4,6 +4,7 @@ import { useId, useMemo, useState } from 'react';
 import { messageFor } from '@/lib/tournament/setupMessages';
 import { estimateSchedule } from '@/lib/tournament/setupSchedule';
 import { StudioDialog } from '../StudioChrome';
+import DrawProgress from '../DrawProgress';
 import { parseFriendlyPairKey } from '@/lib/tournament/friendlyClubs';
 import ClubChip from '../../console/friendly/ClubChip';
 
@@ -281,7 +282,7 @@ function Criteria({ plan }) {
   );
 }
 
-export default function StepDraw({ draft, roster, readiness, busy, onDraw, onFinalize, finalizing, finalizeError, friendly = null, pairTotal = null }) {
+export default function StepDraw({ draft, roster, readiness, busy, onDraw, onFinalize, finalizing, finalizeError, friendly = null, pairTotal = null, progress = null }) {
   const [confirm, setConfirm] = useState(null);
   const isFriendly = draft.tournament.organizerMode === 'friendly';
   const pairName = usePairNames(draft, roster, isFriendly ? friendly : null);
@@ -298,6 +299,8 @@ export default function StepDraw({ draft, roster, readiness, busy, onDraw, onFin
   const guestChanged = Boolean(isFriendly && stale && plan
     && guestIds((plan.groups || []).flatMap((group) => group.entryIds)) !== guestIds((friendly?.approvedPairs || []).map((pair) => pair.pairId)));
 
+  // Đang bốc thăm / cập nhật xem trước: thanh % thay chỗ khu kết quả, xong mới hiện kết quả mới.
+  if (progress && progress.action !== 'finalize') return <DrawProgress action={progress.action} percent={progress.percent} />;
   if (!plan) return <DrawIntro draft={draft} busy={busy} onDraw={onDraw} pairCount={pairCount} />;
 
   return (
@@ -315,6 +318,7 @@ export default function StepDraw({ draft, roster, readiness, busy, onDraw, onFin
       <Schedule plan={plan} draft={draft} pairName={pairName} pairCount={pairCount} />
       <Criteria plan={plan} />
 
+      {progress?.action === 'finalize' ? <DrawProgress action="finalize" percent={progress.percent} /> : (
       <section className="pc-card pc-card--hero" aria-live="polite">
         <p className="pc-eyebrow">Chốt giải</p>
         <h2 className="pc-hero-title" style={{ fontSize: '1.25rem' }}>Chốt bốc thăm &amp; tạo lịch?</h2>
@@ -331,6 +335,7 @@ export default function StepDraw({ draft, roster, readiness, busy, onDraw, onFin
           </button>
         </div>
       </section>
+      )}
 
       {confirm === 'redraw' ? (
         <StudioDialog

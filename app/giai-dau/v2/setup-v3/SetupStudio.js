@@ -10,6 +10,7 @@ import StepInfo from './steps/StepInfo';
 import StepParticipants from './steps/StepParticipants';
 import StepFormatPairing from './steps/StepFormatPairing';
 import StepDraw from './steps/StepDraw';
+import { useDrawProgress } from './DrawProgress';
 import FriendlyDrawGate from './friendly/FriendlyDrawGate';
 import FinalizedLinkDialog from './friendly/FinalizedLinkDialog';
 import { onlyWaitingForClubs } from './friendly/friendlyContext';
@@ -32,6 +33,8 @@ export default function SetupStudio({ tournamentId, divisionId, step: requestedS
   const studio = useSetupStudio({ tournamentId, divisionId, step: requestedStep, organizerMode });
   const { save, step, setStep, readiness, dirty, edit, persist, discard, reloadFromServer, draw, finalize, isFriendly, friendly, reloadFriendly } = studio;
   const [finalized, setFinalized] = useState(null);
+  // Thanh % khi bốc thăm / cập nhật xem trước / chốt (mọi thể thức). Chỉ bọc lời gọi cũ, không đổi API.
+  const { progress: drawProgress, run: runWithProgress } = useDrawProgress();
   // Giải giao hữu (D52): chủ nhà làm xong phần mình ở Bước 1–3; nếu chỉ còn chờ CLB khách thì Bước 4 mở ở dạng bị chặn.
   const gateOpen = isFriendly && save.completedThrough >= 2 && onlyWaitingForClubs(readiness.byStep[3]);
   const [busy, setBusy] = useState(false);
@@ -180,9 +183,13 @@ export default function SetupStudio({ tournamentId, divisionId, step: requestedS
                   busy={busy || save.status === 'saving'}
                   finalizing={studio.finalizing}
                   finalizeError={studio.finalizeError}
-                  onDraw={async (action) => { setBusy(true); try { await draw(action); } finally { setBusy(false); } }}
+                  progress={drawProgress}
+                  onDraw={async (action) => {
+                    setBusy(true);
+                    try { await runWithProgress(action === 'preview' ? 'preview' : 'draw', () => draw(action)); } finally { setBusy(false); }
+                  }}
                   onFinalize={async () => {
-                    const outcome = await finalize();
+                    const outcome = await runWithProgress('finalize', () => finalize());
                     if (!outcome.ok) return;
                     // D50: giải giao hữu sau chốt có link xem (không liệt kê) — hiện link trước khi vào bàn điều hành.
                     if (outcome.result?.publicUrl) setFinalized(outcome.result);

@@ -10,6 +10,7 @@ import { newIdempotencyKey } from '@/lib/tournamentV2Client';
 import GroupKnockoutConfig from './GroupKnockoutConfig';
 import KnockoutConfig from './KnockoutConfig';
 import DoubleElimConfig from './DoubleElimConfig';
+import FriendlyGuestPairs from '../friendly/FriendlyGuestPairs';
 
 const FORMAT_BLURB = {
   group_knockout: 'Chia bảng đấu vòng tròn, các cặp dẫn đầu vào vòng loại trực tiếp.',
@@ -192,10 +193,10 @@ function PairingBoard({ draft, roster, onChange, onAddPerson, stepResult, showEr
 }
 
 // Số sân (chuyển từ Bước 1 sang đây): biết số cặp + thể thức mới gợi ý được số sân.
-function CourtConfig({ draft, onChange, issue, showErrors, sectionKey }) {
+function CourtConfig({ draft, onChange, issue, showErrors, sectionKey, pairCount = draft.pairs.length }) {
   const base = useId();
   const courtCount = Number.isInteger(draft.tournament.courtCount) ? draft.tournament.courtCount : null;
-  const suggestion = suggestCourts({ formatKey: draft.format.formatKey, config: draft.format.config, pairCount: draft.pairs.length });
+  const suggestion = suggestCourts({ formatKey: draft.format.formatKey, config: draft.format.config, pairCount });
   const setCourts = (value) => onChange((current) => ({
     ...current,
     tournament: { ...current.tournament, courtCount: value === '' || value == null ? null : Math.max(1, Math.min(20, Number(value) || 1)) },
@@ -226,7 +227,7 @@ function CourtConfig({ draft, onChange, issue, showErrors, sectionKey }) {
         <div id={`${base}-suggest`} className="pc-court-suggest" aria-live="polite">
           {suggestion ? (
             <>
-              <p><strong>Gợi ý: {suggestion.suggested} sân</strong> cho {draft.pairs.length} cặp. {suggestion.reason}</p>
+              <p><strong>Gợi ý: {suggestion.suggested} sân</strong> cho {pairCount} cặp. {suggestion.reason}</p>
               {surplus ? <p className="pc-card__hint">Chỉ tối đa {suggestion.maxUseful} trận diễn ra cùng lúc — {courtCount - suggestion.maxUseful} sân sẽ để trống.</p> : null}
               {courtCount !== suggestion.suggested ? (
                 <button type="button" className="pc-btn pc-btn--sm pc-btn--soft" onClick={() => setCourts(suggestion.suggested)}>Dùng {suggestion.suggested} sân</button>
@@ -239,7 +240,7 @@ function CourtConfig({ draft, onChange, issue, showErrors, sectionKey }) {
   );
 }
 
-export default function StepFormatPairing({ draft, roster, readiness, showErrors, onChange, onGoToStep }) {
+export default function StepFormatPairing({ draft, roster, readiness, showErrors, onChange, onGoToStep, friendly = null, pairTotal = null }) {
   const base = useId();
   const stepResult = readiness.byStep[3];
   const formatIssue = stepResult.blockers.find((item) => item.field === 'format');
@@ -247,6 +248,10 @@ export default function StepFormatPairing({ draft, roster, readiness, showErrors
   const countIssue = stepResult.blockers.find((item) => item.code === 'PAIR_COUNT_BELOW_MINIMUM')
     || stepResult.warnings.find((item) => item.code === 'PAIR_COUNT_OUTSIDE_RECOMMENDED');
   const total = draft.participants.memberIds.length + draft.participants.guests.length;
+  // Giải giao hữu (FRD-03): tổng cặp = của bạn + CLB khách đã duyệt; blocker CLB có nút "Tới danh sách CLB".
+  const isFriendly = draft.tournament.organizerMode === 'friendly';
+  const pairCount = isFriendly && pairTotal != null ? pairTotal : draft.pairs.length;
+  const clubBlockers = isFriendly ? stepResult.blockers.filter((item) => item.field === 'clubs') : [];
 
   // Thứ tự: ghép cặp trước → biết số cặp → chọn thể thức → số sân (yêu cầu người dùng 2026-09-24).
   return (
@@ -264,16 +269,18 @@ export default function StepFormatPairing({ draft, roster, readiness, showErrors
 
       <section className="pc-card" aria-labelledby={`${base}-pairs`} data-section="pairs">
         <div className="pc-card__head">
-          <h3 id={`${base}-pairs`} className="pc-card__title"><span className="pc-section-key">A</span>Bảng ghép cặp thi đấu</h3>
+          <h3 id={`${base}-pairs`} className="pc-card__title"><span className="pc-section-key">A</span>{isFriendly ? 'Cặp của CLB bạn' : 'Bảng ghép cặp thi đấu'}</h3>
           <span className="pc-card__hint">{draft.pairs.length} cặp · không có danh sách dự bị</span>
         </div>
         <PairingBoard draft={draft} roster={roster} onChange={onChange} stepResult={stepResult} showErrors={showErrors} onAddPerson={() => onGoToStep(2)} />
       </section>
 
+      {isFriendly ? <FriendlyGuestPairs friendly={friendly} hostPairCount={draft.pairs.length} clubBlockers={clubBlockers} onGoToStep={onGoToStep} /> : null}
+
       <section className="pc-card" aria-labelledby={`${base}-format`} data-section="format">
         <div className="pc-card__head">
           <h3 id={`${base}-format`} className="pc-card__title"><span className="pc-section-key">B</span>Chọn thể thức thi đấu</h3>
-          {draft.pairs.length ? <span className="pc-card__hint">Đang có {draft.pairs.length} cặp</span> : null}
+          {pairCount ? <span className="pc-card__hint">Đang có {pairCount} cặp</span> : null}
         </div>
         <FormatCards draft={draft} onChange={onChange} />
         {formatIssue && showErrors ? (
@@ -295,7 +302,7 @@ export default function StepFormatPairing({ draft, roster, readiness, showErrors
         </div>
       ) : null}
 
-      <CourtConfig draft={draft} onChange={onChange} issue={courtIssue} showErrors={showErrors} sectionKey={draft.format.formatKey && draft.format.formatKey !== 'round_robin' ? 'D' : 'C'} />
+      <CourtConfig draft={draft} onChange={onChange} issue={courtIssue} showErrors={showErrors} pairCount={pairCount} sectionKey={draft.format.formatKey && draft.format.formatKey !== 'round_robin' ? 'D' : 'C'} />
     </>
   );
 }

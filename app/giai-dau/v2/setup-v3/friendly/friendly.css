@@ -159,3 +159,12 @@ li[data-selected] .fr-radio { border-color: var(--pc-brand-600); background: var
 .fr-gate__item small { color: var(--pc-muted); font-size: 0.75rem; }
 .fr-gate__icon { flex: none; display: grid; place-items: center; width: 1.5rem; height: 1.5rem; border-radius: 50%; background: #fff; font-size: 0.75rem; font-weight: 800; color: var(--pc-ok); }
 .fr-gate .pc-notice { margin-top: 0.75rem; }
+
+/* ---------- Cặp CLB khách (Bước 3) ---------- */
+.fr-guest-pairs { display: grid; gap: 0.75rem; }
+.fr-guest-pairs > .pc-card__head { margin-bottom: 0; }
+.fr-guest-club { display: grid; gap: 0.5rem; }
+.fr-guest-club__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.fr-guest-club__wait { margin: 0; padding: 0.75rem; border: 1px dashed var(--pc-border); border-radius: var(--pc-radius-lg); color: var(--pc-muted); }
+.fr-guest-pairs__note { margin: 0; color: var(--pc-muted); font-size: 0.75rem; }
+.fr-total { padding: 0.625rem 0.75rem; border: 1px solid var(--pc-brand-200); border-radius: var(--pc-radius-lg); background: var(--pc-brand-50); color: var(--pc-brand-700); }

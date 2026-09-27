@@ -10,6 +10,9 @@
   display: grid; gap: 0.75rem; max-width: 40rem; margin: 0 auto; padding: 0.75rem 0.75rem 6rem;
   color: var(--pc-text); font-family: var(--li-font), 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 0.875rem; line-height: 1.25rem;
 }
+.li-page { --li-app-nav: 0px; }
+/* Dưới 1120px app có thanh tab dính đáy (MobileBottomNav) — thanh hành động đứng trên nó. */
+@media (max-width: 1119px) { .li-page { --li-app-nav: var(--ph-bottom-nav-height, 78px); } }
 .li-page *, .li-page *::before, .li-page *::after { box-sizing: border-box; }
 .li-page button, .li-page input, .li-page textarea { font: inherit; color: inherit; }
 .li-page :focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.35); border-radius: var(--pc-radius); }
@@ -115,7 +118,7 @@
 .li-pair[data-over] { border-color: #fecaca; background: var(--pc-err-bg); }
 .li-pair__text { min-width: 0; overflow-wrap: anywhere; }
 .li-actionbar {
-  position: sticky; bottom: calc(var(--ph-bottom-nav-height, 0px) + env(safe-area-inset-bottom)); z-index: 20;
+  position: sticky; bottom: calc(var(--li-app-nav) + env(safe-area-inset-bottom)); z-index: 20;
   display: grid; gap: 0.5rem; padding: 0.75rem; border: 1px solid var(--pc-border); border-radius: var(--pc-radius-xl);
   background: rgba(255, 255, 255, 0.97); box-shadow: 0 -6px 16px rgba(15, 23, 42, 0.08);
 }
@@ -125,7 +128,7 @@
 .li-actionbar__hint { margin: 0; color: var(--pc-err); font-size: 0.75rem; text-align: center; }
 .li-list { display: grid; gap: 0.5rem; margin: 0; padding: 0; list-style: none; }
 .li-list li { padding: 0.625rem 0.75rem; border: 1px solid var(--pc-border); border-radius: var(--pc-radius-lg); background: var(--pc-bg); }
-.li-dialog-backdrop { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 1rem; background: rgba(15, 23, 42, 0.45); }
+.li-dialog-backdrop { position: fixed; inset: 0; z-index: 1250; display: grid; place-items: center; padding: 1rem; background: rgba(15, 23, 42, 0.45); }
 .li-dialog { display: grid; gap: 0.75rem; width: 100%; max-width: 26rem; padding: 1.25rem; border-radius: var(--pc-radius-xl); background: #fff; box-shadow: 0 20px 40px rgba(15, 23, 42, 0.2); text-align: center; }
 .li-dialog h2, .li-dialog p { margin: 0; }
 .li-dialog .li-icon { justify-self: center; }

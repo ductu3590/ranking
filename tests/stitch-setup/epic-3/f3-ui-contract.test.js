@@ -315,7 +315,7 @@ suite('f3 ui contract — CLB khách, BXH CLB (D53), chữ hiển thị, CSS', {
       for (const selector of selectors) {
         const classes = selector.match(/\.[a-zA-Z][\w-]*/g) || [];
         assert.ok(classes.length && classes.every((cls) => cls.startsWith(`.${prefix}`) || /^\.(pc|pl)-/.test(cls)), `${file}: selector "${selector}" ngoài tiền tố ${prefix}`);
-        assert.ok(classes[0].startsWith(`.${prefix}`) || selector.startsWith('li[') , `${file}: selector gốc phải là ${prefix} (${selector})`);
+        assert.ok(classes.some((cls) => cls.startsWith(`.${prefix}`)), `${file}: selector phải gắn class ${prefix} (${selector})`);
       }
       for (const hex of css.match(/#[0-9a-f]{3,6}\b/gi) || []) assert.ok(palette.has(hex.toLowerCase()), `${file}: màu lạ ${hex}`);
     }

@@ -83,7 +83,8 @@
 .fr-confirm p { margin: 0; }
 
 /* ---------- Sheet (mời CLB, duyệt danh sách) ---------- */
-.fr-layer { z-index: 60; }
+/* Trên thanh tab app (MobileBottomNav 1100) và drawer (1200), dưới chuông (1300): nút cuối sheet không bị che. */
+.pc-dialog-backdrop.fr-layer, .fr-sheet-backdrop.fr-layer { z-index: 1250; }
 .fr-sheet-backdrop {
   position: fixed; inset: 0; display: flex; align-items: flex-end; justify-content: center;
   background: rgba(15, 23, 42, 0.45);

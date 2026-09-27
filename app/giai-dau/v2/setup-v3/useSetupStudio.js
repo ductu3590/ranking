@@ -98,6 +98,11 @@ export function useSetupStudio({ tournamentId: initialTournamentId, divisionId: 
     try {
       const setup = await loadSetupDraft(current.tournamentId, current.divisionId);
       setFriendly(setup?.friendly || null);
+      // CLB khách vừa được duyệt/rút → server tính lại progress (completedThrough). Không có thay đổi chưa lưu thì
+      // nạp lại để bước mở đúng; reducer tự bỏ qua khi đang sửa/đang lưu/xung đột.
+      if (setup && !isDirty(saveRef.current)) {
+        dispatch({ type: 'hydrate', payload: { ...hydratePayload(setup, current.tournamentId, current.divisionId), savedAt: saveRef.current.lastSavedAt } });
+      }
       return setup?.friendly || null;
     } catch {
       return null;

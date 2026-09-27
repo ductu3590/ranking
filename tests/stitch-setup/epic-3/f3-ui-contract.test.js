@@ -199,7 +199,7 @@ suite('f3 ui contract — chủ nhà (dashboard, wizard, D46/D49/D51/D52)', {
     const ui = src(`${SETUP}/friendly/friendlyUi.js`);
     assert.ok(ui.includes('`${count} cặp (tối đa ${quota})`'));
     const editor = src('app/giai-dau/loi-moi/[id]/GuestRosterEditor.js');
-    assert.ok(editor.includes('pairCounterText(roster.pairs.length, quota)') && editor.includes('data-over={over || undefined}'));
+    assert.ok(editor.includes('pairCounterText(state.pairs.length, quota)') && editor.includes('data-over={over || undefined}'));
     const review = src(`${SETUP}/friendly/ClubReviewSheet.js`);
     assert.ok(review.includes('pairCounterText(count, club?.quota)'));
     for (const file of NEW_UI) assert.equal(/Còn trống|phải đủ|cần đủ/.test(src(file)), false, `${file} ngụ ý phải đủ hạn mức`);
@@ -245,15 +245,58 @@ suite('f3 ui contract — chủ nhà (dashboard, wizard, D46/D49/D51/D52)', {
 });
 
 suite('f3 ui contract — CLB khách, BXH CLB (D53), chữ hiển thị, CSS', {
-  'đăng ký cặp của CLB khách: chỉ thành viên CLB (không ô khách mời), ghép bằng chạm đúng hai người, không kéo-thả'() {
+  'đăng ký cặp của CLB khách (sau nghiệm thu): 2 cột "ghép = chọn", chỉ thành viên CLB, không bước chọn VĐV riêng, không kéo-thả'() {
     const editor = src('app/giai-dau/loi-moi/[id]/GuestRosterEditor.js');
     assert.equal(/khách mời|guest:|guests|Thêm khách/i.test(stripComments(editor)), false, 'không có khách mời trong đội CLB khách (D38)');
     assert.equal(/draggable|onDragStart|onDrop|dnd/i.test(editor), false);
-    assert.ok(editor.includes('Pairing.toggleSelection(current, ref)') && editor.includes('aria-pressed={pressed}'));
-    assert.ok(editor.includes("disabled={phase !== 'ready' || busy}") && editor.includes('Pairing.createPair(state, selection.first, selection.second, makePairId)'));
-    assert.ok(editor.includes('Chưa có hồ sơ thi đấu') && editor.includes('const disabled = !member.hasAthlete'), 'người thiếu hồ sơ không chọn được');
-    assert.ok(editor.includes('Chọn thêm một người') && editor.includes('Bỏ chọn người lẻ'), 'người lẻ: hai lựa chọn, không dự bị');
+    assert.ok(editor.includes("import * as Roster from '@/lib/tournament/guestRosterDraft'"), 'logic ghép ở hàm thuần');
+    assert.ok(editor.includes('Roster.toggleSelect(current, member.memberId') && editor.includes('aria-pressed={pressed}'));
+    assert.ok(editor.includes('disabled={!ready || busy}') && editor.includes('const ready = selection.length === 2 && !full;'), 'Ghép cặp chỉ bật khi chọn đúng 2 và chưa đủ hạn mức');
+    assert.ok(editor.includes('className="li-roster"') && editor.includes('Thành viên CLB') && editor.includes('Cặp đã ghép'), 'hai cột');
+    assert.ok(editor.includes('!paired.has(String(member.memberId))'), 'người đã vào cặp biến khỏi cột trái');
+    assert.ok(editor.includes('Chưa có hồ sơ thi đấu') && editor.includes('`Đã đủ ${state.pairs.length} cặp (tối đa)`'));
+    assert.equal(/Chọn thêm một người|Bỏ chọn người lẻ|Chưa ghép|Chọn toàn bộ|type="checkbox"/.test(editor), false, 'bỏ bước chọn VĐV + khái niệm người chưa ghép');
     assert.ok(editor.includes('Lưu nháp') && editor.includes('Gửi danh sách') && editor.includes('disabled={blockers.length > 0 || busy}'));
+    assert.ok(editor.includes('payload = () => Roster.toPayload(state)'));
+    const css = src('app/giai-dau/loi-moi/loi-moi.css');
+    assert.ok(css.includes('@media (min-width: 768px) { .li-roster { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }') && /\.li-composer \{\s*position: sticky;/.test(css));
+  },
+
+  'ghép = chọn (chạy thật lib/tournament/guestRosterDraft): chọn 2 → ghép → memberIds chỉ người trong cặp; đủ quota khoá; tách mở lại; nháp cũ không lỗi'() {
+    const R = lib('lib/tournament/guestRosterDraft.js');
+    const F = lib('lib/tournament/friendlyClubs.js');
+    const members = ['1', '2', '3', '4', '5'].map((id) => ({ memberId: id, name: `VĐV ${id}`, active: true, hasAthlete: true }))
+      .concat([{ memberId: '9', name: 'Chưa hồ sơ', active: true, hasAthlete: false }]);
+    let n = 0;
+    const makeId = () => `p${++n}`;
+    let state = R.fromSaved({});
+    assert.equal(R.rosterBlockers(state, { quota: 2, members })[0].code, 'FRIENDLY_ROSTER_EMPTY', '0 cặp không gửi được');
+    let selection = R.toggleSelect([], '1', { state, member: members[0], quota: 2 });
+    selection = R.toggleSelect(selection, '2', { state, member: members[1], quota: 2 });
+    assert.deepEqual(R.toggleSelect(selection, '3', { state, member: members[2], quota: 2 }), ['1', '2'], 'tối đa 2 người');
+    assert.deepEqual(R.toggleSelect([], '9', { state, member: members[5], quota: 2 }), [], 'thiếu hồ sơ không chọn được');
+    state = R.pairSelected(state, selection, { makeId, quota: 2 });
+    let payload = R.toPayload(state);
+    assert.deepEqual(payload.memberIds, ['1', '2']);
+    assert.deepEqual(payload.unpairedRefs, []);
+    assert.ok(F.validateClubRosterForSave(payload).ok && F.validateClubRosterForSubmit(payload, { quota: 2, members: Object.fromEntries(members.map((m) => [m.memberId, m])) }).ok, 'gửi được khi ≥ 1 cặp');
+    assert.equal(R.canSelect(state, members[0], 2), false, 'người đã trong cặp không chọn lại');
+    state = R.pairSelected(state, ['3', '4'], { makeId, quota: 2 });
+    assert.equal(R.isFull(state, 2), true);
+    assert.equal(R.canSelect(state, members[4], 2), false, 'đủ quota → khoá chọn');
+    assert.equal(R.pairSelected(state, ['5', '1'], { makeId, quota: 2 }), state, 'đủ quota → không ghép thêm');
+    state = R.splitPair(state, 'p1');
+    assert.equal(R.isFull(state, 2), false);
+    assert.equal(R.canSelect(state, members[0], 2), true, 'tách → mở lại, người về cột trái');
+    assert.deepEqual(R.toPayload(state).memberIds, ['3', '4']);
+    assert.equal(R.isFull({ pairs: [{ pairId: 'a', participantRefs: ['member:1', 'member:2'] }] }, null), false, 'không quota → không giới hạn');
+    const legacy = { memberIds: ['1', '2', '3'], pairs: [{ pairId: 'old', participantRefs: ['member:1', 'member:2'] }], unpairedRefs: ['member:3'] };
+    const fromLegacy = R.fromSaved(legacy);
+    assert.deepEqual(fromLegacy.pairs.map((pair) => pair.pairId), ['old']);
+    assert.equal(R.canSelect(fromLegacy, members[2], 3), true, 'người chưa ghép của nháp cũ quay về cột trái');
+    assert.equal(R.savedNeedsRewrite(legacy), true, 'nháp cũ → lần lưu kế tiếp ghi shape mới');
+    assert.deepEqual(R.toPayload(fromLegacy).memberIds, ['1', '2']);
+    assert.equal(R.savedNeedsRewrite(R.toPayload(fromLegacy)), false);
   },
 
   'chi tiết lời mời: nút theo invitation.actions; gửi = lưu trước rồi submit; xung đột version; rời trang khi chưa lưu'() {
@@ -289,6 +332,24 @@ suite('f3 ui contract — CLB khách, BXH CLB (D53), chữ hiển thị, CSS', {
     assert.ok(card.includes("'CLB khách'") && !/Khách mời/.test(card), 'CLB khách không gắn nhãn "Khách mời"');
     const chip = src('app/giai-dau/v2/console/friendly/ClubChip.js');
     assert.ok(chip.includes('CLUB_CHIP_MAX = 14') && chip.includes('title={String(name)}'));
+  },
+
+  'bàn điều hành (sau nghiệm thu): "Tiến độ giải" + nhãn trạng thái theo board mới nhất của mục con, không gọi thêm API'() {
+    const shell = src('app/giai-dau/v2/console/TournamentConsoleV2.js');
+    assert.ok(shell.includes('const syncFromBoard = useCallback((next) => {') && shell.includes('progress: next.progress'));
+    assert.ok(shell.includes('status: next.tournamentStatus'), 'nhãn "Chờ diễn ra/Đang diễn ra/Đã kết thúc" cùng nguồn');
+    for (const tag of ['<ControlCenter', '<MatchesView', '<BracketStandings']) {
+      const at = shell.indexOf(tag);
+      assert.ok(at > 0 && shell.slice(at, shell.indexOf('/>', at)).includes('onBoard={syncFromBoard}'), `${tag} báo board lên shell`);
+    }
+    assert.ok(shell.includes('progress={board?.progress}'));
+    for (const file of ['control/ControlCenter.js', 'matches/MatchesView.js', 'bracket/BracketStandings.js']) {
+      const text = src(`app/giai-dau/v2/console/${file}`);
+      const load = text.slice(text.indexOf('const load = useCallback'), text.indexOf('}, [', text.indexOf('const load = useCallback')));
+      assert.ok(/getOperationsBoard\(tournamentId\)/.test(load) && load.includes('if (onBoard) onBoard(next);'), `${file}: mỗi lần tải board (sau lưu/chốt/polling) báo lên shell`);
+    }
+    const shellLoad = shell.slice(shell.indexOf('const syncFromBoard'), shell.indexOf('useEffect(', shell.indexOf('const syncFromBoard')));
+    assert.equal(/getCourtBoard|listTournaments|getOperationsBoard/.test(shellLoad), false, 'đồng bộ không gọi API');
   },
 
   'chữ hiển thị: không tiếng Anh cấm, không chữ Stitch tự thêm, không mã lỗi thô'() {

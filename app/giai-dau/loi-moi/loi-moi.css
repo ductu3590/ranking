@@ -99,20 +99,18 @@
 }
 .li-members { display: grid; margin: 0; padding: 0; list-style: none; }
 .li-members li + li { border-top: 1px solid var(--pc-border); }
-.li-members li[data-disabled] { opacity: 0.55; }
-.li-member { display: flex; align-items: center; gap: 0.625rem; min-height: 48px; padding: 0.25rem 0; cursor: pointer; }
-.li-member input { width: 1.25rem; height: 1.25rem; accent-color: var(--pc-brand-600); }
+.li-member {
+  display: flex; align-items: center; gap: 0.625rem; width: 100%; min-height: 48px; padding: 0.25rem 0.5rem;
+  border: 0; border-radius: var(--pc-radius); background: none; text-align: left; cursor: pointer;
+}
+.li-member[aria-pressed='true'] { background: var(--pc-brand-50); box-shadow: inset 0 0 0 2px var(--pc-brand-600); }
+.li-member[aria-pressed='true'] .li-avatar { background: var(--pc-brand-600); color: #fff; }
+.li-member:disabled { cursor: not-allowed; opacity: 0.55; }
 .li-member__name { display: grid; flex: 1; min-width: 0; }
 .li-member__name small { color: var(--pc-muted); font-size: 0.75rem; }
 .li-avatar { flex: none; display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%; background: var(--pc-brand-50); color: var(--pc-brand-700); font-weight: 800; font-size: 0.8125rem; }
-.li-tag { padding: 0 0.375rem; border: 1px solid var(--pc-warn-border); border-radius: 999px; background: var(--pc-warn-bg); color: var(--pc-warn); font-size: 0.6875rem; font-weight: 700; }
 .li-counter { padding: 0.0625rem 0.5rem; border: 1px solid var(--pc-brand-200); border-radius: 999px; background: var(--pc-brand-50); color: var(--pc-brand-700); font-size: 0.75rem; font-weight: 700; white-space: nowrap; }
 .li-counter[data-over] { border-color: #fecaca; background: var(--pc-err-bg); color: var(--pc-err); }
-.li-pool { display: grid; gap: 0.5rem; padding: 0.75rem; border: 1px solid var(--pc-border); border-radius: var(--pc-radius-lg); background: var(--pc-bg); }
-.li-pool__title { margin: 0; color: var(--pc-muted); font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
-.li-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0; padding: 0; list-style: none; }
-.li-chip { min-height: 44px; padding: 0 0.875rem; border: 1px solid var(--pc-border); border-radius: var(--pc-radius); background: #fff; font-weight: 600; cursor: pointer; }
-.li-chip[aria-pressed='true'] { border: 2px solid var(--pc-brand-600); background: var(--pc-brand-50); color: var(--pc-brand-700); }
 .li-pairs { display: grid; gap: 0.5rem; margin: 0; padding: 0; list-style: none; }
 .li-pair { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; min-height: 48px; padding: 0.375rem 0.5rem 0.375rem 0.75rem; border: 1px solid var(--pc-border); border-radius: var(--pc-radius-lg); background: var(--pc-bg); }
 .li-pair[data-over] { border-color: #fecaca; background: var(--pc-err-bg); }
@@ -132,3 +130,17 @@
 .li-dialog { display: grid; gap: 0.75rem; width: 100%; max-width: 26rem; padding: 1.25rem; border-radius: var(--pc-radius-xl); background: #fff; box-shadow: 0 20px 40px rgba(15, 23, 42, 0.2); text-align: center; }
 .li-dialog h2, .li-dialog p { margin: 0; }
 .li-dialog .li-icon { justify-self: center; }
+
+/* ---------- Ghép = chọn (sau nghiệm thu F3): 2 cột trên PC, trên/dưới ở 390px ---------- */
+.li-page { --li-app-header: 0px; }
+@media (max-width: 1119px) { .li-page { --li-app-header: 80px; } }
+.li-roster { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.75rem; align-items: start; }
+@media (min-width: 768px) { .li-roster { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.li-composer {
+  position: sticky; top: calc(var(--li-app-header) + 0.5rem); z-index: 5;
+  display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.5rem 0.5rem 0.75rem;
+  border: 1px solid var(--pc-brand-200); border-radius: var(--pc-radius-lg); background: var(--pc-brand-50);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+}
+.li-composer__names { min-width: 0; font-weight: 700; overflow-wrap: anywhere; }
+.li-counter[data-full] { border-color: #a7f3d0; background: var(--pc-ok-bg); color: var(--pc-ok); }

@@ -38,6 +38,8 @@ function panelStyleFor(button) {
    - thong bao giai dau (tournament_invitation / tournament_roster_review): route da chieu `display`
      { title, body, href, actionLabel } -> tieu de, noi dung, link toi loi moi / buoc duyet.
    - kind khac chua biet: chi tieu de chung + Bo qua (khong hien thanh dong so tien). */
+const TOURNAMENT_KINDS = new Set(['tournament_invitation', 'tournament_roster_review']);
+
 function NotificationItem({ item, onAssign, onDismiss, onNavigate }) {
     if (item.kind === 'unassigned_transaction') {
         return <div className="ph-notification-item">
@@ -51,7 +53,10 @@ function NotificationItem({ item, onAssign, onDismiss, onNavigate }) {
     }
     const display = item.display;
     return <div className="ph-notification-item" data-kind={item.kind || undefined}>
-        <p className="ph-notification-item__amount">{display?.title || 'Việc cần xử lý'}</p>
+        <p className="ph-notification-item__amount">
+            {TOURNAMENT_KINDS.has(item.kind) ? <span aria-hidden="true">🏆 </span> : null}
+            {display?.title || 'Việc cần xử lý'}
+        </p>
         {display?.body ? <p className="ph-notification-item__raw">{display.body}</p> : null}
         <div className="ph-notification-item__actions">
             {display?.href ? <Link href={display.href} className="ph-btn ph-btn--primary ph-btn--sm" onClick={onNavigate}>

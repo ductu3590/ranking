@@ -138,3 +138,14 @@ Một hàng `pg_proc` duy nhất cho `finalize_internal_setup_v4` (không sinh o
 
 Không chạy DROP/TRUNCATE/DELETE/UPDATE nào trên dữ liệu thật; group 1 không bị đụng (host kiểm thử là group 59, khách
 CLB 19 + group tạm chỉ trong transaction đã ROLLBACK). Không sửa code.
+
+## Nghiệm thu Epic 3 — PASS (2026-09-28)
+
+Người dùng chạy browser trên server Epic 3 (localhost:3200, worktree `ranking-epic3`), CLB 59 chủ nhà + CLB 19 khách, tới hết giải (giải 256 "Giao huu POC" loại kép 24/24 trận, 257, 258). Kết luận của người dùng: **"Epic 3 PASS"**.
+
+Sửa trong vòng nghiệm thu:
+- Màn đăng ký cặp CLB khách → 2 cột, "ghép = chọn", đủ hạn mức thì khoá (`7f3c1af`).
+- Ô "Tiến độ giải" + nhãn trạng thái ở shell bàn điều hành không cập nhật khi lưu tỉ số — lỗi có từ Epic 2 (`e777aa3`).
+- Thanh tiến độ % khi bốc thăm / bốc lại / cập nhật xem trước / chốt, mọi thể thức (`3d4c64e`…`4ff8dd2`); lỗi không hiện dưới React Strict Mode (`c99a36b`).
+
+Migration: 110 và 111 đã apply production (mục F1, F2 ở trên). Test: `node tests/stitch-setup/run-all.js` 47/48 — chỉ đỏ `epic-1/ui-contract` (CRLF trên Windows, có từ trước; xanh khi checkout LF).

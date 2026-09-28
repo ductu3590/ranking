@@ -63,6 +63,12 @@ suite('thanh tiến độ bốc thăm — component, gắn 4 hành động, CSS'
     assert.ok(studio.includes('setBusy(true);') && studio.includes('finally { setBusy(false); }'), 'nút bị khoá trong lúc chạy');
   },
 
+  'hook: cờ alive bật lại khi mount (Strict Mode dev mount → cleanup → mount, không được kẹt false)'() {
+    const hook = src(`${SETUP}/DrawProgress.js`);
+    assert.ok(/useEffect\(\(\) => \{\s*alive\.current = true;\s*return \(\) => \{ alive\.current = false; \};\s*\}, \[\]\);/.test(hook), 'effect phải đặt alive.current = true khi mount');
+    assert.equal(hook.includes('useEffect(() => () => { alive.current = false; }, []);'), false, 'không còn effect chỉ tắt cờ');
+  },
+
   'CSS: token DESIGN.md sáng, không nền tối của mẫu gốc, có prefers-reduced-motion, rãnh ≤ 500px'() {
     const css = src(`${SETUP}/studio.css`);
     const block = css.slice(css.indexOf('/* ---------- Thanh tiến độ %'));

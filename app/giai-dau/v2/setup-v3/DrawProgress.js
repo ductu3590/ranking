@@ -10,7 +10,11 @@ const sleep = (ms) => new Promise((resolve) => { setTimeout(resolve, ms); });
 export function useDrawProgress() {
   const [progress, setProgress] = useState(null);
   const alive = useRef(true);
-  useEffect(() => () => { alive.current = false; }, []);
+  // Bật lại khi mount: Strict Mode (dev) chạy mount → cleanup → mount, nếu chỉ tắt ở cleanup thì cờ kẹt false.
+  useEffect(() => {
+    alive.current = true;
+    return () => { alive.current = false; };
+  }, []);
 
   const run = useCallback(async (action, task) => {
     const startedAt = Date.now();

@@ -11,6 +11,7 @@ import { loadMemberContext, setupView as buildSetupView, todayInVietnam } from '
 import { actorName } from '@/lib/tournament/actorName';
 import { normalizeParticipants } from '@/lib/tournament/setupParticipants';
 import { resolveRepairMode, normalizeRepairReport } from '@/lib/tournament/legacyPairRepair';
+import { friendlySetupView, loadFriendlyContext, loadFriendlyTournament } from '@/lib/tournament/friendlyServer';
 
 // Xung dot nghiep vu nay ERRCODE 'PH409' (migration 078). Truoc day dung 40001,
 // nhung 40001 la serialization_failure nen tang tren tu dong retry va request treo.
@@ -137,7 +138,12 @@ export async function GET(request) {
             invitedSystemIds.length ? db.from('groups').select('id, name').in('id', invitedSystemIds) : Promise.resolve({ data: [] }),
             invitedExternalIds.length ? db.from('tournament_external_clubs').select('id, name').eq('group_id', Number(groupId)).in('id', invitedExternalIds) : Promise.resolve({ data: [] }),
         ]);
-        const setup = await buildSetupView(db, groupId, division.setup_draft);
+        // Giải giao hữu (Epic 3 F2 §3.5): luật bước theo cặp hiệu lực + khối `friendly` chỉ tên/trạng thái/số cặp.
+        const friendlyTournament = await loadFriendlyTournament(db, { groupId, tournamentId: Number(tournamentId) });
+        const friendly = await loadFriendlyContext(db, {
+            groupId, tournamentId: Number(tournamentId), draft: normalizeDraft(division.setup_draft), tournament: friendlyTournament,
+        });
+        const setup = await buildSetupView(db, groupId, division.setup_draft, { friendly });
         const invitedSystemNames = new Map((invitedSystemResult.data || []).map((row) => [String(row.id), row.name]));
         const invitedExternalNames = new Map((invitedExternalResult.data || []).map((row) => [String(row.id), row.name]));
         return NextResponse.json({
@@ -162,6 +168,7 @@ export async function GET(request) {
             pairs: (pairs || []).map((pair) => ({ ...pair, members: membersByPair.get(pair.id) || [], entry_id: (entries || []).find((entry) => entry.pair_id === pair.id)?.id || null })),
             entries: entries || [],
             stages: stages || [],
+            ...(friendly ? { friendly: friendlySetupView(friendly, { tournament: friendlyTournament, rosterLockStatus: division.roster_lock_status }) } : {}),
         });
     } catch (err) {
         console.error('Setup GET error:', err);
@@ -211,6 +218,16 @@ export async function POST(request) {
             let ctx;
             try {
                 ctx = { members: await loadMemberContext(db, groupId, payload.participants.memberIds), today: todayInVietnam() };
+                // Giải đã tồn tại: loại giải chốt một lần lúc tạo (Epic 3 F2 §3.1) — không gọi RPC khi lệch.
+                if (validId(tournamentId)) {
+                    const existing = await loadFriendlyTournament(db, { groupId, tournamentId: Number(tournamentId) });
+                    const currentMode = existing?.settings?.organizer_mode || 'internal';
+                    if (existing && ['internal', 'friendly'].includes(currentMode) && payload.tournament.organizerMode !== currentMode) {
+                        return setupIssueError('ORGANIZER_MODE_LOCKED', 409);
+                    }
+                    const friendly = await loadFriendlyContext(db, { groupId, tournamentId: Number(tournamentId), draft: payload, tournament: existing });
+                    if (friendly) ctx = { ...ctx, friendly };
+                }
             } catch (contextError) {
                 return NextResponse.json({ error: contextError.message, code: 'SETUP_READ_FAILED' }, { status: 500 });
             }
@@ -251,6 +268,15 @@ export async function POST(request) {
         }
 
         if (action === 'replace_invited_clubs') {
+            // Luồng v3: lời mời CLB không còn nằm trong bản nháp (Epic 3 F1) — đi POST/PATCH /clubs (RPC friendly_*).
+            // RPC 090 chèn tournament_clubs không qua hạn mức D46 → khoá với mọi division đã có bản nháp v3.
+            const { data: draftDivision, error: draftDivisionError } = await db.from('tournament_divisions')
+                .select('id, draft_version:setup_draft->>draftVersion')
+                .eq('id', Number(divisionId)).eq('group_id', Number(groupId)).eq('tournament_id', Number(tournamentId)).maybeSingle();
+            if (draftDivisionError) return mutationError(draftDivisionError);
+            if (Number(draftDivision?.draft_version) >= 3) {
+                return NextResponse.json({ error: messageFor('SETUP_ACTION_RETIRED').text, code: 'SETUP_ACTION_RETIRED' }, { status: 410 });
+            }
             const invitedClubs = body?.invited_clubs ?? body?.invitedClubs;
             if (!Array.isArray(invitedClubs)) {
                 return NextResponse.json({ error: 'invited_clubs phải là mảng CLB được mời', code: 'SETUP_PAYLOAD_INVALID' }, { status: 400 });

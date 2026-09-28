@@ -1,10 +1,11 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { getOperationsBoard, getStandings } from '@/lib/tournamentV2Client';
+import { getFriendlyStandings, getOperationsBoard, getStandings } from '@/lib/tournamentV2Client';
 import BracketView from '../../shared/BracketView';
 import { GroupTables, FinalRanking } from '../../shared/StandingsView';
 import ScoreSheet from '../control/ScoreSheet';
+import ClubStandingsCard from '../friendly/ClubStandingsCard';
 import { runStageAction, stageActionLabel } from '../stageAction';
 import '../control/control.css';
 import './bracket-standings.css';
@@ -72,25 +73,35 @@ function FinishCard({ board, tournamentId, isAdmin, onDone }) {
   </aside>;
 }
 
-export default function BracketStandings({ tournamentId, isAdmin, onChanged }) {
+export default function BracketStandings({ tournamentId, isAdmin, onChanged, onBoard, friendly = false }) {
   const [board, setBoard] = useState(null);
   const [standings, setStandings] = useState({});
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [tab, setTab] = useState(null);
   const [sheet, setSheet] = useState(null);
+  // Giải giao hữu (D53): chỉ bổ sung BXH tổng CLB, tải lại cùng nhịp với BXH cặp. Giải nội bộ không gọi.
+  const [clubStandings, setClubStandings] = useState(null);
+  const [clubError, setClubError] = useState('');
 
   const load = useCallback(async () => {
     try {
       const next = await getOperationsBoard(tournamentId);
       const entries = await Promise.all((next.stages || []).map((stage) => getStandings(stage.id).then((data) => [stage.id, data]).catch(() => [stage.id, null])));
       setBoard(next);
+      // Shell (Tiến độ giải, nhãn trạng thái) dùng cùng board — không gọi thêm API.
+      if (onBoard) onBoard(next);
       setStandings(Object.fromEntries(entries));
       setError('');
+      if (friendly) {
+        getFriendlyStandings({ tournamentId })
+          .then((data) => { setClubStandings(data); setClubError(''); })
+          .catch((clubLoadError) => setClubError(clubLoadError.message || 'Không tải được xếp hạng CLB.'));
+      }
     } catch (loadError) {
       setError(loadError.message || 'Không tải được sơ đồ và xếp hạng.');
     }
-  }, [tournamentId]);
+  }, [tournamentId, friendly, onBoard]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -142,6 +153,7 @@ export default function BracketStandings({ tournamentId, isAdmin, onChanged }) {
       <p className="bs-foot ops-muted">Cặp thắng được tự điền vào trận kế tiếp ngay khi chốt tỉ số · Số trận đã chốt: {board.progress.finalized}/{board.progress.total}</p>
     </section> : <div className="bs-standings">
       <div className="bs-main">
+        {friendly ? <ClubStandingsCard standings={clubStandings} loading={!clubStandings && !clubError} error={clubError} onRetry={load} /> : null}
         {groupStages.map((stage) => {
           const data = standings[stage.id];
           const stageDone = stage.status === 'completed' || board.schedule.filter((group) => String(group.stageId) === String(stage.id)).every((group) => group.counts.finalized === group.counts.total);

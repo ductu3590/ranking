@@ -1,0 +1,62 @@
+/* Chip CLB + bảng xếp hạng tổng CLB của giải giao hữu (Epic 3 F3, Stitch FRD-07/08).
+   Dùng chung ở bàn điều hành, trang công khai và màn thiết lập → mọi token có giá trị dự phòng theo DESIGN.md. */
+
+.fr-club-chip {
+  --fr-club: #7c3aed;
+  display: inline-flex; align-items: center; gap: 0.3rem; max-width: 100%;
+  padding: 0.1rem 0.5rem; border: 1px solid var(--pc-border, #e2e8f0); border-radius: 999px;
+  background: var(--pc-card, #ffffff); color: var(--pc-text, #0f172a);
+  font-size: 0.6875rem; font-weight: 600; line-height: 1.1rem; white-space: nowrap; vertical-align: middle;
+}
+.fr-club-chip > i { flex: none; width: 0.45rem; height: 0.45rem; border-radius: 50%; background: var(--fr-club); }
+.fr-club-chip > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+
+.fr-standings-card {
+  display: grid; gap: 0.75rem; padding: 1rem;
+  border: 1px solid var(--pc-border, #e2e8f0); border-radius: var(--pc-radius-xl, 1rem);
+  background: var(--pc-card, #ffffff); box-shadow: var(--pc-shadow, 0 1px 2px rgba(15, 23, 42, 0.06));
+}
+.fr-standings-card__head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.fr-standings-card__head h2 {
+  display: flex; align-items: center; gap: 0.5rem; margin: 0;
+  font-size: 0.8125rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase;
+}
+.fr-standings-card__head h2 i { width: 0.55rem; height: 0.55rem; border-radius: 50%; background: var(--pc-brand-600, #7c3aed); }
+.fr-standings-card__tag {
+  padding: 0.1rem 0.5rem; border: 1px solid #a7f3d0; border-radius: 999px;
+  background: var(--pc-ok-bg, #ecfdf5); color: var(--pc-ok, #047857); font-size: 0.6875rem; font-weight: 700;
+}
+
+.fr-h2h { display: grid; gap: 0.6rem; }
+.fr-h2h__row { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 0.5rem; }
+.fr-h2h__side { display: grid; justify-items: start; gap: 0.2rem; min-width: 0; }
+.fr-h2h__side--right { justify-items: end; }
+.fr-h2h__side small { color: var(--pc-muted, #64748b); font-size: 0.6875rem; }
+.fr-h2h__score { display: flex; align-items: baseline; gap: 0.35rem; font-variant-numeric: tabular-nums; }
+.fr-h2h__score b { font-size: 2rem; line-height: 2.25rem; font-weight: 800; }
+.fr-h2h__score span { color: var(--pc-subtle, #94a3b8); font-size: 1.25rem; }
+.fr-h2h__meta {
+  margin: 0; padding: 0.5rem 0.75rem; border-radius: var(--pc-radius-lg, 0.75rem);
+  background: var(--pc-bg, #f8fafc); text-align: center; font-size: 0.8125rem; font-weight: 700;
+}
+
+.fr-standings-wrap { overflow-x: auto; }
+.fr-standings { width: 100%; border-collapse: collapse; font-size: 0.8125rem; }
+.fr-standings th {
+  padding: 0.4rem 0.5rem; background: var(--pc-bg, #f8fafc); color: var(--pc-muted, #64748b);
+  font-size: 0.6875rem; font-weight: 700; text-align: left; white-space: nowrap;
+}
+.fr-standings td { padding: 0.5rem; border-top: 1px solid var(--pc-border, #e2e8f0); font-variant-numeric: tabular-nums; }
+.fr-standings td.fr-up { color: var(--pc-ok, #047857); font-weight: 700; }
+.fr-standings td.fr-down { color: var(--pc-err, #b91c1c); font-weight: 700; }
+.fr-rank {
+  display: inline-grid; place-items: center; width: 1.5rem; height: 1.5rem; border-radius: 50%;
+  background: var(--pc-brand-50, #f5f3ff); color: var(--pc-brand-700, #6d28d9); font-weight: 700; font-size: 0.75rem;
+}
+
+.fr-muted { margin: 0; color: var(--pc-muted, #64748b); font-size: 0.8125rem; }
+.fr-note { margin: 0; color: var(--pc-muted, #64748b); font-size: 0.75rem; }
+.fr-link {
+  min-height: 44px; padding: 0 0.25rem; border: 0; background: none; color: var(--pc-brand-600, #7c3aed);
+  font: inherit; font-weight: 700; cursor: pointer;
+}

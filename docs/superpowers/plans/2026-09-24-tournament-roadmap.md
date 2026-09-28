@@ -49,6 +49,8 @@ Tham khảo mã nguồn mở (chỉ học ý tưởng, không chép code): tài 
 
 ### Epic 3 — Giải giao hữu liên CLB (~2 lát)
 
+- **Trạng thái (2026-09-28): nghiệm thu PASS.** Spec `docs/superpowers/specs/2026-09-25-epic-3-friendly/`, quyết định D38–D53 (ADR-007), bằng chứng `_workspace/epic-3-friendly/evidence.md`, migration 110 + 111 đã apply.
+
 - **Phạm vi:** `organizerMode: 'friendly'`; CLB chủ nhà tạo giải và mời CLB (hạn mức); **admin CLB khách tự đăng ký** thành viên của mình (D18); **cặp chỉ trong cùng CLB** (D17); chủ nhà duyệt; chốt giải qua cùng pipeline plan → finalize (hàm SQL kiểm thành viên theo đúng group của từng CLB).
 - **Thiết kế:** bản nháp v3 thêm chiều CLB cho người tham gia/cặp (hoặc tách phần đăng ký của CLB khách thành bảng đăng ký riêng, bản nháp của chủ nhà chỉ tham chiếu). Quyền truy cập chéo CLB qua `requireTournamentAccess` + scope `group_id`; rà lại `interclub.js`.
 - **Rủi ro:** bảo mật đa CLB (RLS, không lộ danh sách thành viên CLB khác), cạnh tranh ghi khi nhiều CLB đăng ký cùng lúc.

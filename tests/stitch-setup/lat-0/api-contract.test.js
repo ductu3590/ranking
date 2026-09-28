@@ -53,7 +53,8 @@ suite('api contract lát 0', {
   },
 
   'GET: trả khối setup (draft v3 + progress + resumeStep + readiness)'() {
-    assert.ok(setup.includes('const setup = await buildSetupView(db, groupId, division.setup_draft)'));
+    // Epic 3 F2: thêm tuỳ chọn { friendly } (null với giải nội bộ → view như cũ).
+    assert.ok(/const setup = await buildSetupView\(db, groupId, division\.setup_draft(, \{ friendly \})?\)/.test(setup));
     assert.ok(/draft: \{ \.\.\.draft, progress: \{ completedThrough \}, currentStep: resumeStep \}/.test(server));
   },
 

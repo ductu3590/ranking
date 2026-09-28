@@ -3,6 +3,7 @@
 import { useId, useMemo, useState } from 'react';
 import { messageFor } from '@/lib/tournament/setupMessages';
 import { newIdempotencyKey } from '@/lib/tournamentV2Client';
+import FriendlyClubsPanel from '../friendly/FriendlyClubsPanel';
 
 function initials(name) {
   const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
@@ -55,7 +56,19 @@ function GuestRow({ guest, warning, onRename, onRemove }) {
   );
 }
 
-export default function StepParticipants({ draft, roster, rosterLoading, readiness, showErrors, onChange }) {
+// Giải giao hữu (Epic 3 F3 §3.2, D49): không có khách mời ở cả phía chủ nhà — ẩn khu "Khách mời"; bản nháp cũ còn
+// khách thì hiện blocker kèm nút xoá. Dưới danh sách thành viên là khu "CLB tham dự".
+function FriendlyGuestBlocker({ guests, onClear }) {
+  if (!guests.length) return null;
+  return (
+    <div className="pc-notice pc-notice--error" role="alert" data-code="FRIENDLY_HOST_GUEST_NOT_ALLOWED" style={{ flexDirection: 'column' }}>
+      <p>{messageFor('FRIENDLY_HOST_GUEST_NOT_ALLOWED', { count: guests.length }).text}</p>
+      <div className="pc-btn-row"><button type="button" className="pc-btn pc-btn--sm pc-btn--danger" onClick={onClear}>Xoá {guests.length} khách mời</button></div>
+    </div>
+  );
+}
+
+export default function StepParticipants({ draft, roster, rosterLoading, readiness, showErrors, onChange, friendly = null, tournamentId = null, onFriendlyChanged }) {
   const base = useId();
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState('active');
@@ -99,6 +112,8 @@ export default function StepParticipants({ draft, roster, rosterLoading, readine
   const memberBlockers = stepResult.blockers.filter((item) => item.field === 'participants' && (showErrors || item.code !== 'ROSTER_EMPTY'));
   const inactiveWarning = stepResult.warnings.find((item) => item.code === 'INACTIVE_MEMBER_SELECTED');
   const total = draft.participants.memberIds.length + guests.length;
+  const isFriendly = draft.tournament.organizerMode === 'friendly';
+  const colors = Object.fromEntries((friendly?.clubs || []).map((club) => [String(club.tournamentClubId), club.color]));
 
   return (
     <>
@@ -107,7 +122,9 @@ export default function StepParticipants({ draft, roster, rosterLoading, readine
           <div>
             <p className="pc-eyebrow">Quản lý VĐV thi đấu</p>
             <h2 id={`${base}-title`} className="pc-hero-title">Danh sách người tham gia</h2>
-            <p className="pc-lead">Chọn thành viên CLB và thêm khách mời. Mọi người được chọn đều là VĐV thi đấu chính thức; không có danh sách dự bị.</p>
+            <p className="pc-lead">{isFriendly
+              ? 'Chọn thành viên CLB bạn và mời CLB khác. CLB khách tự chọn người và gửi danh sách cặp.'
+              : 'Chọn thành viên CLB và thêm khách mời. Mọi người được chọn đều là VĐV thi đấu chính thức; không có danh sách dự bị.'}</p>
           </div>
           <span className="pc-badge pc-badge--brand" aria-live="polite">{total} VĐV đã chọn</span>
         </div>
@@ -115,7 +132,7 @@ export default function StepParticipants({ draft, roster, rosterLoading, readine
 
       <section className="pc-card" aria-labelledby={`${base}-roster`}>
         <div className="pc-card__head">
-          <h3 id={`${base}-roster`} className="pc-card__title">1. Thành viên CLB <span className="pc-badge pc-badge--muted">{selected.size} đã chọn</span></h3>
+          <h3 id={`${base}-roster`} className="pc-card__title">{isFriendly ? '1. Thành viên CLB của bạn' : '1. Thành viên CLB'} <span className="pc-badge pc-badge--muted">{selected.size} đã chọn</span></h3>
           <div className="pc-segmented" role="group" aria-label="Lọc thành viên">
             <button type="button" aria-pressed={filter === 'active'} onClick={() => setFilter('active')}>Đang hoạt động ({activeIds.length})</button>
             <button type="button" aria-pressed={filter === 'all'} onClick={() => setFilter('all')}>Tất cả ({(roster || []).length})</button>
@@ -178,6 +195,22 @@ export default function StepParticipants({ draft, roster, rosterLoading, readine
         </div>
       </section>
 
+      {isFriendly ? (
+        <>
+          <FriendlyGuestBlocker guests={guests} onClear={() => setGuests([])} />
+          {tournamentId ? (
+            <FriendlyClubsPanel
+              tournamentId={tournamentId}
+              hostClub={friendly?.hostClub || null}
+              colors={colors}
+              selectedCount={draft.participants.memberIds.length}
+              onChanged={onFriendlyChanged}
+            />
+          ) : (
+            <div className="pc-notice pc-notice--info"><p>Lưu bản nháp để mời CLB khác.</p></div>
+          )}
+        </>
+      ) : (
       <section className="pc-card" aria-labelledby={`${base}-guests`}>
         <div className="pc-card__head">
           <h3 id={`${base}-guests`} className="pc-card__title">2. Khách mời <span className="pc-badge pc-badge--muted">{guests.length} khách</span></h3>
@@ -210,6 +243,7 @@ export default function StepParticipants({ draft, roster, rosterLoading, readine
           </div>
         ) : <p className="pc-empty">Chưa có khách mời.</p>}
       </section>
+      )}
     </>
   );
 }

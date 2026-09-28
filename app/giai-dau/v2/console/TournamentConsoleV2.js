@@ -61,6 +61,19 @@ export default function TournamentConsoleV2({ tournamentId }) {
     }
   }, [tournamentId]);
 
+  // Tiến độ giải + nhãn trạng thái ở shell theo board mới nhất mà mục con vừa tải (sau lưu/chốt tỉ số, tiến cấp,
+  // kết thúc chặng, polling). Không gọi thêm API; chỉ đổi state khi số liệu thật sự khác.
+  const syncFromBoard = useCallback((next) => {
+    if (!next) return;
+    if (next.progress) {
+      setBoard((current) => (current?.progress?.total === next.progress.total && current?.progress?.finalized === next.progress.finalized
+        ? current : { ...(current || {}), progress: next.progress }));
+    }
+    if (next.tournamentStatus) {
+      setTournament((current) => (current && current.status !== next.tournamentStatus ? { ...current, status: next.tournamentStatus } : current));
+    }
+  }, []);
+
   useEffect(() => {
     let active = true;
     fetch('/api/groups/session', { credentials: 'same-origin', cache: 'no-store' })
@@ -123,9 +136,9 @@ export default function TournamentConsoleV2({ tournamentId }) {
 
   return <ConsoleShell tournament={tournament} tournamentId={tournamentId} progress={board?.progress} actor={session}>
     {(step) => <>
-      {step === 'control' ? <ControlCenter tournamentId={tournamentId} isAdmin={isAdmin} onSettings={goSettings} onStandings={() => goStep('bracket')} onMatches={() => goStep('matches')} onChanged={load} /> : null}
-      {step === 'matches' ? (v4Schedule ? <MatchesView tournamentId={tournamentId} isAdmin={isAdmin} /> : <>{stagePicker}<ResultsTab {...stepProps} /></>) : null}
-      {step === 'bracket' ? (v4Schedule ? <BracketStandings tournamentId={tournamentId} isAdmin={isAdmin} onChanged={load} /> : <>{stagePicker}<StandingsTab {...stepProps} /><BracketTab {...stepProps} /></>) : null}
+      {step === 'control' ? <ControlCenter tournamentId={tournamentId} isAdmin={isAdmin} onSettings={goSettings} onStandings={() => goStep('bracket')} onMatches={() => goStep('matches')} onChanged={load} onBoard={syncFromBoard} /> : null}
+      {step === 'matches' ? (v4Schedule ? <MatchesView tournamentId={tournamentId} isAdmin={isAdmin} onBoard={syncFromBoard} /> : <>{stagePicker}<ResultsTab {...stepProps} /></>) : null}
+      {step === 'bracket' ? (v4Schedule ? <BracketStandings tournamentId={tournamentId} isAdmin={isAdmin} onChanged={load} onBoard={syncFromBoard} friendly={tournament?.organizer_mode === 'friendly'} /> : <>{stagePicker}<StandingsTab {...stepProps} /><BracketTab {...stepProps} /></>) : null}
       {step === 'settings' && v4Schedule ? <SettingsView tournament={tournament} tournamentId={tournamentId} isAdmin={isAdmin} reload={load}>
         {isCommunity ? <div id="dang-ky-mo"><OpenRegTab {...stepProps} /></div> : null}
       </SettingsView> : null}

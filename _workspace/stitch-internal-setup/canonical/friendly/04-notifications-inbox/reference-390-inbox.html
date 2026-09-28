@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lời mời giải giao hữu · Mobile 390px | PickHub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f5f3ff',
+              100: '#ede9fe',
+              200: '#ddd6fe',
+              500: '#8b5cf6',
+              600: '#7c3aed',
+              700: '#6d28d9',
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+      line-height: 1;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans antialiased min-h-screen py-8 px-4 flex flex-col items-center justify-start selection:bg-brand-100 selection:text-brand-700">
+
+  <!-- Main Mobile Container: Exactly 390px, natural height, no inner scroll, no fixed phone frame -->
+  <div class="w-[390px] max-w-full bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+
+    <!-- Top Bar -->
+    <header class="h-14 px-4 bg-white border-b border-slate-100 flex items-center justify-between sticky top-0 z-30">
+      <button type="button" class="w-9 h-9 rounded-lg flex items-center justify-center text-slate-700 hover:bg-slate-100 transition-colors" aria-label="Menu">
+        <span class="material-symbols-outlined text-[22px]">menu</span>
+      </button>
+      <div class="flex items-center">
+        <span class="text-xl font-extrabold text-brand-600 tracking-tight">PickHub</span>
+      </div>
+      <button type="button" class="w-9 h-9 rounded-lg flex items-center justify-center text-slate-700 hover:bg-slate-100 relative transition-colors" aria-label="Thông báo">
+        <span class="material-symbols-outlined text-[22px]">notifications</span>
+        <span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-brand-600 ring-2 ring-white"></span>
+      </button>
+    </header>
+
+    <!-- Page Content -->
+    <div class="p-4 space-y-5 bg-slate-50/50">
+
+      <!-- Breadcrumb & Page Header -->
+      <div>
+        <nav class="flex items-center gap-1.5 text-xs font-medium text-slate-500 mb-1">
+          <span>Giải đấu</span>
+          <span class="text-slate-300">›</span>
+          <span class="text-slate-800 font-semibold">Lời mời</span>
+        </nav>
+        <h1 class="text-xl font-bold text-slate-900 tracking-tight">Lời mời giải giao hữu</h1>
+        <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+          Lời mời từ CLB khác. Mỗi lời mời cũng hiện trong chuông thông báo.
+        </p>
+      </div>
+
+      <!-- GROUP 1: Cần bạn xử lý (count 2) -->
+      <section class="space-y-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wide">Cần bạn xử lý</h2>
+            <span class="inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800">2</span>
+          </div>
+        </div>
+
+        <!-- Card 1: Giao hữu Thu 2026 -->
+        <article class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm hover:border-brand-200 transition-all space-y-3">
+          <!-- Header row: Title & Host Chip -->
+          <div class="space-y-1.5">
+            <div class="flex items-start justify-between gap-2">
+              <h3 class="text-base font-bold text-slate-900 leading-snug">Giao hữu Thu 2026</h3>
+              <!-- Grey status chip -->
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-200 shrink-0">
+                Chờ phản hồi
+              </span>
+            </div>
+            
+            <!-- Host Club Chip -->
+            <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-white border border-slate-200 text-xs text-slate-700 shadow-2xs">
+              <span class="w-2 h-2 rounded-full bg-brand-600 shrink-0"></span>
+              <span class="font-medium truncate max-w-[200px]">CLB Test 23.9…</span>
+            </div>
+          </div>
+
+          <!-- Event Details -->
+          <div class="space-y-1.5 text-xs text-slate-600">
+            <div class="flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-slate-400 text-[16px] shrink-0">calendar_today</span>
+              <span class="font-medium text-slate-700">CN 12/10 · 07:30 · Sân Pickleball Cầu Giấy</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-slate-400 text-[16px] shrink-0">groups</span>
+              <span>Hạn mức 3 cặp · đã gửi 0</span>
+            </div>
+            <div class="flex items-center gap-1.5 text-amber-700 font-medium">
+              <span class="material-symbols-outlined text-amber-500 text-[16px] shrink-0">schedule</span>
+              <span>Hạn chót còn 2 ngày</span>
+            </div>
+          </div>
+
+          <!-- Action Button -->
+          <div class="pt-1">
+            <button type="button" class="w-full py-2 px-3 rounded-lg bg-brand-600 hover:bg-brand-700 text-white font-semibold text-xs transition-colors shadow-sm flex items-center justify-center gap-1.5">
+              <span>Trả lời</span>
+              <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+            </button>
+          </div>
+        </article>
+
+        <!-- Card 2: Giao hữu mùa đông -->
+        <article class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm hover:border-amber-200 transition-all space-y-3">
+          <!-- Header row: Title & Host Chip -->
+          <div class="space-y-1.5">
+            <div class="flex items-start justify-between gap-2">
+              <h3 class="text-base font-bold text-slate-900 leading-snug">Giao hữu mùa đông</h3>
+              <!-- Amber status chip -->
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200/80 shrink-0">
+                Cần sửa
+              </span>
+            </div>
+
+            <!-- Host Club Chip -->
+            <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-white border border-slate-200 text-xs text-slate-700 shadow-2xs">
+              <span class="w-2 h-2 rounded-full bg-brand-600 shrink-0"></span>
+              <span class="font-medium truncate max-w-[200px]">CLB Test 23.9…</span>
+            </div>
+          </div>
+
+          <!-- Event Details -->
+          <div class="space-y-1.5 text-xs text-slate-600">
+            <div class="flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-slate-400 text-[16px] shrink-0">calendar_today</span>
+              <span class="font-medium text-slate-700">T7 23/11 · 14:00 · Nhà thi đấu Long Biên</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-slate-400 text-[16px] shrink-0">groups</span>
+              <span>Hạn mức 4 cặp · đã gửi 4</span>
+            </div>
+          </div>
+
+          <!-- Action Button -->
+          <div class="pt-1">
+            <button type="button" class="w-full py-2 px-3 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-semibold text-xs transition-colors shadow-sm flex items-center justify-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px]">edit_note</span>
+              <span>Sửa danh sách</span>
+            </button>
+          </div>
+        </article>
+      </section>
+
+      <!-- GROUP 2: Đang diễn ra (count 1) -->
+      <section class="space-y-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wide">Đang diễn ra</h2>
+            <span class="inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-[11px] font-bold bg-brand-100 text-brand-700">1</span>
+          </div>
+        </div>
+
+        <!-- Card: Giao hữu cuối tuần -->
+        <article class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm hover:border-slate-300 transition-all space-y-3">
+          <div class="space-y-1.5">
+            <div class="flex items-start justify-between gap-2">
+              <h3 class="text-base font-bold text-slate-900 leading-snug">Giao hữu cuối tuần</h3>
+              <!-- Light purple chip -->
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-brand-50 text-brand-700 border border-brand-200/70 shrink-0">
+                Đang đăng ký
+              </span>
+            </div>
+
+            <!-- Host Club Chip -->
+            <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-white border border-slate-200 text-xs text-slate-700 shadow-2xs">
+              <span class="w-2 h-2 rounded-full bg-brand-600 shrink-0"></span>
+              <span class="font-medium truncate max-w-[200px]">CLB Test 23.9…</span>
+            </div>
+          </div>
+
+          <div class="space-y-1.5 text-xs text-slate-600">
+            <div class="flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-slate-400 text-[16px] shrink-0">groups</span>
+              <span>Hạn mức 3 cặp · đã gửi 2</span>
+            </div>
+          </div>
+
+          <!-- Outlined Action Button -->
+          <div class="pt-1">
+            <button type="button" class="w-full py-2 px-3 rounded-lg bg-white border border-brand-600 text-brand-600 hover:bg-brand-50 font-semibold text-xs transition-colors flex items-center justify-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px]">person_add</span>
+              <span>Đăng ký cặp</span>
+            </button>
+          </div>
+        </article>
+      </section>
+
+      <!-- GROUP 3: Đã xong (count 1) -->
+      <section class="space-y-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wide">Đã xong</h2>
+            <span class="inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-600">1</span>
+          </div>
+        </div>
+
+        <!-- Card muted: Giao hữu Hè 2026 -->
+        <article class="bg-slate-50/70 rounded-xl border border-slate-200 p-4 transition-all space-y-3">
+          <div class="space-y-1.5">
+            <div class="flex items-start justify-between gap-2">
+              <h3 class="text-base font-semibold text-slate-700 leading-snug">Giao hữu Hè 2026</h3>
+              <!-- Emerald status chip -->
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80 shrink-0">
+                Đã chốt
+              </span>
+            </div>
+
+            <!-- Host Club Chip -->
+            <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-white border border-slate-200 text-xs text-slate-500 shadow-2xs">
+              <span class="w-2 h-2 rounded-full bg-slate-400 shrink-0"></span>
+              <span class="font-medium truncate max-w-[200px]">CLB Test 23.9…</span>
+            </div>
+          </div>
+
+          <!-- Text button -->
+          <div class="pt-1 flex justify-end">
+            <button type="button" class="py-1 px-2.5 rounded-md text-slate-600 hover:text-brand-600 hover:bg-white text-xs font-semibold transition-colors flex items-center gap-1">
+              <span>Xem trang giải</span>
+              <span class="material-symbols-outlined text-[15px]">arrow_forward</span>
+            </button>
+          </div>
+        </article>
+      </section>
+
+      <!-- SEPARATE SECTION: TRẠNG THÁI TRỐNG -->
+      <section class="pt-3 border-t border-slate-200/80 space-y-2">
+        <span class="block text-[11px] font-bold uppercase tracking-wider text-slate-500">TRẠNG THÁI TRỐNG</span>
+        
+        <div class="bg-white rounded-xl border border-slate-200 p-5 text-center space-y-2 shadow-2xs">
+          <div class="w-10 h-10 mx-auto rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+            <span class="material-symbols-outlined text-[22px]">mail</span>
+          </div>
+          <p class="text-xs text-slate-600 max-w-[280px] mx-auto leading-relaxed">
+            Chưa có lời mời nào. Khi CLB khác mời, lời mời sẽ hiện ở đây và trong chuông thông báo.
+          </p>
+        </div>
+      </section>
+
+      <!-- SEPARATE SECTION: LỐI VÀO TRÊN TRANG GIẢI ĐẤU -->
+      <section class="pt-2 pb-2 space-y-2">
+        <span class="block text-[11px] font-bold uppercase tracking-wider text-slate-500">LỐI VÀO TRÊN TRANG GIẢI ĐẤU</span>
+        
+        <button type="button" class="w-full bg-white rounded-xl border border-slate-200 p-3.5 flex items-center justify-between text-left shadow-2xs hover:border-brand-200 hover:bg-slate-50/50 transition-all group">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 border border-amber-100">
+              <span class="material-symbols-outlined text-[18px]">trophy</span>
+            </div>
+            <div>
+              <span class="text-xs font-bold text-slate-800 group-hover:text-brand-600 transition-colors">Lời mời giải giao hữu</span>
+              <span class="inline-flex items-center justify-center ml-1 px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-brand-100 text-brand-700">1</span>
+            </div>
+          </div>
+          <span class="material-symbols-outlined text-slate-400 group-hover:text-slate-600 text-[18px] transition-colors">chevron_right</span>
+        </button>
+      </section>
+
+    </div>
+  </div>
+
+</body>
+</html>

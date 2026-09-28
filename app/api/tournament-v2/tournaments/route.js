@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { randomBytes } from 'crypto';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { requireValidatedGroupAdmin } from '@/lib/groupSession';
@@ -11,6 +10,8 @@ import { writeOperationLog } from '@/lib/tournament/operationLog';
 import { finalStandingsFrom } from '@/lib/tournament/qualification';
 import { computeStageStandings } from '@/lib/tournament/standingsService';
 import { getClubReadScope } from '@/lib/clubReadContext';
+import { preserveServerOwnedSettings } from '@/lib/tournament/friendlyClubs';
+import { generateSlug } from '@/lib/tournament/publicSlug';
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -53,24 +54,6 @@ function buildTournamentPayload(body, groupId) {
     }
     payload.updated_at = new Date().toISOString();
     return payload;
-}
-
-function slugify(name) {
-    return String(name || '')
-        .normalize('NFD')
-        .replace(/[̀-ͯ]/g, '')
-        .replace(/đ/g, 'd')
-        .replace(/Đ/g, 'D')
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/-+/g, '-')
-        .replace(/^-|-$/g, '');
-}
-
-function generateSlug(name) {
-    const base = slugify(name) || 'giai';
-    const suffix = randomBytes(9).toString('hex');
-    return `${base}-${suffix}`;
 }
 
 // Giải cộng đồng là phạm vi toàn hệ thống. group_id vẫn NOT NULL trong giai
@@ -572,6 +555,16 @@ export async function PATCH(request) {
         delete payload.group_id;
         if (payload.name === null) {
             return NextResponse.json({ error: 'Tournament name is required' }, { status: 400 });
+        }
+
+        // settings là cột jsonb chung: client chỉ sửa khoá của mình. organizer_mode và friendly (hạn chót / khoá
+        // đăng ký giao hữu) do server quản lý — giữ nguyên giá trị hiện có, client không đặt/xoá được (Epic 3 F1 §6.5).
+        if ('settings' in body) {
+            const { data: current, error: settingsErr } = await db.from('tournaments').select('settings')
+                .eq('id', id).eq('group_id', adminCheck.groupId).maybeSingle();
+            if (settingsErr) return NextResponse.json({ error: settingsErr.message }, { status: 500 });
+            if (!current) return NextResponse.json({ error: 'Không tìm thấy giải' }, { status: 404 });
+            payload.settings = preserveServerOwnedSettings(current.settings, body.settings);
         }
 
         // Giải tạo bằng setup 4 bước (hàm SQL) chưa có public_slug. Bật link (unlisted/public) thì sinh slug

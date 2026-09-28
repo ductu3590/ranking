@@ -10,6 +10,11 @@
   --pc-brand-600: #7c3aed;
   --pc-brand-700: #6d28d9;
   --pc-indigo-600: #4f46e5;
+  /* DESIGN.md (sáng) — thanh tiến độ bốc thăm */
+  --pc-track: #dce9ff;              /* surface-container-high */
+  --pc-outline-variant: #ccc3d8;
+  --pc-secondary-container: #645efb;
+  --pc-on-surface: #0b1c30;
   --pc-bg: #f8fafc;
   --pc-card: #ffffff;
   --pc-border: #e2e8f0;
@@ -339,4 +344,46 @@
   .pc-table tr { padding: 0.5rem 0.75rem; border-top: 1px solid var(--pc-border); }
   .pc-table td { border: 0; padding: 0.125rem 0; display: grid; grid-template-columns: 5rem minmax(0, 1fr); gap: 0.5rem; }
   .pc-table td::before { content: attr(data-label); font-weight: 700; color: var(--pc-muted); font-size: 0.6875rem; text-transform: uppercase; }
+}
+
+/* ---------- Thanh tiến độ % khi bốc thăm / chốt (mọi thể thức) ----------
+   Phỏng cấu trúc mẫu uiverse rust_1966/tall-fly-13 (rãnh bo tròn, thanh gradient có glow, ripple, 5 hạt sáng, % ở giữa),
+   viết lại theo token DESIGN.md sáng: rãnh surface-container-high, thanh primary-container → secondary-container. */
+.pc-progress-card { display: grid; gap: 0.625rem; }
+.pc-progress__label { margin: 0; font-weight: 700; color: var(--pc-on-surface); }
+.pc-progress {
+  position: relative; width: 100%; max-width: 500px; height: 20px; border-radius: 30px; overflow: hidden;
+  background: var(--pc-track); border: 1px solid var(--pc-outline-variant);
+  box-shadow: inset 0 1px 3px rgba(11, 28, 48, 0.12);
+}
+.pc-progress__bar {
+  position: relative; height: 100%; border-radius: 30px; overflow: hidden;
+  background: linear-gradient(90deg, var(--pc-brand-600), var(--pc-secondary-container));
+  box-shadow: 0 0 10px rgba(124, 58, 237, 0.35);
+  transition: width 0.2s linear;
+}
+.pc-progress__bar::before {
+  content: ''; position: absolute; inset: 0; border-radius: inherit;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0) 70%);
+  animation: pc-progress-ripple 1.8s ease-out infinite;
+}
+.pc-progress__dot {
+  position: absolute; bottom: 3px; width: 4px; height: 4px; border-radius: 50%;
+  background: rgba(255, 255, 255, 0.7); animation: pc-progress-float 2.4s ease-in-out infinite;
+}
+.pc-progress__dot:nth-child(1) { left: 12%; animation-delay: 0s; }
+.pc-progress__dot:nth-child(2) { left: 30%; animation-delay: 0.4s; }
+.pc-progress__dot:nth-child(3) { left: 50%; animation-delay: 0.8s; }
+.pc-progress__dot:nth-child(4) { left: 70%; animation-delay: 1.2s; }
+.pc-progress__dot:nth-child(5) { left: 88%; animation-delay: 1.6s; }
+.pc-progress__text {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  font-size: 10px; font-weight: 800; letter-spacing: 1px; color: var(--pc-on-surface);
+}
+.pc-progress__text[data-on-bar] { color: #fff; text-shadow: 0 1px 2px rgba(11, 28, 48, 0.45); }
+@keyframes pc-progress-ripple { from { transform: scale(0.5); opacity: 0.7; } to { transform: scale(1.5); opacity: 0; } }
+@keyframes pc-progress-float { 0%, 100% { transform: translateY(0); opacity: 0; } 50% { transform: translateY(-20px); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .pc-progress__bar { transition: none; }
+  .pc-progress__bar::before, .pc-progress__dot { animation: none; display: none; }
 }

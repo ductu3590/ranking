@@ -1,179 +1,246 @@
+// CLB tham dự giải giao hữu liên CLB — phía CHỦ NHÀ (spec Epic 3 F1 §6.1, ADR-007 D39, D46, D47).
+//   GET  ?mode=available[&tournamentId=][&q=]  danh sách mọi CLB PickHub để mời (chỉ id, name) + hạn mức CLB khách
+//   GET  ?tournamentId=                       CLB của giải (HostClubView) + cửa sổ đăng ký + hạn mức
+//   POST { tournament_id, club_id, quota?, invitation_note? }        mời / mời lại → RPC friendly_invite_club
+//   PATCH { id, action, expected_version, note?, quota? }             hành động chủ nhà → RPC friendly_club_action
+// Hạn mức CLB khách chỉ đến từ friendlyEntitlements (không bao giờ từ body); token link mời do server sinh, chỉ băm
+// đi vào DB, token thô trả đúng một lần trong response (invitePath).
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { requireValidatedGroupAdmin } from '@/lib/groupSession';
-import { transitionTournamentClub, validateTournamentClubReference } from '@/lib/tournament/interclub';
+import { requireTournamentAccess } from '@/lib/tournament/accessRuntime';
+import { registrationWindow, statusLabel } from '@/lib/tournament/friendlyClubs';
+import { resolveFriendlyEntitlements, guestClubLimitView } from '@/lib/tournament/friendlyEntitlements';
+import { issueInviteToken, invitePath } from '@/lib/tournament/friendlyInviteLink';
+import {
+    FRIENDLY_DIVISION_TEMPLATE,
+    HOST_CLUB_FIELDS,
+    HOST_ACTIONS,
+    positiveId,
+    friendlyErrorPayload,
+    rpcErrorPayload,
+    projectHostClubRow,
+    parseQuotaInput,
+    parseInvitationNote,
+    hostActionPayload,
+    escapeLike,
+    parseClubSearch,
+    systemGroupId,
+} from '@/lib/tournament/friendlyServer';
 
 const db = supabaseAdmin || supabaseServer;
+const NO_STORE = { 'Cache-Control': 'no-store' };
 
-const SELECT_FIELDS = 'id, group_id, tournament_id, club_id, external_club_id, invitation_status, quota, invitation_note, version';
-
-function domainError(error) {
-    if (!error?.code || !/^[A-Z_]+$/.test(error.code)) return null;
-    const status = error.code === 'INVALID_CLUB_TRANSITION' ? 409 : 400;
-    return NextResponse.json({ error: error.message, code: error.code }, { status });
+function reply({ status, body }) {
+    return NextResponse.json(body, { status });
 }
 
-// Gắn tên hiển thị cho CLB PickHub và CLB ngoài hệ thống để UI không phải
-// tự đoán từ id.
-async function decorateClubNames(rows, groupId) {
+function fail(code, params) {
+    return reply(friendlyErrorPayload(code, params));
+}
+
+// Hạn mức CLB khách của giải: điểm quyết định duy nhất là friendlyEntitlements (D46).
+async function loadLimit(groupId, tournamentId) {
+    const entitlements = await resolveFriendlyEntitlements({ db, groupId });
+    const { data, error } = await db.from('tournament_clubs')
+        .select('id, group_id, club_id, invitation_status')
+        .eq('group_id', groupId).eq('tournament_id', tournamentId);
+    if (error) throw error;
+    return { entitlements, rows: data || [], limit: guestClubLimitView({ maxGuestClubs: entitlements.maxGuestClubs, rows: data || [] }) };
+}
+
+async function loadWindow(groupId, tournamentId) {
+    const [{ data: tournament, error: tournamentError }, { data: division, error: divisionError }] = await Promise.all([
+        db.from('tournaments').select('id, settings').eq('id', tournamentId).eq('group_id', groupId).maybeSingle(),
+        db.from('tournament_divisions').select('id, roster_lock_status')
+            .eq('group_id', groupId).eq('tournament_id', tournamentId).eq('competition_template', FRIENDLY_DIVISION_TEMPLATE)
+            .order('id').limit(1).maybeSingle(),
+    ]);
+    if (tournamentError || divisionError) throw tournamentError || divisionError;
+    return registrationWindow({ settings: tournament?.settings, rosterLockStatus: division?.roster_lock_status, now: new Date() });
+}
+
+// Tên hiển thị: CLB PickHub theo groups (không logo_url — data-URL nặng), dòng CLB ngoài cũ theo tournament_external_clubs.
+async function clubNames(rows, groupId) {
     const clubIds = [...new Set(rows.map((row) => row.club_id).filter((id) => id != null))];
     const externalIds = [...new Set(rows.map((row) => row.external_club_id).filter((id) => id != null))];
     const [groupsResult, externalResult] = await Promise.all([
         clubIds.length ? db.from('groups').select('id, name').in('id', clubIds) : Promise.resolve({ data: [] }),
-        externalIds.length ? db.from('tournament_external_clubs').select('id, name, contact_name, contact_channel').eq('group_id', groupId).in('id', externalIds) : Promise.resolve({ data: [] }),
+        externalIds.length ? db.from('tournament_external_clubs').select('id, name').eq('group_id', groupId).in('id', externalIds) : Promise.resolve({ data: [] }),
     ]);
-    const groupNames = new Map((groupsResult.data || []).map((row) => [String(row.id), row.name]));
-    const externalNames = new Map((externalResult.data || []).map((row) => [String(row.id), row]));
-    return rows.map((row) => ({
-        ...row,
-        is_external: row.external_club_id != null,
-        name: row.club_id != null
-            ? (groupNames.get(String(row.club_id)) || `CLB #${row.club_id}`)
-            : (externalNames.get(String(row.external_club_id))?.name || `CLB ngoài #${row.external_club_id}`),
-    }));
+    if (groupsResult.error || externalResult.error) throw groupsResult.error || externalResult.error;
+    const groups = new Map((groupsResult.data || []).map((row) => [String(row.id), row.name]));
+    const external = new Map((externalResult.data || []).map((row) => [String(row.id), row.name]));
+    return (row) => (row.club_id != null
+        ? (groups.get(String(row.club_id)) || `CLB #${row.club_id}`)
+        : (external.get(String(row.external_club_id)) || `CLB ngoài #${row.external_club_id}`));
+}
+
+async function hostView(row, groupId) {
+    const nameOf = await clubNames([row], groupId);
+    return projectHostClubRow(row, { clubName: nameOf(row) });
 }
 
 export async function GET(request) {
     try {
-        const adminCheck = await requireValidatedGroupAdmin();
-        if (!adminCheck.ok) return adminCheck.response;
         const { searchParams } = new URL(request.url);
+        const rawTournamentId = searchParams.get('tournamentId');
 
-        // Danh sách CLB PickHub mời được: các CLB khác trong hệ thống. Không phụ
-        // thuộc một giải cụ thể (wizard gọi trước khi giải tồn tại), nên không
-        // đòi tournamentId ở chế độ này.
+        // Danh sách mọi CLB PickHub (D46): chỉ id + name; không code (mã đăng nhập CLB), không logo_url.
         if (searchParams.get('mode') === 'available') {
-            const { data, error } = await db.from('groups').select('id, name').neq('id', adminCheck.groupId).order('name');
+            const adminCheck = await requireValidatedGroupAdmin();
+            if (!adminCheck.ok) return adminCheck.response;
+            const search = parseClubSearch(searchParams.get('q'));
+            if (!search.ok) return fail(search.code);
+            let access = null;
+            if (rawTournamentId != null) {
+                const tournamentId = positiveId(rawTournamentId);
+                if (!tournamentId) return fail('SETUP_PAYLOAD_INVALID');
+                access = await requireTournamentAccess({ tournamentId, need: 'write' });
+                if (!access.ok) return access.response;
+            }
+            // Bỏ CLB của phiên và CLB hệ thống (PICKHUB_SYSTEM_GROUP_ID nếu cấu hình).
+            let query = db.from('groups').select('id, name').neq('id', adminCheck.groupId);
+            const systemId = systemGroupId();
+            if (systemId) query = query.neq('id', systemId);
+            if (search.q) query = query.ilike('name', `%${escapeLike(search.q)}%`);
+            const { data, error } = await query.order('name').limit(200);
             if (error) throw error;
-            return NextResponse.json({ clubs: data || [] });
+            const clubs = (data || []).map((club) => ({ id: club.id, name: club.name }));
+            if (!access) return NextResponse.json({ clubs });
+
+            const { rows, limit } = await loadLimit(access.groupId, access.tournament.id);
+            const byClub = new Map(rows.filter((row) => row.club_id != null).map((row) => [String(row.club_id), row]));
+            return NextResponse.json({
+                clubs: clubs.map((club) => {
+                    const row = byClub.get(String(club.id));
+                    return {
+                        ...club,
+                        invitation: row ? { id: row.id, status: row.invitation_status, statusLabel: statusLabel(row.invitation_status, 'host') } : null,
+                    };
+                }),
+                limit,
+            });
         }
 
-        const tournamentId = searchParams.get('tournamentId');
-        if (!tournamentId) return NextResponse.json({ error: 'tournamentId is required' }, { status: 400 });
+        const tournamentId = positiveId(rawTournamentId);
+        if (!tournamentId) return fail('SETUP_PAYLOAD_INVALID');
+        const access = await requireTournamentAccess({ tournamentId, need: 'write' });
+        if (!access.ok) return access.response;
 
         const { data, error } = await db.from('tournament_clubs')
-            .select(SELECT_FIELDS)
-            .eq('group_id', adminCheck.groupId).eq('tournament_id', tournamentId).order('id');
+            .select(HOST_CLUB_FIELDS)
+            .eq('group_id', access.groupId).eq('tournament_id', tournamentId).order('id');
         if (error) throw error;
-        return NextResponse.json({ clubs: await decorateClubNames(data || [], adminCheck.groupId) });
+        const rows = data || [];
+        const [nameOf, window, { limit }] = await Promise.all([
+            clubNames(rows, access.groupId),
+            loadWindow(access.groupId, tournamentId),
+            loadLimit(access.groupId, tournamentId),
+        ]);
+        return NextResponse.json({
+            window,
+            limit,
+            clubs: rows.map((row) => projectHostClubRow(row, { clubName: nameOf(row) })),
+        });
     } catch (error) {
         console.error('Tournament clubs GET error:', error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return NextResponse.json({ error: 'Không tải được danh sách CLB.', code: 'FRIENDLY_READ_FAILED' }, { status: 500 });
     }
 }
 
 export async function POST(request) {
     try {
-        const adminCheck = await requireValidatedGroupAdmin();
-        if (!adminCheck.ok) return adminCheck.response;
-        const body = await request.json();
-        const tournamentId = body?.tournament_id;
-        const quota = body?.quota == null || body.quota === '' ? null : Number(body.quota);
-        if (!tournamentId) {
-            return NextResponse.json({ error: 'tournament_id là bắt buộc' }, { status: 400 });
+        const body = await request.json().catch(() => null);
+        if (!body || typeof body !== 'object' || Array.isArray(body)) return fail('SETUP_PAYLOAD_INVALID');
+        // D39: chỉ mời CLB có trên PickHub.
+        if (body.external_club_id != null || (typeof body.external_club_name === 'string' && body.external_club_name.trim())) {
+            return fail('EXTERNAL_CLUB_NOT_SUPPORTED');
         }
-        if (quota != null && (!Number.isInteger(quota) || quota <= 0)) {
-            return NextResponse.json({ error: 'quota phải là số nguyên dương' }, { status: 400 });
-        }
+        const tournamentId = positiveId(body.tournament_id);
+        const clubId = positiveId(body.club_id);
+        if (!tournamentId || !clubId) return fail('SETUP_PAYLOAD_INVALID');
+        if (clubId === systemGroupId()) return fail('CLUB_NOT_FOUND');
+        const quota = parseQuotaInput(body.quota);
+        if (!quota.ok) return fail(quota.code);
+        const note = parseInvitationNote(body.invitation_note);
+        if (!note.ok) return fail(note.code);
 
-        const { data: tournament, error: tournamentError } = await db.from('tournaments')
-            .select('id').eq('id', tournamentId).eq('group_id', adminCheck.groupId).maybeSingle();
-        if (tournamentError) throw tournamentError;
-        if (!tournament) return NextResponse.json({ error: 'Không tìm thấy giải trong CLB hiện tại' }, { status: 404 });
+        const access = await requireTournamentAccess({ tournamentId, need: 'write' });
+        if (!access.ok) return access.response;
 
-        // CLB ngoài PickHub: tạo bản ghi trong phạm vi giải, không tạo group mới.
-        let externalClubId = body?.external_club_id ?? null;
-        const externalName = String(body?.external_club_name || '').trim();
-        if (!externalClubId && externalName) {
-            const { data: external, error: externalError } = await db.from('tournament_external_clubs')
-                .upsert({
-                    group_id: adminCheck.groupId,
-                    name: externalName,
-                    contact_name: body?.contact_name || null,
-                    contact_channel: body?.contact_channel || null,
-                }, { onConflict: 'group_id,name' })
-                .select('id, name')
-                .single();
-            if (externalError) return NextResponse.json({ error: externalError.message }, { status: 500 });
-            externalClubId = external.id;
+        const entitlements = await resolveFriendlyEntitlements({ db, groupId: access.groupId });
+        const token = issueInviteToken();
+        const { data, error } = await db.rpc('friendly_invite_club', {
+            p_group_id: Number(access.groupId),
+            p_tournament_id: tournamentId,
+            p_club_id: clubId,
+            p_quota: quota.quota,
+            p_note: note.note,
+            p_max_guest_clubs: entitlements.maxGuestClubs,
+            p_invite_token_hash: token.tokenHash,
+        });
+        if (error) {
+            const limitHit = String(error.message || '').includes('FRIENDLY_CLUB_LIMIT_REACHED');
+            const payload = rpcErrorPayload(error, limitHit ? { max: entitlements.maxGuestClubs } : undefined);
+            if (payload.status >= 500) console.error('friendly_invite_club error:', error);
+            return reply(payload);
         }
-
-        const clubId = body?.club_id == null || body.club_id === '' ? null : Number(body.club_id);
-        let reference;
-        try {
-            reference = validateTournamentClubReference({ club_id: clubId, external_club_id: externalClubId });
-        } catch (error) {
-            const response = domainError(error);
-            if (response) return response;
-            throw error;
-        }
-        if (reference.club_id != null && !Number.isInteger(reference.club_id)) {
-            return NextResponse.json({ error: 'club_id không hợp lệ' }, { status: 400 });
-        }
-
-        const isHost = reference.club_id != null && reference.club_id === Number(adminCheck.groupId);
-        const { data, error } = await db.from('tournament_clubs').insert({
-            group_id: adminCheck.groupId,
-            tournament_id: tournamentId,
-            club_id: reference.club_id,
-            external_club_id: reference.external_club_id,
-            quota,
-            invitation_note: body?.invitation_note || null,
-            // CLB chủ giải tham gia sẵn; CLB được mời phải tự xác nhận.
-            invitation_status: isHost ? 'accepted' : 'invited',
-        }).select(SELECT_FIELDS).single();
-        if (error) throw error;
-        const [decorated] = await decorateClubNames([data], adminCheck.groupId);
-        return NextResponse.json({ success: true, club: decorated });
+        const [club, { limit }] = await Promise.all([hostView(data, access.groupId), loadLimit(access.groupId, tournamentId)]);
+        // invitePath chỉ có trong response này; client ghép window.location.origin.
+        return NextResponse.json({ club, invitePath: invitePath(token.rawToken), limit }, { headers: NO_STORE });
     } catch (error) {
         console.error('Tournament clubs POST error:', error);
-        const conflict = error.code === '23505';
-        return NextResponse.json({ error: conflict ? 'CLB đã được mời vào giải' : error.message }, { status: conflict ? 409 : 500 });
+        return NextResponse.json({ error: 'Không mời được CLB. Thử lại sau.', code: 'FRIENDLY_MUTATION_FAILED' }, { status: 500 });
     }
 }
 
 export async function PATCH(request) {
     try {
-        const adminCheck = await requireValidatedGroupAdmin();
-        if (!adminCheck.ok) return adminCheck.response;
-        const body = await request.json();
-        if (!body?.id) return NextResponse.json({ error: 'id là bắt buộc' }, { status: 400 });
+        const body = await request.json().catch(() => null);
+        if (!body || typeof body !== 'object' || Array.isArray(body)) return fail('SETUP_PAYLOAD_INVALID');
+        const id = positiveId(body.id);
+        const expectedVersion = positiveId(body.expected_version);
+        const action = typeof body.action === 'string' ? body.action : '';
+        if (!id || !expectedVersion || !HOST_ACTIONS.includes(action)) return fail('SETUP_PAYLOAD_INVALID');
+        const input = { note: body.note };
+        if (Object.prototype.hasOwnProperty.call(body, 'quota')) input.quota = body.quota;
+        const prepared = hostActionPayload(action, input);
+        if (!prepared.ok) return fail(prepared.code);
 
-        const { data: current, error: currentError } = await db.from('tournament_clubs')
-            .select(SELECT_FIELDS)
-            .eq('id', body.id).eq('group_id', adminCheck.groupId).maybeSingle();
-        if (currentError) throw currentError;
-        if (!current) return NextResponse.json({ error: 'Không tìm thấy CLB tham dự' }, { status: 404 });
+        const { data: row, error: rowError } = await db.from('tournament_clubs')
+            .select('id, group_id, tournament_id').eq('id', id).maybeSingle();
+        if (rowError) throw rowError;
+        if (!row) return fail('FRIENDLY_CLUB_NOT_FOUND');
+        const access = await requireTournamentAccess({ tournamentId: row.tournament_id, need: 'write' });
+        if (!access.ok) return access.response;
+        if (String(row.group_id) !== String(access.groupId)) return fail('FRIENDLY_CLUB_NOT_FOUND');
 
-        const patch = { updated_at: new Date().toISOString(), version: Number(current.version || 1) + 1 };
-        if (body.action) {
-            try {
-                patch.invitation_status = transitionTournamentClub(current.invitation_status, body.action);
-            } catch (error) {
-                const response = domainError(error);
-                if (response) return response;
-                throw error;
-            }
+        const payload = { ...prepared.payload };
+        let token = null;
+        if (action === 'rotate_link') {
+            token = issueInviteToken();
+            payload.inviteTokenHash = token.tokenHash;
         }
-        if (body.quota != null && body.quota !== '') {
-            const quota = Number(body.quota);
-            if (!Number.isInteger(quota) || quota <= 0) {
-                return NextResponse.json({ error: 'quota phải là số nguyên dương' }, { status: 400 });
-            }
-            patch.quota = quota;
+        const { data, error } = await db.rpc('friendly_club_action', {
+            p_actor_group_id: Number(access.groupId),
+            p_side: 'host',
+            p_tournament_club_id: id,
+            p_action: action,
+            p_expected_version: expectedVersion,
+            p_payload: payload,
+        });
+        if (error) {
+            const response = rpcErrorPayload(error);
+            if (response.status >= 500) console.error('friendly_club_action (host) error:', error);
+            return reply(response);
         }
-        if (body.invitation_note != null) patch.invitation_note = String(body.invitation_note).trim() || null;
-
-        const { data, error } = await db.from('tournament_clubs')
-            .update(patch)
-            .eq('id', body.id).eq('group_id', adminCheck.groupId)
-            .select(SELECT_FIELDS).single();
-        if (error) throw error;
-        const [decorated] = await decorateClubNames([data], adminCheck.groupId);
-        return NextResponse.json({ success: true, club: decorated });
+        const club = await hostView(data, access.groupId);
+        if (token) return NextResponse.json({ club, invitePath: invitePath(token.rawToken) }, { headers: NO_STORE });
+        return NextResponse.json({ club });
     } catch (error) {
         console.error('Tournament clubs PATCH error:', error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return NextResponse.json({ error: 'Không cập nhật được lời mời. Thử lại sau.', code: 'FRIENDLY_MUTATION_FAILED' }, { status: 500 });
     }
 }

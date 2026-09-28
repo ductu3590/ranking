@@ -5,12 +5,15 @@ import { computeStageStandings } from '@/lib/tournament/standingsService';
 import { buildPublicSnapshot, normalizePublicSlug } from '@/lib/tournament/publicSnapshot';
 import { buildOperationsBoard } from '@/lib/tournament/operationsBoard';
 import { projectPublicBoard } from '@/lib/tournament/publicBoard';
+import { loadFriendlyClubStandings, publicFriendlyBlock } from '@/lib/tournament/friendlyServer';
 
 const db = supabaseAdmin || supabaseServer;
 
 const PUBLIC_TOURNAMENT_SELECT = [
     'id', 'group_id', 'public_slug', 'name', 'description', 'event_date',
     'status', 'location', 'entrant_type', 'visibility', 'share_settings',
+    // Chỉ để rẽ nhánh giải giao hữu (Epic 3 F2 §7.2); buildPublicSnapshot không chiếu khóa này ra ngoài.
+    'organizer_mode:settings->>organizer_mode',
 ].join(', ');
 const PUBLIC_STAGE_SELECT = [
     'id', 'tournament_id', 'division_id', 'stage_order', 'name',
@@ -172,10 +175,18 @@ export async function GET(request) {
             games,
             standingsByStage,
         });
-        if (!board) return NextResponse.json(snapshot);
+        // Giải giao hữu liên CLB đã chốt: BXH tổng CLB + màu CLB + CLB của từng entry (allowlist publicFriendlyBlock;
+        // không group id, logo, thành viên). Trước chốt không có khối này (danh sách CLB khách chưa công khai).
+        let friendly = null;
+        if (tournament.organizer_mode === 'friendly') {
+            const standings = await loadFriendlyClubStandings(db, { tournament: { id: tournament.id, group_id: tournament.group_id } });
+            if (standings.finalized) friendly = publicFriendlyBlock(standings);
+        }
+        const extra = friendly ? { friendly } : {};
+        if (!board) return NextResponse.json({ ...snapshot, ...extra });
         // Tên CLB tổ chức hiện ở thanh trên của trang công khai (Stitch OPS-07). Chỉ tên, không mã/liên hệ.
         const clubRows = tournament.group_id ? await readRows('groups', 'name', [['eq', 'id', tournament.group_id]]) : [];
-        return NextResponse.json({ ...snapshot, board, club: { name: clubRows[0]?.name || null } });
+        return NextResponse.json({ ...snapshot, board, club: { name: clubRows[0]?.name || null }, ...extra });
     } catch (err) {
         console.error('Public v2 GET error:', err);
         return NextResponse.json({ error: err.message }, { status: err.status || 500 });

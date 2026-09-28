@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import Link from 'next/link';
 import AssignTransactionDialog from './AssignTransactionDialog';
 import './PhNotificationBell.css';
 
@@ -30,6 +31,40 @@ function panelStyleFor(button) {
     return openUpward
         ? { left, bottom: Math.max(EDGE, viewportHeight - rect.top + GAP), width }
         : { left, top: Math.min(rect.bottom + GAP, viewportHeight - EDGE), width };
+}
+
+/* Moi muc re nhanh theo kind (Epic 3 F1):
+   - unassigned_transaction: giu nguyen hien thi giao dich + nut gan thanh vien.
+   - thong bao giai dau (tournament_invitation / tournament_roster_review): route da chieu `display`
+     { title, body, href, actionLabel } -> tieu de, noi dung, link toi loi moi / buoc duyet.
+   - kind khac chua biet: chi tieu de chung + Bo qua (khong hien thanh dong so tien). */
+const TOURNAMENT_KINDS = new Set(['tournament_invitation', 'tournament_roster_review']);
+
+function NotificationItem({ item, onAssign, onDismiss, onNavigate }) {
+    if (item.kind === 'unassigned_transaction') {
+        return <div className="ph-notification-item">
+            <p className="ph-notification-item__amount">{Number(item.payload?.so_tien || 0).toLocaleString('vi-VN')}đ chưa rõ người nộp</p>
+            <p className="ph-notification-item__raw">{item.payload?.noi_dung_goc}</p>
+            <div className="ph-notification-item__actions">
+                <button type="button" className="ph-btn ph-btn--primary ph-btn--sm" onClick={() => onAssign(item)}>Gán cho thành viên</button>
+                <button type="button" className="ph-btn ph-btn--outline ph-btn--sm" onClick={() => onDismiss(item)}>Bỏ qua</button>
+            </div>
+        </div>;
+    }
+    const display = item.display;
+    return <div className="ph-notification-item" data-kind={item.kind || undefined}>
+        <p className="ph-notification-item__amount">
+            {TOURNAMENT_KINDS.has(item.kind) ? <span aria-hidden="true">🏆 </span> : null}
+            {display?.title || 'Việc cần xử lý'}
+        </p>
+        {display?.body ? <p className="ph-notification-item__raw">{display.body}</p> : null}
+        <div className="ph-notification-item__actions">
+            {display?.href ? <Link href={display.href} className="ph-btn ph-btn--primary ph-btn--sm" onClick={onNavigate}>
+                {display.actionLabel || 'Xem'}
+            </Link> : null}
+            <button type="button" className="ph-btn ph-btn--outline ph-btn--sm" onClick={() => onDismiss(item)}>Bỏ qua</button>
+        </div>
+    </div>;
 }
 
 export default function PhNotificationBell() {
@@ -134,14 +169,13 @@ export default function PhNotificationBell() {
                         <button type="button" className="ph-btn ph-btn--outline ph-btn--sm" onClick={() => void load()}>Thử lại</button>
                     </div> : null}
                     {!loading && !error && items.length === 0 ? <p className="ph-notification-panel__empty">Không có việc nào cần xử lý.</p> : null}
-                    {!loading && !error && items.map((item) => <div key={item.id} className="ph-notification-item">
-                        <p className="ph-notification-item__amount">{Number(item.payload?.so_tien || 0).toLocaleString('vi-VN')}đ chưa rõ người nộp</p>
-                        <p className="ph-notification-item__raw">{item.payload?.noi_dung_goc}</p>
-                        <div className="ph-notification-item__actions">
-                            <button type="button" className="ph-btn ph-btn--primary ph-btn--sm" onClick={() => startAssign(item)}>Gán cho thành viên</button>
-                            <button type="button" className="ph-btn ph-btn--outline ph-btn--sm" onClick={() => dismiss(item)}>Bỏ qua</button>
-                        </div>
-                    </div>)}
+                    {!loading && !error && items.map((item) => <NotificationItem
+                        key={item.id}
+                        item={item}
+                        onAssign={startAssign}
+                        onDismiss={dismiss}
+                        onNavigate={closePanel}
+                    />)}
                 </div>
             </div>
         </div>,

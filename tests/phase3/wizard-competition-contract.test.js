@@ -315,8 +315,11 @@ for (const [file, tokens, methods] of routes) {
 }
 
 const clubsRoute = read('app/api/tournament-v2/clubs/route.js');
-assert(clubsRoute.includes('tournament_external_clubs'), 'clubs route hỗ trợ CLB ngoài hệ thống');
-assert(clubsRoute.includes('transitionTournamentClub'), 'clubs route dùng state machine domain');
+// Epic 3 F1 (D39): chỉ mời CLB PickHub; dòng CLB ngoài cũ vẫn hiển thị tên. Máy trạng thái lời mời chuyển sang
+// friendlyClubs.FRIENDLY_TRANSITIONS, thực thi trong RPC friendly_club_action (migration 110).
+assert(clubsRoute.includes('tournament_external_clubs'), 'clubs route vẫn hiển thị tên dòng CLB ngoài cũ');
+assert(clubsRoute.includes('EXTERNAL_CLUB_NOT_SUPPORTED'), 'clubs route từ chối mời CLB ngoài hệ thống (D39)');
+assert(clubsRoute.includes("db.rpc('friendly_club_action'"), 'clubs route dùng state machine domain (RPC friendly_club_action)');
 assert(/export async function PATCH/.test(clubsRoute), 'clubs route có PATCH để BTC duyệt');
 
 const tournamentsRoute = read('app/api/tournament-v2/tournaments/route.js');

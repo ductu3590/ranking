@@ -1472,3 +1472,29 @@
     flex-shrink: 0;
 }
 .v2-pair-vs { color: var(--text-muted); font-size: 0.75rem; }
+
+/* ===== Giải giao hữu liên CLB (Epic 3 F3, D52, FRD-04) ===== */
+.v2-create-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.v2-create-actions .v2-create-tournament { min-height: 44px; }
+
+.v2-friendly-line {
+    display: flex; align-items: center; gap: 6px; margin: 6px 0 0;
+    color: var(--text-muted); font-size: .8rem; font-weight: 700;
+}
+.v2-friendly-line i { flex: none; width: 7px; height: 7px; border-radius: 50%; background: #94a3b8; }
+.v2-friendly-line[data-tone="action"] { color: #b45309; }
+.v2-friendly-line[data-tone="action"] i { background: #f59e0b; }
+.v2-friendly-line[data-tone="ok"] { color: #047857; }
+.v2-friendly-line[data-tone="ok"] i { background: #10b981; }
+.v2-friendly-line[data-tone="warn"] { color: #b91c1c; }
+.v2-friendly-line[data-tone="warn"] i { background: #b91c1c; }
+
+.v2-invite-entry {
+    display: flex; align-items: center; gap: 10px; min-height: 52px; margin: 0 0 18px; padding: 10px 14px;
+    border: 1px solid #e2e8f0; border-radius: 14px; background: #fff; color: var(--text-primary);
+    font-weight: 700; text-decoration: none;
+}
+.v2-invite-entry:hover { border-color: #ddd6fe; }
+.v2-invite-entry__icon { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 10px; background: #fffbeb; }
+.v2-invite-entry__text { flex: 1; min-width: 0; }
+.v2-invite-entry__count { padding: 2px 8px; border-radius: 999px; background: #ede9fe; color: #6d28d9; font-size: .75rem; }

@@ -182,3 +182,10 @@
   .ph-shell-bare { padding: 24px 0; }
   .pl-page { border-right: 1px solid rgba(226, 232, 240, .8); border-left: 1px solid rgba(226, 232, 240, .8); box-shadow: 0 25px 50px -12px rgba(15, 23, 42, .25); }
 }
+
+/* Giải giao hữu (Epic 3 F3, D53): đoạn chuyển "Cặp · CLB" ở tab Xếp hạng. */
+.pl-club-switch { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.pl-club-switch > span { color: var(--pl-muted); font-size: .75rem; font-weight: 700; }
+.pl-club-switch > div { display: inline-flex; gap: 2px; padding: 3px; border-radius: 10px; background: var(--pl-soft); }
+.pl-club-switch button { min-width: 64px; min-height: 36px; padding: 0 12px; border: 0; border-radius: 8px; background: transparent; color: var(--pl-muted); cursor: pointer; font: inherit; font-size: .8rem; font-weight: 700; }
+.pl-club-switch button[aria-selected="true"] { background: #fff; color: var(--pl-text); box-shadow: 0 1px 2px rgba(15, 23, 42, .08); }

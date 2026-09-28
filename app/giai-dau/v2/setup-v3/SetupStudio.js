@@ -10,6 +10,10 @@ import StepInfo from './steps/StepInfo';
 import StepParticipants from './steps/StepParticipants';
 import StepFormatPairing from './steps/StepFormatPairing';
 import StepDraw from './steps/StepDraw';
+import { useDrawProgress } from './DrawProgress';
+import FriendlyDrawGate from './friendly/FriendlyDrawGate';
+import FinalizedLinkDialog from './friendly/FinalizedLinkDialog';
+import { onlyWaitingForClubs } from './friendly/friendlyContext';
 import './studio.css';
 
 // Font self-host lúc build (không gọi Google Fonts lúc chạy), chỉ áp trong shell setup.
@@ -21,12 +25,18 @@ const NEXT_HINT = {
   3: 'Bốc thăm, xem trước lịch và chốt giải.',
   4: null,
 };
+const FRIENDLY_NEXT_HINT = { ...NEXT_HINT, 1: 'Chọn thành viên CLB bạn và mời CLB khác.', 2: 'Ghép cặp của CLB bạn, xem cặp CLB khách, chọn thể thức và số sân.' };
 
-export default function SetupStudio({ tournamentId, divisionId, step: requestedStep, onExit }) {
+export default function SetupStudio({ tournamentId, divisionId, step: requestedStep, organizerMode = 'internal', onExit }) {
   const router = useRouter();
   const pathname = usePathname();
-  const studio = useSetupStudio({ tournamentId, divisionId, step: requestedStep });
-  const { save, step, setStep, readiness, dirty, edit, persist, discard, reloadFromServer, draw, finalize } = studio;
+  const studio = useSetupStudio({ tournamentId, divisionId, step: requestedStep, organizerMode });
+  const { save, step, setStep, readiness, dirty, edit, persist, discard, reloadFromServer, draw, finalize, isFriendly, friendly, reloadFriendly } = studio;
+  const [finalized, setFinalized] = useState(null);
+  // Thanh % khi bốc thăm / cập nhật xem trước / chốt (mọi thể thức). Chỉ bọc lời gọi cũ, không đổi API.
+  const { progress: drawProgress, run: runWithProgress } = useDrawProgress();
+  // Giải giao hữu (D52): chủ nhà làm xong phần mình ở Bước 1–3; nếu chỉ còn chờ CLB khách thì Bước 4 mở ở dạng bị chặn.
+  const gateOpen = isFriendly && save.completedThrough >= 2 && onlyWaitingForClubs(readiness.byStep[3]);
   const [busy, setBusy] = useState(false);
   const [showErrors, setShowErrors] = useState({});
   const [pendingNav, setPendingNav] = useState(null);
@@ -35,9 +45,14 @@ export default function SetupStudio({ tournamentId, divisionId, step: requestedS
   // URL phản ánh giải + bước để reload quay về đúng chỗ. replace: không chồng lịch sử.
   useEffect(() => {
     if (!save.tournamentId) return;
-    const params = new URLSearchParams({ create: 'internal', tournamentId: save.tournamentId, divisionId: save.divisionId, step: String(step) });
+    const params = new URLSearchParams({ create: isFriendly ? 'friendly' : 'internal', tournamentId: save.tournamentId, divisionId: save.divisionId, step: String(step) });
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-  }, [pathname, router, save.tournamentId, save.divisionId, step]);
+  }, [isFriendly, pathname, router, save.tournamentId, save.divisionId, step]);
+
+  // Giải giao hữu: quay lại Bước 2–4 thì tải lại khối CLB tham dự (CLB khách có thể vừa gửi/sửa danh sách).
+  useEffect(() => {
+    if (isFriendly && step >= 2) reloadFriendly();
+  }, [isFriendly, reloadFriendly, step]);
 
   // Giải đã chốt không mở lại màn thiết lập (spec Lát 0 §10): chuyển tới mục Điều hành.
   useEffect(() => {
@@ -52,19 +67,19 @@ export default function SetupStudio({ tournamentId, divisionId, step: requestedS
   }, [dirty]);
 
   const moveTo = useCallback((target, completedThrough = save.completedThrough) => {
-    const next = allowedStep(target, completedThrough);
+    const next = target === 4 && gateOpen ? 4 : allowedStep(target, completedThrough);
     setStep(next);
     requestAnimationFrame(() => mainRef.current?.focus?.());
-  }, [save.completedThrough, setStep]);
+  }, [gateOpen, save.completedThrough, setStep]);
 
   // Rời bước khi còn thay đổi chưa lưu → hỏi Lưu / Bỏ / Ở lại (spec Lát 0 §4.2).
   const requestNav = useCallback((target) => {
     if (target === step) return;
-    if (target !== 'exit' && target > allowedStep(target, save.completedThrough)) return;
+    if (target !== 'exit' && target > allowedStep(target, save.completedThrough) && !(target === 4 && gateOpen)) return;
     if (dirty) { setPendingNav(target); return; }
     if (target === 'exit') onExit?.();
     else moveTo(target);
-  }, [dirty, moveTo, onExit, save.completedThrough, step]);
+  }, [dirty, gateOpen, moveTo, onExit, save.completedThrough, step]);
 
   const doSave = useCallback(async () => {
     if (!save.draft.tournament.name.trim()) {
@@ -84,11 +99,12 @@ export default function SetupStudio({ tournamentId, divisionId, step: requestedS
       completedThrough = result.completedThrough;
     }
     if (completedThrough >= step) moveTo(step + 1, completedThrough);
+    else if (step === 3 && gateOpen) setStep(4);
     else {
       setShowErrors((current) => ({ ...current, [step]: true }));
       requestAnimationFrame(() => document.querySelector('.pc-rail .pc-check[data-state="blocker"]')?.scrollIntoView?.({ block: 'center' }));
     }
-  }, [dirty, doSave, moveTo, save.completedThrough, save.status, step]);
+  }, [dirty, doSave, gateOpen, moveTo, save.completedThrough, save.status, setStep, step]);
 
   const resolveNav = useCallback(async (choice) => {
     const target = pendingNav;
@@ -117,17 +133,22 @@ export default function SetupStudio({ tournamentId, divisionId, step: requestedS
 
   const draft = save.draft;
   const participants = draft.participants.memberIds.length + draft.participants.guests.length;
+  // Giải giao hữu: tổng cặp = cặp của CLB mình + cặp CLB khách đã duyệt.
+  const guestPairCount = isFriendly ? (friendly?.approvedPairs || []).length : 0;
+  const pairTotal = draft.pairs.length + guestPairCount;
   const summaries = {
     1: draft.tournament.eventDate ? draft.tournament.eventDate.split('-').reverse().join('/') : '',
     2: participants ? `${participants} VĐV` : '',
-    3: draft.pairs.length ? `${draft.pairs.length} cặp${draft.tournament.courtCount ? ` · ${draft.tournament.courtCount} sân` : ''}` : '',
+    3: pairTotal ? `${pairTotal} cặp${draft.tournament.courtCount ? ` · ${draft.tournament.courtCount} sân` : ''}` : '',
   };
   const stepProps = { draft, readiness, showErrors: Boolean(showErrors[step]), onChange: edit };
+  const friendlyProps = isFriendly ? { friendly, pairTotal } : {};
+  const showGate = isFriendly && step === 4 && save.completedThrough < 3;
 
   return (
     <div className={`pc-studio ${jakarta.variable}`}>
-      <StudioHeader title={draft.tournament.name} save={save} onBack={() => requestNav('exit')} />
-      <StudioStepper step={step} completedThrough={save.completedThrough} summaries={summaries} onSelect={requestNav} />
+      <StudioHeader title={draft.tournament.name} save={save} onBack={() => requestNav('exit')} friendly={isFriendly} />
+      <StudioStepper step={step} completedThrough={save.completedThrough} summaries={summaries} onSelect={requestNav} extraOpenStep={gateOpen ? 4 : null} />
 
       {save.status === 'conflict' ? (
         <div className="pc-layout" style={{ paddingBottom: 0 }}>
@@ -145,33 +166,51 @@ export default function SetupStudio({ tournamentId, divisionId, step: requestedS
         <main ref={mainRef} className="pc-main" tabIndex={-1} aria-busy={studio.loading || undefined}>
           {studio.loading ? <section className="pc-card"><p className="pc-empty">Đang tải bản nháp…</p></section> : (
             <>
-              {step === 1 ? <StepInfo {...stepProps} /> : null}
-              {step === 2 ? <StepParticipants {...stepProps} roster={studio.roster} rosterLoading={!studio.roster.length && studio.loading} /> : null}
-              {step === 3 ? <StepFormatPairing {...stepProps} roster={studio.roster} onGoToStep={requestNav} /> : null}
-              {step === 4 ? (
+              {step === 1 ? <StepInfo {...stepProps} modeLocked={Boolean(save.tournamentId)} /> : null}
+              {step === 2 ? (
+                <StepParticipants
+                  {...stepProps} roster={studio.roster} rosterLoading={!studio.roster.length && studio.loading}
+                  friendly={friendly} tournamentId={save.tournamentId} onFriendlyChanged={reloadFriendly}
+                />
+              ) : null}
+              {step === 3 ? <StepFormatPairing {...stepProps} {...friendlyProps} roster={studio.roster} onGoToStep={requestNav} /> : null}
+              {showGate ? <FriendlyDrawGate draft={draft} readiness={readiness} friendly={friendly} onGoToStep={requestNav} /> : null}
+              {step === 4 && !showGate ? (
                 <StepDraw
                   {...stepProps}
+                  {...friendlyProps}
                   roster={studio.roster}
                   busy={busy || save.status === 'saving'}
                   finalizing={studio.finalizing}
                   finalizeError={studio.finalizeError}
-                  onDraw={async (action) => { setBusy(true); try { await draw(action); } finally { setBusy(false); } }}
+                  progress={drawProgress}
+                  onDraw={async (action) => {
+                    setBusy(true);
+                    try { await runWithProgress(action === 'preview' ? 'preview' : 'draw', () => draw(action)); } finally { setBusy(false); }
+                  }}
                   onFinalize={async () => {
-                    const outcome = await finalize();
-                    if (outcome.ok) router.push(outcome.result?.redirect || '/giai-dau/v2');
+                    const outcome = await runWithProgress('finalize', () => finalize());
+                    if (!outcome.ok) return;
+                    // D50: giải giao hữu sau chốt có link xem (không liệt kê) — hiện link trước khi vào bàn điều hành.
+                    if (outcome.result?.publicUrl) setFinalized(outcome.result);
+                    else router.push(outcome.result?.redirect || '/giai-dau/v2');
                   }}
                 />
               ) : null}
             </>
           )}
         </main>
-        <ReadinessRail step={step} readiness={readiness} nextHint={NEXT_HINT[step]} />
+        <ReadinessRail step={showGate ? 3 : step} readiness={readiness} nextHint={(isFriendly ? FRIENDLY_NEXT_HINT : NEXT_HINT)[step]} />
       </div>
 
       <StudioActionBar
         step={step} save={save} dirty={dirty} busy={busy || save.status === 'saving'} canAdvance
         onBack={() => requestNav(step - 1)} onSave={doSave} onNext={goNext}
       />
+
+      {finalized ? (
+        <FinalizedLinkDialog publicUrl={finalized.publicUrl} onContinue={() => router.push(finalized.redirect || '/giai-dau/v2')} />
+      ) : null}
 
       {pendingNav != null ? (
         <StudioDialog

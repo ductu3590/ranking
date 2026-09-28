@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { rememberClubAccessContext } from '@/lib/clubAccessClient';
+import { safeNextPath } from '@/lib/tournament/inviteNextPath';
 import './page.css';
 
 const EMPTY_CREATE_FORM = {
@@ -32,6 +33,8 @@ export default function PickhubHomePage() {
     const [showMemberPassword, setShowMemberPassword] = useState(false);
     const [adminPasswordConfirmation, setAdminPasswordConfirmation] = useState('');
     const [memberPasswordConfirmation, setMemberPasswordConfirmation] = useState('');
+    // ?dang-nhap=clb&next=… (link mời giải giao hữu, Epic 3 F3 §4.5): chỉ nhận đường nội bộ đã kiểm bằng safeNextPath.
+    const [loginNext, setLoginNext] = useState(null);
 
     useEffect(() => {
         const storedGroup = window.localStorage.getItem(GROUP_STORAGE_KEY);
@@ -69,6 +72,9 @@ export default function PickhubHomePage() {
         const groupCode = params.get('group');
         if (groupCode) {
             setJoinForm((prev) => ({ ...prev, code: groupCode.toUpperCase() }));
+            setActiveModal('join');
+        } else if (params.get('dang-nhap') === 'clb') {
+            setLoginNext(safeNextPath(params.get('next')));
             setActiveModal('join');
         } else if (params.get('login') === 'vdv' || params.get('dang-nhap') === 'vdv' || params.has('dang-nhap-vdv')) {
             setActiveModal('athlete-login');
@@ -162,7 +168,7 @@ export default function PickhubHomePage() {
             if (!response.ok) throw new Error(data.error || 'Không thể tham gia nhóm.');
 
             rememberGroup(data.group, data.role);
-            router.push(data.redirectTo || '/quy');
+            router.push(loginNext || data.redirectTo || '/quy');
         } catch (err) {
             setError(err.message);
         } finally {
@@ -726,6 +732,7 @@ export default function PickhubHomePage() {
             {activeModal === 'join' && (
                 <Modal title="Tham gia CLB" onClose={closeModal}>
                     <form className="teamfund-form" onSubmit={handleJoinGroup}>
+                        {loginNext ? <p className="teamfund-modal-hint">Đăng nhập để mở lời mời giải. Dùng mật khẩu quản trị để trả lời lời mời; sau khi đăng nhập bạn sẽ quay lại lời mời.</p> : null}
                         <FormError message={error} />
                         <label>
                             Mã CLB

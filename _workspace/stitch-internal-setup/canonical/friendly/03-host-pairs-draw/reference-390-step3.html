@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tạo giải giao hữu - Bước 3: Thể thức &amp; Ghép cặp | PickHub</title>
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <!-- Material Symbols Outlined -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f5f3ff',
+              100: '#ede9fe',
+              500: '#8b5cf6',
+              600: '#7c3aed',
+              700: '#6d28d9',
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+      -webkit-font-smoothing: antialiased;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+      line-height: 1;
+      display: inline-block;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen py-8 flex justify-center items-start">
+
+  <!-- Mobile Column: exactly 390px, natural height, no fixed frame, no inner scroll -->
+  <div class="w-[390px] bg-white rounded-2xl shadow-xl shadow-slate-200/60 border border-slate-200 overflow-visible flex flex-col">
+
+    <!-- Top Bar -->
+    <header class="w-full px-4 py-3.5 flex items-center justify-between border-b border-slate-100 bg-white rounded-t-2xl">
+      <button type="button" aria-label="Menu" class="size-9 rounded-lg flex items-center justify-center text-slate-700 hover:bg-slate-100 transition-colors">
+        <span class="material-symbols-outlined text-xl">menu</span>
+      </button>
+      <div class="flex items-center gap-1.5">
+        <span class="font-extrabold text-lg tracking-tight text-[#7c3aed]">PickHub</span>
+      </div>
+      <button type="button" aria-label="Thông báo" class="size-9 rounded-lg flex items-center justify-center text-slate-700 hover:bg-slate-100 transition-colors relative">
+        <span class="material-symbols-outlined text-xl">notifications</span>
+        <span class="absolute top-2 right-2 size-2 rounded-full bg-[#7c3aed]"></span>
+      </button>
+    </header>
+
+    <!-- Subheader & Stepper -->
+    <div class="px-4 pt-4 pb-3 border-b border-slate-100 bg-white">
+      <div class="flex items-center justify-between mb-1.5">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-purple-50 text-[#7c3aed] border border-purple-100">
+          <span class="size-1.5 rounded-full bg-[#7c3aed]"></span>
+          Giao hữu liên câu lạc bộ
+        </span>
+        <span class="text-xs font-semibold text-[#7c3aed]">Bước 3/4</span>
+      </div>
+
+      <div class="flex items-baseline justify-between">
+        <h1 class="text-lg font-bold text-slate-900 tracking-tight">Thể thức &amp; Ghép cặp</h1>
+        <span class="text-xs font-medium text-slate-500 truncate max-w-[150px]">Giao hữu Thu 2026</span>
+      </div>
+
+      <!-- 4-step Horizontal Progress Track -->
+      <div class="grid grid-cols-4 gap-1.5 mt-3">
+        <div class="h-1.5 rounded-full bg-[#7c3aed]"></div>
+        <div class="h-1.5 rounded-full bg-[#7c3aed]"></div>
+        <div class="h-1.5 rounded-full bg-[#7c3aed]"></div>
+        <div class="h-1.5 rounded-full bg-slate-200"></div>
+      </div>
+      <div class="flex items-center justify-between text-[11px] text-slate-400 mt-1.5 font-medium">
+        <span class="text-slate-500">1. Thông tin</span>
+        <span class="text-slate-500">2. Tham gia</span>
+        <span class="text-[#7c3aed] font-bold">3. Ghép cặp</span>
+        <span>4. Lịch đấu</span>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="p-4 space-y-4 bg-slate-50/60">
+
+      <!-- Card 1: Thể thức thi đấu -->
+      <section class="bg-white rounded-xl p-3.5 border border-slate-200 shadow-sm">
+        <div class="flex items-center justify-between mb-2.5 pb-2 border-b border-slate-100">
+          <div class="flex items-center gap-2">
+            <span class="size-6 rounded-md bg-purple-50 text-[#7c3aed] flex items-center justify-center">
+              <span class="material-symbols-outlined text-sm">tune</span>
+            </span>
+            <h2 class="text-sm font-bold text-slate-900">Thể thức thi đấu</h2>
+          </div>
+          <span class="text-[11px] font-semibold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-100">
+            Đã chọn
+          </span>
+        </div>
+
+        <div class="space-y-2">
+          <!-- Main format item -->
+          <div class="p-2.5 rounded-lg bg-purple-50/60 border border-purple-200/80 flex items-start gap-2.5">
+            <span class="material-symbols-outlined text-[#7c3aed] text-lg mt-0.5">check_circle</span>
+            <div class="flex-1">
+              <div class="text-xs font-bold text-slate-900">Vòng bảng → Loại trực tiếp</div>
+              <div class="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
+                2 bảng · 2 suất mỗi bảng đi tiếp vào bán kết chéo
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick badges row -->
+          <div class="flex items-center gap-2 pt-1">
+            <div class="flex-1 px-2.5 py-1.5 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between">
+              <span class="text-[11px] text-slate-500 font-medium">Quy mô sân</span>
+              <span class="text-xs font-bold text-slate-800">2 sân</span>
+            </div>
+            <div class="flex-1 px-2.5 py-1.5 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between">
+              <span class="text-[11px] text-slate-500 font-medium">Cấu hình ván</span>
+              <span class="text-xs font-bold text-slate-800">BO1 (tới 11)</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Card 2: Cặp của bạn (Host Club) -->
+      <section class="bg-white rounded-xl p-3.5 border border-slate-200 shadow-sm">
+        <!-- Card Header with Host Chip -->
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-2">
+            <h2 class="text-sm font-bold text-slate-900">Cặp của bạn</h2>
+            <!-- Host Club Chip -->
+            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-white text-slate-700 border border-slate-200 shadow-2xs">
+              <span class="size-2 rounded-full bg-[#7c3aed]"></span>
+              <span class="truncate max-w-[90px]">CLB Test 23.9…</span>
+            </span>
+          </div>
+          <!-- Counter badge -->
+          <span class="text-xs font-bold px-2 py-0.5 rounded-md bg-purple-50 text-[#7c3aed] border border-purple-100">
+            4 cặp
+          </span>
+        </div>
+
+        <!-- Helper text -->
+        <p class="text-[11px] text-slate-500 mb-3 flex items-center gap-1">
+          <span class="material-symbols-outlined text-xs text-[#7c3aed]">touch_app</span>
+          Chạm hai người rồi bấm Ghép cặp
+        </p>
+
+        <!-- 4 Pair Cards -->
+        <div class="space-y-2">
+          <!-- Pair 1 -->
+          <div class="p-2.5 rounded-lg bg-white border border-slate-200 flex items-center justify-between hover:border-purple-300 transition-colors">
+            <div class="flex items-center gap-2.5">
+              <span class="size-6 rounded-md bg-purple-50 text-[#7c3aed] text-xs font-bold flex items-center justify-center border border-purple-100">
+                01
+              </span>
+              <span class="text-xs font-semibold text-slate-900">Nguyễn Minh + Trần Tuấn</span>
+            </div>
+            <button type="button" class="text-[11px] font-semibold text-rose-600 hover:text-rose-700 px-2 py-1 rounded hover:bg-rose-50 transition-colors">
+              Tách
+            </button>
+          </div>
+
+          <!-- Pair 2 -->
+          <div class="p-2.5 rounded-lg bg-white border border-slate-200 flex items-center justify-between hover:border-purple-300 transition-colors">
+            <div class="flex items-center gap-2.5">
+              <span class="size-6 rounded-md bg-purple-50 text-[#7c3aed] text-xs font-bold flex items-center justify-center border border-purple-100">
+                02
+              </span>
+              <span class="text-xs font-semibold text-slate-900">Lê Hoàng + Phạm Quang</span>
+            </div>
+            <button type="button" class="text-[11px] font-semibold text-rose-600 hover:text-rose-700 px-2 py-1 rounded hover:bg-rose-50 transition-colors">
+              Tách
+            </button>
+          </div>
+
+          <!-- Pair 3 -->
+          <div class="p-2.5 rounded-lg bg-white border border-slate-200 flex items-center justify-between hover:border-purple-300 transition-colors">
+            <div class="flex items-center gap-2.5">
+              <span class="size-6 rounded-md bg-purple-50 text-[#7c3aed] text-xs font-bold flex items-center justify-center border border-purple-100">
+                03
+              </span>
+              <span class="text-xs font-semibold text-slate-900">Đỗ Khánh + Vũ Long</span>
+            </div>
+            <button type="button" class="text-[11px] font-semibold text-rose-600 hover:text-rose-700 px-2 py-1 rounded hover:bg-rose-50 transition-colors">
+              Tách
+            </button>
+          </div>
+
+          <!-- Pair 4 -->
+          <div class="p-2.5 rounded-lg bg-white border border-slate-200 flex items-center justify-between hover:border-purple-300 transition-colors">
+            <div class="flex items-center gap-2.5">
+              <span class="size-6 rounded-md bg-purple-50 text-[#7c3aed] text-xs font-bold flex items-center justify-center border border-purple-100">
+                04
+              </span>
+              <span class="text-xs font-semibold text-slate-900">Bùi Sơn + Đặng Dương</span>
+            </div>
+            <button type="button" class="text-[11px] font-semibold text-rose-600 hover:text-rose-700 px-2 py-1 rounded hover:bg-rose-50 transition-colors">
+              Tách
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Card 3: Cặp CLB khách (Guest Club - Read-only) -->
+      <section class="bg-white rounded-xl p-3.5 border border-slate-200 shadow-sm">
+        <!-- Guest Club Header -->
+        <div class="flex items-center justify-between mb-1.5">
+          <div class="flex items-center gap-1.5">
+            <h2 class="text-sm font-bold text-slate-900">Cặp CLB khách</h2>
+            <!-- Guest Club Chip -->
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-50 text-cyan-800 border border-slate-200">
+              <span class="size-2 rounded-full bg-[#0e7490]"></span>
+              <span class="truncate max-w-[85px]">CLB Test Resp…</span>
+            </span>
+          </div>
+          <!-- Emerald Chip: 3 cặp · đã duyệt -->
+          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <span class="material-symbols-outlined text-[13px]">check_circle</span>
+            3 cặp · đã duyệt
+          </span>
+        </div>
+
+        <!-- Full Club Name -->
+        <div class="text-xs font-medium text-slate-600 mb-3 flex items-center gap-1">
+          <span class="text-slate-400">Đơn vị:</span>
+          <span class="font-semibold text-slate-800">CLB Test Responsive UI</span>
+        </div>
+
+        <!-- 3 Read-only Pair Cards -->
+        <div class="space-y-2 mb-3">
+          <!-- Guest Pair 1 -->
+          <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between text-slate-700">
+            <div class="flex items-center gap-2.5">
+              <span class="size-6 rounded-md bg-slate-200/80 text-slate-600 text-xs font-bold flex items-center justify-center">
+                01
+              </span>
+              <span class="text-xs font-medium text-slate-800">Hoàng Nam + Quốc Khánh</span>
+            </div>
+            <span class="material-symbols-outlined text-slate-400 text-sm" title="Khóa">lock</span>
+          </div>
+
+          <!-- Guest Pair 2 -->
+          <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between text-slate-700">
+            <div class="flex items-center gap-2.5">
+              <span class="size-6 rounded-md bg-slate-200/80 text-slate-600 text-xs font-bold flex items-center justify-center">
+                02
+              </span>
+              <span class="text-xs font-medium text-slate-800">Văn Sơn + Đức Thịnh</span>
+            </div>
+            <span class="material-symbols-outlined text-slate-400 text-sm" title="Khóa">lock</span>
+          </div>
+
+          <!-- Guest Pair 3 -->
+          <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between text-slate-700">
+            <div class="flex items-center gap-2.5">
+              <span class="size-6 rounded-md bg-slate-200/80 text-slate-600 text-xs font-bold flex items-center justify-center">
+                03
+              </span>
+              <span class="text-xs font-medium text-slate-800">Hải Đăng + Gia Huy</span>
+            </div>
+            <span class="material-symbols-outlined text-slate-400 text-sm" title="Khóa">lock</span>
+          </div>
+        </div>
+
+        <!-- Note in slate-500 -->
+        <div class="flex items-start gap-1.5 p-2 rounded-lg bg-slate-50/80 border border-slate-100 text-[11px] text-slate-500 leading-relaxed">
+          <span class="material-symbols-outlined text-slate-400 text-xs mt-0.5">info</span>
+          <span>Cặp CLB khách chỉ xem, không ghép hay tách được.</span>
+        </div>
+      </section>
+
+      <!-- Summary Bar -->
+      <section class="bg-gradient-to-r from-purple-50 via-slate-50 to-purple-50/50 rounded-xl p-3 border border-purple-200/70 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="size-7 rounded-lg bg-[#7c3aed] text-white flex items-center justify-center shadow-xs">
+            <span class="material-symbols-outlined text-sm font-bold">groups</span>
+          </span>
+          <div>
+            <div class="text-xs font-bold text-slate-900">
+              7 cặp <span class="text-slate-500 font-normal">(4 của bạn + 3 của CLB Test Responsive UI)</span>
+            </div>
+            <div class="text-[10px] text-emerald-600 font-medium flex items-center gap-0.5">
+              <span class="material-symbols-outlined text-[11px]">verified</span>
+              Đủ điều kiện bốc thăm chia bảng
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Bottom Navigation Bar (Quay lại & Tiếp tục) -->
+    <footer class="p-4 bg-white border-t border-slate-200 rounded-b-2xl flex items-center gap-3">
+      <button type="button" class="flex-1 py-2.5 px-4 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition-colors flex items-center justify-center gap-1.5">
+        <span class="material-symbols-outlined text-sm">arrow_back</span>
+        Quay lại
+      </button>
+      <button type="button" class="flex-[1.4] py-2.5 px-4 rounded-xl bg-[#7c3aed] hover:bg-[#6d28d9] text-white text-xs font-bold transition-all shadow-md shadow-purple-600/20 flex items-center justify-center gap-1.5">
+        Tiếp tục
+        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+      </button>
+    </footer>
+
+  </div>
+
+</body>
+</html>

@@ -164,7 +164,7 @@ function ReasonDialog({ dialog, busy, onSubmit, onClose }) {
   </div>;
 }
 
-export default function ControlCenter({ tournamentId, isAdmin, onSettings, onStandings, onMatches, onChanged }) {
+export default function ControlCenter({ tournamentId, isAdmin, onSettings, onStandings, onMatches, onChanged, onBoard }) {
   const [board, setBoard] = useState(null);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -183,13 +183,15 @@ export default function ControlCenter({ tournamentId, isAdmin, onSettings, onSta
     try {
       const next = await getOperationsBoard(tournamentId);
       setBoard(next);
+      // Shell (Tiến độ giải, nhãn trạng thái) dùng cùng board — không gọi thêm API.
+      if (onBoard) onBoard(next);
       setError('');
       return true;
     } catch (loadError) {
       setError(loadError.message || 'Không tải được bàn điều hành.');
       return false;
     }
-  }, [tournamentId]);
+  }, [onBoard, tournamentId]);
 
   // Làm mới bằng cùng nhịp với trang công khai: dừng khi tab ẩn, làm mới khi quay lại.
   useEffect(() => {

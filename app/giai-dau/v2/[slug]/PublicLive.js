@@ -5,6 +5,7 @@ import { Plus_Jakarta_Sans, JetBrains_Mono } from 'next/font/google';
 import BracketView from '../shared/BracketView';
 import { GroupTables, FinalRanking } from '../shared/StandingsView';
 import ShareActions from '../ShareActions';
+import ClubStandingsCard from '../console/friendly/ClubStandingsCard';
 import './public-live.css';
 
 // Font đúng thiết kế Stitch OPS-07; app gốc chỉ tải Montserrat nên các khối rơi về font hệ thống khác nhau.
@@ -162,13 +163,38 @@ function ScheduleTab({ groups, stages }) {
   </div>;
 }
 
-function StandingsTab({ stages, standingsByStage, names, groups, done }) {
+// Giải giao hữu (D53): tab Xếp hạng chỉ BỔ SUNG đoạn chuyển "Cặp · CLB"; phần "Cặp" giữ nguyên như giải nội bộ.
+function StandingsTab({ stages, standingsByStage, names, groups, done, friendly = null }) {
+  const [view, setView] = useState('club');
+  if (friendly?.clubStandings && view === 'club') {
+    return <div className="pl-tab">
+      <ClubSwitch view={view} onChange={setView} />
+      <ClubStandingsCard standings={friendly.clubStandings} />
+    </div>;
+  }
+  return <div className="pl-tab">
+    {friendly?.clubStandings ? <ClubSwitch view={view} onChange={setView} /> : null}
+    <PairStandings stages={stages} standingsByStage={standingsByStage} names={names} groups={groups} done={done} />
+  </div>;
+}
+
+function ClubSwitch({ view, onChange }) {
+  return <div className="pl-club-switch" role="tablist" aria-label="Chế độ xem xếp hạng">
+    <span>Chế độ xem</span>
+    <div>
+      <button type="button" role="tab" aria-selected={view === 'pair'} onClick={() => onChange('pair')}>Cặp</button>
+      <button type="button" role="tab" aria-selected={view === 'club'} onClick={() => onChange('club')}>CLB</button>
+    </div>
+  </div>;
+}
+
+function PairStandings({ stages, standingsByStage, names, groups, done }) {
   const last = stages[stages.length - 1];
   const lastItems = groups.filter((group) => String(group.stageId) === String(last?.id)).flatMap((group) => group.matches);
   const finalMatch = lastItems.find((item) => item.code === 'GF') || lastItems.find((item) => item.code === 'F');
   const undecided = last && last.format !== 'round_robin' ? !finalMatch || finalMatch.status !== 'finalized' : lastItems.some((item) => item.status !== 'finalized');
   const criteria = (stage) => (stage?.tiebreak?.order || []).map((key) => CRITERIA[key] || key);
-  return <div className="pl-tab">
+  return <>
     {!undecided ? <section className="pl-section"><h2><i className="pl-dot is-gold" />Xếp hạng chung cuộc{done ? null : <span className="pl-count is-warn">Tạm tính</span>}</h2>
       <FinalRanking rows={standingsByStage[String(last.id)]?.standings || []} names={names} />
     </section> : null}
@@ -177,7 +203,7 @@ function StandingsTab({ stages, standingsByStage, names, groups, done }) {
       <GroupTables rows={standingsByStage[String(stage.id)]?.standings || []} names={names} criteria={criteria(stage)} />
     </section>)}
     {undecided && last && last.format !== 'round_robin' ? <section className="pl-section"><h2><i className="pl-dot is-gold" />Xếp hạng chung cuộc</h2><FinalRanking rows={[]} undecided /></section> : null}
-  </div>;
+  </>;
 }
 
 function defaultTab(status) {
@@ -271,7 +297,7 @@ export default function PublicLive({ data, initialDivisionId = null }) {
     <div className="pl-main">
       {activeTab === 'live' ? <LiveTab courts={view.courts} upcoming={view.upcoming} recent={view.recent} finalizedCount={view.progress.finalized} now={now} onSeeAll={() => selectTab('schedule')} /> : null}
       {activeTab === 'schedule' ? <ScheduleTab groups={view.groups} stages={view.stages} /> : null}
-      {activeTab === 'standings' ? <StandingsTab stages={view.stages} standingsByStage={data.standingsByStage || {}} names={view.names} groups={view.groups} done={done} /> : null}
+      {activeTab === 'standings' ? <StandingsTab stages={view.stages} standingsByStage={data.standingsByStage || {}} names={view.names} groups={view.groups} done={done} friendly={data.friendly || null} /> : null}
       {activeTab === 'bracket' ? <div className="pl-tab"><BracketView groups={view.bracketGroups} /></div> : null}
     </div>
 

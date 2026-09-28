@@ -1,0 +1,331 @@
+{
+  "stitchProject": "16224817196221939744",
+  "designSystem": "assets/ca3eeb22ca9e4f738817511ae0f13aae (Pro Court OS, light)",
+  "importedAt": "2026-09-25",
+  "files": [
+    {
+      "path": "friendly/01-host-invite/reference-390-link.html",
+      "stitchScreenId": "233bad25a5cc46c3a7b867179aa90644",
+      "bytes": 10650,
+      "sha256": "ca1d80621bb4978ba15d5ed94368c8f1b2dda43c20527506cbba2eb5ea7a0d76"
+    },
+    {
+      "path": "friendly/01-host-invite/reference-390-link.png",
+      "stitchScreenId": "233bad25a5cc46c3a7b867179aa90644",
+      "bytes": 55419,
+      "sha256": "af8ff3c73c26acc6034d760af801d174ed77deb6e5d7270f983e6038975ffbf2"
+    },
+    {
+      "path": "friendly/01-host-invite/reference-390-sheet.html",
+      "stitchScreenId": "31088db2b8f24da59bbf58f8a520284b",
+      "bytes": 14729,
+      "sha256": "d446a1b43efc71f0fe8cc9904c07d8b072c5576a12cc330af387d3f1c186716b"
+    },
+    {
+      "path": "friendly/01-host-invite/reference-390-sheet.png",
+      "stitchScreenId": "31088db2b8f24da59bbf58f8a520284b",
+      "bytes": 54511,
+      "sha256": "8b29bbeb578e759c5f03def0697c0c7b2735fc073dce1418f549ea683b50b667"
+    },
+    {
+      "path": "friendly/01-host-invite/reference-390-states.html",
+      "stitchScreenId": "811f8b1971a54811b1eadd6210774fde",
+      "bytes": 20496,
+      "sha256": "13f3ac055ab5faba08ebf8428e4ce94f7f0468226d0538b35a3a392af41984e2"
+    },
+    {
+      "path": "friendly/01-host-invite/reference-390-states.png",
+      "stitchScreenId": "811f8b1971a54811b1eadd6210774fde",
+      "bytes": 91962,
+      "sha256": "6aedcad977e400636b5b89e374b8d70fa83cbaa9e266e8a40bf535e5b34dbf3e"
+    },
+    {
+      "path": "friendly/01-host-invite/reference-390-type.html",
+      "stitchScreenId": "95079ea9a490462089cfdd1165a1d8d0",
+      "bytes": 14804,
+      "sha256": "7585c769c857c53161bbafe208886e5d83c7341899b4336912afbb8c3cc89331"
+    },
+    {
+      "path": "friendly/01-host-invite/reference-390-type.png",
+      "stitchScreenId": "95079ea9a490462089cfdd1165a1d8d0",
+      "bytes": 56963,
+      "sha256": "baf14a289740f1760d17a15cdfe7cefdc671db0eecb2b91a7aa970405101cbde"
+    },
+    {
+      "path": "friendly/01-host-invite/reference-390.html",
+      "stitchScreenId": "c77f104dfbe44b31bb9cfa58f017cc1e",
+      "bytes": 13498,
+      "sha256": "7612038c3827549f70e4be028a4f70e18b0c2efbebcd1c684efe105f5b65fb4e"
+    },
+    {
+      "path": "friendly/01-host-invite/reference-390.png",
+      "stitchScreenId": "c77f104dfbe44b31bb9cfa58f017cc1e",
+      "bytes": 66949,
+      "sha256": "3c3e94db43c395af62bbc9a93e4a32c8a6a359f25ee2f277db4d695eee06aa54"
+    },
+    {
+      "path": "friendly/02-host-review/reference-390-approved.html",
+      "stitchScreenId": "14d0077087d2487e970ecbcefaa4cc1d",
+      "bytes": 10016,
+      "sha256": "25e1d9661ca2ee4a790d900335385ae59f5c63a2cdd95a16768df7ec3a399168"
+    },
+    {
+      "path": "friendly/02-host-review/reference-390-approved.png",
+      "stitchScreenId": "14d0077087d2487e970ecbcefaa4cc1d",
+      "bytes": 44700,
+      "sha256": "a06db7985ae904ff4d0c283a6c865fed17f4d824d5cca3c825fda9abe7cf6248"
+    },
+    {
+      "path": "friendly/02-host-review/reference-390-request.html",
+      "stitchScreenId": "22dfa01316954918a3781bcdc7ff481b",
+      "bytes": 10744,
+      "sha256": "4bf919f1fd94b19a0a24c94059a35bcf12ed1951fa73ed178419188e6b830398"
+    },
+    {
+      "path": "friendly/02-host-review/reference-390-request.png",
+      "stitchScreenId": "22dfa01316954918a3781bcdc7ff481b",
+      "bytes": 47140,
+      "sha256": "de1dca8ff306f7bfd432ed85e62eaba733422558f03b503fff7b89cc9e468210"
+    },
+    {
+      "path": "friendly/02-host-review/reference-390.html",
+      "stitchScreenId": "02680fbf584a499e914eb2a00cb63dd8",
+      "bytes": 13678,
+      "sha256": "62a3971e26cd8994c833b4a5bf4abc186630a191b55bdc6f519c440a84363872"
+    },
+    {
+      "path": "friendly/02-host-review/reference-390.png",
+      "stitchScreenId": "02680fbf584a499e914eb2a00cb63dd8",
+      "bytes": 36354,
+      "sha256": "73da2d660c6c15d3934a01e74d0139e31b87f59f342ae60597d44e0e96bd7e91"
+    },
+    {
+      "path": "friendly/03-host-pairs-draw/reference-390-step3-blocked.html",
+      "stitchScreenId": "6420f81be8a34b459bdc600c63e8a982",
+      "bytes": 14836,
+      "sha256": "17a10efcd2f2335a4dca215426226c7ea5add17491cf3556d624a0d65ddaafe3"
+    },
+    {
+      "path": "friendly/03-host-pairs-draw/reference-390-step3-blocked.png",
+      "stitchScreenId": "6420f81be8a34b459bdc600c63e8a982",
+      "bytes": 74319,
+      "sha256": "34e34145cc4a2426625df1ff3cc564027d17dbc5c7c73c668e532a7eb729ae96"
+    },
+    {
+      "path": "friendly/03-host-pairs-draw/reference-390-step3.html",
+      "stitchScreenId": "a0d1286def99416cb90c4d1979a9546e",
+      "bytes": 16432,
+      "sha256": "776de5549c2ce30618ccc19458ddc79df66d351e3a5cc6233c17d37cdef5db4b"
+    },
+    {
+      "path": "friendly/03-host-pairs-draw/reference-390-step3.png",
+      "stitchScreenId": "a0d1286def99416cb90c4d1979a9546e",
+      "bytes": 71056,
+      "sha256": "6a7436204e9747ff071df7fa57ad09a29e8e7d62456800d4834e91f164cf51d9"
+    },
+    {
+      "path": "friendly/03-host-pairs-draw/reference-390-step4.html",
+      "stitchScreenId": "4ce65d95aac44a58a23a9b806438397d",
+      "bytes": 15451,
+      "sha256": "9c5bfb23a30d0496f56e82d6ddc82e009bb1f1ba7c01d9ec4c2275dd2dcf47ab"
+    },
+    {
+      "path": "friendly/03-host-pairs-draw/reference-390-step4.png",
+      "stitchScreenId": "4ce65d95aac44a58a23a9b806438397d",
+      "bytes": 93184,
+      "sha256": "9c5cf814e204e8692758c38c563ec1979bfd0f4fe2d8ea2a97e43d7d98300845"
+    },
+    {
+      "path": "friendly/04-notifications-inbox/reference-390-bell.html",
+      "stitchScreenId": "960dc6e5765541a38d56000c6e7f2e90",
+      "bytes": 14595,
+      "sha256": "429caf16c69fa31e79f1f5a76eb3f0831441b673d75447bcd7c25596ec53bef5"
+    },
+    {
+      "path": "friendly/04-notifications-inbox/reference-390-bell.png",
+      "stitchScreenId": "960dc6e5765541a38d56000c6e7f2e90",
+      "bytes": 66266,
+      "sha256": "747ec6f82270a3611d6227864ebd83e55834dcef6f45db0fa2c82ffaf2b78441"
+    },
+    {
+      "path": "friendly/04-notifications-inbox/reference-390-inbox.html",
+      "stitchScreenId": "d17937ad83d04baa97492303791814ae",
+      "bytes": 14935,
+      "sha256": "b40e2bd224301ab0533b2ae1afa78db752f1357ebfdd06db32f821427ff734f3"
+    },
+    {
+      "path": "friendly/04-notifications-inbox/reference-390-inbox.png",
+      "stitchScreenId": "d17937ad83d04baa97492303791814ae",
+      "bytes": 68229,
+      "sha256": "d68aa9f5ceafcc6a0c0ed782583c995467dbe8b2aec02f677312bcfee771476e"
+    },
+    {
+      "path": "friendly/05-invite-link/reference-390-login.html",
+      "stitchScreenId": "e2981b7d65f54d5ca805ae14c1fc2afe",
+      "bytes": 10946,
+      "sha256": "07fa2626dc03069d125ff5bb2511271235a753fcc9da239b7966a7b9012681c9"
+    },
+    {
+      "path": "friendly/05-invite-link/reference-390-login.png",
+      "stitchScreenId": "e2981b7d65f54d5ca805ae14c1fc2afe",
+      "bytes": 33446,
+      "sha256": "4c7bb9668ca9d0ba16879e722ca4322b6914e109b6f44a477dad4595fc0899c8"
+    },
+    {
+      "path": "friendly/05-invite-link/reference-390-states.html",
+      "stitchScreenId": "b70d6341f73c497b82c66e406ad09294",
+      "bytes": 9983,
+      "sha256": "3f25c207540680c058d29d9377335a546f1a390e68e3b279a365e71c5a6447b7"
+    },
+    {
+      "path": "friendly/05-invite-link/reference-390-states.png",
+      "stitchScreenId": "b70d6341f73c497b82c66e406ad09294",
+      "bytes": 49708,
+      "sha256": "5eac30fbdf190d345efa3ceb6b98776710da69f09d18b8e712d5d49aa3d047a1"
+    },
+    {
+      "path": "friendly/05-invite-link/reference-390-wrong-club.html",
+      "stitchScreenId": "06583d50156e4960adf84f610c3ba38a",
+      "bytes": 6916,
+      "sha256": "a5d73025b3fd15821b6086d35256b7be58340f53e556399c6755f1d55d7e44f4"
+    },
+    {
+      "path": "friendly/05-invite-link/reference-390-wrong-club.png",
+      "stitchScreenId": "06583d50156e4960adf84f610c3ba38a",
+      "bytes": 25591,
+      "sha256": "b3a9321986bd70d8c41b788950f672e27e6ac6010209d06834f680e97b28c0a1"
+    },
+    {
+      "path": "friendly/06-guest-registration/reference-390-changes-requested.html",
+      "stitchScreenId": "5850d8cb3ea144e2b2f5124b6786f6cf",
+      "bytes": 16194,
+      "sha256": "d341c9f47e95988311dc11abf4fc0801f4687121db3ba5c16731ba56bb4011a4"
+    },
+    {
+      "path": "friendly/06-guest-registration/reference-390-changes-requested.png",
+      "stitchScreenId": "5850d8cb3ea144e2b2f5124b6786f6cf",
+      "bytes": 69903,
+      "sha256": "32bda0191afa9a193dc7b48e899239bf36d3ab802f45f0b17225de4e3d8017a4"
+    },
+    {
+      "path": "friendly/06-guest-registration/reference-390-closed-finalized.html",
+      "stitchScreenId": "6ad857ccac5445ea90ee7293419c4353",
+      "bytes": 11945,
+      "sha256": "b1eea176cd18fea50affc8f9bc580a4d043433808ab5c57f04c1df9ee90359d9"
+    },
+    {
+      "path": "friendly/06-guest-registration/reference-390-closed-finalized.png",
+      "stitchScreenId": "6ad857ccac5445ea90ee7293419c4353",
+      "bytes": 45792,
+      "sha256": "81662fc00d407ee4bb1e9ad5c837e50f6c10bba92ad29e3fd8550cc27798b4c8"
+    },
+    {
+      "path": "friendly/06-guest-registration/reference-390-conflict.html",
+      "stitchScreenId": "b58d1a7ed6714a378fc15d4e124026c7",
+      "bytes": 11065,
+      "sha256": "4cd59478f4e7e9b4492e5189bb65939b7e63d453f1848759a7b0c039a0a7ef7f"
+    },
+    {
+      "path": "friendly/06-guest-registration/reference-390-conflict.png",
+      "stitchScreenId": "b58d1a7ed6714a378fc15d4e124026c7",
+      "bytes": 49874,
+      "sha256": "eb7a6f5646a0fb39e757c5093f81b3c12e5973c025d3c5f79e3a58c468806805"
+    },
+    {
+      "path": "friendly/06-guest-registration/reference-390-invited.html",
+      "stitchScreenId": "57d0bf47c95d499692567ac9577f076d",
+      "bytes": 11895,
+      "sha256": "375ba063906d6756ba7a7149ebcff27fabf70832af6308ad60881a3764d6f0a3"
+    },
+    {
+      "path": "friendly/06-guest-registration/reference-390-invited.png",
+      "stitchScreenId": "57d0bf47c95d499692567ac9577f076d",
+      "bytes": 45201,
+      "sha256": "aefde72d2e9ad421533635ac8ea5f6ac6d2d9da57693eb5aaa15db367632ed31"
+    },
+    {
+      "path": "friendly/06-guest-registration/reference-390-submitted-approved.html",
+      "stitchScreenId": "9cbe84b84cc342d1889e0079d08a81e8",
+      "bytes": 11944,
+      "sha256": "2f3c8dda3ddb9acb4660fa527cb06f81aa6d5bd9e122af88e24f6a0d2ccaa7de"
+    },
+    {
+      "path": "friendly/06-guest-registration/reference-390-submitted-approved.png",
+      "stitchScreenId": "9cbe84b84cc342d1889e0079d08a81e8",
+      "bytes": 61202,
+      "sha256": "24e08d35b93ae31e2a39a184440a827a0b48c5cd1c7df83a20a14864de66bae1"
+    },
+    {
+      "path": "friendly/06-guest-registration/reference-390.html",
+      "stitchScreenId": "428b32bc28fa4f82b98b97e15168c2de",
+      "bytes": 20486,
+      "sha256": "93d622e617a521d845091b93a609d61f475162aee81b84f611f3ed222972799e"
+    },
+    {
+      "path": "friendly/06-guest-registration/reference-390.png",
+      "stitchScreenId": "428b32bc28fa4f82b98b97e15168c2de",
+      "bytes": 67020,
+      "sha256": "dbc1ada4ebca526412689458bacd0bbfc055c91a75119041346b8f8db374d72e"
+    },
+    {
+      "path": "friendly/07-club-standings/reference-390-3clubs.html",
+      "stitchScreenId": "71cf270326ef48a0881a7365d2783c3f",
+      "bytes": 21194,
+      "sha256": "dc0d9cbb4316c6fd6806e2b84039d6774b4b1cfa4efc33ff31b1646ad61515de"
+    },
+    {
+      "path": "friendly/07-club-standings/reference-390-3clubs.png",
+      "stitchScreenId": "71cf270326ef48a0881a7365d2783c3f",
+      "bytes": 57438,
+      "sha256": "3e80dfa30a190734d903e48307f1ae07aa24614b931be6bd58112b01c8f6a4b1"
+    },
+    {
+      "path": "friendly/07-club-standings/reference-390-bracket.html",
+      "stitchScreenId": "1bb7648053fa449c9a70b0674bcf1f75",
+      "bytes": 18339,
+      "sha256": "5185ab646f09ddb5f2a69ac0e292e09a9141d92d169783ba60da1905ae0be1ff"
+    },
+    {
+      "path": "friendly/07-club-standings/reference-390-bracket.png",
+      "stitchScreenId": "1bb7648053fa449c9a70b0674bcf1f75",
+      "bytes": 56007,
+      "sha256": "d9406a113667010c1506bd9ecd47482074086670bdc979a558bd294caeccac2b"
+    },
+    {
+      "path": "friendly/07-club-standings/reference-390.html",
+      "stitchScreenId": "847b4f7619e8448cb3a1e62c48057dce",
+      "bytes": 18770,
+      "sha256": "adb075008f15786b928d1d86686fc06861bea42bed14864291417e31013434b0"
+    },
+    {
+      "path": "friendly/07-club-standings/reference-390.png",
+      "stitchScreenId": "847b4f7619e8448cb3a1e62c48057dce",
+      "bytes": 66309,
+      "sha256": "a25358ee7a9ddade1313b139738d632c22e57e7a9b36533d8fdd9a7d0962f3f8"
+    },
+    {
+      "path": "friendly/08-public-friendly/reference-390-standings.html",
+      "stitchScreenId": "6f3470c4833c48ee8f506581e85986c6",
+      "bytes": 21502,
+      "sha256": "32e127f175aaceae988a9147932b9c9e0a86e4a81f515b143ab3ef1030bb1156"
+    },
+    {
+      "path": "friendly/08-public-friendly/reference-390-standings.png",
+      "stitchScreenId": "6f3470c4833c48ee8f506581e85986c6",
+      "bytes": 89481,
+      "sha256": "5eb69484d618ed038d548b55bd1abe53446daa1d666f1cb909d937552189175e"
+    },
+    {
+      "path": "friendly/08-public-friendly/reference-390.html",
+      "stitchScreenId": "6cda1e543469444cab47357ab1f5e3d1",
+      "bytes": 25683,
+      "sha256": "5f5894019a1635a349e60630e54edc21a9ec9dfdfd4fb4d2f9c614d277085dea"
+    },
+    {
+      "path": "friendly/08-public-friendly/reference-390.png",
+      "stitchScreenId": "6cda1e543469444cab47357ab1f5e3d1",
+      "bytes": 98987,
+      "sha256": "86fc72dd458c46d4579570828ec6d70685a60d01025b593f5617b00771db4ab5"
+    }
+  ]
+}

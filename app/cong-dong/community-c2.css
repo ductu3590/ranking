@@ -106,6 +106,10 @@
 /* Khu quản trị có khung riêng: ẩn thanh trên công khai và bỏ lề khung chung. */
 .cd-shell:has(.ad-shell) .cd-topbar { display: none; }
 .cd-shell:has(.ad-shell) .cd-main { padding: 0; justify-items: stretch; }
+/* Workspace dựng giải (studio setup dùng chung) có khung riêng: ẩn thanh trên, chiếm hết bề ngang, không để lưới căn giữa kéo rộng theo nội dung. */
+.cd-shell:has(.pc-studio) .cd-topbar { display: none; }
+.cd-shell:has(.pc-studio) .cd-main { padding: 0; justify-items: stretch; min-width: 0; }
+.cd-main > .pc-studio { width: 100%; min-width: 0; max-width: 100%; }
 .ad-content { padding: 0 1rem 2rem; }
 .ad-topbar { padding: 0.75rem 1rem 0; }
 .ad-shell { --ad-sidebar: 16rem; display: grid; grid-template-columns: 1fr; width: 100%; max-width: 90rem; margin: 0 auto; }

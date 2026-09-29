@@ -80,3 +80,14 @@ Dùng skill tournament-orchestrator + tournament-setup-invariants. Trước khi 
 brainstorm chốt các "câu hỏi mở" của epic bằng AskUserQuestion, rồi viết spec chia lát
 vào docs/superpowers/specs/. Làm theo "Quy tắc làm việc chung" mục 1 của roadmap.
 ```
+
+## Việc còn nợ (ghi 2026-09-29, sau Epic 4)
+
+### Nợ 1 — Liên kết tài khoản VĐV công khai với hồ sơ thành viên CLB (phase riêng, CHƯA quyết hướng)
+- **Hiện trạng:** `player_accounts` (SĐT + mật khẩu, D54) độc lập với CLB. Chốt giải cộng đồng tạo `athletes` mới (không `legacy_club_member_id`) → một người có thể có hai hồ sơ; thành tích giải cộng đồng không cộng vào hồ sơ CLB; chưa có phát hiện trùng.
+- **Định hướng của người dùng:** hai loại tài khoản **độc lập** — (1) thành viên chỉ sinh hoạt CLB: xem quỹ, BXH; (2) người thích đánh giải: có thể **liên kết** với hồ sơ CLB và tham gia giải trên hệ thống.
+- **Hướng đề xuất (chưa chọn):** (a) khi chốt giải so SĐT với thành viên CLB, gợi ý gộp, admin xác nhận; (b) thành viên tự liên kết trong "Hồ sơ" bằng mã / admin CLB xác nhận.
+- **Cần:** spec + migration riêng; đụng `athletes`, `athlete_accounts`, `player_accounts`, `lib/domain/identity/duplicates.js`.
+- **Nhắc lại** khi bàn Epic tiếp theo hoặc khi người dùng hỏi "còn nợ gì".
+
+### Nợ 2 — Xuất HTML/PNG các màn Stitch Epic 4 vào `_workspace/stitch-internal-setup/canonical/community/<key>/reference-desktop|mobile`.

@@ -44,7 +44,7 @@ export default function TournamentConsoleV2({ tournamentId }) {
     setLoading(true);
     setError('');
     try {
-      const [list, stageList, courtBoard, divisionList] = await Promise.all([listTournaments(), listStages(tournamentId), getCourtBoard(tournamentId), listDivisions(tournamentId)]);
+      const [list, stageList, courtBoard, divisionList] = await Promise.all([listTournaments(tournamentId), listStages(tournamentId), getCourtBoard(tournamentId), listDivisions(tournamentId)]);
       setTournament((Array.isArray(list) ? list : []).find((item) => String(item.id) === String(tournamentId)) || null);
       const nextStages = Array.isArray(stageList) ? stageList : [];
       setStages(nextStages);
@@ -83,6 +83,15 @@ export default function TournamentConsoleV2({ tournamentId }) {
         const nextSession = view?.session || null;
         setSession(nextSession);
         setIsAdmin(nextSession?.role === 'admin');
+        if (nextSession?.role === 'admin') return null;
+        // Không có phiên CLB: thử phiên admin hệ thống (giải cộng đồng, Epic 4 C3). Quyền thật vẫn do từng route kiểm.
+        return fetch('/api/platform/session', { credentials: 'same-origin', cache: 'no-store' })
+          .then((response) => (response.ok ? response.json() : null))
+          .then((platform) => {
+            if (!active || !platform?.session) return;
+            setSession({ group_name: 'PickHub', group_code: 'PH', role: 'admin' });
+            setIsAdmin(true);
+          });
       })
       .catch(() => {
         if (active) { setSession(null); setIsAdmin(false); }

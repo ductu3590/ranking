@@ -4,17 +4,19 @@ import { supabaseServer } from '@/lib/supabaseServer';
 import { computeStageStandings } from '@/lib/tournament/standingsService';
 import { qualificationOutlook } from '@/lib/tournament/qualification';
 import { getClubReadScope } from '@/lib/clubReadContext';
+import { communityReadScope } from '@/lib/communitySetupServer';
 
 const db = supabaseAdmin || supabaseServer;
 
 export async function GET(request) {
     try {
-        const scope = await getClubReadScope();
-        if (!scope.ok) return scope.response;
-        const groupId = scope.groupId;
-
         const { searchParams } = new URL(request.url);
         const stageId = searchParams.get('stageId');
+        // Phiên CLB / VĐV đi đường cũ; admin hệ thống chỉ được đọc BXH của giải cộng đồng (Epic 4 C3).
+        let scope = await getClubReadScope();
+        if (!scope.ok) scope = (await communityReadScope({ stageId })) || scope;
+        if (!scope.ok) return scope.response;
+        const groupId = scope.groupId;
         if (!stageId) {
             return NextResponse.json({ error: 'stageId is required' }, { status: 400 });
         }

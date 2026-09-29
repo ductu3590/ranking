@@ -1,9 +1,15 @@
 import crypto from 'crypto';
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
-import { hashSessionKey, limiter, setPlatformSessionCookie, secret, signPlatformSession, verifyPassword } from '@/lib/platformSession';
+import { getValidatedPlatformSessionFromCookies, hashSessionKey, limiter, setPlatformSessionCookie, secret, signPlatformSession, verifyPassword } from '@/lib/platformSession';
 import { getPlatformRateLimitKey, validatePlatformLogin } from '@/lib/platformSessionCore';
 import { clientIp, consumePublicRateLimit } from '@/lib/publicRateLimit';
+
+// GET: trạng thái phiên admin hệ thống (chỉ vai trò, không trả gì nhạy cảm) — bàn điều hành giải cộng đồng dùng để hiện điều khiển.
+export async function GET() {
+  const session = await getValidatedPlatformSessionFromCookies();
+  return NextResponse.json({ session: session ? { role: session.role } : null }, { headers: { 'Cache-Control': 'no-store' } });
+}
 
 export async function POST(request) {
   try {

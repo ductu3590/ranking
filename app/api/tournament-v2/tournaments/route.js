@@ -10,6 +10,8 @@ import { writeOperationLog } from '@/lib/tournament/operationLog';
 import { finalStandingsFrom } from '@/lib/tournament/qualification';
 import { computeStageStandings } from '@/lib/tournament/standingsService';
 import { getClubReadScope } from '@/lib/clubReadContext';
+import { requireTournamentAccess } from '@/lib/tournament/accessRuntime';
+import { communitySetupAdmin } from '@/lib/communitySetupServer';
 import { preserveServerOwnedSettings } from '@/lib/tournament/friendlyClubs';
 import { generateSlug } from '@/lib/tournament/publicSlug';
 
@@ -230,17 +232,30 @@ async function insertWithSlugRetry(payload) {
     return { data: null, error: new Error('Unable to generate a unique public slug') };
 }
 
-export async function GET() {
+export async function GET(request) {
     try {
-        const scope = await getClubReadScope();
+        // Bàn điều hành giải cộng đồng (Epic 4 C3): admin hệ thống không có phiên CLB nên xin đúng MỘT giải qua ?id=.
+        // Chỉ cấp cho platform actor có quyền đọc giải đó; phiên CLB / VĐV đi đường cũ, không đổi.
+        const idParam = new URL(request.url).searchParams.get('id');
+        let onlyTournamentId = null;
+        let scope = null;
+        if (/^[1-9][0-9]{0,15}$/.test(String(idParam || ''))) {
+            const access = await requireTournamentAccess({ tournamentId: idParam, need: 'read' });
+            if (access.ok && access.actorKind === 'platform') {
+                scope = { ok: true, groupId: access.groupId };
+                onlyTournamentId = Number(idParam);
+            }
+        }
+        if (!scope) scope = await getClubReadScope();
         if (!scope.ok) return scope.response;
         const groupId = scope.groupId;
 
-        const { data, error } = await db
+        let tournamentQuery = db
             .from('tournaments')
             .select('*')
-            .eq('group_id', groupId)
-            .order('event_date', { ascending: false });
+            .eq('group_id', groupId);
+        if (onlyTournamentId) tournamentQuery = tournamentQuery.eq('id', onlyTournamentId);
+        const { data, error } = await tournamentQuery.order('event_date', { ascending: false });
 
         if (error) {
             return NextResponse.json({ error: error.message }, { status: 500 });
@@ -504,7 +519,12 @@ export async function POST(request) {
 
 export async function PATCH(request) {
     try {
-        const adminCheck = await requireValidatedGroupAdmin();
+        let adminCheck = await requireValidatedGroupAdmin();
+        if (!adminCheck.ok) {
+            // Giải cộng đồng (Epic 4 C3): admin hệ thống đổi trạng thái (vd. kết thúc giải) bằng platform_session; phiên CLB giữ nguyên.
+            const peek = await request.clone().json().catch(() => null);
+            adminCheck = (await communitySetupAdmin(peek?.id)) || adminCheck;
+        }
         if (!adminCheck.ok) return adminCheck.response;
 
         const body = await request.json();

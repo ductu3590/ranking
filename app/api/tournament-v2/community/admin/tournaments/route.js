@@ -50,8 +50,15 @@ export async function PATCH(request) {
             if (value && !/^\d{4}-\d{2}-\d{2}$/.test(value)) return communityJson({ error: 'Ngày thi đấu không hợp lệ.', code: 'COMMUNITY_DATE_INVALID' }, 400);
             update.event_date = value;
         }
+        if ('startTime' in body) {
+            const value = body.startTime ? String(body.startTime) : '';
+            if (value && !/^([01]\d|2[0-3]):[0-5]\d$/.test(value)) return communityJson({ error: 'Giờ bắt đầu không hợp lệ.', code: 'COMMUNITY_TIME_INVALID' }, 400);
+            const settings = { ...(update.settings || current.settings || {}) };
+            if (value) settings.start_time = value; else delete settings.start_time;
+            update.settings = settings;
+        }
         if ('openRegistration' in body) {
-            update.settings = { ...(current.settings || {}), open_registration: body.openRegistration === true };
+            update.settings = { ...(update.settings || current.settings || {}), open_registration: body.openRegistration === true };
             // Mở đăng ký cần link công khai: bảo đảm slug và visibility unlisted (giải đã có slug thì giữ nguyên).
             if (body.openRegistration === true) {
                 update.visibility = 'unlisted';

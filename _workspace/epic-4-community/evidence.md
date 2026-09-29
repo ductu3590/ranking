@@ -55,3 +55,41 @@ Lỗi giao diện tìm thấy và sửa khi kiểm: `.cd-shell button { color: i
 2. **Cấp tài khoản admin hệ thống đầu tiên:** người dùng tự chạy `scripts/seed-platform-account.js` với biến môi trường tự đặt (agent không nhìn mật khẩu).
 3. Trang `/cong-dong/quan-tri` sau đăng nhập mới chỉ báo "đã đăng nhập"; danh sách giải cộng đồng thuộc lát C2.
 4. Màn Stitch PLC-02/03, PLA-01 (PC + mobile) để đối chiếu — xem `canonical/community/`.
+
+---
+
+## Lát C2 — đăng ký, ghép cặp, duyệt, phí, công khai
+
+### Cơ sở dữ liệu
+- Migration `113_community_registrations.sql` **đã apply** lên project hiện hữu; 38 ca SQL (`database/tests/epic4_c2_integration.sql`, sinh bởi `scripts/qa/epic4-c2-integration.js`) chạy trong `BEGIN … ROLLBACK`, xanh; `md5(prosrc)` của 13 hàm khớp file migration (sau khi bỏ chú thích trong thân hàm).
+- Migration thuần additive; không đổi CHECK của `origin`, đơn cộng đồng phân biệt bằng `player_account_id IS NOT NULL`.
+
+### Kiểm qua API + trình duyệt (dữ liệu `TEST-CD`, giải 262, nhóm 8)
+| Thao tác | Kết quả |
+|---|---|
+| A đăng ký "đã có bạn" nhập SĐT B → B thấy lời mời → nhận | Cặp A+B gộp, trạng thái "Chờ duyệt" |
+| C, D đăng ký "cần tìm bạn" | 2 đơn "Chờ bạn ghép", hiện trong bảng tìm bạn (chỉ tên hiển thị) |
+| Admin: **Duyệt** cặp A+B | Đã duyệt 1/2, bộ đếm cập nhật |
+| Admin: chọn C + D → **Ghép hộ** | "Đã ghép cặp", 1 đơn "Chờ duyệt" (nút bị vô hiệu đến khi chọn đúng hai người ở khung "VĐV lẻ") |
+| Admin: **Đánh dấu đã thu** / Bỏ đánh dấu | Nhãn "Đã xác nhận thu" |
+| Admin: **Duyệt** cặp C+D | Đã duyệt 2/2, "Chưa thu phí" giảm còn 1 |
+| Công khai `GET /public/community/{slug}/pairs` | `approved 2/2`, 2 tên cặp; không chứa SĐT/ngày sinh (8/8 lần gọi nhất quán; header `no-store`) |
+| Mobile 375px: trang công khai, "Đơn của tôi", trang đăng ký | không tràn ngang; nút ≥ 44 px; giải đầy → "Đăng ký vào danh sách chờ" |
+| PC 1280px: bảng duyệt admin | bảng đủ cột, thanh thao tác hàng loạt |
+
+Ghi chú: một lần gọi đầu tiên vào `/pairs` ngay sau khi duyệt trả `approved 0`; không tái hiện trong 8+ lần gọi sau và khi tải trang. Truy vấn đọc thẳng bảng (không có cache, `force-dynamic`, `no-store`). Sẽ kiểm lại ở lượt chạy C3.
+
+### Lỗi tìm thấy và sửa
+1. **Có từ trước:** `lib/platformSession.js` chỉ `select('session_key_hash, revoked_at, expires_at')`, trong khi lõi xác thực so `account_id` → phiên admin hệ thống luôn bị coi không hợp lệ (chưa lộ vì chưa có tài khoản admin). Đã thêm `account_id`; test hồi quy `c2-platform-session.test.js`.
+2. `loadMyCommunity` thoát sớm khi VĐV chưa có đơn → mất lời mời gửi theo SĐT. Thêm `loadInvitesIn` dùng ở mọi nhánh.
+3. `POST/PATCH /tournaments` chỉ nhận phiên CLB → thêm route riêng `community/admin/tournaments` cho admin hệ thống.
+
+### Test
+- `npm run test:stitch-setup`: xanh, trừ `epic-1\ui-contract.test.js` (lỗi CRLF có từ trước, đã ghi ở C1).
+- Test C2: `c2-registration-domain`, `c2-migration-static`, `c2-route-contract`, `c2-permission-matrix`, `c2-platform-session`, `c2-ui-contract`.
+- `npm run test:open-registration`: xanh. `next lint`: chỉ cảnh báo cũ.
+
+### Dữ liệu test còn lại (dọn cuối Epic 4 sau khi người dùng xác nhận)
+- `player_accounts` TEST-CD (4 tài khoản 0900000901–904), giải 262 `ZZ TEST-CD Giải Thu 2026` nhóm 8, đăng ký/cặp tương ứng.
+- Tài khoản admin hệ thống **thử** (id 2) trong `platform_accounts`: phải xoá/vô hiệu trước khi bàn giao.
+- `.env.local` cục bộ có `PLATFORM_SESSION_SECRET` ngẫu nhiên (file gitignore).

@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import './community.css';
+import './community-c2.css';
+import TopbarAccount from './TopbarAccount';
 
 export const metadata = {
   title: 'Giải cộng đồng · PickHub',
@@ -17,9 +19,7 @@ export default function CommunityLayout({ children }) {
           <span className="cd-brand__name">PickHub</span>
           <span className="cd-brand__tag">Giải cộng đồng</span>
         </Link>
-        <nav className="cd-topnav" aria-label="Tài khoản">
-          <Link className="cd-link" href="/cong-dong/tai-khoan/ho-so">Tài khoản</Link>
-        </nav>
+        <TopbarAccount />
       </header>
       <main className="cd-main">{children}</main>
     </div>

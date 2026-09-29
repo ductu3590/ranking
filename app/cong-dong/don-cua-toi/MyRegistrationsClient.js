@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
-import { FeeChip, Notice, StatusBadge } from '../CommunityUi';
+import { BoxIcon, FeeChip, Notice, StatusBadge, UsersIcon } from '../CommunityUi';
 import { api, errorText, formatDate, loginUrl } from '../communityClient';
 
 export default function MyRegistrationsClient() {
@@ -47,7 +47,7 @@ export default function MyRegistrationsClient() {
     return (
         <div className="cd-wide">
             <header className="cd-pagehead">
-                <h1 className="cd-title">Đơn của tôi</h1>
+                <h1 className="cd-title cd-title--xl">Đơn của tôi</h1>
                 <p className="cd-lead">Theo dõi trạng thái đăng ký các giải bạn tham gia</p>
             </header>
 
@@ -75,23 +75,19 @@ export default function MyRegistrationsClient() {
 
             <div className="cd-grid cd-grid--2">
                 {state.registrations.map((reg) => (
-                    <article className="cd-tcard" key={reg.id}>
-                        <div className="cd-tcard__head">
-                            <div>
-                                <h2 className="cd-tcard__title">{reg.tournament.name}</h2>
-                                <p className="cd-muted">{reg.division.name}{reg.tournament.eventDate ? ` · ${formatDate(reg.tournament.eventDate)}` : ''}</p>
-                            </div>
+                    <article className="cd-tcard cd-regcard" key={reg.id}>
+                        <div className="cd-regcard__top">
                             <StatusBadge tone={reg.state.tone}>{reg.state.label}</StatusBadge>
-                        </div>
-                        <p className="cd-pairline">
-                            {reg.partnerName ? reg.seatNames.join(' & ') : `${reg.seatNames[0] || ''}${reg.status === 'awaiting_partner' ? ' · đang tìm bạn ghép' : ''}`}
-                        </p>
-                        <div className="cd-chips">
                             {Number(reg.division.entryFee) > 0 || reg.fee.key !== 'free' ? <FeeChip fee={reg.fee} /> : null}
-                            {reg.pendingInvites > 0 ? <span className="cd-muted">Đã gửi {reg.pendingInvites} lời mời</span> : null}
                         </div>
-                        {reg.locked ? <p className="cd-note" data-tone="muted">Giải đã chốt danh sách</p> : (
-                            <div className="cd-actions">
+                        <h2 className="cd-regcard__title">{reg.tournament.name}</h2>
+                        <ul className="cd-regcard__rows">
+                            <li><BoxIcon /> {reg.division.name}{reg.tournament.eventDate ? ` · ${formatDate(reg.tournament.eventDate)}` : ''}</li>
+                            <li><UsersIcon /> {reg.partnerName ? reg.seatNames.join(' & ') : `${reg.seatNames[0] || ''}${reg.status === 'awaiting_partner' ? ' · đang tìm bạn ghép' : ''}`}</li>
+                            {reg.pendingInvites > 0 ? <li className="cd-muted">Đã gửi {reg.pendingInvites} lời mời</li> : null}
+                        </ul>
+                        {reg.locked ? <p className="cd-note cd-note--center" data-tone="muted">Giải đã chốt danh sách</p> : (
+                            <div className="cd-actions cd-actions--end">
                                 {reg.canInvite ? <Link className="cd-btn cd-btn--primary cd-btn--sm" href={`/cong-dong/don-cua-toi/${reg.id}/ghep`}>Rủ bạn ghép</Link> : null}
                                 {reg.canWithdraw && confirmId !== reg.id ? (
                                     <button type="button" className="cd-btn cd-btn--ghost cd-btn--sm" onClick={() => setConfirmId(reg.id)}>Rút đăng ký</button>

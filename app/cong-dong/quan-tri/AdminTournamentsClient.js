@@ -184,17 +184,22 @@ export default function AdminTournamentsClient({ role }) {
 
     return (
         <AdminShell role={role} active={form?.id ? 'settings' : 'tournaments'} tournamentId={form?.id || null} title="Giải cộng đồng"
-            breadcrumb={form?.id ? `Giải cộng đồng / ${form.name || ''}` : null}>
-            <div className="ad-toolbar">
-                <p className="cd-lead">Quản lý danh sách giải đấu và thiết lập mở đăng ký</p>
-                <button type="button" className="cd-btn cd-btn--primary" onClick={() => { setForm(emptyForm()); setNotice({ tone: '', text: '' }); }}>+ Tạo giải mới</button>
+            breadcrumb={form?.id ? `Giải cộng đồng / ${form.name || ''}` : null}
+            lead="Quản lý danh sách giải đấu và thiết lập mở đăng ký"
+            actions={<button type="button" className="cd-btn cd-btn--primary cd-btn--cta" onClick={() => { setForm(emptyForm()); setNotice({ tone: '', text: '' }); }}>+ Tạo giải mới</button>}>
+            <div className="ad-legend" aria-label="Chú thích trạng thái">
+                <span>Trạng thái:</span>
+                {Object.values(PHASES).map((phase) => <StatusBadge key={phase.label} tone={phase.tone}>{phase.label}</StatusBadge>)}
             </div>
 
             {notice.text ? <Notice tone={notice.tone === 'error' ? 'error' : 'ok'}>{notice.text}</Notice> : null}
             {state.error ? <p className="cd-alert" role="alert">{state.error}</p> : null}
 
             <section className="cd-card cd-card--flat ad-table-card" aria-label="Danh sách giải đấu cộng đồng">
-                <h2 className="cd-subtitle">Danh sách giải đấu cộng đồng</h2>
+                <div className="ad-cardhead">
+                    <h2 className="ad-cardhead__title"><i aria-hidden="true" />Danh sách giải đấu cộng đồng</h2>
+                    {state.tournaments.length ? <span className="cd-muted">{state.tournaments.length} giải hiện có</span> : null}
+                </div>
                 {state.loading ? <p className="cd-lead" aria-busy="true">Đang tải…</p> : null}
                 {!state.loading && state.tournaments.length === 0 ? <p className="cd-empty">Chưa có giải cộng đồng nào. Bấm &ldquo;Tạo giải mới&rdquo; để bắt đầu.</p> : null}
                 {state.tournaments.length ? (
@@ -220,6 +225,9 @@ export default function AdminTournamentsClient({ role }) {
                                                 <span className="cd-actions">
                                                     <button type="button" className="cd-btn cd-btn--secondary cd-btn--sm" onClick={() => { setForm(formFromTournament(t)); setNotice({ tone: '', text: '' }); }}>Quản lý</button>
                                                     <Link className="cd-btn cd-btn--ghost cd-btn--sm" href={`/cong-dong/quan-tri/giai/${t.id}/dang-ky`}>Duyệt đăng ký</Link>
+                                                    {t.phase === 'finalized'
+                                                        ? <Link className="cd-btn cd-btn--ghost cd-btn--sm" href={`/dieu-hanh-giai/${t.id}?step=control`}>Điều hành</Link>
+                                                        : <Link className="cd-btn cd-btn--ghost cd-btn--sm" href={`/cong-dong/quan-tri/giai/${t.id}/cai-dat`}>Dựng giải</Link>}
                                                     {t.slug ? <button type="button" className="cd-btn cd-btn--ghost cd-btn--sm" onClick={() => copy(t.slug)}>Sao chép link</button> : null}
                                                 </span>
                                             </td>

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import { CalendarIcon, Notice, PinIcon, ProgressBar } from '../../../CommunityUi';
+import { ArrowIcon, CalendarIcon, ClockIcon, Notice, PinIcon, UserIcon } from '../../../CommunityUi';
 import { api, errorText, formatDate, formatVnd, loginUrl } from '../../../communityClient';
 
 const PROFILE_CODES = ['COMMUNITY_GENDER_REQUIRED', 'COMMUNITY_DOB_REQUIRED', 'COMMUNITY_PHR_REQUIRED'];
@@ -55,6 +55,8 @@ export default function RegisterClient({ slug }) {
     const division = divisions.find((d) => d.id === divisionId);
     const isPair = division?.entrantType === 'pair';
     const fee = Number(division?.entryFee) || 0;
+    const summary = division?.summary;
+    const percent = summary && summary.capacity ? Math.min(100, Math.round((summary.approved / summary.capacity) * 100)) : 0;
 
     async function submit(event) {
         event.preventDefault();
@@ -77,10 +79,29 @@ export default function RegisterClient({ slug }) {
     }
 
     return (
-        <div className="cd-wide">
-            <div className="cd-split cd-split--form">
-                <form className="cd-card cd-form" onSubmit={submit}>
-                    <h1 className="cd-title">Đăng ký tham gia</h1>
+        <div className="cd-wide cd-register">
+            <div className="cd-split cd-split--register">
+                <aside className="cd-card cd-sticky cd-tourinfo" aria-label="Tóm tắt giải">
+                    <span className="cd-eyebrow-text">Thông tin giải đấu</span>
+                    <h2 className="cd-tourinfo__title">{tournament.name}</h2>
+                    <ul className="cd-meta cd-meta--lg cd-tourinfo__meta">
+                        {tournament.location ? <li><PinIcon /> {tournament.location}</li> : null}
+                        {tournament.eventDate ? <li><CalendarIcon /> {formatDate(tournament.eventDate, { withWeekday: true })}</li> : null}
+                        {division?.deadline ? <li><ClockIcon /> Hạn đăng ký: <b>{formatDate(division.deadline)}</b></li> : null}
+                    </ul>
+                    {summary?.capacity != null ? (
+                        <div className="cd-progressbox">
+                            <div className="cd-capacity__row"><span>Tiến độ đăng ký</span><b className="cd-brandtext">{summary.approved}/{summary.capacity} cặp đã duyệt</b></div>
+                            <div className="cd-progress__track" role="progressbar" aria-valuemin={0} aria-valuemax={summary.capacity} aria-valuenow={summary.approved} aria-label={`${summary.approved}/${summary.capacity} cặp đã duyệt`}>
+                                <span style={{ width: `${percent}%` }} />
+                            </div>
+                            <small>{summary.full ? 'Đã đủ suất chính thức · nhận danh sách chờ' : `Còn ${summary.remaining} suất đăng ký chính thức`}</small>
+                        </div>
+                    ) : null}
+                </aside>
+
+                <form className="cd-formstack" onSubmit={submit}>
+                    <h1 className="cd-title cd-title--lg">Đăng ký tham gia</h1>
                     {error.text ? (
                         <p className="cd-alert" role="alert">
                             {error.text}{' '}
@@ -88,45 +109,52 @@ export default function RegisterClient({ slug }) {
                         </p>
                     ) : null}
 
-                    <fieldset className="cd-fieldset">
-                        <legend>Chọn nội dung</legend>
+                    <section className="cd-card cd-formcard" role="radiogroup" aria-labelledby="cd-division-title">
+                        <h3 id="cd-division-title" className="cd-formcard__title">Chọn nội dung</h3>
                         {divisions.map((d) => (
-                            <label key={d.id} className="cd-choice" data-active={divisionId === d.id} data-disabled={!d.open.ok}>
+                            <label key={d.id} className="cd-choice cd-choice--split" data-active={divisionId === d.id} data-disabled={!d.open.ok}>
                                 <input type="radio" name="division" value={d.id} checked={divisionId === d.id} disabled={!d.open.ok}
                                     onChange={() => setDivisionId(d.id)} />
                                 <span className="cd-choice__body">
                                     <strong>{d.name}</strong>
                                     <span className="cd-muted">
-                                        {d.summary.capacity != null ? `${d.summary.approved}/${d.summary.capacity} cặp` : `${d.summary.approved} cặp`} · {formatVnd(d.entryFee)}{Number(d.entryFee) > 0 ? '/cặp' : ''}
+                                        {d.summary.capacity != null ? `${d.summary.approved}/${d.summary.capacity} cặp đã duyệt` : `${d.summary.approved} cặp đã duyệt`}
                                         {!d.open.ok ? ' · Đã đóng đăng ký' : ''}
                                     </span>
                                 </span>
+                                <span className="cd-choice__price">{formatVnd(d.entryFee)}{Number(d.entryFee) > 0 ? '/cặp' : ''}</span>
                             </label>
                         ))}
-                    </fieldset>
+                    </section>
 
-                    <fieldset className="cd-fieldset">
-                        <legend>Hồ sơ của bạn</legend>
-                        <div className="cd-readonly">
-                            <span>{account.displayName}{account.gender ? ` · ${GENDER_LABEL[account.gender]}` : ''}{account.selfDeclaredPhr != null ? ` · PHR ${account.selfDeclaredPhr}` : ''}</span>
-                            <Link href="/cong-dong/tai-khoan/ho-so">Sửa hồ sơ</Link>
+                    <section className="cd-card cd-formcard" aria-labelledby="cd-profile-title">
+                        <div className="cd-formcard__head">
+                            <h3 id="cd-profile-title" className="cd-formcard__title">Hồ sơ của bạn</h3>
+                            <Link className="cd-link cd-link--sm" href="/cong-dong/tai-khoan/ho-so">Sửa hồ sơ</Link>
                         </div>
-                    </fieldset>
+                        <div className="cd-profilebox">
+                            <span className="cd-profilebox__name"><UserIcon /> <b>{account.displayName}</b></span>
+                            {account.gender ? <span className="cd-profilebox__item"><i aria-hidden="true" />Giới tính: <b>{GENDER_LABEL[account.gender]}</b></span> : null}
+                            {account.selfDeclaredPhr != null ? <span className="cd-profilebox__item"><i aria-hidden="true" />Trình độ: <em className="cd-phr">PHR {account.selfDeclaredPhr}</em></span> : null}
+                        </div>
+                    </section>
 
                     {isPair ? (
-                        <fieldset className="cd-fieldset">
-                            <legend>Bạn ghép cặp</legend>
-                            <label className="cd-choice" data-active={partnerMode === 'have'}>
-                                <input type="radio" name="partner" checked={partnerMode === 'have'} onChange={() => setPartnerMode('have')} />
-                                <span className="cd-choice__body"><strong>Tôi đã có bạn ghép</strong></span>
-                            </label>
-                            {partnerMode === 'have' ? (
-                                <div className="cd-field cd-field--nested">
-                                    <label htmlFor="cd-partner-phone">Số điện thoại của bạn ghép</label>
-                                    <input id="cd-partner-phone" type="tel" inputMode="tel" placeholder="0912 345 678" value={partnerPhone} onChange={(e) => setPartnerPhone(e.target.value)} required />
-                                    <p className="cd-hint">Bạn ghép cần có tài khoản VĐV PickHub. Hệ thống sẽ gửi lời mời cho bạn ấy.</p>
-                                </div>
-                            ) : null}
+                        <section className="cd-card cd-formcard" role="radiogroup" aria-labelledby="cd-partner-title">
+                            <h3 id="cd-partner-title" className="cd-formcard__title">Bạn ghép cặp</h3>
+                            <div className="cd-choice cd-choice--group" data-active={partnerMode === 'have'}>
+                                <label className="cd-choice__row">
+                                    <input type="radio" name="partner" checked={partnerMode === 'have'} onChange={() => setPartnerMode('have')} />
+                                    <strong>Tôi đã có bạn ghép</strong>
+                                </label>
+                                {partnerMode === 'have' ? (
+                                    <div className="cd-field cd-field--nested">
+                                        <label htmlFor="cd-partner-phone">Số điện thoại của bạn ghép</label>
+                                        <input id="cd-partner-phone" type="tel" inputMode="tel" placeholder="Nhập số điện thoại VĐV ghép" value={partnerPhone} onChange={(e) => setPartnerPhone(e.target.value)} required />
+                                        <p className="cd-hint">Bạn ghép cần có tài khoản VĐV PickHub. Hệ thống sẽ gửi lời mời cho bạn ấy.</p>
+                                    </div>
+                                ) : null}
+                            </div>
                             <label className="cd-choice" data-active={partnerMode === 'need'}>
                                 <input type="radio" name="partner" checked={partnerMode === 'need'} onChange={() => setPartnerMode('need')} />
                                 <span className="cd-choice__body">
@@ -134,34 +162,21 @@ export default function RegisterClient({ slug }) {
                                     <span className="cd-muted">Đơn của bạn ở trạng thái Chờ bạn ghép cho tới khi có người nhận lời</span>
                                 </span>
                             </label>
-                        </fieldset>
+                        </section>
                     ) : null}
 
-                    {fee > 0 ? <Notice tone="warn">Lệ phí {formatVnd(fee)}/cặp thu ngoài hệ thống. Ban tổ chức sẽ liên hệ qua số điện thoại của bạn.</Notice> : null}
+                    {fee > 0 ? <Notice tone="warn" icon>Lệ phí {formatVnd(fee)}/cặp thu ngoài hệ thống. Ban tổ chức sẽ liên hệ qua số điện thoại của bạn.</Notice> : null}
 
                     <div className="cd-honeypot" aria-hidden="true">
                         <label htmlFor="cd-reg-company">Công ty</label>
                         <input id="cd-reg-company" name="company" tabIndex={-1} autoComplete="off" value={company} onChange={(e) => setCompany(e.target.value)} />
                     </div>
 
-                    <button type="submit" className="cd-btn cd-btn--primary cd-btn--block" disabled={busy || !division || openDivisions.length === 0}>
-                        {busy ? 'Đang gửi…' : 'Gửi đăng ký'}
+                    <button type="submit" className="cd-btn cd-btn--cta cd-btn--primary cd-btn--submit" disabled={busy || !division || openDivisions.length === 0}>
+                        {busy ? 'Đang gửi…' : <>Gửi đăng ký <ArrowIcon /></>}
                     </button>
                     {openDivisions.length === 0 ? <Notice tone="warn">Giải hiện không có nội dung nào nhận đăng ký.</Notice> : null}
                 </form>
-
-                <aside className="cd-card cd-sticky" aria-label="Tóm tắt giải">
-                    <h2 className="cd-subtitle">{tournament.name}</h2>
-                    <ul className="cd-meta">
-                        {tournament.location ? <li><PinIcon /> {tournament.location}</li> : null}
-                        {tournament.eventDate ? <li><CalendarIcon /> {formatDate(tournament.eventDate, { withWeekday: true })}</li> : null}
-                        {division?.deadline ? <li>Hạn đăng ký {formatDate(division.deadline)}</li> : null}
-                    </ul>
-                    {division?.summary.capacity != null
-                        ? <ProgressBar value={division.summary.approved} max={division.summary.capacity} label={`${division.summary.approved}/${division.summary.capacity} cặp đã duyệt`} />
-                        : null}
-                    <Link className="cd-link" href={`/cong-dong/giai/${tournament.slug}`}>Xem trang giải</Link>
-                </aside>
             </div>
         </div>
     );

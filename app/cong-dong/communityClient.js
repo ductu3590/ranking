@@ -51,6 +51,14 @@ export function initialOf(name) {
     return (parts[parts.length - 1] || '?').charAt(0).toUpperCase();
 }
 
+// Hai chữ cái đầu (họ + tên), dùng cho ảnh đại diện trong danh sách (Stitch: "LH", "TT"). Một từ → một chữ.
+export function initialsOf(name) {
+    const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+    if (!parts.length) return '?';
+    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+    return `${parts[0].charAt(0)}${parts[parts.length - 1].charAt(0)}`.toUpperCase();
+}
+
 // Nội dung đôi Nam-Nữ / Nam / Nữ / Đơn — tên chip hiển thị theo dữ liệu thật (tên nội dung do admin đặt).
 export function loginUrl(nextPath, tab = 'dang-nhap') {
     return `/cong-dong/tai-khoan?tab=${tab}&next=${encodeURIComponent(nextPath)}`;

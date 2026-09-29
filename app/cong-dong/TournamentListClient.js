@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 
-import { CalendarIcon, Chip, PinIcon, ProgressBar } from './CommunityUi';
+import { CalendarIcon, ChevronIcon, Chip, PinIcon, SearchIcon } from './CommunityUi';
 import { api, errorText, formatDate, formatVnd } from './communityClient';
 
 const FILTERS = [
@@ -42,9 +42,10 @@ function summarize(tournament) {
     return { approved, capacity, minFee, maxFee, deadline: deadlines[0] || null, full };
 }
 
-function feeLabel({ minFee, maxFee }) {
+// Chỉ phần giá trị (nhãn "Lệ phí" nằm ở dòng nhỏ phía trên, đúng thiết kế PLC-01).
+function feeValue({ minFee, maxFee }) {
     if (maxFee <= 0) return null;
-    return minFee === maxFee ? `Lệ phí ${formatVnd(maxFee)}/cặp` : `Lệ phí từ ${formatVnd(minFee)}/cặp`;
+    return minFee === maxFee ? `${formatVnd(maxFee)}/cặp` : `Từ ${formatVnd(minFee)}/cặp`;
 }
 
 export default function TournamentListClient() {
@@ -69,15 +70,17 @@ export default function TournamentListClient() {
     }, [state.tournaments, query, filter]);
 
     return (
-        <div className="cd-wide">
+        <div className="cd-wide cd-list">
             <header className="cd-pagehead">
-                <h1 className="cd-title">Giải cộng đồng đang mở đăng ký</h1>
+                <span className="cd-eyebrow"><i aria-hidden="true" />Đang mở đăng ký</span>
+                <h1 className="cd-title cd-title--xl">Giải cộng đồng đang mở đăng ký</h1>
                 <p className="cd-lead">Chọn một giải, tạo tài khoản và đăng ký cùng bạn ghép cặp</p>
             </header>
 
-            <div className="cd-filters">
+            <div className="cd-filterbar">
                 <label className="cd-search">
                     <span className="cd-sr">Tìm giải theo tên hoặc địa điểm</span>
+                    <SearchIcon />
                     <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Tìm giải theo tên hoặc địa điểm" />
                 </label>
                 <div className="cd-chips" role="group" aria-label="Lọc theo thời gian">
@@ -100,26 +103,42 @@ export default function TournamentListClient() {
             <div className="cd-grid">
                 {visible.map((tournament) => {
                     const info = summarize(tournament);
-                    const fee = feeLabel(info);
+                    const fee = feeValue(info);
+                    const percent = info.capacity ? Math.min(100, Math.round((info.approved / info.capacity) * 100)) : 0;
                     return (
-                        <article className="cd-tcard" key={tournament.id}>
+                        <article className="cd-tcard cd-tcard--stitch" key={tournament.id}>
+                            <div className="cd-tcard__top">
+                                <div className="cd-divchips">
+                                    {(tournament.divisions || []).map((d) => <span key={d.id} className="cd-divchip">{d.name}</span>)}
+                                </div>
+                                {info.full ? <Chip tone="warn">Đã đủ · nhận danh sách chờ</Chip> : (!fee ? <Chip tone="ok">Miễn phí</Chip> : null)}
+                            </div>
                             <h2 className="cd-tcard__title">{tournament.name}</h2>
                             <ul className="cd-meta">
                                 {tournament.location ? <li><PinIcon /> {tournament.location}</li> : null}
                                 {tournament.event_date ? <li><CalendarIcon /> {formatDate(tournament.event_date, { withWeekday: true })}</li> : null}
                             </ul>
-                            <div className="cd-chips">
-                                {(tournament.divisions || []).map((d) => <Chip key={d.id} tone="brand">{d.name}</Chip>)}
+                            <div className="cd-capacity" data-full={info.full || undefined}>
+                                <div className="cd-capacity__row">
+                                    <span>Số lượng đăng ký</span>
+                                    <b>{info.capacity != null ? `${info.approved}/${info.capacity} cặp đã duyệt` : `${info.approved} cặp đã duyệt`}</b>
+                                </div>
+                                {info.capacity != null ? (
+                                    <div className="cd-progress__track" role="progressbar" aria-valuemin={0} aria-valuemax={info.capacity} aria-valuenow={info.approved} aria-label={`${info.approved}/${info.capacity} cặp đã duyệt`}>
+                                        <span style={{ width: `${percent}%` }} />
+                                    </div>
+                                ) : null}
                             </div>
-                            {info.capacity != null
-                                ? <ProgressBar value={info.approved} max={info.capacity} label={`${info.approved}/${info.capacity} cặp đã duyệt`} />
-                                : <p className="cd-muted">{info.approved} cặp đã duyệt</p>}
-                            <div className="cd-chips">
-                                {info.full ? <Chip tone="warn">Đã đủ · nhận danh sách chờ</Chip> : null}
-                                {fee ? <span className="cd-muted">{fee}</span> : <Chip tone="ok">Miễn phí</Chip>}
+                            <div className="cd-feeline">
+                                <div>
+                                    <small>Lệ phí</small>
+                                    <b data-free={!fee || undefined}>{fee || 'Miễn phí'}</b>
+                                </div>
+                                {info.deadline ? <div className="cd-feeline__end"><small>Hạn đăng ký</small><span>{formatDate(info.deadline)}</span></div> : null}
                             </div>
-                            {info.deadline ? <p className="cd-muted">Hạn đăng ký {formatDate(info.deadline)}</p> : null}
-                            <Link className="cd-btn cd-btn--primary cd-btn--block" href={`/cong-dong/giai/${tournament.public_slug}`}>Xem giải &amp; đăng ký</Link>
+                            <Link className={`cd-btn cd-btn--cta cd-btn--block ${info.full ? 'cd-btn--outline' : 'cd-btn--primary'}`} href={`/cong-dong/giai/${tournament.public_slug}`}>
+                                Xem giải &amp; đăng ký <ChevronIcon />
+                            </Link>
                         </article>
                     );
                 })}

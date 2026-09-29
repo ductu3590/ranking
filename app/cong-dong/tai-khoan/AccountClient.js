@@ -76,6 +76,11 @@ export default function AccountClient() {
   function switchTab(key) {
     setTab(key);
     setError('');
+    // Giữ ?tab= trên URL và báo thanh trên (nút góc phải là hành động ngược với tab đang mở).
+    const url = new URL(window.location.href);
+    url.searchParams.set('tab', key);
+    window.history.replaceState(null, '', url.toString());
+    window.dispatchEvent(new CustomEvent('cd:accounttab', { detail: key }));
   }
 
   async function submitSignup(event) {

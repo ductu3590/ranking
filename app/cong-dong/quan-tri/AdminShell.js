@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
+import { ChevronIcon } from '../CommunityUi';
+
 const ROLE_LABELS = { community_admin: 'Quản trị cộng đồng', platform_admin: 'Quản trị hệ thống' };
 
 function Icon({ d }) {
@@ -16,7 +18,7 @@ function Icon({ d }) {
 
 // Khung admin hệ thống (Epic 4 C2; Stitch PLA-02/03): PC có sidebar 256px, mobile có thanh trên + menu trượt.
 // Chỉ đọc/xóa phiên admin hệ thống (platform_session) qua /api/platform/session*, không đụng phiên VĐV.
-export default function AdminShell({ role, active, tournamentId = null, title, breadcrumb = null, children }) {
+export default function AdminShell({ role, active, tournamentId = null, title, breadcrumb = null, lead = null, actions = null, status = null, children }) {
     const router = useRouter();
     const [open, setOpen] = useState(false);
 
@@ -40,7 +42,9 @@ export default function AdminShell({ role, active, tournamentId = null, title, b
         <div className="ad-shell" data-menu-open={open}>
             <aside className="ad-sidebar" aria-label="Điều hướng quản trị">
                 <div className="ad-brand">
-                    <span className="cd-logo" aria-hidden="true">P</span>
+                    <span className="cd-logo" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18" /></svg>
+                    </span>
                     <div>
                         <strong>PickHub</strong>
                         <span className="ad-brand__tag">Quản trị hệ thống</span>
@@ -57,19 +61,35 @@ export default function AdminShell({ role, active, tournamentId = null, title, b
                 <div className="ad-account">
                     <span className="cd-avatar" aria-hidden="true">A</span>
                     <span className="ad-account__name">{ROLE_LABELS[role] || 'Quản trị'}</span>
-                    <button type="button" className="cd-linkbtn" onClick={logout}>Đăng xuất</button>
+                    <button type="button" className="ad-logout" onClick={logout}>
+                        <Icon d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+                        Đăng xuất
+                    </button>
                 </div>
             </aside>
 
             <div className="ad-main">
+                {breadcrumb || status ? (
+                    <div className="ad-crumbbar">
+                        <nav className="ad-crumb" aria-label="Đường dẫn">
+                            {String(breadcrumb || '').split(' / ').filter(Boolean).map((part, index, all) => (
+                                <span key={`${part}-${index}`} data-last={index === all.length - 1 || undefined}>
+                                    {part}{index < all.length - 1 ? <ChevronIcon /> : null}
+                                </span>
+                            ))}
+                        </nav>
+                        {status}
+                    </div>
+                ) : null}
                 <header className="ad-topbar">
                     <button type="button" className="ad-menubtn" aria-label="Mở menu" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
                         <Icon d="M4 6h16M4 12h16M4 18h16" />
                     </button>
                     <div className="ad-topbar__text">
-                        {breadcrumb ? <p className="ad-crumb">{breadcrumb}</p> : null}
                         <h1 className="ad-title">{title}</h1>
+                        {lead ? <p className="ad-lead">{lead}</p> : null}
                     </div>
+                    {actions ? <div className="ad-topbar__actions">{actions}</div> : null}
                 </header>
                 <div className="ad-content">{children}</div>
             </div>

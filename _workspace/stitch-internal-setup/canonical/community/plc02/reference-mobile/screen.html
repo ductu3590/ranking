@@ -1,0 +1,188 @@
+<!DOCTYPE html><html lang="vi"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PLC-02 Tạo tài khoản VĐV PickHub Mobile</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            primary: '#7c3aed',
+            'primary-hover': '#6d28d9',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f8fafc;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+  </style>
+</head>
+<body class="bg-[#f8fafc] text-slate-800">
+
+  <!-- Khung 390px đúng chuẩn, chiều cao tự nhiên, không khung giả, không thanh trạng thái -->
+  <div class="w-[390px] min-h-screen bg-[#f8fafc] flex flex-col antialiased">
+    
+    <!-- Thanh trên gọn -->
+    <header class="w-full bg-white border-b border-[#e2e8f0] px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <!-- Logo PickHub SVG -->
+        <div class="flex items-center gap-1.5">
+          <svg class="w-6 h-6 text-[#7c3aed]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <circle cx="12" cy="12" r="4"></circle>
+            <line x1="4.93" y1="4.93" x2="9.17" y2="9.17"></line>
+            <line x1="14.83" y1="14.83" x2="19.07" y2="19.07"></line>
+            <line x1="14.83" y1="9.17" x2="19.07" y2="4.93"></line>
+            <line x1="4.93" y1="19.07" x2="9.17" y2="14.83"></line>
+          </svg>
+          <span class="font-bold text-lg tracking-tight text-slate-900">PickHub</span>
+        </div>
+        <!-- Nhãn Giải cộng đồng -->
+        <span class="text-[11px] font-medium bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full border border-slate-200">
+          Giải cộng đồng
+        </span>
+      </div>
+
+      <!-- Nút viền nhỏ Đăng nhập -->
+      <a href="#" class="text-xs font-semibold text-slate-700 border border-[#e2e8f0] hover:bg-slate-50 px-2.5 py-1.5 rounded-md transition-colors">
+        Đăng nhập
+      </a>
+    </header>
+
+    <!-- Thân trang với lề 16px -->
+    <main class="p-4 flex-1">
+      
+      <!-- Thẻ trắng viền #e2e8f0 -->
+      <div class="bg-white rounded-xl border border-[#e2e8f0] p-4 shadow-sm">
+        
+        <!-- Hai tab: Tạo tài khoản & Đăng nhập -->
+        <div class="flex border-b border-[#e2e8f0] mb-5">
+          <button type="button" class="pb-2.5 text-sm font-bold text-[#7c3aed] border-b-2 border-[#7c3aed] px-1 mr-4 focus:outline-none">
+            Tạo tài khoản
+          </button>
+          <button type="button" class="pb-2.5 text-sm font-medium text-slate-400 hover:text-slate-600 px-1 focus:outline-none">
+            Đăng nhập
+          </button>
+        </div>
+
+        <!-- Tiêu đề & phụ đề -->
+        <div class="mb-5">
+          <h1 class="text-xl font-bold text-slate-900 mb-1">Tạo tài khoản VĐV</h1>
+          <p class="text-xs text-slate-500 leading-relaxed">Dùng để đăng ký giải cộng đồng và rủ bạn ghép cặp</p>
+        </div>
+
+        <!-- Form nhập liệu -->
+        <form class="space-y-4" onsubmit="event.preventDefault();">
+          
+          <!-- Tên hiển thị -->
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1.5">Tên hiển thị</label>
+            <input type="text" placeholder="Ví dụ: Nguyễn Minh" class="w-full h-[44px] px-3 rounded-lg border border-[#e2e8f0] bg-white text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed] transition-colors">
+          </div>
+
+          <!-- Số điện thoại -->
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1.5">Số điện thoại</label>
+            <input type="tel" placeholder="0912 345 678" class="w-full h-[44px] px-3 rounded-lg border border-[#e2e8f0] bg-white text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed] transition-colors">
+            <p class="text-[11px] text-slate-500 mt-1">Dùng để đăng nhập, không hiển thị công khai</p>
+          </div>
+
+          <!-- Mật khẩu -->
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1.5">Mật khẩu</label>
+            <div class="relative">
+              <input type="password" placeholder="••••••••" class="w-full h-[44px] pl-3 pr-14 rounded-lg border border-[#e2e8f0] bg-white text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed] transition-colors tracking-widest">
+              <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-[#7c3aed] hover:text-[#6d28d9] focus:outline-none">
+                Hiện
+              </button>
+            </div>
+            <p class="text-[11px] text-slate-500 mt-1">Tối thiểu 8 ký tự</p>
+          </div>
+
+          <!-- Nhập lại mật khẩu -->
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1.5">Nhập lại mật khẩu</label>
+            <input type="password" placeholder="••••••••" class="w-full h-[44px] px-3 rounded-lg border border-[#e2e8f0] bg-white text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed] transition-colors tracking-widest">
+          </div>
+
+          <!-- Khối thu gọn "Thông tin thêm (không bắt buộc)" đang mở -->
+          <div class="border border-[#e2e8f0] rounded-lg p-3 bg-slate-50/50 space-y-3.5 mt-2">
+            <div class="flex items-center justify-between cursor-pointer">
+              <span class="text-xs font-semibold text-slate-700">Thông tin thêm (không bắt buộc)</span>
+              <svg class="w-4 h-4 text-slate-400 transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </div>
+
+            <!-- Giới tính (hai nút Nam/Nữ) -->
+            <div>
+              <label class="block text-[11px] font-medium text-slate-600 mb-1.5">Giới tính</label>
+              <div class="grid grid-cols-2 gap-2">
+                <button type="button" class="h-[40px] rounded-md text-xs font-semibold border border-[#7c3aed] bg-[#f5f3ff] text-[#7c3aed] flex items-center justify-center transition-colors">
+                  Nam
+                </button>
+                <button type="button" class="h-[40px] rounded-md text-xs font-medium border border-[#e2e8f0] bg-white text-slate-700 hover:bg-slate-50 flex items-center justify-center transition-colors">
+                  Nữ
+                </button>
+              </div>
+            </div>
+
+            <!-- Ngày sinh -->
+            <div>
+              <label class="block text-[11px] font-medium text-slate-600 mb-1.5">Ngày sinh</label>
+              <input type="text" placeholder="Ngày / Tháng / Năm" class="w-full h-[40px] px-3 rounded-md border border-[#e2e8f0] bg-white text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed] transition-colors">
+            </div>
+
+            <!-- Trình độ PHR tự khai (ô số, ví dụ 3.25) -->
+            <div>
+              <label class="block text-[11px] font-medium text-slate-600 mb-1.5">Trình độ PHR tự khai</label>
+              <input type="text" placeholder="Ví dụ: 3.25" class="w-full h-[40px] px-3 rounded-md border border-[#e2e8f0] bg-white text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed] transition-colors">
+            </div>
+          </div>
+
+          <!-- Nút tím rộng hết chiều ngang cao 48px "Tạo tài khoản" -->
+          <div class="pt-2">
+            <button type="submit" class="w-full h-[48px] rounded-lg bg-[#7c3aed] hover:bg-[#6d28d9] text-white font-semibold text-sm flex items-center justify-center shadow-sm transition-colors active:scale-[0.99]">
+              Tạo tài khoản
+            </button>
+          </div>
+
+          <!-- Dưới nút "Đã có tài khoản? Đăng nhập" -->
+          <div class="text-center pt-1">
+            <span class="text-xs text-slate-500">Đã có tài khoản? </span>
+            <a href="#" class="text-xs font-semibold text-[#7c3aed] hover:underline">Đăng nhập</a>
+          </div>
+
+          <!-- Câu điều khoản nhỏ -->
+          <p class="text-[11px] text-slate-400 text-center leading-normal px-2 pt-1 pb-1">
+            Bằng việc tạo tài khoản, bạn đồng ý cho ban tổ chức xem số điện thoại để liên hệ về giải.
+          </p>
+
+        </form>
+
+      </div>
+
+    </main>
+
+  </div>
+
+
+
+</body></html>

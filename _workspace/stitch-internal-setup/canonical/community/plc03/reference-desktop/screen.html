@@ -1,0 +1,153 @@
+<!DOCTYPE html><html lang="vi"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng nhập VĐV PickHub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              DEFAULT: '#7c3aed',
+              hover: '#6d28d9',
+              light: '#f5f3ff',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[#f8fafc] flex flex-col justify-between">
+  <!-- Thanh trên gọn -->
+  <header class="w-full border-b border-[#e2e8f0] bg-white">
+    <div class="max-w-[1280px] mx-auto px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2">
+          <!-- Logo PickHub SVG -->
+          <svg class="w-7 h-7 text-[#7c3aed]" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="13" cy="13" r="8" stroke="currentColor" stroke-width="2.75"></circle>
+            <circle cx="11.5" cy="11.5" r="1.5" fill="currentColor"></circle>
+            <circle cx="15.5" cy="11.5" r="1.5" fill="currentColor"></circle>
+            <circle cx="13.5" cy="15" r="1.5" fill="currentColor"></circle>
+            <path d="M19 19L27 27" stroke="currentColor" stroke-width="3" stroke-linecap="round"></path>
+          </svg>
+          <span class="text-xl font-bold tracking-tight text-[#7c3aed]">PickHub</span>
+        </div>
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#f1f5f9] text-[#475569] border border-[#e2e8f0]">
+          Giải cộng đồng
+        </span>
+      </div>
+      <div>
+        <a href="#" class="inline-flex items-center justify-center px-4 py-2 border border-[#cbd5e1] rounded-lg text-sm font-semibold text-[#334155] hover:bg-[#f8fafc] transition-colors">
+          Tạo tài khoản
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Nội dung trung tâm -->
+  <main class="flex-1 flex flex-col items-center justify-center py-10 px-4">
+    <!-- Thẻ trắng 440px căn giữa -->
+    <div class="w-full max-w-[440px] bg-white rounded-2xl border border-[#e2e8f0] shadow-sm p-7">
+      <!-- Hai tab -->
+      <div class="flex border-b border-[#e2e8f0] mb-6">
+        <button type="button" class="pb-3 px-1 mr-6 text-sm font-medium text-[#64748b] hover:text-[#0f172a] transition-colors">
+          Tạo tài khoản
+        </button>
+        <button type="button" class="pb-3 px-1 text-sm font-semibold text-[#7c3aed] border-b-2 border-[#7c3aed] -mb-[1px]">
+          Đăng nhập
+        </button>
+      </div>
+
+      <!-- Tiêu đề & phụ đề -->
+      <div class="mb-5">
+        <h1 class="text-2xl font-bold text-[#0f172a] tracking-tight">Đăng nhập</h1>
+        <p class="text-sm text-[#64748b] mt-1">Đăng nhập để đăng ký giải và xem đơn của bạn</p>
+      </div>
+
+      <!-- Thanh cảnh báo đỏ nhạt -->
+      <div class="mb-5 p-3.5 bg-red-50 border border-red-200 rounded-xl flex items-start gap-2.5">
+        <svg class="w-5 h-5 text-red-500 shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+        </svg>
+        <div class="text-sm text-red-700 leading-snug font-medium">
+          Số điện thoại hoặc mật khẩu không đúng.
+        </div>
+      </div>
+
+      <!-- Form -->
+      <form class="space-y-4" onsubmit="return false;">
+        <!-- Ô Số điện thoại -->
+        <div>
+          <label class="block text-sm font-medium text-[#334155] mb-1.5">Số điện thoại</label>
+          <input type="text" value="0912 345 678" class="w-full px-3.5 py-2.5 bg-white border border-red-300 focus:border-red-500 focus:ring-1 focus:ring-red-500 rounded-lg text-sm text-[#0f172a] outline-none transition">
+        </div>
+
+        <!-- Ô Mật khẩu -->
+        <div>
+          <label class="block text-sm font-medium text-[#334155] mb-1.5">Mật khẩu</label>
+          <div class="relative">
+            <input type="password" value="MatKhau123" class="w-full pl-3.5 pr-14 py-2.5 bg-white border border-red-300 focus:border-red-500 focus:ring-1 focus:ring-red-500 rounded-lg text-sm text-[#0f172a] outline-none transition tracking-widest">
+            <button type="button" class="absolute inset-y-0 right-0 px-3.5 flex items-center text-sm font-medium text-[#7c3aed] hover:text-[#6d28d9] focus:outline-none">
+              Hiện
+            </button>
+          </div>
+        </div>
+
+        <!-- Nút Đăng nhập -->
+        <button type="button" class="w-full py-2.5 px-4 bg-[#7c3aed] hover:bg-[#6d28d9] text-white font-semibold text-sm rounded-lg shadow-sm transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-[#7c3aed] focus:ring-offset-1 mt-2">
+          Đăng nhập
+        </button>
+      </form>
+
+      <!-- Liên kết bên dưới nút -->
+      <div class="mt-5 text-center space-y-2">
+        <p class="text-sm text-[#64748b]">
+          Chưa có tài khoản? <a href="#" class="font-semibold text-[#7c3aed] hover:underline">Tạo tài khoản</a>
+        </p>
+        <p class="text-xs text-[#94a3b8]">
+          Quên mật khẩu? Liên hệ ban tổ chức giải để được đặt lại.
+        </p>
+      </div>
+    </div>
+
+    <!-- Thẻ nhỏ thứ hai: TRẠNG THÁI GIỚI HẠN -->
+    <div class="w-full max-w-[440px] bg-white rounded-2xl border border-[#e2e8f0] shadow-sm p-6 mt-4">
+      <div class="text-[11px] font-bold tracking-wider text-[#64748b] uppercase mb-3">
+        TRẠNG THÁI GIỚI HẠN
+      </div>
+
+      <!-- Thanh cảnh báo vàng -->
+      <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-2.5 mb-4">
+        <svg class="w-5 h-5 text-amber-500 shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+        </svg>
+        <div class="text-sm text-amber-800 leading-snug font-medium">
+          Bạn thử quá nhiều lần. Vui lòng thử lại sau 4 phút.
+        </div>
+      </div>
+
+      <!-- Nút Đăng nhập bị vô hiệu hóa -->
+      <button type="button" disabled="" class="w-full py-2.5 px-4 bg-[#e2e8f0] text-[#94a3b8] font-semibold text-sm rounded-lg cursor-not-allowed text-center select-none">
+        Đăng nhập
+      </button>
+    </div>
+  </main>
+
+
+</body></html>

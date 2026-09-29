@@ -1,0 +1,425 @@
+<!DOCTYPE html><html lang="vi"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>PickHub - Giải cộng đồng đang mở đăng ký</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "tertiary-fixed-dim": "#ffb784",
+            "on-primary-container": "#ede0ff",
+            "outline-variant": "#ccc3d8",
+            "on-secondary-fixed": "#131b2e",
+            "primary-container": "#7c3aed",
+            "surface-container": "#e5eeff",
+            "primary": "#7c3aed",
+            "on-tertiary-container": "#ffe0cd",
+            "on-secondary-fixed-variant": "#3f465c",
+            "inverse-primary": "#d2bbff",
+            "tertiary-fixed": "#ffdcc6",
+            "tertiary-container": "#a15100",
+            "surface-variant": "#d3e4fe",
+            "surface-tint": "#732ee4",
+            "surface-dim": "#cbdbf5",
+            "surface-container-highest": "#d3e4fe",
+            "on-secondary": "#ffffff",
+            "inverse-on-surface": "#eaf1ff",
+            "secondary-fixed": "#dae2fd",
+            "background": "#f8fafc",
+            "surface-container-lowest": "#ffffff",
+            "on-primary": "#ffffff",
+            "tertiary": "#7d3d00",
+            "error": "#ba1a1a",
+            "on-tertiary-fixed-variant": "#713700",
+            "surface": "#f8fafc",
+            "surface-bright": "#f8fafc",
+            "on-error": "#ffffff",
+            "on-primary-fixed": "#25005a",
+            "on-background": "#0f172a",
+            "primary-fixed": "#eaddff",
+            "surface-container-low": "#eff4ff",
+            "on-surface": "#0f172a",
+            "error-container": "#ffdad6",
+            "secondary-fixed-dim": "#bec6e0",
+            "on-primary-fixed-variant": "#5a00c6",
+            "primary-fixed-dim": "#d2bbff",
+            "on-surface-variant": "#4a4455",
+            "on-error-container": "#93000a",
+            "on-tertiary-fixed": "#301400",
+            "secondary": "#565e74",
+            "on-secondary-container": "#5c647a",
+            "on-tertiary": "#ffffff",
+            "inverse-surface": "#213145",
+            "outline": "#e2e8f0",
+            "surface-container-high": "#dce9ff",
+            "secondary-container": "#dae2fd"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "2xl": "1rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-md": "0.75rem",
+            "space-lg": "1rem",
+            "space-xs": "0.25rem",
+            "gutter-lg": "1.5rem",
+            "space-2xl": "2rem",
+            "gutter": "1rem",
+            "margin-md": "1.5rem",
+            "margin": "1rem",
+            "space-xl": "1.5rem",
+            "margin-lg": "2rem",
+            "space-sm": "0.5rem"
+          },
+          "fontFamily": {
+            "headline-lg": ["Plus Jakarta Sans"],
+            "body-sm": ["Plus Jakarta Sans"],
+            "body-lg": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "headline-xl": ["Plus Jakarta Sans"],
+            "label-sm": ["Plus Jakarta Sans"],
+            "body-md": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "label-lg": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.015em", "fontWeight": "700" }],
+            "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "headline-xl": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+            "label-sm": ["10px", { "lineHeight": "12px", "letterSpacing": "0.04em", "fontWeight": "700" }],
+            "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }],
+            "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }]
+          }
+        },
+      },
+    }
+  </script>
+</head>
+<body class="bg-background text-on-surface font-body-md antialiased min-h-screen flex flex-col selection:bg-primary-container selection:text-white">
+<!-- 1. THANH TRÊN (HEADER/TOP NAVIGATION) -->
+<header class="w-full bg-surface-container-lowest border-b border-outline sticky top-0 z-30 transition duration-150 ease-in-out">
+<div class="w-full max-w-[1280px] mx-auto px-margin-lg flex items-center justify-between h-16">
+<!-- Logo + Huy hiệu giải đấu -->
+<div class="flex items-center gap-space-md">
+<a class="flex items-center gap-2 group" href="#">
+<div class="w-9 h-9 rounded-lg bg-primary-container flex items-center justify-center text-white shadow-sm">
+<!-- Vợt / Bóng Pickleball SVG -->
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="9"></circle>
+<line x1="8" x2="8.01" y1="8" y2="8"></line>
+<line x1="12" x2="12.01" y1="8" y2="8"></line>
+<line x1="16" x2="16.01" y1="8" y2="8"></line>
+<line x1="10" x2="10.01" y1="12" y2="12"></line>
+<line x1="14" x2="14.01" y1="12" y2="12"></line>
+<line x1="12" x2="12.01" y1="16" y2="16"></line>
+</svg>
+</div>
+<span class="font-headline-md text-headline-md font-bold text-primary tracking-tight">PickHub</span>
+</a>
+<!-- Huy hiệu phân hệ -->
+<div class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+<span class="font-label-md text-label-md">Giải cộng đồng</span>
+</div>
+</div>
+<!-- Khu vực hành động bên phải (Chưa đăng nhập) -->
+<div class="flex items-center gap-space-md">
+<button class="px-4 py-2 rounded-lg border border-outline bg-transparent text-slate-900 font-label-lg text-label-lg font-semibold hover:bg-slate-50 hover:border-slate-300 transition-colors" type="button">
+          Đăng nhập
+        </button>
+<button class="px-4 py-2 rounded-lg bg-primary hover:bg-[#6d28d9] text-white font-label-lg text-label-lg font-semibold shadow-sm transition-colors" type="button">
+          Tạo tài khoản
+        </button>
+</div>
+</div>
+</header>
+<!-- NỘI DUNG CHÍNH (CANVAS CÔNG CỘNG) -->
+<main class="flex-1 w-full max-w-[1280px] mx-auto px-margin-lg py-8 flex flex-col gap-8">
+<!-- 2. PHẦN TIÊU ĐỀ TRANG (PAGE HEADER) -->
+<section class="flex flex-col">
+<div class="flex items-center gap-2 mb-2">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-50 text-primary border border-purple-100 font-label-sm text-label-sm">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+</span>
+          ĐANG MỞ ĐĂNG KÝ
+        </span>
+</div>
+<h1 class="font-headline-lg text-headline-lg font-bold text-slate-900 tracking-tight">
+        Giải cộng đồng đang mở đăng ký
+      </h1>
+<p class="font-body-lg text-body-lg text-slate-600 mt-2">
+        Chọn một giải, tạo tài khoản và đăng ký cùng bạn ghép cặp
+      </p>
+</section>
+<!-- 3. HÀNG LỌC (SEARCH & FILTERS) -->
+<section class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 p-2 bg-surface-container-lowest rounded-xl border border-outline shadow-sm">
+<!-- Ô tìm kiếm -->
+<div class="relative flex-1">
+<div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<circle cx="11" cy="11" r="8" stroke-width="2"></circle>
+<line stroke-linecap="round" stroke-width="2" x1="21" x2="16.65" y1="21" y2="16.65"></line>
+</svg>
+</div>
+<input class="w-full pl-10 pr-4 py-2.5 h-11 bg-white rounded-lg border border-transparent placeholder:text-slate-400 text-slate-900 font-body-md text-body-md focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none" placeholder="Tìm giải theo tên hoặc địa điểm" type="text">
+</div>
+<!-- 3 Filter Chips -->
+<div class="flex items-center gap-2 shrink-0 px-1 pb-1 md:pb-0">
+<!-- Chip "Tất cả" (Đang chọn) -->
+<button class="h-10 px-4 rounded-lg bg-primary text-white font-label-md text-label-md flex items-center justify-center transition-colors shadow-sm" type="button">
+          Tất cả
+        </button>
+<!-- Chip "Tuần này" -->
+<button class="h-10 px-4 rounded-lg bg-white border border-outline hover:border-slate-300 text-slate-700 font-label-md text-label-md flex items-center justify-center hover:bg-slate-50 transition-colors" type="button">
+          Tuần này
+        </button>
+<!-- Chip "Tháng này" -->
+<button class="h-10 px-4 rounded-lg bg-white border border-outline hover:border-slate-300 text-slate-700 font-label-md text-label-md flex items-center justify-center hover:bg-slate-50 transition-colors" type="button">
+          Tháng này
+        </button>
+</div>
+</section>
+<!-- 4. LƯỚI 3 CỘT THẺ GIẢI ĐẤU (TOURNAMENT CARDS GRID) -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- THẺ 1 -->
+<div class="bg-surface-container-lowest border border-outline rounded-2xl p-6 flex flex-col justify-between hover:border-slate-300 transition-all duration-200 hover:-translate-y-0.5 shadow-sm group">
+<div>
+<!-- Header Thẻ & Chips Nội dung thi đấu -->
+<div class="flex items-center gap-2 mb-3 flex-wrap">
+<span class="px-2.5 py-1 rounded-md bg-purple-50 text-purple-700 font-label-sm text-label-sm border border-purple-100">
+              Đôi Nam Nữ
+            </span>
+<span class="px-2.5 py-1 rounded-md bg-purple-50 text-purple-700 font-label-sm text-label-sm border border-purple-100">
+              Đôi Nam
+            </span>
+</div>
+<!-- Tên giải -->
+<h2 class="font-headline-sm text-headline-sm font-bold text-slate-900 line-clamp-2 leading-snug group-hover:text-primary transition-colors">
+            Giải Pickleball Cộng đồng Hà Nội – Mùa Thu
+          </h2>
+<!-- Meta thông tin (Địa điểm & Thời gian) -->
+<div class="mt-4 space-y-2.5 text-slate-600 font-body-md text-body-md">
+<div class="flex items-center gap-2.5">
+<svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Sân Cầu Giấy, Hà Nội</span>
+</div>
+<div class="flex items-center gap-2.5">
+<svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<rect height="18" rx="2" ry="2" stroke-width="2" width="18" x="3" y="4"></rect>
+<line stroke-linecap="round" stroke-width="2" x1="16" x2="16" y1="2" y2="6"></line>
+<line stroke-linecap="round" stroke-width="2" x1="8" x2="8" y1="2" y2="6"></line>
+<line stroke-width="2" x1="3" x2="21" y1="10" y2="10"></line>
+</svg>
+<span>Thứ Bảy 18/10/2026</span>
+</div>
+</div>
+<!-- Tiến độ đăng ký -->
+<div class="mt-5 pt-4 border-t border-slate-100">
+<div class="flex items-center justify-between text-slate-700 font-label-md text-label-md mb-1.5">
+<span>Số lượng đăng ký</span>
+<span class="font-bold text-slate-900">12/16 cặp đã duyệt</span>
+</div>
+<!-- Thanh tiến độ 75% -->
+<div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 75%;"></div>
+</div>
+</div>
+<!-- Thông tin chi phí & hạn chót -->
+<div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between font-label-md text-label-md">
+<div class="text-slate-900 font-bold">
+              Lệ phí 150.000đ/cặp
+            </div>
+<div class="text-slate-500 font-normal">
+              Hạn đăng ký 12/10/2026
+            </div>
+</div>
+</div>
+<!-- Nút hành động -->
+<div class="mt-6">
+<button class="w-full bg-primary hover:bg-[#6d28d9] text-white py-2.5 px-4 rounded-lg font-label-lg text-label-lg font-semibold transition-colors flex items-center justify-center gap-1.5 shadow-sm" type="button">
+<span>Xem giải &amp; đăng ký</span>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+</div>
+<!-- THẺ 2 -->
+<div class="bg-surface-container-lowest border border-outline rounded-2xl p-6 flex flex-col justify-between hover:border-slate-300 transition-all duration-200 hover:-translate-y-0.5 shadow-sm group">
+<div>
+<!-- Header Thẻ & Chips Nội dung thi đấu & Huy hiệu danh sách chờ -->
+<div class="flex items-center justify-between gap-2 mb-3 flex-wrap">
+<span class="px-2.5 py-1 rounded-md bg-purple-50 text-purple-700 font-label-sm text-label-sm border border-purple-100">
+              Đôi Nam Nữ
+            </span>
+<span class="px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 font-label-sm text-label-sm">
+              Đã đủ · nhận danh sách chờ
+            </span>
+</div>
+<!-- Tên giải -->
+<h2 class="font-headline-sm text-headline-sm font-bold text-slate-900 line-clamp-2 leading-snug group-hover:text-primary transition-colors">
+            Giải Giao lưu Cuối tuần Đà Nẵng
+          </h2>
+<!-- Meta thông tin -->
+<div class="mt-4 space-y-2.5 text-slate-600 font-body-md text-body-md">
+<div class="flex items-center gap-2.5">
+<svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Sân Hải Châu, Đà Nẵng</span>
+</div>
+<div class="flex items-center gap-2.5">
+<svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<rect height="18" rx="2" ry="2" stroke-width="2" width="18" x="3" y="4"></rect>
+<line stroke-linecap="round" stroke-width="2" x1="16" x2="16" y1="2" y2="6"></line>
+<line stroke-linecap="round" stroke-width="2" x1="8" x2="8" y1="2" y2="6"></line>
+<line stroke-width="2" x1="3" x2="21" y1="10" y2="10"></line>
+</svg>
+<span>Thứ Bảy 25/10/2026</span>
+</div>
+</div>
+<!-- Tiến độ đăng ký 100% -->
+<div class="mt-5 pt-4 border-t border-slate-100">
+<div class="flex items-center justify-between text-slate-700 font-label-md text-label-md mb-1.5">
+<span>Số lượng đăng ký</span>
+<span class="font-bold text-amber-700">16/16 cặp đã duyệt</span>
+</div>
+<!-- Thanh tiến độ 100% -->
+<div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+<div class="bg-amber-500 h-full rounded-full" style="width: 100%;"></div>
+</div>
+</div>
+<!-- Thông tin chi phí & hạn chót -->
+<div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between font-label-md text-label-md">
+<div class="text-slate-900 font-bold">
+              Lệ phí 200.000đ/cặp
+            </div>
+<div class="text-slate-500 font-normal">
+              Hạn đăng ký 20/10/2026
+            </div>
+</div>
+</div>
+<!-- Nút hành động -->
+<div class="mt-6">
+<button class="w-full bg-white border border-slate-300 hover:bg-slate-50 text-slate-900 py-2.5 px-4 rounded-lg font-label-lg text-label-lg font-semibold transition-colors flex items-center justify-center gap-1.5" type="button">
+<span>Xem giải &amp; đăng ký</span>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+</div>
+<!-- THẺ 3 -->
+<div class="bg-surface-container-lowest border border-outline rounded-2xl p-6 flex flex-col justify-between hover:border-slate-300 transition-all duration-200 hover:-translate-y-0.5 shadow-sm group">
+<div>
+<!-- Header Thẻ & Chip Miễn phí & Nội dung -->
+<div class="flex items-center justify-between gap-2 mb-3 flex-wrap">
+<span class="px-2.5 py-1 rounded-md bg-purple-50 text-purple-700 font-label-sm text-label-sm border border-purple-100">
+              Đôi Nam
+            </span>
+<span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-label-sm text-label-sm font-bold">
+              Miễn phí
+            </span>
+</div>
+<!-- Tên giải -->
+<h2 class="font-headline-sm text-headline-sm font-bold text-slate-900 line-clamp-2 leading-snug group-hover:text-primary transition-colors">
+            Giải Người mới TP.HCM
+          </h2>
+<!-- Meta thông tin -->
+<div class="mt-4 space-y-2.5 text-slate-600 font-body-md text-body-md">
+<div class="flex items-center gap-2.5">
+<svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Sân Thủ Đức</span>
+</div>
+<div class="flex items-center gap-2.5">
+<svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<rect height="18" rx="2" ry="2" stroke-width="2" width="18" x="3" y="4"></rect>
+<line stroke-linecap="round" stroke-width="2" x1="16" x2="16" y1="2" y2="6"></line>
+<line stroke-linecap="round" stroke-width="2" x1="8" x2="8" y1="2" y2="6"></line>
+<line stroke-width="2" x1="3" x2="21" y1="10" y2="10"></line>
+</svg>
+<span>Chủ Nhật 02/11/2026</span>
+</div>
+</div>
+<!-- Tiến độ đăng ký 25% -->
+<div class="mt-5 pt-4 border-t border-slate-100">
+<div class="flex items-center justify-between text-slate-700 font-label-md text-label-md mb-1.5">
+<span>Số lượng đăng ký</span>
+<span class="font-bold text-slate-900">3/12 cặp đã duyệt</span>
+</div>
+<!-- Thanh tiến độ 25% -->
+<div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 25%;"></div>
+</div>
+</div>
+<!-- Thông tin chi phí & hạn chót -->
+<div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between font-label-md text-label-md">
+<div class="text-emerald-700 font-bold">
+              Miễn phí
+            </div>
+<div class="text-slate-500 font-normal">
+              Hạn đăng ký 28/10/2026
+            </div>
+</div>
+</div>
+<!-- Nút hành động -->
+<div class="mt-6">
+<button class="w-full bg-primary hover:bg-[#6d28d9] text-white py-2.5 px-4 rounded-lg font-label-lg text-label-lg font-semibold transition-colors flex items-center justify-center gap-1.5 shadow-sm" type="button">
+<span>Xem giải &amp; đăng ký</span>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+</div>
+</section>
+<!-- 5. PHÍA DƯỚI CÙNG: KHỐI MINH HỌA TRẠNG THÁI RỖNG (EMPTY STATE PREVIEW) -->
+<section class="mt-4 pt-8 border-t border-slate-200">
+<div class="max-w-md mx-auto p-6 rounded-xl border border-dashed border-slate-300 bg-white text-center flex flex-col items-center">
+<!-- Badge nhãn trạng thái rỗng -->
+<span class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 font-label-sm text-label-sm font-bold uppercase tracking-wider mb-3">
+          TRẠNG THÁI RỖNG
+        </span>
+<!-- Icon minh họa rỗng -->
+<div class="w-10 h-10 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 mb-2">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<rect height="18" rx="2" stroke-width="2" width="18" x="3" y="4"></rect>
+<line stroke-linecap="round" stroke-width="2" x1="9" x2="15" y1="9" y2="15"></line>
+<line stroke-linecap="round" stroke-width="2" x1="15" x2="9" y1="9" y2="15"></line>
+</svg>
+</div>
+<!-- Nội dung yêu cầu -->
+<p class="font-body-md text-body-md text-slate-600">
+          Chưa có giải nào đang mở đăng ký. Hãy quay lại sau.
+        </p>
+</div>
+</section>
+</main>
+</body></html>

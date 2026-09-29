@@ -19,7 +19,28 @@ export default function TopbarAccount() {
         return () => { alive = false; };
     }, [pathname]);
 
-    if (pathname.startsWith('/cong-dong/quan-tri') || pathname.startsWith('/cong-dong/tai-khoan')) return null;
+    // Trang đăng nhập / tạo tài khoản (Stitch PLC-02/03): nút bên phải là hành động NGƯỢC với tab đang mở.
+    const [accountTab, setAccountTab] = useState('tao');
+    useEffect(() => {
+        if (pathname !== '/cong-dong/tai-khoan') return undefined;
+        setAccountTab(new URLSearchParams(window.location.search).get('tab') === 'dang-nhap' ? 'dang-nhap' : 'tao');
+        const onTab = (event) => setAccountTab(event.detail === 'dang-nhap' ? 'dang-nhap' : 'tao');
+        window.addEventListener('cd:accounttab', onTab);
+        return () => window.removeEventListener('cd:accounttab', onTab);
+    }, [pathname]);
+
+    if (pathname.startsWith('/cong-dong/quan-tri')) return null;
+    if (pathname === '/cong-dong/tai-khoan') {
+        if (account) return null;
+        return (
+            <nav className="cd-topnav" aria-label="Tài khoản">
+                <Link className="cd-btn cd-btn--ghost cd-btn--sm" href={`/cong-dong/tai-khoan?tab=${accountTab === 'tao' ? 'dang-nhap' : 'tao'}`}>
+                    {accountTab === 'tao' ? 'Đăng nhập' : 'Tạo tài khoản'}
+                </Link>
+            </nav>
+        );
+    }
+    if (pathname.startsWith('/cong-dong/tai-khoan')) return null;
     if (account === undefined) return <nav className="cd-topnav" aria-label="Tài khoản" />;
     if (!account) {
         return (

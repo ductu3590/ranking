@@ -1,0 +1,268 @@
+<!DOCTYPE html><html class="h-full bg-slate-50" lang="vi"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Tạo tài khoản VĐV PickHub - PLC-02</title>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "error-container": "#ffdad6",
+            "tertiary-fixed-dim": "#ffb784",
+            "on-primary-fixed": "#25005a",
+            "tertiary-container": "#a15100",
+            "on-secondary": "#ffffff",
+            "primary-container": "#7c3aed",
+            "background": "#f8f9ff",
+            "on-surface": "#0b1c30",
+            "outline": "#7b7487",
+            "on-tertiary-container": "#ffe0cd",
+            "surface-container-high": "#dce9ff",
+            "on-secondary-fixed": "#131b2e",
+            "surface-bright": "#f8f9ff",
+            "surface-container-low": "#eff4ff",
+            "surface-dim": "#cbdbf5",
+            "on-background": "#0b1c30",
+            "secondary-container": "#dae2fd",
+            "tertiary": "#7d3d00",
+            "surface-container": "#e5eeff",
+            "inverse-surface": "#213145",
+            "on-error-container": "#93000a",
+            "on-tertiary-fixed-variant": "#713700",
+            "outline-variant": "#ccc3d8",
+            "primary": "#7c3aed",
+            "surface-container-highest": "#d3e4fe",
+            "surface-variant": "#d3e4fe",
+            "tertiary-fixed": "#ffdcc6",
+            "on-secondary-container": "#5c647a",
+            "on-primary-fixed-variant": "#5a00c6",
+            "on-error": "#ffffff",
+            "secondary": "#565e74",
+            "on-tertiary": "#ffffff",
+            "secondary-fixed-dim": "#bec6e0",
+            "error": "#ba1a1a",
+            "inverse-on-surface": "#eaf1ff",
+            "secondary-fixed": "#dae2fd",
+            "inverse-primary": "#d2bbff",
+            "on-surface-variant": "#4a4455",
+            "surface": "#f8f9ff",
+            "on-primary": "#ffffff",
+            "surface-tint": "#732ee4",
+            "on-primary-container": "#ede0ff",
+            "surface-container-lowest": "#ffffff",
+            "on-tertiary-fixed": "#301400",
+            "on-secondary-fixed-variant": "#3f465c",
+            "primary-fixed-dim": "#d2bbff",
+            "primary-fixed": "#eaddff"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-lg": "1rem",
+            "margin-lg": "2rem",
+            "space-md": "0.75rem",
+            "space-2xl": "2rem",
+            "margin-md": "1.5rem",
+            "gutter-lg": "1.5rem",
+            "space-xs": "0.25rem",
+            "margin": "1rem",
+            "gutter": "1rem",
+            "space-sm": "0.5rem",
+            "space-xl": "1.5rem"
+          },
+          "fontFamily": {
+            "headline-lg-mobile": ["Plus Jakarta Sans"],
+            "body-lg": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "label-sm": ["Plus Jakarta Sans"],
+            "headline-xl-mobile": ["Plus Jakarta Sans"],
+            "body-sm": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "label-lg": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "body-md": ["Plus Jakarta Sans"],
+            "headline-xl": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "700" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.015em", "fontWeight": "700" }],
+            "label-sm": ["10px", { "lineHeight": "12px", "letterSpacing": "0.04em", "fontWeight": "700" }],
+            "headline-xl-mobile": ["30px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+            "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+            "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }],
+            "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "headline-xl": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "800" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+  </style>
+</head>
+<body class="min-h-full bg-slate-50 flex flex-col justify-between text-slate-800 antialiased">
+<!-- 1. Thanh trên gọn (Top Bar) -->
+<header class="w-full bg-white border-b border-slate-200">
+<div class="w-full max-w-[1280px] mx-auto px-margin-lg h-16 flex items-center justify-between">
+<!-- Logo + Tag -->
+<div class="flex items-center gap-3">
+<a class="flex items-center gap-2 text-primary focus:outline-none" href="#">
+<svg class="w-7 h-7 text-primary shrink-0" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 32 32">
+<!-- Vợt Pickleball & Quả bóng nét thanh lịch -->
+<rect fill="none" height="17" rx="7" stroke="currentColor" width="14" x="7" y="4"></rect>
+<path d="M14 21v7"></path>
+<path d="M12 28h4"></path>
+<circle cx="23" cy="9" fill="none" r="4" stroke="currentColor"></circle>
+<circle cx="21.5" cy="8" fill="currentColor" r="0.7"></circle>
+<circle cx="24.5" cy="8" fill="currentColor" r="0.7"></circle>
+<circle cx="23" cy="10" fill="currentColor" r="0.7"></circle>
+</svg>
+<span class="font-headline-md text-headline-md font-bold text-primary tracking-tight">PickHub</span>
+</a>
+<span class="inline-flex items-center border border-slate-200 bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5 rounded-full">
+          Giải cộng đồng
+        </span>
+</div>
+<!-- Nút Đăng nhập -->
+<a class="border border-slate-300 text-slate-700 hover:border-slate-400 hover:bg-slate-50 px-4 py-2 rounded-lg text-sm font-medium transition-colors" href="#">
+        Đăng nhập
+      </a>
+</div>
+</header>
+<!-- 2. Khối chính giữa trang (Main Container) -->
+<main class="flex-1 flex items-center justify-center py-12 px-4">
+<div class="w-[440px] bg-white border border-slate-200 rounded-[12px] p-8 shadow-sm">
+<!-- Tab Header -->
+<div class="flex border-b border-slate-200">
+<button class="relative pb-3 text-sm font-semibold text-primary focus:outline-none" type="button">
+          Tạo tài khoản
+          <span class="absolute bottom-0 left-0 right-0 h-[2px] bg-[#7c3aed]"></span>
+</button>
+<button class="pb-3 ml-6 text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors focus:outline-none" type="button">
+          Đăng nhập
+        </button>
+</div>
+<!-- Tiêu đề trong thẻ -->
+<div class="mt-6 mb-6">
+<h1 class="text-xl font-bold text-slate-900 leading-tight mb-1">Tạo tài khoản VĐV</h1>
+<p class="text-sm text-slate-500">Dùng để đăng ký giải cộng đồng và rủ bạn ghép cặp</p>
+</div>
+<!-- Form Fields -->
+<form class="space-y-4">
+<!-- Ô 1: Tên hiển thị -->
+<div>
+<label class="block text-sm font-semibold text-slate-700 mb-1.5" for="displayName">
+            Tên hiển thị
+          </label>
+<input class="w-full h-10 px-3 border border-slate-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 transition-colors" id="displayName" placeholder="Ví dụ: Nguyễn Minh" type="text">
+</div>
+<!-- Ô 2: Số điện thoại -->
+<div>
+<label class="block text-sm font-semibold text-slate-700 mb-1.5" for="phone">
+            Số điện thoại
+          </label>
+<input class="w-full h-10 px-3 border border-slate-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 transition-colors" id="phone" placeholder="0912 345 678" type="tel">
+<p class="text-xs text-slate-500 mt-1">Dùng để đăng nhập, không hiển thị công khai</p>
+</div>
+<!-- Ô 3: Mật khẩu -->
+<div>
+<label class="block text-sm font-semibold text-slate-700 mb-1.5" for="password">
+            Mật khẩu
+          </label>
+<div class="relative">
+<input class="w-full h-10 pl-3 pr-14 border border-slate-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 transition-colors tracking-wide" id="password" placeholder="••••••••" type="password">
+<button class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-primary hover:underline cursor-pointer select-none" onclick="const p = document.getElementById('password'); const isPass = p.type === 'password'; p.type = isPass ? 'text' : 'password'; this.textContent = isPass ? 'Ẩn' : 'Hiện';" type="button">
+              Hiện
+            </button>
+</div>
+<p class="text-xs text-slate-500 mt-1">Tối thiểu 8 ký tự</p>
+</div>
+<!-- Ô 4: Nhập lại mật khẩu -->
+<div>
+<label class="block text-sm font-semibold text-slate-700 mb-1.5" for="confirmPassword">
+            Nhập lại mật khẩu
+          </label>
+<input class="w-full h-10 px-3 border border-slate-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 transition-colors tracking-wide" id="confirmPassword" placeholder="••••••••" type="password">
+</div>
+<!-- 4. Khối thu gọn "Thông tin thêm (không bắt buộc)" - Trạng thái MỞ -->
+<div class="rounded-lg border border-slate-100 bg-slate-50/50 p-4 pt-3.5 space-y-4 mb-6">
+<div class="flex items-center justify-between cursor-pointer select-none">
+<span class="text-sm font-semibold text-slate-700">Thông tin thêm (không bắt buộc)</span>
+<svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<path d="M18 15l-6-6-6 6"></path>
+</svg>
+</div>
+<!-- Chi tiết mở rộng -->
+<div class="space-y-4 pt-1">
+<!-- Giới tính -->
+<div>
+<label class="block text-xs font-medium text-slate-600 mb-1.5">Giới tính</label>
+<div class="grid grid-cols-2 gap-2">
+<button class="h-9 flex items-center justify-center rounded-lg border border-[#7c3aed] bg-[#f3e8ff] text-[#7c3aed] text-sm font-medium transition-colors" type="button">
+                  Nam
+                </button>
+<button class="h-9 flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 text-sm font-medium hover:bg-slate-50 transition-colors" type="button">
+                  Nữ
+                </button>
+</div>
+</div>
+<!-- Ngày sinh -->
+<div>
+<label class="block text-xs font-medium text-slate-600 mb-1.5" for="birthDate">Ngày sinh</label>
+<input class="w-full h-9 px-3 border border-slate-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 bg-white focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 transition-colors" id="birthDate" placeholder="Ngày / Tháng / Năm" type="text">
+</div>
+<!-- Trình độ PHR tự khai -->
+<div>
+<label class="block text-xs font-medium text-slate-600 mb-1.5" for="phrLevel">Trình độ PHR tự khai</label>
+<input class="w-full h-9 px-3 border border-slate-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 bg-white focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 transition-colors" id="phrLevel" placeholder="Ví dụ: 3.25" type="text">
+</div>
+</div>
+</div>
+<!-- 5. Nút bấm và phần chân thẻ -->
+<button class="w-full bg-[#7c3aed] hover:bg-[#6d28d9] text-white py-3 rounded-lg font-semibold text-base shadow-sm transition-colors text-center cursor-pointer" type="button">
+          Tạo tài khoản
+        </button>
+<div class="text-center pt-2">
+<p class="text-sm text-slate-600">
+            Đã có tài khoản? <a class="font-bold text-primary hover:underline cursor-pointer" href="#">Đăng nhập</a>
+</p>
+</div>
+<p class="text-center text-xs text-slate-400 mt-4 leading-relaxed">
+          Bằng việc tạo tài khoản, bạn đồng ý cho ban tổ chức xem số điện thoại để liên hệ về giải.
+        </p>
+</form>
+</div>
+</main>
+<!-- 6. Phần chân trang (Footer) -->
+<footer class="w-full bg-white border-t border-slate-200">
+<div class="w-full max-w-[1280px] mx-auto px-margin-lg py-4 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+<div>
+        © 2025 PickHub. Hệ thống quản lý giải đấu pickleball cộng đồng.
+      </div>
+<div class="flex items-center gap-6">
+<a class="hover:text-primary transition-colors" href="#">Điều khoản dịch vụ</a>
+<a class="hover:text-primary transition-colors" href="#">Chính sách bảo mật</a>
+<a class="hover:text-primary transition-colors" href="#">Hỗ trợ BTC</a>
+</div>
+</div>
+</footer>
+</body></html>

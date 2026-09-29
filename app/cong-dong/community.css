@@ -11,7 +11,8 @@
   font-family: var(--ph-font-loaded), 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 0.875rem; line-height: 1.25rem;
 }
 .cd-shell *, .cd-shell *::before, .cd-shell *::after { box-sizing: border-box; }
-.cd-shell button, .cd-shell input { font: inherit; color: inherit; }
+.cd-shell button, .cd-shell input { font: inherit; }
+.cd-shell input { color: inherit; }
 .cd-shell :focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.35); border-radius: var(--cd-radius); }
 
 /* Thanh trên gọn */

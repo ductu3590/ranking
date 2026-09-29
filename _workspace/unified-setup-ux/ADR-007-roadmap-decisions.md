@@ -93,3 +93,22 @@ Chốt câu hỏi mở của spec (`docs/superpowers/specs/2026-09-25-epic-3-fri
 | D51 | Hạn mức CLB khách là **mức tối đa**, không phải số bắt buộc: gửi từ 1 cặp tới `quota` cặp đều hợp lệ (vd hạn mức 10, gửi 6 hay 8 đều được); chỉ vượt mới chặn (`FRIENDLY_QUOTA_EXCEEDED`), 0 cặp chặn (`FRIENDLY_ROSTER_EMPTY`). Luật nằm ở hệ thống (domain + SQL 110 đã đúng), UI không cần giải thích — bộ đếm "x/y cặp" không được ngụ ý phải đủ y (người dùng chốt 2026-09-27) | Giải giao lưu phong trào, CLB khách thường ít người hơn chủ nhà |
 | D52 | Người dùng **duyệt giao diện Stitch Epic 3** (FRD-01…08 + FRD-09 "chủ nhà sau khi mời", xem trực tiếp trên Stitch project 16224817196221939744) và cho tiến hành lát F3. Mời xong wizard **không khoá**: chủ nhà làm tiếp Bước 1–3, chỉ Bước 4 chặn tới khi CLB khách gửi và được duyệt; giải là bản nháp trong danh sách giải (2026-09-27) | Chốt thiết kế trước khi code (D44) |
 | D53 | Bàn điều hành và trang công khai (Trực tiếp · Lịch · Xếp hạng · Sơ đồ) **giữ nguyên giao diện hiện tại** (Epic 2); giải giao hữu chỉ **bổ sung BXH tổng CLB** (D40) — không làm lại FRD-07/08 theo Stitch ngoài phần bảng CLB (2026-09-27) | Giao diện điều hành vừa nghiệm thu ở Epic 2; giảm phạm vi F3 |
+
+## Bổ sung — Epic 4 (Giải cộng đồng), brainstorm 2026-09-29
+
+Chốt với người dùng bằng AskUserQuestion + duyệt thiết kế 2026-09-29. Spec: `docs/superpowers/specs/2026-09-29-epic-4-community/`.
+Phát hiện khi rà: `athlete_accounts` gắn cứng CLB (`club_id`, `club_membership_id` NOT NULL); `platform_accounts` 0 dòng và **không có trang đăng nhập**; `setup`/`setup/finalize` chỉ nhận phiên CLB; `tournament_athletes.source` chưa có `community`; `lib/rateLimit.js` là bộ nhớ tiến trình.
+
+| Mã | Quyết định | Lý do |
+|---|---|---|
+| D54 | Tài khoản VĐV công khai là **bảng mới `player_accounts`** (SĐT chuẩn hóa + mật khẩu, không cần CLB) + `player_sessions`; `athlete_accounts` của CLB giữ nguyên | Người ngoài CLB không có đường đăng ký; không đụng dữ liệu CLB đang chạy |
+| D55 | Cấp admin hệ thống bằng **script CLI** (`scripts/seed-platform-account.js` đã có; người dùng tự đặt mật khẩu qua biến môi trường); **thêm trang đăng nhập admin hệ thống** (còn thiếu). Chưa làm giao diện quản lý tài khoản admin | Người dùng chọn script |
+| D56 | Lệ phí **thu ngoài hệ thống**; hiển thị `entry_fee`; admin đánh dấu "Đã xác nhận thu" thủ công; không chặn duyệt/chốt (chỉ cảnh báo Bước 4) | Người dùng chọn; không tích hợp SePay ở epic này |
+| D57 | Công khai **chỉ tên cặp đã duyệt** + bộ đếm `X/Y`; không SĐT, không đơn chờ | Người dùng chọn; bảo vệ dữ liệu cá nhân người ngoài |
+| D58 | Giải cộng đồng **cấm đăng ký ẩn danh**: `public/registration` POST và `public/pair-invite` trả 401 `PLAYER_SESSION_REQUIRED` với giải `community` | Thực thi D19 |
+| D59 | Rủ ghép cặp: link rủ (băm, hết hạn 7 ngày) hoặc lời mời theo SĐT chính xác (phản hồi đồng nhất, có giới hạn tần suất); bảng tìm bạn ghép chỉ cho VĐV đã đăng nhập có đơn lẻ, chỉ tên hiển thị (+ giới tính/PHR khi nội dung cần) | Bỏ đường liệt kê VĐV lẻ kèm giới tính/PHR cho bất kỳ ai có token |
+| D60 | Chống spam: bộ đếm **lưu DB** (`public_rate_limits` + RPC nguyên tử), honeypot, SĐT duy nhất/tài khoản, một đơn hoạt động/tài khoản/nội dung; **không OTP SĐT** ở epic này (admin duyệt là chốt chặn) | `rateLimit.js` bộ nhớ không bền trên serverless |
+| D61 | Cặp cộng đồng vào setup như giao hữu: cặp hiệu lực = đơn `approved`, khóa `r<id>.<version>`; participantRef mới `player:<accountId>`; `tournament_athletes.source='community'`; `athletes` chỉ tạo **lúc chốt giải** cho tài khoản chưa có; không gộp với `athletes` của CLB | Fail-closed khi đổi đơn (như `friendlyPairKey`); tránh tài khoản spam sinh bản ghi `athletes` |
+| D62 | `setup`, `setup/finalize`, `registrations` dùng `requireTournamentAccess` (platform actor qua được giải cộng đồng; phiên CLB giữ nguyên) | Admin hệ thống chưa dùng được workspace setup |
+| D63 | Deploy như D24/D27/D45: nhánh + PR nháp; agent apply migration (ROLLBACK trước, md5 sau); dữ liệu test = giải + tài khoản VĐV tiền tố `TEST-CD` trong group 8 (system); không đụng group 1; người dùng chạy browser rồi tự merge | Người dùng giữ quyền lên production |
+| D64 | **Mọi màn Stitch của Epic 4 thiết kế cả PC (1280px) lẫn mobile (390px)**; màn admin ưu tiên PC; nghiệm thu browser ở cả hai kích thước. Bản PC cho các màn Epic 1–3 là nợ riêng của người dùng, ngoài Epic 4 | Người dùng điều hành trên PC tiện hơn (2026-09-29) |

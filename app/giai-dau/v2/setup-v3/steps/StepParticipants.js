@@ -4,6 +4,8 @@ import { useId, useMemo, useState } from 'react';
 import { messageFor } from '@/lib/tournament/setupMessages';
 import { newIdempotencyKey } from '@/lib/tournamentV2Client';
 import FriendlyClubsPanel from '../friendly/FriendlyClubsPanel';
+import CommunityPairsPanel from '../community/CommunityPairsPanel';
+import '../community/community.css';
 
 function initials(name) {
   const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
@@ -68,7 +70,31 @@ function FriendlyGuestBlocker({ guests, onClear }) {
   );
 }
 
-export default function StepParticipants({ draft, roster, rosterLoading, readiness, showErrors, onChange, friendly = null, tournamentId = null, onFriendlyChanged }) {
+// Giải cộng đồng (Epic 4 C3): Bước 2 chỉ hiển thị các cặp đã duyệt ở bảng đăng ký — không chọn thành viên CLB, không khách mời.
+function CommunityParticipants({ readiness, community, registrationsHref, onReloadCommunity }) {
+  const stepResult = readiness.byStep[2];
+  return (
+    <>
+      <section className="pc-card pc-card--hero" aria-labelledby="cm-step2-title">
+        <div className="pc-card__head">
+          <div>
+            <p className="pc-eyebrow">Người tham gia</p>
+            <h2 id="cm-step2-title" className="pc-hero-title">Các cặp đã duyệt</h2>
+            <p className="pc-lead">Giải cộng đồng lấy người thi đấu từ các đăng ký đã duyệt. Cần duyệt thêm hoặc ghép hộ thì mở bảng duyệt rồi quay lại bấm Tải lại.</p>
+          </div>
+          <span className="pc-badge pc-badge--brand">{community?.approvedPairs?.length || 0} cặp</span>
+        </div>
+      </section>
+      <CommunityPairsPanel community={community} registrationsHref={registrationsHref} blockers={stepResult.blockers} warnings={stepResult.warnings} onRefresh={onReloadCommunity} />
+    </>
+  );
+}
+
+export default function StepParticipants(props) {
+  return props.community ? <CommunityParticipants {...props} /> : <ClubParticipants {...props} />;
+}
+
+function ClubParticipants({ draft, roster, rosterLoading, readiness, showErrors, onChange, friendly = null, tournamentId = null, onFriendlyChanged }) {
   const base = useId();
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState('active');

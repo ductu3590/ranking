@@ -28,13 +28,14 @@ export function saveStatusText(save) {
   }
 }
 
-export function StudioHeader({ title, save, onBack, friendly = false }) {
+export function StudioHeader({ title, save, onBack, friendly = false, community = false }) {
   return (
     <header className="pc-header">
       <button type="button" className="pc-header__back" onClick={onBack} aria-label="Quay về danh sách giải">‹</button>
       <div className="pc-header__title">
-        <h1>{title || (friendly ? 'Tạo giải giao hữu' : 'Tạo giải nội bộ')}</h1>
+        <h1>{title || (community ? 'Dựng giải cộng đồng' : friendly ? 'Tạo giải giao hữu' : 'Tạo giải nội bộ')}</h1>
         {friendly ? <span className="pc-badge pc-badge--brand">Giao hữu liên CLB</span> : null}
+        {community ? <span className="pc-badge pc-badge--brand">Giải cộng đồng</span> : null}
         <span className="pc-badge pc-badge--draft">Nháp</span>
         <span className="pc-save-status" data-status={save.status} role="status" aria-live="polite">{saveStatusText(save)}</span>
       </div>

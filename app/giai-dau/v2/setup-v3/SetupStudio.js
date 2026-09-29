@@ -25,13 +25,15 @@ const NEXT_HINT = {
   3: 'Bốc thăm, xem trước lịch và chốt giải.',
   4: null,
 };
+const COMMUNITY_NEXT_HINT = { ...NEXT_HINT, 1: 'Xem các cặp đã duyệt ở đăng ký.', 2: 'Chọn thể thức và số sân cho các cặp đã duyệt.' };
 const FRIENDLY_NEXT_HINT = { ...NEXT_HINT, 1: 'Chọn thành viên CLB bạn và mời CLB khác.', 2: 'Ghép cặp của CLB bạn, xem cặp CLB khách, chọn thể thức và số sân.' };
 
-export default function SetupStudio({ tournamentId, divisionId, step: requestedStep, organizerMode = 'internal', onExit }) {
+// registrationsHref: (chỉ giải cộng đồng) đường dẫn tới bảng duyệt đăng ký của nội dung đang dựng.
+export default function SetupStudio({ tournamentId, divisionId, step: requestedStep, organizerMode = 'internal', onExit, registrationsHref = null }) {
   const router = useRouter();
   const pathname = usePathname();
   const studio = useSetupStudio({ tournamentId, divisionId, step: requestedStep, organizerMode });
-  const { save, step, setStep, readiness, dirty, edit, persist, discard, reloadFromServer, draw, finalize, isFriendly, friendly, reloadFriendly } = studio;
+  const { save, step, setStep, readiness, dirty, edit, persist, discard, reloadFromServer, draw, finalize, isFriendly, friendly, reloadFriendly, isCommunity, community, reloadCommunity } = studio;
   const [finalized, setFinalized] = useState(null);
   // Thanh % khi bốc thăm / cập nhật xem trước / chốt (mọi thể thức). Chỉ bọc lời gọi cũ, không đổi API.
   const { progress: drawProgress, run: runWithProgress } = useDrawProgress();
@@ -53,6 +55,11 @@ export default function SetupStudio({ tournamentId, divisionId, step: requestedS
   useEffect(() => {
     if (isFriendly && step >= 2) reloadFriendly();
   }, [isFriendly, reloadFriendly, step]);
+
+  // Giải cộng đồng: quay lại Bước 2–4 thì tải lại khối cặp đã duyệt (admin có thể vừa duyệt / ghép hộ ở bảng duyệt).
+  useEffect(() => {
+    if (isCommunity && step >= 2) reloadCommunity();
+  }, [isCommunity, reloadCommunity, step]);
 
   // Giải đã chốt không mở lại màn thiết lập (spec Lát 0 §10): chuyển tới mục Điều hành.
   useEffect(() => {
@@ -132,10 +139,12 @@ export default function SetupStudio({ tournamentId, divisionId, step: requestedS
   }
 
   const draft = save.draft;
-  const participants = draft.participants.memberIds.length + draft.participants.guests.length;
+  // Giải cộng đồng: người tham gia = các cặp đã duyệt (2 VĐV mỗi cặp), không chọn từng người.
+  const communityPairCount = isCommunity ? (community?.approvedPairs || []).length : 0;
+  const participants = isCommunity ? communityPairCount * 2 : draft.participants.memberIds.length + draft.participants.guests.length;
   // Giải giao hữu: tổng cặp = cặp của CLB mình + cặp CLB khách đã duyệt.
   const guestPairCount = isFriendly ? (friendly?.approvedPairs || []).length : 0;
-  const pairTotal = draft.pairs.length + guestPairCount;
+  const pairTotal = isCommunity ? communityPairCount : draft.pairs.length + guestPairCount;
   const summaries = {
     1: draft.tournament.eventDate ? draft.tournament.eventDate.split('-').reverse().join('/') : '',
     2: participants ? `${participants} VĐV` : '',
@@ -143,11 +152,12 @@ export default function SetupStudio({ tournamentId, divisionId, step: requestedS
   };
   const stepProps = { draft, readiness, showErrors: Boolean(showErrors[step]), onChange: edit };
   const friendlyProps = isFriendly ? { friendly, pairTotal } : {};
+  const communityProps = isCommunity ? { community, pairTotal, registrationsHref } : {};
   const showGate = isFriendly && step === 4 && save.completedThrough < 3;
 
   return (
     <div className={`pc-studio ${jakarta.variable}`}>
-      <StudioHeader title={draft.tournament.name} save={save} onBack={() => requestNav('exit')} friendly={isFriendly} />
+      <StudioHeader title={draft.tournament.name} save={save} onBack={() => requestNav('exit')} friendly={isFriendly} community={isCommunity} />
       <StudioStepper step={step} completedThrough={save.completedThrough} summaries={summaries} onSelect={requestNav} extraOpenStep={gateOpen ? 4 : null} />
 
       {save.status === 'conflict' ? (
@@ -166,19 +176,21 @@ export default function SetupStudio({ tournamentId, divisionId, step: requestedS
         <main ref={mainRef} className="pc-main" tabIndex={-1} aria-busy={studio.loading || undefined}>
           {studio.loading ? <section className="pc-card"><p className="pc-empty">Đang tải bản nháp…</p></section> : (
             <>
-              {step === 1 ? <StepInfo {...stepProps} modeLocked={Boolean(save.tournamentId)} /> : null}
+              {step === 1 ? <StepInfo {...stepProps} modeLocked={Boolean(save.tournamentId)} community={isCommunity} registrationsHref={registrationsHref} /> : null}
               {step === 2 ? (
                 <StepParticipants
                   {...stepProps} roster={studio.roster} rosterLoading={!studio.roster.length && studio.loading}
                   friendly={friendly} tournamentId={save.tournamentId} onFriendlyChanged={reloadFriendly}
+                  {...communityProps} onReloadCommunity={reloadCommunity}
                 />
               ) : null}
-              {step === 3 ? <StepFormatPairing {...stepProps} {...friendlyProps} roster={studio.roster} onGoToStep={requestNav} /> : null}
+              {step === 3 ? <StepFormatPairing {...stepProps} {...friendlyProps} {...communityProps} roster={studio.roster} onGoToStep={requestNav} /> : null}
               {showGate ? <FriendlyDrawGate draft={draft} readiness={readiness} friendly={friendly} onGoToStep={requestNav} /> : null}
               {step === 4 && !showGate ? (
                 <StepDraw
                   {...stepProps}
                   {...friendlyProps}
+                  {...communityProps}
                   roster={studio.roster}
                   busy={busy || save.status === 'saving'}
                   finalizing={studio.finalizing}
@@ -200,7 +212,7 @@ export default function SetupStudio({ tournamentId, divisionId, step: requestedS
             </>
           )}
         </main>
-        <ReadinessRail step={showGate ? 3 : step} readiness={readiness} nextHint={(isFriendly ? FRIENDLY_NEXT_HINT : NEXT_HINT)[step]} />
+        <ReadinessRail step={showGate ? 3 : step} readiness={readiness} nextHint={(isCommunity ? COMMUNITY_NEXT_HINT : isFriendly ? FRIENDLY_NEXT_HINT : NEXT_HINT)[step]} />
       </div>
 
       <StudioActionBar

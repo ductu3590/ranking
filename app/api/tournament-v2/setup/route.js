@@ -13,7 +13,7 @@ import { normalizeParticipants } from '@/lib/tournament/setupParticipants';
 import { resolveRepairMode, normalizeRepairReport } from '@/lib/tournament/legacyPairRepair';
 import { friendlySetupView, loadFriendlyContext, loadFriendlyTournament } from '@/lib/tournament/friendlyServer';
 import { communitySetupAdmin, loadCommunitySetup } from '@/lib/communitySetupServer';
-import { projectCommunityView } from '@/lib/tournament/communitySetup';
+import { applyCommunityTournamentMeta, projectCommunityView } from '@/lib/tournament/communitySetup';
 
 // Xung dot nghiep vu nay ERRCODE 'PH409' (migration 078). Truoc day dung 40001,
 // nhung 40001 la serialization_failure nen tang tren tu dong retry va request treo.
@@ -150,7 +150,7 @@ export async function GET(request) {
         const setup = await buildSetupView(db, groupId, division.setup_draft, { friendly });
         // Giải cộng đồng: cặp hiệu lực = đơn đã duyệt (null với giải CLB / giao hữu → view ở trên nguyên vẹn, như trước Epic 4).
         const community = await loadCommunitySetup({ groupId, tournamentId: Number(tournamentId), divisionId: Number(divisionId) });
-        const communitySetup = community ? await buildSetupView(db, groupId, division.setup_draft, { friendly, community }) : null;
+        const communitySetup = community ? await buildSetupView(db, groupId, applyCommunityTournamentMeta(division.setup_draft, community.meta), { friendly, community }) : null;
         const invitedSystemNames = new Map((invitedSystemResult.data || []).map((row) => [String(row.id), row.name]));
         const invitedExternalNames = new Map((invitedExternalResult.data || []).map((row) => [String(row.id), row.name]));
         return NextResponse.json({

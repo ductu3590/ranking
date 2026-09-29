@@ -11,6 +11,8 @@ import GroupKnockoutConfig from './GroupKnockoutConfig';
 import KnockoutConfig from './KnockoutConfig';
 import DoubleElimConfig from './DoubleElimConfig';
 import FriendlyGuestPairs from '../friendly/FriendlyGuestPairs';
+import CommunityPairsPanel from '../community/CommunityPairsPanel';
+import '../community/community.css';
 
 const FORMAT_BLURB = {
   group_knockout: 'Chia bảng đấu vòng tròn, các cặp dẫn đầu vào vòng loại trực tiếp.',
@@ -240,7 +242,7 @@ function CourtConfig({ draft, onChange, issue, showErrors, sectionKey, pairCount
   );
 }
 
-export default function StepFormatPairing({ draft, roster, readiness, showErrors, onChange, onGoToStep, friendly = null, pairTotal = null }) {
+export default function StepFormatPairing({ draft, roster, readiness, showErrors, onChange, onGoToStep, friendly = null, pairTotal = null, community = null, registrationsHref = null }) {
   const base = useId();
   const stepResult = readiness.byStep[3];
   const formatIssue = stepResult.blockers.find((item) => item.field === 'format');
@@ -250,7 +252,8 @@ export default function StepFormatPairing({ draft, roster, readiness, showErrors
   const total = draft.participants.memberIds.length + draft.participants.guests.length;
   // Giải giao hữu (FRD-03): tổng cặp = của bạn + CLB khách đã duyệt; blocker CLB có nút "Tới danh sách CLB".
   const isFriendly = draft.tournament.organizerMode === 'friendly';
-  const pairCount = isFriendly && pairTotal != null ? pairTotal : draft.pairs.length;
+  const isCommunity = Boolean(community);
+  const pairCount = (isFriendly || isCommunity) && pairTotal != null ? pairTotal : draft.pairs.length;
   const clubBlockers = isFriendly ? stepResult.blockers.filter((item) => item.field === 'clubs') : [];
 
   // Thứ tự: ghép cặp trước → biết số cặp → chọn thể thức → số sân (yêu cầu người dùng 2026-09-24).
@@ -261,19 +264,23 @@ export default function StepFormatPairing({ draft, roster, readiness, showErrors
           <div>
             <p className="pc-eyebrow">Thiết lập thi đấu</p>
             <h2 id={`${base}-title`} className="pc-hero-title">Ghép cặp, thể thức &amp; sân</h2>
-            <p className="pc-lead">Ghép {total} VĐV thành các cặp đánh đôi, rồi chọn thể thức và số sân phù hợp với số cặp.</p>
+            <p className="pc-lead">{isCommunity ? `Các cặp đã được ghép và duyệt ở bảng đăng ký. Chọn thể thức và số sân phù hợp với ${pairCount} cặp.` : `Ghép ${total} VĐV thành các cặp đánh đôi, rồi chọn thể thức và số sân phù hợp với số cặp.`}</p>
           </div>
-          <span className="pc-badge pc-badge--brand">{draft.pairs.length * 2}/{total} VĐV đã vào cặp</span>
+          <span className="pc-badge pc-badge--brand">{isCommunity ? `${pairCount} cặp đã duyệt` : `${draft.pairs.length * 2}/${total} VĐV đã vào cặp`}</span>
         </div>
       </section>
 
-      <section className="pc-card" aria-labelledby={`${base}-pairs`} data-section="pairs">
-        <div className="pc-card__head">
-          <h3 id={`${base}-pairs`} className="pc-card__title"><span className="pc-section-key">A</span>{isFriendly ? 'Cặp của CLB bạn' : 'Bảng ghép cặp thi đấu'}</h3>
-          <span className="pc-card__hint">{draft.pairs.length} cặp · không có danh sách dự bị</span>
-        </div>
-        <PairingBoard draft={draft} roster={roster} onChange={onChange} stepResult={stepResult} showErrors={showErrors} onAddPerson={() => onGoToStep(2)} />
-      </section>
+      {isCommunity ? (
+        <CommunityPairsPanel community={community} registrationsHref={registrationsHref} compact />
+      ) : (
+        <section className="pc-card" aria-labelledby={`${base}-pairs`} data-section="pairs">
+          <div className="pc-card__head">
+            <h3 id={`${base}-pairs`} className="pc-card__title"><span className="pc-section-key">A</span>{isFriendly ? 'Cặp của CLB bạn' : 'Bảng ghép cặp thi đấu'}</h3>
+            <span className="pc-card__hint">{draft.pairs.length} cặp · không có danh sách dự bị</span>
+          </div>
+          <PairingBoard draft={draft} roster={roster} onChange={onChange} stepResult={stepResult} showErrors={showErrors} onAddPerson={() => onGoToStep(2)} />
+        </section>
+      )}
 
       {isFriendly ? <FriendlyGuestPairs friendly={friendly} hostPairCount={draft.pairs.length} clubBlockers={clubBlockers} onGoToStep={onGoToStep} /> : null}
 

@@ -3,6 +3,7 @@
 import { useId } from 'react';
 import { messageFor } from '@/lib/tournament/setupMessages';
 import '../friendly/friendly.css';
+import '../community/community.css';
 
 // Ô "Loại giải" (Epic 3 F3 §3.1, Stitch FRD-01 type): chọn trước lần lưu đầu; sau đó chỉ đọc (ORGANIZER_MODE_LOCKED).
 const ORGANIZER_MODES = [
@@ -83,7 +84,7 @@ function weekdayLabel(value) {
   return date.toLocaleDateString('vi-VN', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
-export default function StepInfo({ draft, readiness, showErrors, onChange, modeLocked = false }) {
+export default function StepInfo({ draft, readiness, showErrors, onChange, modeLocked = false, community = false, registrationsHref = null }) {
   const base = useId();
   const t = draft.tournament;
   const stepResult = readiness.byStep[1];
@@ -111,7 +112,17 @@ export default function StepInfo({ draft, readiness, showErrors, onChange, modeL
         </div>
       </section>
 
-      <OrganizerModeCard base={base} mode={t.organizerMode} locked={modeLocked} onSelect={(organizerMode) => set({ organizerMode })} />
+      {community ? (
+        <section className="pc-card" aria-labelledby={`${base}-community`} data-section="community-note">
+          <div className="pc-card__head">
+            <h3 id={`${base}-community`} className="pc-card__title">Giải cộng đồng</h3>
+            {registrationsHref ? <a className="pc-btn pc-btn--sm pc-btn--soft" href={registrationsHref}>Mở bảng duyệt đăng ký</a> : null}
+          </div>
+          <p className="pc-lead cm-note">VĐV tự đăng ký trên trang công khai. Đóng / mở đăng ký, hạn chót và duyệt cặp làm ở bảng duyệt; Bước 2 chỉ lấy các cặp đã duyệt.</p>
+        </section>
+      ) : (
+        <OrganizerModeCard base={base} mode={t.organizerMode} locked={modeLocked} onSelect={(organizerMode) => set({ organizerMode })} />
+      )}
 
       <section className="pc-card" aria-labelledby={`${base}-core`}>
         <div className="pc-card__head">

@@ -52,7 +52,8 @@ suite('C3 setup route', {
   'GET trả khối community đã chiếu (không SĐT) và tính bước theo cặp đã duyệt': () => {
     assert.ok(setup.includes('loadCommunitySetup('));
     assert.ok(setup.includes('projectCommunityView(community)'));
-    assert.ok(/buildSetupView\(db, groupId, division\.setup_draft, \{ friendly, community \}\)/.test(setup));
+    assert.ok(/buildSetupView\(db, groupId, applyCommunityTournamentMeta\(division\.setup_draft, community\.meta\), \{ friendly, community \}\)/.test(setup), 'Bước 1 được điền sẵn từ bản ghi giải');
+    assert.ok(/buildSetupView\(db, groupId, division\.setup_draft, \{ friendly \}\)/.test(setup), 'nhánh giải CLB / giao hữu không đổi');
   },
   'lưu bản nháp nạp ctx.community để progress do server tính': () => {
     assert.ok(/if \(community\) ctx = \{ \.\.\.ctx, community \};/.test(setup));

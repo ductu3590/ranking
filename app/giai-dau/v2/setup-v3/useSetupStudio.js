@@ -7,6 +7,7 @@ import { computeSetupReadiness } from '@/lib/tournament/setupReadiness';
 import { allowedStep } from '@/lib/tournament/setupStepRules';
 import { emptyDraft, normalizeDraft } from '@/lib/tournament/setupDraftV3';
 import { clientFriendlyContext } from './friendly/friendlyContext';
+import { clientCommunityContext } from './community/communityContext';
 
 const SAVE_TIMEOUT_MS = 20000;
 
@@ -35,6 +36,7 @@ function hydratePayload(setup, tournamentId, divisionId) {
 
 // Bản nháp trống theo loại giải chọn từ dashboard (?create=friendly). Loại giải ghi vào bản nháp ở lần lưu đầu,
 // sau đó server khoá (ORGANIZER_MODE_LOCKED).
+// Giải cộng đồng (Epic 4 C3) luôn dùng bản nháp 'internal' (chế độ cộng đồng do tournaments.organizer_type quyết định, không do bản nháp).
 function blankDraft(organizerMode) {
   if (organizerMode !== 'friendly') return emptyDraft();
   const draft = emptyDraft();
@@ -46,6 +48,8 @@ export function useSetupStudio({ tournamentId: initialTournamentId, divisionId: 
   const [save, dispatch] = useReducer(saveReducer, undefined, () => initialSaveState({ draft: blankDraft(organizerMode) }));
   // Khối `friendly` của GET /setup (chỉ giải giao hữu): CLB tham dự, hạn mức, cặp CLB khách đã duyệt.
   const [friendly, setFriendly] = useState(null);
+  // Khối `community` của GET /setup (chỉ giải cộng đồng): các cặp đã duyệt (tên + PHR) và bộ đếm đơn còn lại.
+  const [community, setCommunity] = useState(null);
   const [step, setStep] = useState(1);
   const [roster, setRoster] = useState([]);
   const [loading, setLoading] = useState(Boolean(initialTournamentId && initialDivisionId));
@@ -59,7 +63,8 @@ export function useSetupStudio({ tournamentId: initialTournamentId, divisionId: 
 
   useEffect(() => {
     let alive = true;
-    listClubRoster().then((rows) => { if (alive) setRoster(Array.isArray(rows) ? rows : []); }).catch(() => {});
+    // Giải cộng đồng không chọn thành viên CLB → không nạp danh bạ CLB hệ thống.
+    if (organizerMode !== 'community') listClubRoster().then((rows) => { if (alive) setRoster(Array.isArray(rows) ? rows : []); }).catch(() => {});
     // Id vừa do chính lần lưu đầu tạo ra (URL cập nhật theo) → đã có dữ liệu, không tải lại.
     if (initialTournamentId && saveRef.current.tournamentId === String(initialTournamentId)) return () => { alive = false; };
     if (!(initialTournamentId && initialDivisionId)) {
@@ -74,6 +79,7 @@ export function useSetupStudio({ tournamentId: initialTournamentId, divisionId: 
         if (payload.draft.clientDraftKey) clientDraftKeyRef.current = payload.draft.clientDraftKey;
         dispatch({ type: 'hydrate', payload });
         setFriendly(setup?.friendly || null);
+        setCommunity(setup?.community || null);
         // URL chỉ là yêu cầu; server quyết định bước được mở (không bypass bằng ?step=).
         setStep(allowedStep(requestedStep || setup?.resumeStep || 1, payload.completedThrough));
       })
@@ -85,11 +91,13 @@ export function useSetupStudio({ tournamentId: initialTournamentId, divisionId: 
   }, [initialTournamentId, initialDivisionId]);
 
   const friendlyCtx = useMemo(() => clientFriendlyContext(friendly), [friendly]);
+  const communityCtx = useMemo(() => clientCommunityContext(community), [community]);
   const ctx = useMemo(() => ({
     members: roster.length ? memberContext(roster) : undefined,
     today: todayInVietnam(),
     ...(friendlyCtx ? { friendly: friendlyCtx } : {}),
-  }), [roster, friendlyCtx]);
+    ...(communityCtx ? { community: communityCtx } : {}),
+  }), [roster, friendlyCtx, communityCtx]);
 
   // Tải lại riêng khối `friendly` (sau khi mời/duyệt/khoá… hoặc khi quay lại Bước 2–4); không đụng bản nháp đang sửa.
   const reloadFriendly = useCallback(async () => {
@@ -104,6 +112,22 @@ export function useSetupStudio({ tournamentId: initialTournamentId, divisionId: 
         dispatch({ type: 'hydrate', payload: { ...hydratePayload(setup, current.tournamentId, current.divisionId), savedAt: saveRef.current.lastSavedAt } });
       }
       return setup?.friendly || null;
+    } catch {
+      return null;
+    }
+  }, []);
+
+  // Tải lại riêng khối `community` (đơn vừa được duyệt / ghép hộ ở bảng duyệt) khi quay lại Bước 2–4; không đụng bản nháp đang sửa.
+  const reloadCommunity = useCallback(async () => {
+    const current = saveRef.current;
+    if (!current.tournamentId || !current.divisionId) return null;
+    try {
+      const setup = await loadSetupDraft(current.tournamentId, current.divisionId);
+      setCommunity(setup?.community || null);
+      if (setup && !isDirty(saveRef.current)) {
+        dispatch({ type: 'hydrate', payload: { ...hydratePayload(setup, current.tournamentId, current.divisionId), savedAt: saveRef.current.lastSavedAt } });
+      }
+      return setup?.community || null;
     } catch {
       return null;
     }
@@ -196,6 +220,7 @@ export function useSetupStudio({ tournamentId: initialTournamentId, divisionId: 
     const setup = await loadSetupDraft(current.tournamentId, current.divisionId);
     const payload = hydratePayload(setup, current.tournamentId, current.divisionId);
     setFriendly(setup?.friendly || null);
+    setCommunity(setup?.community || null);
     if (mode === 'keep') dispatch({ type: 'conflictKeepMine', revision: payload.revision });
     else {
       dispatch({ type: 'conflictReload', payload });
@@ -225,5 +250,8 @@ export function useSetupStudio({ tournamentId: initialTournamentId, divisionId: 
     friendly,
     reloadFriendly,
     isFriendly,
+    community,
+    reloadCommunity,
+    isCommunity: organizerMode === 'community' || Boolean(community),
   };
 }

@@ -282,12 +282,13 @@ function Criteria({ plan }) {
   );
 }
 
-export default function StepDraw({ draft, roster, readiness, busy, onDraw, onFinalize, finalizing, finalizeError, friendly = null, pairTotal = null, progress = null }) {
+export default function StepDraw({ draft, roster, readiness, busy, onDraw, onFinalize, finalizing, finalizeError, friendly = null, pairTotal = null, progress = null, community = null }) {
   const [confirm, setConfirm] = useState(null);
   const isFriendly = draft.tournament.organizerMode === 'friendly';
-  const pairName = usePairNames(draft, roster, isFriendly ? friendly : null);
+  // Giải cộng đồng: tên cặp lấy từ khối community (cùng shape approvedPairs[{ pairId, members:[{ name }] }] như friendly).
+  const pairName = usePairNames(draft, roster, isFriendly ? friendly : community);
   const clubOf = useClubOf(isFriendly ? friendly : null);
-  const pairCount = isFriendly && pairTotal != null ? pairTotal : draft.pairs.length;
+  const pairCount = (isFriendly || community) && pairTotal != null ? pairTotal : draft.pairs.length;
   const plan = draft.draw.plan;
   const blockers = readiness.byStep[4].blockers;
   const stale = blockers.find((item) => item.code === 'DRAW_STALE');

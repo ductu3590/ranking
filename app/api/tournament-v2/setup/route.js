@@ -12,6 +12,8 @@ import { actorName } from '@/lib/tournament/actorName';
 import { normalizeParticipants } from '@/lib/tournament/setupParticipants';
 import { resolveRepairMode, normalizeRepairReport } from '@/lib/tournament/legacyPairRepair';
 import { friendlySetupView, loadFriendlyContext, loadFriendlyTournament } from '@/lib/tournament/friendlyServer';
+import { communitySetupAdmin, loadCommunitySetup } from '@/lib/communitySetupServer';
+import { projectCommunityView } from '@/lib/tournament/communitySetup';
 
 // Xung dot nghiep vu nay ERRCODE 'PH409' (migration 078). Truoc day dung 40001,
 // nhung 40001 la serialization_failure nen tang tren tu dong retry va request treo.
@@ -73,12 +75,14 @@ function setupIssueError(code, status = 400, params) {
 
 export async function GET(request) {
     try {
-        const adminCheck = await requireValidatedGroupAdmin();
-        if (!adminCheck.ok) return adminCheck.response;
-        const groupId = adminCheck.groupId;
         const { searchParams } = new URL(request.url);
         const divisionId = searchParams.get('divisionId') || searchParams.get('division_id');
         const tournamentId = searchParams.get('tournamentId') || searchParams.get('tournament_id');
+        // Phiên CLB giữ nguyên; chỉ khi không phải admin CLB mới xét admin hệ thống của GIẢI CỘNG ĐỒNG (Epic 4 C3, D62).
+        let adminCheck = await requireValidatedGroupAdmin();
+        if (!adminCheck.ok) adminCheck = (await communitySetupAdmin(tournamentId)) || adminCheck;
+        if (!adminCheck.ok) return adminCheck.response;
+        const groupId = adminCheck.groupId;
 
         if (!validId(divisionId) || !validId(tournamentId)) {
             return NextResponse.json({ error: 'divisionId và tournamentId phải là số nguyên dương' }, { status: 400 });
@@ -144,6 +148,9 @@ export async function GET(request) {
             groupId, tournamentId: Number(tournamentId), draft: normalizeDraft(division.setup_draft), tournament: friendlyTournament,
         });
         const setup = await buildSetupView(db, groupId, division.setup_draft, { friendly });
+        // Giải cộng đồng: cặp hiệu lực = đơn đã duyệt (null với giải CLB / giao hữu → view ở trên nguyên vẹn, như trước Epic 4).
+        const community = await loadCommunitySetup({ groupId, tournamentId: Number(tournamentId), divisionId: Number(divisionId) });
+        const communitySetup = community ? await buildSetupView(db, groupId, division.setup_draft, { friendly, community }) : null;
         const invitedSystemNames = new Map((invitedSystemResult.data || []).map((row) => [String(row.id), row.name]));
         const invitedExternalNames = new Map((invitedExternalResult.data || []).map((row) => [String(row.id), row.name]));
         return NextResponse.json({
@@ -153,7 +160,7 @@ export async function GET(request) {
             // It carries member ids, never tournament-athlete ids as client identity.
             draft: division.setup_draft || null,
             // Luồng v3: draft đã chuẩn hóa + progress/readiness do server tính.
-            setup,
+            setup: communitySetup || setup,
             invitedClubs: invitedRows.map((club) => ({
                 tournamentClubId: club.id,
                 clubId: club.club_id,
@@ -169,6 +176,7 @@ export async function GET(request) {
             entries: entries || [],
             stages: stages || [],
             ...(friendly ? { friendly: friendlySetupView(friendly, { tournament: friendlyTournament, rosterLockStatus: division.roster_lock_status }) } : {}),
+            ...(community ? { community: projectCommunityView(community) } : {}),
         });
     } catch (err) {
         console.error('Setup GET error:', err);
@@ -178,7 +186,12 @@ export async function GET(request) {
 
 export async function POST(request) {
     try {
-        const adminCheck = await requireValidatedGroupAdmin();
+        let adminCheck = await requireValidatedGroupAdmin();
+        if (!adminCheck.ok) {
+            // Giải cộng đồng (Epic 4 C3, D62): admin hệ thống thao tác bằng platform_session trên giải ĐÃ có (không tạo mới).
+            const preview = await request.clone().json().catch(() => null);
+            adminCheck = (await communitySetupAdmin(preview?.tournament_id ?? preview?.tournamentId)) || adminCheck;
+        }
         if (!adminCheck.ok) return adminCheck.response;
         const groupId = adminCheck.groupId;
         const body = await request.json();
@@ -200,6 +213,10 @@ export async function POST(request) {
         }
         if (rawIdempotencyKey == null || !idempotencyKey || idempotencyKey.length > 200) {
             return NextResponse.json({ error: 'idempotency_key là bắt buộc và phải dài 1-200 ký tự', code: 'SETUP_PAYLOAD_INVALID' }, { status: 400 });
+        }
+        // Giải cộng đồng: người tham gia lấy từ đơn đã duyệt (C2) → không có thao tác roster / CLB / ghép cặp qua setup, và chỉ sửa giải đã có.
+        if (adminCheck.community && (!['save_aggregate', 'unseed_playoff', 'configure_top_two_playoff'].includes(action) || !hasTournamentId)) {
+            return NextResponse.json({ error: 'Thao tác này không dùng cho giải cộng đồng.', code: 'COMMUNITY_ACTION_NOT_ALLOWED' }, { status: 403 });
         }
 
         if (action === 'save_aggregate') {
@@ -227,6 +244,8 @@ export async function POST(request) {
                     }
                     const friendly = await loadFriendlyContext(db, { groupId, tournamentId: Number(tournamentId), draft: payload, tournament: existing });
                     if (friendly) ctx = { ...ctx, friendly };
+                    const community = await loadCommunitySetup({ groupId, tournamentId: Number(tournamentId), divisionId: Number(divisionId) });
+                    if (community) ctx = { ...ctx, community };
                 }
             } catch (contextError) {
                 return NextResponse.json({ error: contextError.message, code: 'SETUP_READ_FAILED' }, { status: 500 });

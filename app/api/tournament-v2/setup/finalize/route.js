@@ -9,6 +9,7 @@ import { buildSetupPlan } from '@/lib/tournament/setupPlans';
 import { firstBlocker, setupContext } from '@/lib/tournament/setupServer';
 import { effectivePairs, entryClubs, finalizePlanPayload } from '@/lib/tournament/friendlySetup';
 import { loadFriendlyContext, organizerModeMismatch, publishFriendlyTournament } from '@/lib/tournament/friendlyServer';
+import { communitySetupAdmin, loadCommunitySetup } from '@/lib/communitySetupServer';
 
 // Chốt giải luồng v3 (spec Lát A §10): route TÍNH LẠI plan từ bản nháp đã lưu (không tin
 // plan do client gửi), so fingerprint với bản đã xem trước, rồi gọi RPC v4 ghi nguyên tử.
@@ -29,6 +30,7 @@ const RPC_CODES = [
     'FRIENDLY_HOST_GUEST_NOT_ALLOWED', 'FRIENDLY_GUEST_NOT_ALLOWED', 'FRIENDLY_CLUB_NOT_READY', 'EXTERNAL_CLUB_NOT_SUPPORTED',
     'FRIENDLY_CLUB_LIMIT_REACHED', 'FRIENDLY_ROSTER_CHANGED', 'FRIENDLY_QUOTA_EXCEEDED', 'FRIENDLY_ATHLETE_DUPLICATE',
     'FRIENDLY_CLUBS_TOO_FEW',
+    'COMMUNITY_MEMBER_PICK_NOT_ALLOWED', 'COMMUNITY_ROSTER_CHANGED', 'COMMUNITY_TOO_FEW_PAIRS',
     'SETUP_REVISION_CONFLICT', 'ROSTER_LOCKED', 'DRAW_FINGERPRINT_MISMATCH', 'FINALIZE_DRAFT_INVALID',
     'FINALIZE_PLAN_INVALID', 'FINALIZE_STRUCTURE_ALREADY_EXISTS', 'IDEMPOTENCY_KEY_REUSED', 'PAIRING_INVALID',
     'MEMBER_NOT_ACTIVE_IN_GROUP', 'ATHLETE_IDENTITY_MISSING', 'GUEST_INVALID', 'FORMAT_NOT_AVAILABLE',
@@ -64,7 +66,12 @@ function rpcParams(error) {
 }
 
 export async function POST(request) {
-    const admin = await requireValidatedGroupAdmin();
+    let admin = await requireValidatedGroupAdmin();
+    if (!admin.ok) {
+        // Giải cộng đồng (Epic 4 C3, D62): admin hệ thống dùng platform_session; phiên CLB giữ nguyên.
+        const preview = await request.clone().json().catch(() => null);
+        admin = (await communitySetupAdmin(preview?.tournamentId ?? preview?.tournament_id)) || admin;
+    }
     if (!admin.ok) return admin.response;
     try {
         const body = await request.json();
@@ -91,11 +98,14 @@ export async function POST(request) {
         // null với giải nội bộ → mọi bước dưới đây y như trước Epic 3.
         const friendly = await loadFriendlyContext(db, { groupId: admin.groupId, tournamentId: Number(tournamentId), draft });
         if (organizerModeMismatch(draft, friendly)) return fail('ORGANIZER_MODE_LOCKED', 409);
+        // null với giải CLB / giao hữu. Giải cộng đồng: cặp hiệu lực = đơn đã duyệt, tính lại trên server (D61).
+        const community = await loadCommunitySetup({ groupId: admin.groupId, tournamentId: Number(tournamentId), divisionId: Number(divisionId) });
         const ctx = await setupContext(db, admin.groupId, draft, { friendly });
+        if (community) ctx.community = community;
         const blocker = firstBlocker(draft, ctx, 4);
         if (blocker) return fail(blocker.code, 409, blocker.params);
 
-        const pairs = effectivePairs(draft, friendly);
+        const pairs = community ? community.approvedPairs : effectivePairs(draft, friendly);
         let plan;
         try {
             plan = buildSetupPlan({
@@ -120,6 +130,7 @@ export async function POST(request) {
             p_expected_setup_revision: expectedRevision,
             p_idempotency_key: idempotencyKey,
             p_preview_fingerprint: previewFingerprint,
+            // Giải cộng đồng: pairs = cặp đã duyệt ({ pairId, participantRefs }) và friendly = null → p_plan.pairs = { pairId, refs } như giải khác.
             p_plan: finalizePlanPayload({ plan, pairs, friendly }),
         });
         if (error) {

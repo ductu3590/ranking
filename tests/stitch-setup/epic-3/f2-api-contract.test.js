@@ -53,7 +53,8 @@ suite('f2 api contract — migration 111', {
     const names = fs.readdirSync(path.join(ROOT, 'database/migrations')).filter((name) => /^\d+_.*\.sql$/.test(name)).sort();
     assert.deepEqual(names.filter((name) => name.startsWith('111_')), ['111_finalize_v4_friendly.sql']);
     const latest = names.filter((name) => read('database/migrations/' + name).includes(FN)).pop();
-    assert.equal(latest, '111_finalize_v4_friendly.sql');
+    // Epic 4 C3: 114 (nhánh cộng đồng) dựng từ 111 và được khoá riêng bằng epic-4/c3-migration-lock.test.js (114 = 111 + các khối community).
+    assert.ok(['111_finalize_v4_friendly.sql', '114_finalize_v4_community.sql'].includes(latest), latest);
   },
 
   'giữ chữ ký, SECURITY DEFINER + search_path, REVOKE/GRANT/COMMENT y hệt 108; một transaction'() {

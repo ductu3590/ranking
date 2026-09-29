@@ -10,6 +10,7 @@ import { resolveMatchScoring } from '@/lib/tournament/rules/roundScoring';
 
 import { hashScorekeeperToken, validateScorekeeperToken } from '@/lib/tournament/scorekeeperToken';
 import { assertScoreSavable, statusForSave, classifyRpcConflict } from '@/lib/tournament/scoreEntry';
+import { communityScoreAdmin } from '@/lib/communitySetupServer';
 
 const db = supabaseAdmin || supabaseServer;
 
@@ -57,7 +58,9 @@ async function handleGames(request) {
         const games = Array.isArray(body?.games) ? body.games : [];
         if (!matchId) return NextResponse.json({ error: 'matchId is required' }, { status: 400 });
 
-        const adminCheck = await requireValidatedGroupAdmin();
+        let adminCheck = await requireValidatedGroupAdmin();
+        // Giải cộng đồng (Epic 4 C3, D62): admin hệ thống nhập tỉ số bằng platform_session; phiên CLB / link ghi điểm giữ nguyên.
+        if (!adminCheck.ok) adminCheck = (await communityScoreAdmin(matchId)) || adminCheck;
         let groupId;
         let scorekeeperToken = null;
         if (adminCheck.ok) {

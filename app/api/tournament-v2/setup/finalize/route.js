@@ -66,12 +66,10 @@ function rpcParams(error) {
 }
 
 export async function POST(request) {
-    let admin = await requireValidatedGroupAdmin();
-    if (!admin.ok) {
-        // Giải cộng đồng (Epic 4 C3, D62): admin hệ thống dùng platform_session; phiên CLB giữ nguyên.
-        const preview = await request.clone().json().catch(() => null);
-        admin = (await communitySetupAdmin(preview?.tournamentId ?? preview?.tournament_id)) || admin;
-    }
+    // Giải cộng đồng (Epic 4 C3, D62) ưu tiên phiên admin hệ thống: người dùng mở cả phiên CLB thì group_id của CLB không được thay group_id của giải.
+    // communitySetupAdmin trả null với giải CLB / giao hữu → phiên CLB đi đường cũ, không đổi.
+    const peek = await request.clone().json().catch(() => null);
+    const admin = (await communitySetupAdmin(peek?.tournamentId ?? peek?.tournament_id)) || await requireValidatedGroupAdmin();
     if (!admin.ok) return admin.response;
     try {
         const body = await request.json();

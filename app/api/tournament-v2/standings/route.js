@@ -13,8 +13,7 @@ export async function GET(request) {
         const { searchParams } = new URL(request.url);
         const stageId = searchParams.get('stageId');
         // Phiên CLB / VĐV đi đường cũ; admin hệ thống chỉ được đọc BXH của giải cộng đồng (Epic 4 C3).
-        let scope = await getClubReadScope();
-        if (!scope.ok) scope = (await communityReadScope({ stageId })) || scope;
+        const scope = (await communityReadScope({ stageId })) || await getClubReadScope();
         if (!scope.ok) return scope.response;
         const groupId = scope.groupId;
         if (!stageId) {

@@ -15,13 +15,11 @@ const server = src('lib/communitySetupServer.js');
 const setupServer = src('lib/tournament/setupServer.js');
 
 suite('C3 cổng quyền setup giải cộng đồng', {
-  'phiên CLB vẫn đi trước, admin hệ thống chỉ là đường dự phòng': () => {
+  'admin hệ thống ưu tiên trên giải cộng đồng, phiên CLB giữ nguyên cho giải khác': () => {
     for (const [name, code] of [['setup', setup], ['finalize', finalize], ['preview-schedule', preview], ['games', games]]) {
       assert.ok(code.includes('await requireValidatedGroupAdmin()'), `${name}: phải giữ guard phiên CLB`);
-      const guardAt = code.indexOf('await requireValidatedGroupAdmin()');
-      const fallbackAt = Math.max(code.indexOf('communitySetupAdmin('), code.indexOf('communityScoreAdmin('));
-      assert.ok(fallbackAt > guardAt, `${name}: đường admin hệ thống phải nằm SAU guard CLB`);
-      assert.ok(/\|\| (adminCheck|admin)\b/.test(code), `${name}: khi không phải admin hệ thống phải trả lại câu từ chối cũ`);
+      // Giải cộng đồng ưu tiên phiên admin hệ thống (người dùng có thể đang mở cả phiên CLB); null → phiên CLB đi đường cũ.
+      assert.ok(/\(await community(Setup|Score)Admin\([^)]*\)\) \|\| await requireValidatedGroupAdmin\(\)/.test(code), `${name}: cổng cộng đồng trước, rồi mới guard CLB`);
     }
   },
   'communitySetupAdmin chỉ cấp cho platform actor trên giải cộng đồng': () => {

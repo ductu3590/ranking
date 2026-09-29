@@ -78,9 +78,9 @@ export async function GET(request) {
         const { searchParams } = new URL(request.url);
         const divisionId = searchParams.get('divisionId') || searchParams.get('division_id');
         const tournamentId = searchParams.get('tournamentId') || searchParams.get('tournament_id');
-        // Phiên CLB giữ nguyên; chỉ khi không phải admin CLB mới xét admin hệ thống của GIẢI CỘNG ĐỒNG (Epic 4 C3, D62).
-        let adminCheck = await requireValidatedGroupAdmin();
-        if (!adminCheck.ok) adminCheck = (await communitySetupAdmin(tournamentId)) || adminCheck;
+        // Giải CỘNG ĐỒNG (Epic 4 C3, D62) ưu tiên phiên admin hệ thống: người dùng đang mở cả phiên CLB thì group_id của CLB không được thay group_id của giải.
+        // communitySetupAdmin trả null với giải CLB / giao hữu → phiên CLB đi đường cũ, không đổi.
+        let adminCheck = (await communitySetupAdmin(tournamentId)) || await requireValidatedGroupAdmin();
         if (!adminCheck.ok) return adminCheck.response;
         const groupId = adminCheck.groupId;
 
@@ -186,12 +186,9 @@ export async function GET(request) {
 
 export async function POST(request) {
     try {
-        let adminCheck = await requireValidatedGroupAdmin();
-        if (!adminCheck.ok) {
-            // Giải cộng đồng (Epic 4 C3, D62): admin hệ thống thao tác bằng platform_session trên giải ĐÃ có (không tạo mới).
-            const preview = await request.clone().json().catch(() => null);
-            adminCheck = (await communitySetupAdmin(preview?.tournament_id ?? preview?.tournamentId)) || adminCheck;
-        }
+        // Giải cộng đồng (Epic 4 C3, D62): admin hệ thống thao tác bằng platform_session trên giải ĐÃ có (không tạo mới); ưu tiên hơn phiên CLB.
+        const preview = await request.clone().json().catch(() => null);
+        let adminCheck = (await communitySetupAdmin(preview?.tournament_id ?? preview?.tournamentId)) || await requireValidatedGroupAdmin();
         if (!adminCheck.ok) return adminCheck.response;
         const groupId = adminCheck.groupId;
         const body = await request.json();

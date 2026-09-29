@@ -519,12 +519,9 @@ export async function POST(request) {
 
 export async function PATCH(request) {
     try {
-        let adminCheck = await requireValidatedGroupAdmin();
-        if (!adminCheck.ok) {
-            // Giải cộng đồng (Epic 4 C3): admin hệ thống đổi trạng thái (vd. kết thúc giải) bằng platform_session; phiên CLB giữ nguyên.
-            const peek = await request.clone().json().catch(() => null);
-            adminCheck = (await communitySetupAdmin(peek?.id)) || adminCheck;
-        }
+        // Giải cộng đồng (Epic 4 C3): admin hệ thống đổi trạng thái (vd. kết thúc giải) bằng platform_session, ưu tiên hơn phiên CLB.
+        const peek = await request.clone().json().catch(() => null);
+        const adminCheck = (await communitySetupAdmin(peek?.id)) || await requireValidatedGroupAdmin();
         if (!adminCheck.ok) return adminCheck.response;
 
         const body = await request.json();

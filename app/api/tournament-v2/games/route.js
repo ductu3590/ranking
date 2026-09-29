@@ -58,9 +58,8 @@ async function handleGames(request) {
         const games = Array.isArray(body?.games) ? body.games : [];
         if (!matchId) return NextResponse.json({ error: 'matchId is required' }, { status: 400 });
 
-        let adminCheck = await requireValidatedGroupAdmin();
-        // Giải cộng đồng (Epic 4 C3, D62): admin hệ thống nhập tỉ số bằng platform_session; phiên CLB / link ghi điểm giữ nguyên.
-        if (!adminCheck.ok) adminCheck = (await communityScoreAdmin(matchId)) || adminCheck;
+        // Giải cộng đồng (Epic 4 C3, D62): admin hệ thống nhập tỉ số bằng platform_session, ưu tiên hơn phiên CLB; phiên CLB / link ghi điểm giữ nguyên.
+        const adminCheck = (await communityScoreAdmin(matchId)) || await requireValidatedGroupAdmin();
         let groupId;
         let scorekeeperToken = null;
         if (adminCheck.ok) {

@@ -21,7 +21,20 @@ Người dùng duyệt trực tiếp trên Stitch (D64: mọi màn có cả PC v
 | PLA-02 Duyệt đăng ký | `ca46e38afc5e40ddbe5cf1b7b9b7c056` | `e42b132a927549709866f4e0e4453581` |
 | PLA-03 Giải cộng đồng (danh sách + tạo giải) | `380936fa863f4980a17bb087b03ba5c6` | `e703c241d7154f89aa1ffc59c19d6eee` |
 
-Còn lại (sinh tiếp): PLA-04 (Bước 2 setup cộng đồng, PC + mobile).
+| PLA-04 Bước 2 setup cộng đồng | `6af14c1a576e44e9abd65a72de7d79c1` | `f3ff8ecca0264453b62b894fef5bdca5` |
+
+**Đủ 11 màn × 2 kích thước = 22 màn (2026-09-29).** Người dùng duyệt trực tiếp trên Stitch (project trên).
+
+## Chỗ Stitch tự thêm / sai — bỏ khi code
+
+| Màn | Chi tiết | Xử lý |
+|---|---|---|
+| PLC-02 (bản sinh sớm, project cũ) | nhãn "Hiện trên sơ đồ giải", ô PHR dạng dropdown 2.0–5.0 | Bỏ; mã dùng ô số |
+| PLA-01 (bản sinh sớm, project cũ) | huy hiệu "Cổng điều hành an toàn" | Bỏ |
+| PLC-07 mobile | số thứ tự và nhãn "Đã duyệt" cạnh mỗi cặp | Bỏ số thứ tự dạng badge (dễ hiểu nhầm hạt giống); trang công khai chỉ liệt kê cặp đã duyệt |
+| PLA-03 (PC + mobile) | dữ liệu mẫu ghi "Giải Pickleball Cộng đồng **Hà Nam** – Mùa Thu" | Lỗi gõ prompt, chỉ là dữ liệu mẫu; tên giải lấy từ dữ liệu thật |
+| PLC-02/03 PC | thanh trên có huy hiệu tròn, chân trang bản quyền (PLC-02 PC) | Bỏ chân trang |
+| Nhiều màn | email mẫu `admin@pickhub.vn` ở chân sidebar (PLA-03) | Không có email admin trong dữ liệu — bỏ |
 
 Bản sinh sớm ở project Epic 3 (`16224817196221939744`), đã có bản thay thế ở project mới: PLA-01 PC `bd302dcf…`, PLC-02 mobile `dd63912a…`.
 

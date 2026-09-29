@@ -70,6 +70,12 @@ export async function POST(request) {
     const ctx = await resolveContext(slug, divisionId);
     if (ctx.error) return ctx.error;
 
+    // Epic 4 D58: giải cộng đồng bắt buộc tài khoản VĐV — cấm đăng ký ẩn danh bằng SĐT. Đăng ký đi qua
+    // /api/tournament-v2/community/registrations (phiên player_session).
+    if (ctx.tournament.organizer_mode === 'community') {
+      return NextResponse.json({ error: 'Cần đăng nhập tài khoản VĐV để đăng ký giải cộng đồng.', code: 'PLAYER_SESSION_REQUIRED' }, { status: 401 });
+    }
+
     const gate = isRegistrationOpen(ctx.tournament, ctx.division, new Date().toISOString());
     if (!gate.ok) return NextResponse.json({ error: 'Đăng ký đã đóng', code: gate.reason }, { status: 409 });
 

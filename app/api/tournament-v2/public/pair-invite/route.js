@@ -9,8 +9,11 @@ const db = supabaseAdmin || supabaseServer;
 async function authByToken(token) {
   if (!token) return null;
   const { data } = await db.from('tournament_registrations')
-    .select('id, division_id, group_id, status, needs_partner, origin, track_token')
+    .select('id, division_id, group_id, status, needs_partner, origin, track_token, player_account_id')
     .eq('track_token', token).maybeSingle();
+  // Epic 4 D58/D59: đơn của tài khoản VĐV không dùng luồng track_token ẩn danh (đơn cộng đồng đi qua
+  // /api/tournament-v2/community/* với phiên VĐV, và không có track_token).
+  if (data && data.player_account_id != null) return null;
   return data || null;
 }
 

@@ -3,12 +3,16 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { hashSessionKey, limiter, setPlatformSessionCookie, secret, signPlatformSession, verifyPassword } from '@/lib/platformSession';
 import { getPlatformRateLimitKey, validatePlatformLogin } from '@/lib/platformSessionCore';
+import { clientIp, consumePublicRateLimit } from '@/lib/publicRateLimit';
 
 export async function POST(request) {
   try {
     const body = await request.json();
     const login = String(body?.login || '').trim().toLowerCase();
     const password = String(body?.password || '');
+    // Bộ đếm lưu DB chạy trước bộ đếm bộ nhớ (bộ nhớ tiến trình không bền trên serverless; Epic 4 D60).
+    const dbRate = await consumePublicRateLimit('platform_login', { login, ip: clientIp(request) });
+    if (!dbRate.allowed) return NextResponse.json({ error: 'Too many failed attempts' }, { status: 429, headers: { 'Retry-After': String(Math.max(1, dbRate.retryAfterSeconds)) } });
     const loginValidation = validatePlatformLogin(login);
     const rateKey = getPlatformRateLimitKey({ login, account: null });
     const attempt = limiter.canAttempt(rateKey);

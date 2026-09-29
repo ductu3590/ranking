@@ -96,10 +96,10 @@ BEGIN
   INSERT INTO public.tournaments (group_id, name, organizer_type, status, entrant_type, settings, visibility, public_slug)
   VALUES (g, 'ZZE4C2 giải', 'community', 'registration_open', 'pair', '{"open_registration": true, "organizer_mode": "community"}'::jsonb, 'unlisted', 'zze4c2-' || substr(md5(random()::text), 1, 8))
   RETURNING id INTO t;
-  INSERT INTO public.tournament_divisions (group_id, tournament_id, name, entrant_type, registration_open, registration_capacity, gender_mode, entry_fee)
-  VALUES (g, t, 'Đôi Nam Nữ', 'pair', true, 2, 'mixed', 150000) RETURNING id INTO dA;
-  INSERT INTO public.tournament_divisions (group_id, tournament_id, name, entrant_type, registration_open, registration_capacity, gender_mode, entry_fee)
-  VALUES (g, t, 'Đơn', 'individual', true, NULL, 'any', 0) RETURNING id INTO dB;
+  INSERT INTO public.tournament_divisions (group_id, tournament_id, name, entrant_type, play_type, registration_open, registration_capacity, gender_mode, entry_fee)
+  VALUES (g, t, 'Đôi Nam Nữ', 'pair', 'doubles', true, 2, 'mixed', 150000) RETURNING id INTO dA;
+  INSERT INTO public.tournament_divisions (group_id, tournament_id, name, entrant_type, play_type, registration_open, registration_capacity, gender_mode, entry_fee)
+  VALUES (g, t, 'Đơn', 'individual', 'singles', true, NULL, 'any', 0) RETURNING id INTO dB;
   INSERT INTO public.platform_accounts (login, password_hash, role, status) VALUES ('zze4c2-admin', 'x', 'community_admin', 'active') RETURNING id INTO adm;
   INSERT INTO public.player_accounts (phone_norm, password_hash, display_name, gender, self_declared_phr) VALUES ('0900000101', 'x', 'ZZE4C2 A1', 'male', 3.0) RETURNING id INTO a1;
   INSERT INTO public.player_accounts (phone_norm, password_hash, display_name, gender, self_declared_phr) VALUES ('0900000102', 'x', 'ZZE4C2 A2', 'female', 3.0) RETURNING id INTO a2;

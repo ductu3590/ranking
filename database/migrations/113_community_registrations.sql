@@ -306,7 +306,8 @@ BEGIN
 END
 $$;
 
--- Hành động của VĐV trên đơn của mình: withdraw | set_link | invite.
+-- Hành động của VĐV trên đơn của mình: withdraw | set_link | invite (theo SĐT) | invite_registration (theo mã đơn từ
+-- "Bảng tìm bạn ghép", không lộ SĐT; đích phải là đơn lẻ đang tìm bạn cùng nội dung).
 CREATE OR REPLACE FUNCTION public.community_player_action(p_registration_id bigint, p_account_id bigint, p_action text, p_payload jsonb DEFAULT '{}'::jsonb)
 RETURNS jsonb
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
@@ -354,7 +355,6 @@ BEGIN
     END IF;
     PERFORM public.community_send_invite(v_lock, r.id, r.contact_phone_norm, p_payload->>'partner_phone');
   ELSIF p_action = 'invite_registration' THEN
-    -- Mời người trong "Bảng tìm bạn ghép" theo mã đơn (không lộ SĐT). Đích phải là đơn lẻ đang tìm bạn cùng nội dung.
     IF r.player_account_id <> p_account_id OR r.status <> 'awaiting_partner' THEN
       RAISE EXCEPTION 'COMMUNITY_INVALID_TRANSITION' USING ERRCODE = 'PH409';
     END IF;
@@ -400,7 +400,8 @@ BEGIN
 END
 $$;
 
--- Người nhận xử lý lời mời (accept | decline) hoặc người gửi huỷ (cancel).
+-- Người nhận xử lý lời mời (accept | decline) hoặc người gửi huỷ (cancel). v_is_target dùng COALESCE vì
+-- invited_player_account_id có thể NULL (NULL OR false = NULL sẽ làm bỏ qua kiểm quyền người nhận).
 CREATE OR REPLACE FUNCTION public.community_invite_action(p_invite_id bigint, p_account_id bigint, p_action text)
 RETURNS jsonb
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
@@ -424,7 +425,6 @@ BEGIN
     RETURN jsonb_build_object('invite_id', i.id, 'status', 'cancelled');
   END IF;
 
-  -- COALESCE: invited_player_account_id có thể NULL; NULL OR false = NULL sẽ làm bỏ qua kiểm quyền người nhận.
   v_is_target := COALESCE(i.invited_player_account_id = p_account_id, false)
     OR EXISTS (SELECT 1 FROM public.tournament_registrations t WHERE t.id = i.to_registration_id AND t.player_account_id = p_account_id);
   IF NOT v_is_target THEN RAISE EXCEPTION 'COMMUNITY_NOT_FOUND' USING ERRCODE = 'PH409'; END IF;

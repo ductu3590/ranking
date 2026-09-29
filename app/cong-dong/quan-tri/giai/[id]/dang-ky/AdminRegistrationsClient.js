@@ -134,6 +134,7 @@ export default function AdminRegistrationsClient({ tournamentId, role }) {
     return (
         <AdminShell role={role} active="registrations" tournamentId={tournamentId} title="Duyệt đăng ký"
             lead="Quản lý danh sách các cặp và vận động viên đăng ký tham gia thi đấu"
+            subtitle={tournament ? tournament.name : null}
             breadcrumb={tournament ? `Giải cộng đồng / ${tournament.name} / Đăng ký` : null}
             status={phase ? <span className="ad-statuspill" data-tone={phase[0]}><i aria-hidden="true" />{phase[1]}</span> : null}
             actions={tournament && tournament.divisions.length > 1 ? (

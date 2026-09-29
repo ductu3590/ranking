@@ -18,7 +18,7 @@ function Icon({ d }) {
 
 // Khung admin hệ thống (Epic 4 C2; Stitch PLA-02/03): PC có sidebar 256px, mobile có thanh trên + menu trượt.
 // Chỉ đọc/xóa phiên admin hệ thống (platform_session) qua /api/platform/session*, không đụng phiên VĐV.
-export default function AdminShell({ role, active, tournamentId = null, title, breadcrumb = null, lead = null, actions = null, status = null, children }) {
+export default function AdminShell({ role, active, tournamentId = null, title, breadcrumb = null, lead = null, subtitle = null, actions = null, status = null, children }) {
     const router = useRouter();
     const [open, setOpen] = useState(false);
 
@@ -88,6 +88,7 @@ export default function AdminShell({ role, active, tournamentId = null, title, b
                     <div className="ad-topbar__text">
                         <h1 className="ad-title">{title}</h1>
                         {lead ? <p className="ad-lead">{lead}</p> : null}
+                        {subtitle ? <p className="ad-subtitle">{subtitle}</p> : null}
                     </div>
                     {actions ? <div className="ad-topbar__actions">{actions}</div> : null}
                 </header>

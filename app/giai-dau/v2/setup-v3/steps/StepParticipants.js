@@ -75,16 +75,10 @@ function CommunityParticipants({ readiness, community, registrationsHref, onRelo
   const stepResult = readiness.byStep[2];
   return (
     <>
-      <section className="pc-card pc-card--hero" aria-labelledby="cm-step2-title">
-        <div className="pc-card__head">
-          <div>
-            <p className="pc-eyebrow">Người tham gia</p>
-            <h2 id="cm-step2-title" className="pc-hero-title">Các cặp đã duyệt</h2>
-            <p className="pc-lead">Giải cộng đồng lấy người thi đấu từ các đăng ký đã duyệt. Cần duyệt thêm hoặc ghép hộ thì mở bảng duyệt rồi quay lại bấm Tải lại.</p>
-          </div>
-          <span className="pc-badge pc-badge--brand">{community?.approvedPairs?.length || 0} cặp</span>
-        </div>
-      </section>
+      <header className="cm-stephead">
+        <h2 id="cm-step2-title">Người tham gia</h2>
+        <p>Các cặp đã được duyệt sẽ vào giải. Cần duyệt thêm hoặc ghép hộ thì mở bảng duyệt rồi quay lại bấm Tải lại.</p>
+      </header>
       <CommunityPairsPanel community={community} registrationsHref={registrationsHref} blockers={stepResult.blockers} warnings={stepResult.warnings} onRefresh={onReloadCommunity} />
     </>
   );

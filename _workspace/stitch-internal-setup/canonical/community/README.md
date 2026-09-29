@@ -42,3 +42,6 @@ Bản sinh sớm ở project Epic 3 (`16224817196221939744`), đã có bản tha
 - Gọi **tuần tự từng màn**; gọi song song nhiều lệnh thì hầu hết hết thời gian chờ mà không lấy lại được ID.
 - `deviceType: MOBILE` bị bỏ qua: mô tả "cột 390px, chiều cao tự nhiên, không khung điện thoại" trong prompt.
 - Icon: SVG inline (font icon đôi khi không tải kịp khi chụp).
+
+## Đối chiếu UI thật với Stitch (2026-09-29)
+Ảnh chụp tham chiếu của cả 22 màn nằm trong thư mục `<mã màn>/reference-desktop` và `<mã màn>/reference-mobile` (`screenshot.jpg`; PLC-01..03 có thêm `screen.html`). Kết quả đối chiếu từng màn: `_workspace/epic-4-community/evidence.md` mục "Đối chiếu giao diện với Stitch". Lấy ảnh đủ kích thước: thêm `=w1280` vào URL ảnh `lh3` của `get_screen`.

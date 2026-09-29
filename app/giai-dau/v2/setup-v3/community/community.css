@@ -1,22 +1,44 @@
 /* Giải cộng đồng trong studio setup (Epic 4 C3, PLA-04). Dùng token pc-* của studio; PC 1280 + mobile 390. */
+.cm-stephead h2 { margin: 0; font-size: 1.25rem; line-height: 1.75rem; font-weight: 700; color: var(--pc-text, #0f172a); }
+.cm-stephead p { margin: 0.125rem 0 0; font-size: 0.8125rem; color: var(--pc-muted, #64748b); }
+.cm-pairs { display: grid; gap: 0.875rem; }
+
+.cm-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.625rem; }
+.cm-stat { display: grid; gap: 0.25rem; padding: 0.75rem 0.875rem; border: 1px solid var(--pc-border, #e2e8f0); border-radius: 12px; background: var(--pc-surface, #fff); }
+.cm-stat span { font-size: 0.75rem; color: var(--pc-muted, #64748b); }
+.cm-stat strong { font-size: 1.25rem; line-height: 1.5rem; font-weight: 700; color: var(--pc-text, #0f172a); }
+.cm-stat strong small { font-size: 0.875rem; font-weight: 500; color: var(--pc-muted, #64748b); }
+.cm-stat strong em { font-style: normal; font-size: 0.8125rem; font-weight: 500; color: var(--pc-muted, #64748b); }
+.cm-stat[data-tone='warn'] strong { color: #d97706; }
+.cm-stat[data-tone='brand'] strong { color: #7c3aed; }
+.cm-stat[data-tone='danger'] strong { color: #dc2626; }
+.cm-stat[data-tone='ok'] strong { color: #047857; }
+.cm-stats:has(> :nth-child(4)) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 720px) { .cm-stats:has(> :nth-child(4)) { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+.cm-info { display: grid; gap: 0.5rem; padding: 0.75rem 0.875rem; border: 1px solid var(--pc-border, #e2e8f0); border-radius: 12px; background: #f8fafc; }
+.cm-info a.pc-btn { text-decoration: none; color: var(--pc-text, #0f172a); }
+.cm-info p { margin: 0; font-size: 0.8125rem; color: var(--pc-text, #0f172a); }
+
+.cm-listhead { display: flex; align-items: baseline; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap; padding: 0 0.125rem; }
+.cm-listhead h3 { margin: 0; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--pc-muted, #64748b); }
+.cm-listhead span { font-size: 0.75rem; color: var(--pc-muted, #64748b); }
+
 .cm-pair-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .cm-pair {
-  display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 0.5rem 0.75rem;
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; column-gap: 0.75rem; row-gap: 0.125rem;
   padding: 0.75rem 0.9rem; border: 1px solid var(--pc-border, #e2e8f0); border-radius: 12px; background: var(--pc-surface, #fff);
 }
-.cm-pair__no { font-size: 0.75rem; font-weight: 700; color: var(--pc-muted, #64748b); white-space: nowrap; }
+.cm-pair__no { grid-row: 1 / span 2; font-family: ui-monospace, monospace; font-size: 0.75rem; color: var(--pc-muted, #94a3b8); }
 .cm-pair__names { font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
-.cm-pair__phr { grid-column: 2; font-size: 0.8rem; color: var(--pc-muted, #64748b); }
+.cm-pair__phr { grid-column: 2; font-size: 0.8125rem; color: var(--pc-muted, #64748b); }
 .cm-chip {
-  grid-column: 3; grid-row: 1 / span 2; align-self: center; font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 999px;
-  background: #fef3c7; color: #92400e; white-space: nowrap;
+  grid-column: 3; grid-row: 1 / span 2; align-self: center; font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.625rem; border-radius: 999px;
+  border: 1px solid #fde68a; background: #fffbeb; color: #b45309; white-space: nowrap;
 }
-.cm-chip[data-tone='ok'] { background: #dcfce7; color: #166534; }
+.cm-chip[data-tone='ok'] { border-color: #a7f3d0; background: #ecfdf5; color: #047857; }
 .cm-note { margin: 0.25rem 0 0; }
 @media (max-width: 719px) {
   .cm-pair-list { grid-template-columns: 1fr; }
-  .cm-pair { grid-template-columns: 1fr auto; }
-  .cm-pair__no { grid-column: 1 / -1; }
-  .cm-pair__names, .cm-pair__phr { grid-column: 1; }
-  .cm-chip { grid-column: 2; grid-row: 2 / span 2; }
+  .cm-stat { padding: 0.625rem 0.75rem; }
 }

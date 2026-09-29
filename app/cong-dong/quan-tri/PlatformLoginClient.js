@@ -13,7 +13,7 @@ function retryText(response) {
 
 function ShieldIcon() {
   return (
-    <svg className="cd-shield" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg className="cd-shield" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6l7-3z" />
       <path d="M9 12l2 2 4-4" />
     </svg>
@@ -72,10 +72,14 @@ export default function PlatformLoginClient({ signedInRole }) {
   }
 
   return (
-    <section className="cd-card cd-card--narrow" aria-labelledby="cd-admin-title">
-      <ShieldIcon />
-      <h1 id="cd-admin-title" className="cd-title">Đăng nhập quản trị</h1>
-      <p className="cd-lead">Chỉ dành cho tài khoản do PickHub cấp</p>
+    <section className="cd-card cd-card--narrow cd-adminlogin" aria-labelledby="cd-admin-title">
+      <header className="cd-adminlogin__head">
+        <ShieldIcon />
+        <div>
+          <h1 id="cd-admin-title" className="cd-title">Đăng nhập quản trị</h1>
+          <p className="cd-lead">Chỉ dành cho tài khoản do PickHub cấp</p>
+        </div>
+      </header>
       {error ? <p className="cd-alert" role="alert">{error}</p> : null}
       <form className="cd-form" onSubmit={submit}>
         <div className="cd-field">

@@ -135,3 +135,27 @@ Ghi chú: một lần gọi đầu tiên vào `/pairs` ngay sau khi duyệt tr�
 - `player_accounts` TEST-CD (0900000901–904, 0900001001–1016) và các `athletes` `TEST-CD Ca G %` tạo lúc chốt.
 - Tài khoản admin hệ thống **thử** id 2 (`platform_accounts`).
 - `public_rate_limits` `player:*` của localhost (tự hết hạn).
+
+### Đối chiếu giao diện với Stitch (2026-09-29, yêu cầu "đối chiếu từng màn và điều chỉnh")
+Ảnh tham chiếu đã lưu ở `_workspace/stitch-internal-setup/canonical/community/<mã>/reference-desktop|reference-mobile/screenshot.jpg` (22 ảnh; `screen.html` cho PLC-01..03). Đối chiếu bằng trình duyệt thật ở 1280px và 390px.
+
+| Màn | PC 1280 | Mobile 390 | Ghi chú |
+|---|---|---|---|
+| Thanh trên chung | khớp | khớp | logo, chữ PickHub tím, chip "• Giải cộng đồng" |
+| PLC-01 Danh sách | khớp | khớp | số thứ tự "01…" hiện theo Stitch (đảo quyết định cũ) |
+| PLC-02/03 Tài khoản | khớp | khớp | "Thông tin thêm" **thu gọn sẵn** (Stitch mở sẵn) — giữ thu gọn cho form ngắn |
+| PLC-04 Đăng ký | khớp | khớp | dùng `section role=radiogroup` thay `fieldset` (legend đè viền thẻ) |
+| PLC-05 Rủ ghép | khớp | khớp | mobile: tab dạng viên thuốc, huy hiệu đỏ số lời mời; Stitch xếp cả 4 thẻ dọc, ta giữ chuyển tab từng thẻ |
+| PLC-06 Đơn của tôi | khớp | khớp | |
+| PLC-07 Công khai | khớp | khớp | mobile: bỏ thẻ "Đăng ký tham gia" thừa (đã có thanh cố định đáy) |
+| PLA-01 Đăng nhập admin | khớp | khớp | thanh trên chỉ còn logo + chip "Quản trị hệ thống" |
+| PLA-02 Duyệt đăng ký | khớp | khớp | mobile: thẻ đơn xếp lưới, dải thống kê cuộn ngang, thanh thao tác cố định đáy |
+| PLA-03 Danh sách + tạo giải | khớp | khớp | mobile: thanh trên gọn, ẩn chú thích trạng thái |
+| PLA-04 Bước 2 | **lệch có chủ đích** | gần khớp | nội dung Bước 2 khớp (thống kê, ghi chú, cảnh báo, danh sách cặp); khung vẫn là studio dùng chung (thanh trên + stepper), **không có sidebar admin** như Stitch PC — studio dùng chung với giải CLB nên không nhúng sidebar |
+
+Sửa gốc rễ đáng chú ý: khu `/cong-dong` đang chạy Montserrat của khung gốc (rộng hơn) trong khi Stitch dùng **Plus Jakarta Sans** → chữ xuống dòng khác hẳn. Đã tự lưu font (3 file woff2 OFL trong `app/cong-dong/fonts`, `@font-face` trong `community.css`) thay vì `next/font/google` (tải font lúc dev thất bại ngắt quãng: "Cannot read properties of null").
+
+Lệch còn lại, có chủ đích:
+- Danh sách admin giữ thêm nút "Duyệt đăng ký" / "Dựng giải" / "Điều hành" (Stitch chỉ có "Sao chép link" và "Quản lý").
+- Không có chân trang Điều khoản/Chính sách (chưa có trang đó); không có email ở chân sidebar (dữ liệu admin không có email).
+- Dữ liệu mẫu Stitch (Hà Nam, 12/16…) không phải dữ liệu thật.

@@ -124,12 +124,12 @@ export default function PartnerClient({ registrationId }) {
 
     return (
         <div className="cd-wide cd-partner">
-            <header className="cd-pagehead cd-pagehead--row">
-                <div>
+            <header className="cd-pagehead cd-pagehead--stack">
+                <div className="cd-pagehead__row">
                     <h1 className="cd-title cd-title--xl">Rủ bạn ghép cặp</h1>
-                    <p className="cd-lead">{reg.tournament.name} · {reg.division.name}{reg.tournament.eventDate ? ` · ${formatDate(reg.tournament.eventDate)}` : ''}</p>
+                    <StatusBadge tone={reg.state.tone}>{reg.state.label}</StatusBadge>
                 </div>
-                <StatusBadge tone={reg.state.tone}>{reg.state.label}</StatusBadge>
+                <p className="cd-lead">{reg.tournament.name} · {reg.division.name}{reg.tournament.eventDate ? ` · ${formatDate(reg.tournament.eventDate)}` : ''}</p>
             </header>
 
             {notice.text ? <Notice tone={notice.tone === 'error' ? 'error' : 'ok'}>{notice.text}</Notice> : null}
@@ -143,7 +143,7 @@ export default function PartnerClient({ registrationId }) {
                     <div className="cd-tabs cd-tabs--scroll cd-show-sm" role="tablist" aria-label="Cách rủ bạn">
                         {TABS.map((item) => (
                             <button key={item.key} type="button" role="tab" className="cd-tab" aria-selected={tab === item.key} onClick={() => setTab(item.key)}>
-                                {item.label}{item.key === 'incoming' && relevantInvites.length ? ` (${relevantInvites.length})` : ''}
+                                {item.label}{item.key === 'incoming' && relevantInvites.length ? <span className="cd-tabdot" aria-label={`${relevantInvites.length} lời mời`}>{relevantInvites.length}</span> : null}
                             </button>
                         ))}
                     </div>
